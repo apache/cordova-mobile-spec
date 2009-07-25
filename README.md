@@ -2,6 +2,8 @@
 
 More info coming soon.
 
+These specs are designed to run inside the device that implements it - _it will fail in the browser_.
+
 
 LICENSE
 ---
