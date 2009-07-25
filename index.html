@@ -1,0 +1,48 @@
+<html>
+  <!--
+    This file is a fully-functioning example test case. Try opening this file in Firefox, Safari,
+    or Internet Explorer to see what a running test looks like.
+    This file demonstrates the components involved in writing a simple test, such as:
+      * The necessary HTML to run a test (with the required <script> and <link rel="stylesheet"> tags),
+      * A "custom matcher" (i.e., a custom assertion) to make your tests more readable,
+      * And, a simple test with the necessary boiler-plate code to get you up and running.
+    Typically, these components are separated out into multiple files. To see what a more typical suite
+    of tests look like, look at the larger example in the examples/ directory.
+  -->
+  <head>
+    <!-- These are all of the necessary javascript and css files required to run your tests -->
+    <script src="lib/jquery-1.2.6.js"></script>
+    <script src="lib/jquery.fn.js"></script>
+    <script src="lib/jquery.print.js"></script>
+    <script src="lib/screw.builder.js"></script>
+    <script src="lib/screw.matchers.js"></script>
+    <script src="lib/screw.events.js"></script>
+    <script src="lib/screw.behaviors.js"></script>
+    <link rel="stylesheet" href="lib/screw.css">
+    
+    <script src="phonegap.js"></script>
+    
+    <script type="text/javascript">
+
+
+           getDevicePlatform = function() {
+            return device.platform || "Simulator";
+          }    
+          
+          console.log(getDevicePlatform());
+
+      
+      
+      Screw.Unit(function() {
+        describe("is device.available?", function() {
+          it("returns false", function() {
+            expect(device.available).to(equal, false);
+          });
+        });
+      });
+
+
+    </script>
+  </head>
+  <body></body>
+</html>
