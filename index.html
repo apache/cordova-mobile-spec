@@ -19,7 +19,7 @@
 	<script type="text/javascript" src="JSSpec.js"></script>
     <script src="phonegap.js"></script>
     <script type="text/javascript">
-describe('Device information (window.Device)', {
+describe('Device information (window.device)', {
 	'Should contain a platform specification': function() {
 		value_of(window.device.platform).should_have_at_least(1,"characters");
 	},
@@ -88,7 +88,7 @@ describe('Geolocation model', {
 		value_of(pos).should_include("coords");
 		value_of(pos).should_include("timestamp");
 	},
-	'Should define a Coordinates object with latitude, longitude, accuracy, altitude, heading and speed': function() {
+	'Should define a Coordinates object with latitude, longitude, accuracy, altitude, heading and speed properties': function() {
 		var coords = new Coordinates(1,2,3,4,5,6);
 		value_of(coords).should_not_be_null();
 		value_of(coords).should_include("latitude");
