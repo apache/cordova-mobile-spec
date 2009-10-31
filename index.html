@@ -21,16 +21,16 @@
     <script type="text/javascript">
 describe('Device information (window.Device)', {
 	'Should contain a platform specification': function() {
-		value_of(window.Device.platform).should_have_at_least(1,"characters");
+		value_of(window.device.platform).should_have_at_least(1,"characters");
 	},
 	'Should contain a version specification': function() {
-		value_of(window.Device.version).should_have_at_least(1,"characters");
+		value_of(window.device.version).should_have_at_least(1,"characters");
 	},
 	'Should contain a name specification': function() {
-		value_of(window.Device.name).should_have_at_least(1,"characters");
+		value_of(window.device.name).should_have_at_least(1,"characters");
 	},
 	'Should contain a UUID specification': function() {
-		value_of(window.Device.uuid).should_have_at_least(1,"characters");
+		value_of(window.device.uuid).should_have_at_least(1,"characters");
 	}
 })
 describe('Accelerometer functionality (navigator.accelerometer)', {
