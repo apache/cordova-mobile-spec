@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
   <!--
     This file is a fully-functioning example test case. Try opening this file in Firefox, Safari,
     or Internet Explorer to see what a running test looks like.
@@ -10,39 +11,46 @@
     of tests look like, look at the larger example in the examples/ directory.
   -->
   <head>
+  	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  	<title>JSSpec results for PhoneGap JS API</title>
     <!-- These are all of the necessary javascript and css files required to run your tests -->
-    <script src="lib/jquery-1.2.6.js"></script>
-    <script src="lib/jquery.fn.js"></script>
-    <script src="lib/jquery.print.js"></script>
-    <script src="lib/screw.builder.js"></script>
-    <script src="lib/screw.matchers.js"></script>
-    <script src="lib/screw.events.js"></script>
-    <script src="lib/screw.behaviors.js"></script>
-    <link rel="stylesheet" href="lib/screw.css">
-    
+    <link rel="stylesheet" type="text/css" href="JSSpec.css" />
+	<script type="text/javascript" src="diff_match_patch.js"></script>
+	<script type="text/javascript" src="JSSpec.js"></script>
     <script src="phonegap.js"></script>
-    
     <script type="text/javascript">
-
-
-           getDevicePlatform = function() {
-            return device.platform || "Simulator";
-          }    
-          
-          console.log(getDevicePlatform());
-
-      
-      
-      Screw.Unit(function() {
-        describe("is device.available?", function() {
-          it("returns false", function() {
-            expect(device.available).to(equal, false);
-          });
-        });
-      });
-
-
-    </script>
-  </head>
-  <body></body>
+describe('Device information (window.Device)', {
+	'Should contain a platform specification': function() {
+		value_of(window.Device.platform).should_have_at_least(1,"characters");
+	},
+	'Should contain a version specification': function() {
+		value_of(window.Device.version).should_have_at_least(1,"characters");
+	},
+	'Should contain a name specification': function() {
+		value_of(window.Device.name).should_have_at_least(1,"characters");
+	},
+	'Should contain a UUID specification': function() {
+		value_of(window.Device.uuid).should_have_at_least(1,"characters");
+	}
+})
+describe('Accelerometer functionality (navigator.accelerometer)', {
+	'Should have a getCurrentAcceleration function': function() {
+		value_of(navigator.accelerometer).should_include("getCurrentAcceleration");
+	},
+	'Should have a watchAcceleration function': function() {
+		value_of(navigator.accelerometer).should_include("watchAcceleration");
+	},
+	'Should have a clearWatch function': function() {
+		value_of(navigator.accelerometer).should_include("clearWatch");
+	}
+})
+describe('Camera functionality (navigator.camera)', {
+	'Should have a getPicture function': function() {
+		value_of(navigator.camera).should_include("getPicture");
+	}
+})
+	</script>
+	</head>
+	<body>
+	</body>
 </html>
