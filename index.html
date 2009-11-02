@@ -66,6 +66,18 @@ describe('Geolocation functionality (navigator.geolocation)', {
 	},
 	'Should have a watchPosition function': function() {
 		value_of(navigator.geolocation).should_include("watchPosition");
+	},
+	'Should return Position objects from its getCurrentPosition function': function() {
+		var win = function(position) {
+			value_of(position).should_not_be_null();
+			value_of(position).should_include("coords");
+			value_of(position).should_include("timestamp");
+		};
+		var fail = function() {
+			// Force failure if failure callback? That *is* expected behaviour...
+			// value_of(this).should_fail('');
+		};
+		navigator.geolocation.getCurrentPosition(win, fail, {});
 	}
 })
 describe('Network functionality (navigator.network)', {
@@ -97,6 +109,26 @@ describe('Geolocation model', {
 		value_of(coords).should_include("altitude");
 		value_of(coords).should_include("heading");
 		value_of(coords).should_include("speed");
+	}
+})
+describe('Media functionality', {
+	'Should be able to create a Media object and instantiate its members': function() {
+		var src = '/some/dir/test.mp3';
+		var win = function() {};
+		var fail = function() {};
+		var m = new Media(src, win, fail);
+		value_of(m).should_include("src");
+		value_of(m).should_include("successCallback");
+		value_of(m).should_include("errorCallback");
+		value_of(m.src).should_be(src);
+		value_of(typeof(m.play)).should_be("function");
+		value_of(typeof(m.record)).should_be("function");
+		value_of(typeof(m.pause)).should_be("function");
+		value_of(typeof(m.stop)).should_be("function");
+		value_of(typeof(m.successCallback)).should_be("function");
+		value_of(typeof(m.errorCallback)).should_be("function");
+	},
+	'Should throw an error when referencing a non-existent media file': function() {
 	}
 })
 	</script>
