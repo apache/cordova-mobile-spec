@@ -1,8 +1,12 @@
 ## Mobile Spec Suite ##
 
-More info coming soon.
+These specs are designed to run inside the mobile device that implements it - _it will fail in the DESKTOP browser_.
 
-These specs are designed to run inside the device that implements it - _it will fail in the browser_.
+You should include the PhoneGap JavaScript file (phonegap.js) in this project.
+
+The goal is to test mobile device functionality inside a mobile browser.
+Where possible, the PhoneGap API lines up with HTML 5 spec. Maybe down
+the road we could use this spec for parts of HTML 5, too :)
 
 
 LICENSE
