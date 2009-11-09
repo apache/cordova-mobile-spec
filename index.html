@@ -99,10 +99,18 @@ describe('Geolocation model', {
 		value_of(coords).should_include("speed");
 	}
 })
-describe('File API', 'Should include a read and write method' : function() {
+describe('Media API', {
+	'Should define a Media object with a Source' : function () { 
+		var media = new Media();
+		value_of(media).should_not_be_null();
+		value_of(media).should_include("play");
+		value_of(media).should_include("stop");
+	}
+})
+describe('File API', {'Should include a read and write method' : function() {
   value_of(navigator.file).should_include("read");
   value_of(navigator.file).should_include("write");
-})
+}})
 	</script>
 	</head>
 	<body>
