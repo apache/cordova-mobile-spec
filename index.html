@@ -49,11 +49,6 @@ describe('Camera functionality (navigator.camera)', {
 		value_of(navigator.camera).should_include("getPicture");
 	}
 })
-describe('Contacts functionality (navigator.ContactManager)', {
-	'Should have a getAllContacts function': function() {
-		value_of(navigator.ContactManager).should_include("getAllContacts");
-	}
-})
 describe('Geolocation functionality (navigator.geolocation)', {
 	'Should have an initially null lastPosition property': function() {
 		value_of(navigator.geolocation.lastPosition).should_be_null(); 
@@ -111,6 +106,59 @@ describe('File API', {'Should include a read and write method' : function() {
   value_of(navigator.file).should_include("read");
   value_of(navigator.file).should_include("write");
 }})
+describe('Contact Model', {
+  'Should define the Contact Model with names, phones, and other data': function() {
+    var contact = new Contact();
+    value_of(contact).should_include('givenNames');
+    value_of(contact).should_include('familyNames');
+    value_of(contact).should_include('phones');
+    value_of(contact).should_include('category);
+    value_of(contact).should_include('companyName');
+    value_of(contact).should_include('isCompany');
+    value_of(contact).should_include('email');
+    value_of(contact).should_include('addresses');
+    value_of(contact).should_include('uri');
+    value_of(contact).should_include('prefix');
+    value_of(contact).should_include('jobTitle');
+    value_of(contact).should_include('birthday');
+    value_of(contact).should_include('phoneticName');
+  }
+})
+describe('Address Model', {
+  'Should define the address with street, postal code, etc.': function() {
+    var address = new Address();
+    value_of(address).should_include('street');
+    value_of(address).should_include('postalCode');
+    value_of(address).should_include('city');
+    value_of(address).should_include('region');
+    value_of(address).should_include('countryCode');
+    value_of(address).should_include('country');
+    value_of(address).should_include('building');
+    value_of(address).should_include('floor');
+    value_of(address).should_include('accessCode');
+  }
+})
+describe('Phone Number Model', {
+  'Should define the phone number with a number and a type' : function() {
+  var phone_no = new PhoneNumber();
+  value_of(phone_no).should_include('number');
+  value_of(phone_no).should_include('type');
+  }
+})
+describe('Email Model', {
+  'Should define the e-mail address with an email and a type' : function() {
+    var email = new Email();
+    value_of(email).should_include('address');
+    value_of(email).should_include('type');
+  }
+})
+describe('AddressBook', {
+  'Should define the addressBook with the CRUD functions' : function() {
+    value_of(navigator.AddressBook).should_include('addContact');
+    value_of(navigator.AddressBook).should_include('removeContact');
+    value_of(navigator.AddressBook).should_include('findContacts'); 
+  }
+})
 	</script>
 	</head>
 	<body>
