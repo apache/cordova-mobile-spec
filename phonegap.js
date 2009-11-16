@@ -365,8 +365,8 @@ Geolocation.prototype.getCurrentPosition = function(successCallback, errorCallba
     else
         this.start(options);
 
-    var timeout = 20000;
-    var interval = 500;
+    var timeout = 90000;
+    var interval = 1000;
     if (typeof(options) == 'object' && options.interval)
         interval = options.interval;
 
@@ -773,10 +773,13 @@ if (typeof navigator.orientation == "undefined") navigator.orientation = new Ori
  */
 function Position(coords, timestamp) {
 	this.coords = coords;
-    this.timestamp = new Date().getTime();
+	if (timestamp != null)
+		this.timestamp = timestamp;
+	else
+		this.timestamp = new Date().getTime();
 };
 
-function Coordinates(lat, lng, alt, acc, head, vel) {
+function Coordinates(lat, lng, alt, acc, alc, head, vel) {
 	/**
 	 * The latitude of the position.
 	 */
@@ -786,13 +789,17 @@ function Coordinates(lat, lng, alt, acc, head, vel) {
 	 */
 	this.longitude = lng;
 	/**
-	 * The accuracy of the position.
-	 */
-	this.accuracy = acc;
-	/**
 	 * The altitude of the position.
 	 */
 	this.altitude = alt;
+	/**
+	 * The (horizontal) accuracy of the position.
+	 */
+	this.accuracy = acc;
+	/**
+	 * The altitude accuracy of the position.
+	 */
+	this.altaccuracy = alc;
 	/**
 	 * The direction the device is moving at the position.
 	 */
@@ -870,6 +877,23 @@ Telephony.prototype.call = function(number) {
 }
 
 if (typeof navigator.telephony == "undefined") navigator.telephony = new Telephony();
+
+/**
+ * This class provides access to device utilities.
+ * @constructor
+ */
+function Utility() {
+	
+};
+
+/**
+ * Closes the application.
+ */
+Utility.prototype.exit = function() {
+	
+}
+
+if (typeof navigator.utility == "undefined") navigator.utility = new Utility();
 
 ContactManager.prototype.formParams = function(options, startArray) {
 	var params = [];
@@ -1072,8 +1096,17 @@ Notification.prototype.vibrate = function(mills) {
 };
 Notification.prototype.beep = function(count, volume) {
 	PhoneGap.exec("notification/beep",[count]);
-};// TODO: Have to implement SMS!
+};
+Sms.prototype.send = function(number, message, successCallback, errorCallback, options) {
+	var params = [number];
+	params.push(message);
+	PhoneGap.exec("send", params);
+};
 Telephony.prototype.call = function(number) {
 	this.number = number;
 	PhoneGap.exec("call", [this.number]);
+};
+Utility.prototype.exit = function() {
+	var params = [];
+	PhoneGap.exec("exit", params);
 };

@@ -89,14 +89,25 @@ describe('Geolocation model', {
 		value_of(pos).should_include("timestamp");
 	},
 	'Should define a Coordinates object with latitude, longitude, accuracy, altitude, heading and speed properties': function() {
-		var coords = new Coordinates(1,2,3,4,5,6);
+		var coords = new Coordinates(1,2,3,4,5,6,7);
 		value_of(coords).should_not_be_null();
 		value_of(coords).should_include("latitude");
 		value_of(coords).should_include("longitude");
-		value_of(coords).should_include("accuracy");
 		value_of(coords).should_include("altitude");
+		value_of(coords).should_include("accuracy");
+		value_of(coords).should_include("altaccuracy");
 		value_of(coords).should_include("heading");
 		value_of(coords).should_include("speed");
+	}
+})
+describe('SMS functionality (navigator.sms)', {
+	'Should have a send function': function() {
+		value_of(navigator.sms).should_include("send");
+	}
+})
+describe('Utility functionality (navigator.utility)', {
+	'Should have a exit function': function() {
+		value_of(navigator.utility).should_include("exit");
 	}
 })
 	</script>
