@@ -18,132 +18,16 @@
 	<script type="text/javascript" src="diff_match_patch.js"></script>
 	<script type="text/javascript" src="JSSpec.js"></script>
     <script src="phonegap.js"></script>
+	<script src="tests/device.tests.js"></script>
+	<script src="tests/accelerometer.tests.js"></script>
+	<script src="tests/camera.tests.js"></script>
+	<script src="tests/file.tests.js"></script>
+	<script src="tests/geolocation.tests.js"></script>
+	<script src="tests/network.tests.js"></script>
+	<script src="tests/notification.tests.js"></script>
+	<script src="tests/sms.tests.js"></script>
+	<script src="tests/addressbook.tests.js"></script>
     <script type="text/javascript">
-describe('Device information (window.device)', {
-	'Should contain a platform specification': function() {
-		value_of(window.device.platform).should_have_at_least(1,"characters");
-	},
-	'Should contain a version specification': function() {
-		value_of(window.device.version).should_have_at_least(1,"characters");
-	},
-	'Should contain a name specification': function() {
-		value_of(window.device.name).should_have_at_least(1,"characters");
-	},
-	'Should contain a UUID specification': function() {
-		value_of(window.device.uuid).should_have_at_least(1,"characters");
-	}
-})
-describe('Accelerometer functionality (navigator.accelerometer)', {
-	'Should have a getCurrentAcceleration function': function() {
-		value_of(navigator.accelerometer).should_include("getCurrentAcceleration");
-	},
-	'Should have a watchAcceleration function': function() {
-		value_of(navigator.accelerometer).should_include("watchAcceleration");
-	},
-	'Should have a clearWatch function': function() {
-		value_of(navigator.accelerometer).should_include("clearWatch");
-	}
-})
-describe('Camera functionality (navigator.camera)', {
-	'Should have a getPicture function': function() {
-		value_of(navigator.camera).should_include("getPicture");
-	}
-})
-describe('Geolocation functionality (navigator.geolocation)', {
-	'Should have an initially null lastPosition property': function() {
-		value_of(navigator.geolocation.lastPosition).should_be_null(); 
-	},
-	'Should have a callbacks object': function() {
-		value_of(navigator.geolocation).should_include("callbacks");
-	},
-	'Should have a getCurrentPosition function': function() {
-		value_of(navigator.geolocation).should_include("getCurrentPosition");
-	},
-	'Should have a watchPosition function': function() {
-		value_of(navigator.geolocation).should_include("watchPosition");
-	},
-	'Should return Position objects from its getCurrentPosition function': function() {
-		var win = function(position) {
-			value_of(position).should_not_be_null();
-			value_of(position).should_include("coords");
-			value_of(position).should_include("timestamp");
-		};
-		var fail = function() {
-			// Force failure if failure callback? That *is* expected behaviour...
-			// value_of(this).should_fail('');
-		};
-		navigator.geolocation.getCurrentPosition(win, fail, {});
-	}
-})
-describe('Network functionality (navigator.network)', {
-	'Should have a isReachable function': function() {
-		value_of(navigator.network).should_include("isReachable");
-	}
-})
-describe('Notification functionality (navigator.notification)', {
-	'Should have a vibrate function': function() {
-		value_of(navigator.notification).should_include("vibrate");
-	},
-	'Should have a beep function': function() {
-		value_of(navigator.notification).should_include("beep");
-	}
-})
-describe('Geolocation model', {
-	'Should define a Position object with coords and timestamp properties': function() {
-		var pos = new Position({});
-		value_of(pos).should_not_be_null();
-		value_of(pos).should_include("coords");
-		value_of(pos).should_include("timestamp");
-	},
-	'Should define a Coordinates object with latitude, longitude, accuracy, altitude, heading and speed properties': function() {
-		var coords = new Coordinates(1,2,3,4,5,6,7);
-		value_of(coords).should_not_be_null();
-		value_of(coords).should_include("latitude");
-		value_of(coords).should_include("longitude");
-		value_of(coords).should_include("altitude");
-		value_of(coords).should_include("accuracy");
-		value_of(coords).should_include("altaccuracy");
-		value_of(coords).should_include("heading");
-		value_of(coords).should_include("speed");
-	}
-})
-describe('Media functionality', {
-	'Should be able to create a Media object and instantiate its members': function() {
-		var src = '/some/dir/test.mp3';
-		var win = function() {};
-		var fail = function() {};
-		var m = new Media(src, win, fail);
-		value_of(m).should_include("src");
-		value_of(m).should_include("successCallback");
-		value_of(m).should_include("errorCallback");
-		value_of(m.src).should_be(src);
-		value_of(typeof(m.play)).should_be("function");
-		value_of(typeof(m.record)).should_be("function");
-		value_of(typeof(m.pause)).should_be("function");
-		value_of(typeof(m.stop)).should_be("function");
-	},
-	'Should throw an error when referencing a non-existent media file': function() {
-	}
-})
-describe('File functionality (navigator.file)', {
-	'Should include a read and write method': function() {
-		value_of(navigator.file).should_include("read");
-		value_of(navigator.file).should_include("write");
-	}
-})
-describe('SMS functionality (navigator.sms)', {
-	'Should have a send function': function() {
-		value_of(navigator.sms).should_include("send");
-	}
-})
-describe('Address Book functionality (navigator.AddressBook)', {
-  'Should define the AddressBook with the CRUD functions' : function() {
-	value_of(navigator.AddressBook).should_not_be_null();
-    value_of(navigator.AddressBook).should_include('addContact');
-    value_of(navigator.AddressBook).should_include('removeContact');
-    value_of(navigator.AddressBook).should_include('findContacts'); 
-  }
-})
 /**
  * Not sure whether this is necessary or whether it should be part of a mobile device API. Need to get more input on it.
  ** 
