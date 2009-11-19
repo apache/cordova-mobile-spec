@@ -1,4 +1,7 @@
 describe('Device information (window.device)', {
+	'Should exist' : function() {
+		value_of(window.device).should_not_be_null();
+	},
 	'Should contain a platform specification': function() {
 		value_of(window.device.platform).should_have_at_least(1,"characters");
 	},

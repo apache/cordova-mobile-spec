@@ -1,4 +1,7 @@
 describe('Geolocation functionality (navigator.geolocation)', {
+	'Should exist' : function() {
+		value_of(navigator.geolocation).should_not_be_null();
+	},
 	'Should have an initially null lastPosition property': function() {
 		value_of(navigator.geolocation.lastPosition).should_be_null(); 
 	},
@@ -7,9 +10,11 @@ describe('Geolocation functionality (navigator.geolocation)', {
 	},
 	'Should have a getCurrentPosition function': function() {
 		value_of(navigator.geolocation).should_include("getCurrentPosition");
+		value_of(typeof navigator.geolocation.getCurrentPosition).should_be('function');
 	},
 	'Should have a watchPosition function': function() {
 		value_of(navigator.geolocation).should_include("watchPosition");
+		value_of(typeof navigator.geolocation.watchPosition).should_be('function');
 	},
 	'Should return Position objects from its getCurrentPosition function': function() {
 		var win = function(position) {
