@@ -1,50 +1,41 @@
-describe('Geolocation functionality (navigator.geolocation)', {
-	'Should exist' : function() {
-		value_of(navigator.geolocation).should_not_be_null();
-	},
-	'Should have an initially null lastPosition property': function() {
-		value_of(navigator.geolocation.lastPosition).should_be_null(); 
-	},
-	'Should have a callbacks object': function() {
-		value_of(navigator.geolocation).should_include("callbacks");
-	},
-	'Should have a getCurrentPosition function': function() {
-		value_of(navigator.geolocation).should_include("getCurrentPosition");
-		value_of(typeof navigator.geolocation.getCurrentPosition).should_be('function');
-	},
-	'Should have a watchPosition function': function() {
-		value_of(navigator.geolocation).should_include("watchPosition");
-		value_of(typeof navigator.geolocation.watchPosition).should_be('function');
-	},
-	'Should return Position objects from its getCurrentPosition function': function() {
-		var win = function(position) {
-			value_of(position).should_not_be_null();
-			value_of(position).should_include("coords");
-			value_of(position).should_include("timestamp");
-			value_of(typeof position.timestamp).should_be();
-		};
-		var fail = function() {
-			// Failing is expected behaviour, but we need to be able to control the conditions surrounding failure.
-		};
-		navigator.geolocation.getCurrentPosition(win, fail, {});
-	}
-})
-describe('Geolocation model', {
-	'Should define a Position object with coords and timestamp properties': function() {
-		var pos = new Position({});
-		value_of(pos).should_not_be_null();
-		value_of(pos).should_include("coords");
-		value_of(pos).should_include("timestamp");
-	},
-	'Should define a Coordinates object with latitude, longitude, accuracy, altitude, heading and speed properties': function() {
+Tests.prototype.GeoLocationTests = function() {	
+	module('Geolocation (navigator.geolocation)');
+	test("should exist", function() {
+  		expect(1);
+  		ok(navigator.geolocation != null, "navigator.geolocation is null!");
+	});
+	test("should have an initially null lastPosition property", function() {
+  		expect(1);
+  		ok(navigator.geolocation.lastPosition == null, "navigator.geolocation.lastPosition is not initially null!");
+	});
+	test("should contain a getCurrentPosition function", function() {
+		expect(2);
+		ok(navigator.geolocation.getCurrentPosition != null, "navigator.geolocation.getCurrentPosition is null!");
+		ok(typeof navigator.geolocation.getCurrentPosition == 'function', "navigator.geolocation.getCurrentPosition is not a function!");
+	});
+	test("should contain a watchPosition function", function() {
+		expect(2);
+		ok(navigator.geolocation.watchPosition != null, "navigator.geolocation.watchPosition is null!");
+		ok(typeof navigator.geolocation.watchPosition == 'function', "navigator.geolocation.watchPosition is not a function!");
+	});
+	// TODO: Test callbacks for geo.
+	module('Geolocation model');
+	test("should be able to define a Position object with coords and timestamp properties", function() {
+		expect(3);
+		var pos = new Position();
+		ok(pos != null, "new Position() is null!");
+		ok(pos.coords != null, "new Position() does not include a 'coords' property!");
+		ok(pos.timestamp != null, "new Position() does not include a 'timestamp' property!");
+	});
+	test("should be able to define a Coordinates object with latitude, longitude, accuracy, altitude, heading and speed properties", function() {
+		expect(8);
 		var coords = new Coordinates(1,2,3,4,5,6,7);
-		value_of(coords).should_not_be_null();
-		value_of(coords).should_include("latitude");
-		value_of(coords).should_include("longitude");
-		value_of(coords).should_include("altitude");
-		value_of(coords).should_include("accuracy");
-		value_of(coords).should_include("altaccuracy");
-		value_of(coords).should_include("heading");
-		value_of(coords).should_include("speed");
-	}
-})
+		ok(coords != null, "new Coordinates() is null!");
+		ok(coords.latitude != null, "new Coordinates() does not include a 'latitude' property!");
+		ok(coords.longitude != null, "new Coordinates() does not include a 'longitude' property!");
+		ok(coords.accuracy != null, "new Coordinates() does not include a 'accuracy' property!");
+		ok(coords.altitude != null, "new Coordinates() does not include a 'altitude' property!");
+		ok(coords.heading != null, "new Coordinates() does not include a 'heading' property!");
+		ok(coords.speed != null, "new Coordinates() does not include a 'speed' property!");
+	});
+};

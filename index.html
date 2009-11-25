@@ -1,45 +1,39 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-  <!--
-    This file is a fully-functioning example test case. Try opening this file in Firefox, Safari,
-    or Internet Explorer to see what a running test looks like.
-    This file demonstrates the components involved in writing a simple test, such as:
-      * The necessary HTML to run a test (with the required <script> and <link rel="stylesheet"> tags),
-      * A "custom matcher" (i.e., a custom assertion) to make your tests more readable,
-      * And, a simple test with the necessary boiler-plate code to get you up and running.
-    Typically, these components are separated out into multiple files. To see what a more typical suite
-    of tests look like, look at the larger example in the examples/ directory.
-  -->
   <head>
   	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-  	<title>JSSpec results for PhoneGap JS API</title>
-    <!-- These are all of the necessary javascript and css files required to run your tests -->
-    <link rel="stylesheet" type="text/css" href="JSSpec.css" />
-	<script type="text/javascript" src="diff_match_patch.js"></script>
-	<script type="text/javascript" src="JSSpec.js"></script>
-    <script src="phonegap.js"></script>
-	<script src="tests/accelerometer.tests.js"></script>
-	<script src="tests/addressbook.tests.js"></script>
-	<script src="tests/camera.tests.js"></script>
-	<script src="tests/device.tests.js"></script>
-	<script src="tests/file.tests.js"></script>
-	<script src="tests/geolocation.tests.js"></script>
-	<script src="tests/network.tests.js"></script>
-	<script src="tests/notification.tests.js"></script>
-	<script src="tests/sms.tests.js"></script>
-	<script src="tests/telephony.tests.js"></script>
-    <script type="text/javascript">
-/**
- * Not sure whether this is necessary or whether it should be part of a mobile device API. Need to get more input on it.
- ** 
-describe('Utility functionality (navigator.utility)', {
-	'Should have a exit function': function() {
-		value_of(navigator.utility).should_include("exit");
-	}
-})
-*/
+  	<title>QUnit results for PhoneGap JS API</title>
+    <!-- You need the following two files in the same directory for QUnit to run. -->
+    <link rel="stylesheet" type="text/css" href="qunit.css" />
+	<script type="text/javascript" src="qunit.js"></script>
+	<!-- Make sure you copy in phonegap.js from the PhoneGap repository (that's what you're testing, right?) -->
+    <script type="text/javascript" src="phonegap.js"></script>
+	<script type="text/javascript">
+		function Tests() {}
+		var tests = new Tests();
+		function run() {
+			for (var t in tests) {
+				if (t.indexOf('Tests') > -1) {
+					tests[t]();
+				}
+			} 
+		}
 	</script>
+	<script type="text/javascript" src="tests/accelerometer.tests.js"></script>
+	<script type="text/javascript" src="tests/addressbook.tests.js"></script>
+	<script type="text/javascript" src="tests/camera.tests.js"></script>
+	<script type="text/javascript" src="tests/device.tests.js"></script>
+	<script type="text/javascript" src="tests/file.tests.js"></script>
+	<script type="text/javascript" src="tests/geolocation.tests.js"></script>
+	<script type="text/javascript" src="tests/network.tests.js"></script>
+	<script type="text/javascript" src="tests/notification.tests.js"></script>
+	<script type="text/javascript" src="tests/sms.tests.js"></script>
+	<script type="text/javascript" src="tests/telephony.tests.js"></script>
 	</head>
-	<body>
+	<body onload="run();">
+		<h1 id="qunit-header">Mobile Spec (PhoneGap) Tests</h1>
+		<h2 id="qunit-banner"></h2>
+		<h2 id="qunit-userAgent"></h2>
+		<ol id="qunit-tests"></ol>
 	</body>
 </html>

@@ -1,13 +1,27 @@
-describe('Address Book functionality (navigator.AddressBook)', {
-  'Should exist' : function() {
-	value_of(navigator.AddressBook).should_not_be_null();
-  },
-  'Should define the AddressBook with the CRUD functions' : function() {
-    value_of(navigator.AddressBook).should_include('addContact');
-	value_of(typeof navigator.AddressBook.addContact).should_be('function');
-    value_of(navigator.AddressBook).should_include('removeContact');
-	value_of(typeof navigator.AddressBook.removeContact).should_be('function');
-    value_of(navigator.AddressBook).should_include('findContacts'); 
-	value_of(typeof navigator.AddressBook.findContacts).should_be('function');
-  }
-})
+Tests.prototype.AddressBookTests = function() {
+	module('Address Book (navigator.AddressBook)');
+	test("should exist", function() {
+  		expect(1);
+  		ok(navigator.AddressBook != null, "navigator.AddressBook is null!");
+	});
+	test("should contain an addContact function", function() {
+		expect(2);
+		ok(navigator.AddressBook.addContact != null, "navigator.AddressBook.addContact is null!");
+		ok(typeof navigator.AddressBook.addContact == 'function', "navigator.AddressBook.addContact is not a function!");
+	});
+	test("should contain a removeContact function", function() {
+		expect(2);
+		ok(navigator.AddressBook.removeContact != null, "navigator.AddressBook.removeContact is null!");
+		ok(typeof navigator.AddressBook.removeContact == 'function', "navigator.AddressBook.removeContact is not a function!");
+	});
+	test("should contain an updateContact function", function() {
+		expect(2);
+		ok(navigator.AddressBook.updateContact != null, "navigator.AddressBook.updateContact is null!");
+		ok(typeof navigator.AddressBook.updateContact == 'function', "navigator.AddressBook.updateContact is not a function!");
+	});
+	test("should contain a findContacts function", function() {
+		expect(2);
+		ok(navigator.AddressBook.findContacts != null, "navigator.AddressBook.findContacts is null!");
+		ok(typeof navigator.AddressBook.findContacts == 'function', "navigator.AddressBook.findContacts is not a function!");
+	});
+};

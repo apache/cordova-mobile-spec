@@ -1,9 +1,12 @@
-describe('Telephony functionality (navigator.telephony)', {
-  'Should exist' : function() {
-	value_of(navigator.telephony).should_not_be_null();
-  },
-  'Should have a send function' : function() {
-	value_of(navigator.telephony).should_include('send');
-	value_of(typeof navigator.telephony.send).should_be('function');
-  }
-})
+Tests.prototype.TelephonyTests = function() {	
+	module('Telephony (navigator.telephony)');
+	test("should exist", function() {
+  		expect(1);
+  		ok(navigator.telephony != null, "navigator.telephony is null!");
+	});
+	test("should contain a send function", function() {
+		expect(2);
+		ok(navigator.telephony.send != null, "navigator.telephony.send is null!");
+		ok(typeof navigator.telephony.send == 'function', "navigator.telephony.send is not a function!");
+	});
+};
