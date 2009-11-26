@@ -28,7 +28,7 @@ Tests.prototype.GeoLocationTests = function() {
 		ok(pos.timestamp != null, "new Position() should include a 'timestamp' property.");
 	});
 	test("should be able to define a Coordinates object with latitude, longitude, accuracy, altitude, heading and speed properties", function() {
-		expect(8);
+		expect(7);
 		var coords = new Coordinates(1,2,3,4,5,6,7);
 		ok(coords != null, "new Coordinates() should not be null.");
 		ok(coords.latitude != null, "new Coordinates() should include a 'latitude' property.");
