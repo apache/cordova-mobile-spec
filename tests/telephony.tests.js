@@ -2,11 +2,11 @@ Tests.prototype.TelephonyTests = function() {
 	module('Telephony (navigator.telephony)');
 	test("should exist", function() {
   		expect(1);
-  		ok(navigator.telephony != null, "navigator.telephony is null!");
+  		ok(navigator.telephony != null, "navigator.telephony should not be null.");
 	});
 	test("should contain a send function", function() {
 		expect(2);
-		ok(navigator.telephony.send != null, "navigator.telephony.send is null!");
-		ok(typeof navigator.telephony.send == 'function', "navigator.telephony.send is not a function!");
+		ok(navigator.telephony.send != null, "navigator.telephony.send should not be null.");
+		ok(typeof navigator.telephony.send == 'function', "navigator.telephony.send should be a function.");
 	});
 };
