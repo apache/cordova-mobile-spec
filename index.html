@@ -9,8 +9,13 @@
 	<!-- Make sure you copy in phonegap.js from the PhoneGap repository (that's what you're testing, right?) -->
     <script type="text/javascript" src="phonegap.js"></script>
 	<script type="text/javascript">
-		function Tests() {}
+		var 
+		function Tests() {
+			this.TEST_TIMEOUT = 10000;
+		};
 		var tests = new Tests();
+		
+		// Runs each function in Tests that contains 'Tests' in the name.
 		function run() {
 			for (var t in tests) {
 				if (t.indexOf('Tests') > -1) {
@@ -20,7 +25,7 @@
 		}
 	</script>
 	<script type="text/javascript" src="tests/accelerometer.tests.js"></script>
-	<script type="text/javascript" src="tests/addressbook.tests.js"></script>
+	<script type="text/javascript" src="tests/contacts.tests.js"></script>
 	<script type="text/javascript" src="tests/camera.tests.js"></script>
 	<script type="text/javascript" src="tests/device.tests.js"></script>
 	<script type="text/javascript" src="tests/file.tests.js"></script>

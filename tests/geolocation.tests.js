@@ -18,7 +18,17 @@ Tests.prototype.GeoLocationTests = function() {
 		ok(navigator.geolocation.watchPosition != null, "navigator.geolocation.watchPosition should not be null.");
 		ok(typeof navigator.geolocation.watchPosition == 'function', "navigator.geolocation.watchPosition should be a function.");
 	});
-	// TODO: Test callbacks for geo.
+	test("getCurrentPosition success callback should be called with a Position object", function() {
+		expect(2);
+		stop(tests.TEST_TIMEOUT);
+		var win = function(p) {
+			ok(p.coords != null, "Position object returned in getCurrentPosition success callback has a 'coords' property.");
+			ok(p.timestamp != null, "Position object returned in getCurrentPosition success callback has a 'timestamp' property.");
+			start();
+		};
+		var fail = function() { start(); };
+		navigator.geolocation.getCurrentPosition(win, fail);
+	});
 	module('Geolocation model');
 	test("should be able to define a Position object with coords and timestamp properties", function() {
 		expect(3);
