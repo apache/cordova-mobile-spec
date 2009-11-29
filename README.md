@@ -2,7 +2,10 @@
 
 These specs are designed to run inside the mobile device that implements it - _it will fail in the DESKTOP browser_.
 
-You should include the PhoneGap JavaScript file (phonegap.js) in this project.
+These set of tests is designed to be used with PhoneGap. You should initialize a fresh PhoneGap repository (git clone 
+git://github.com/phonegap/phonegap.git) and then toss these files into the www or assets folder, replacing the
+contents. Make sure you include phonegap.js - each platform directory in the PhoneGap repository has a build or make
+file, which will create a phonegap.js file for you (and in most cases copy it into the www or assets folder).
 
 The goal is to test mobile device functionality inside a mobile browser.
 Where possible, the PhoneGap API lines up with HTML 5 spec. Maybe down
