@@ -19,11 +19,12 @@ Tests.prototype.GeoLocationTests = function() {
 		ok(typeof navigator.geolocation.watchPosition == 'function', "navigator.geolocation.watchPosition should be a function.");
 	});
 	test("getCurrentPosition success callback should be called with a Position object", function() {
-		expect(2);
+		expect(3);
 		stop(tests.TEST_TIMEOUT);
 		var win = function(p) {
 			ok(p.coords != null, "Position object returned in getCurrentPosition success callback has a 'coords' property.");
 			ok(p.timestamp != null, "Position object returned in getCurrentPosition success callback has a 'timestamp' property.");
+			equals(p, navigator.geolocation.lastPosition, "Position object returned in getCurrentPosition success callback equals navigator.geolocation.lastPosition.");
 			start();
 		};
 		var fail = function() { start(); };
