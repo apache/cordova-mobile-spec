@@ -30,6 +30,7 @@ Tests.prototype.GeoLocationTests = function() {
 		var fail = function() { start(); };
 		navigator.geolocation.getCurrentPosition(win, fail);
 	});
+	// TODO: Need to test watchPosition success callback, test that makes sure clearPosition works (how to test that a timer is getting cleared?)
 	module('Geolocation model');
 	test("should be able to define a Position object with coords and timestamp properties", function() {
 		expect(3);
