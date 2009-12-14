@@ -12,6 +12,17 @@ Tests.prototype.ContactsTests = function() {
 	// TODO: Need to add tests for the find function. Need to be able to include test data, but how? How do we add a contact 
 	// 		 to the phone before running the test?
 	// TODO: Need to include tests that check error-handling, doubt there is any in the framework code.
+	test("contacts.find success callback should be called with an array", function() {
+		expect(1);
+		stop(tests.TEST_TIMEOUT);
+		var win = function(result) {
+			ok(typeof result.length != 'undefined', "Object returned in contacts.find success callback is a valid array (has a length property)");
+			start();
+		};
+		var fail = function() { start(); };
+		var filter = new ContactsFilter("");
+		navigator.contacts.find(filter,win, fail);
+	});
 	
 	module("Contacts model");
 	test("should be able to define a Contacts object with name, emails, phones and id attributes.", function() {
@@ -24,4 +35,5 @@ Tests.prototype.ContactsTests = function() {
 		ok(con.phones != null, "new Contact() should include a 'phones' array.");
 		ok(con.id != null, "new Contact() should include an 'id' property.");
 	});
+	
 };
