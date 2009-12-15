@@ -6,7 +6,7 @@ Tests.prototype.SMSTests = function() {
 	});
 	test("should contain a send function", function() {
 		expect(2);
-		ok(navigator.sms.send != null, "navigator.sms.send should not be null.");
+		ok(typeof navigator.sms.send != 'undefined' && navigator.sms.send != null, "navigator.sms.send should not be null.");
 		ok(typeof navigator.sms.send == 'function', "navigator.sms.send should be a function.");
 	});
 };

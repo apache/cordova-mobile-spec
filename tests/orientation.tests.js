@@ -6,18 +6,19 @@ Tests.prototype.OrientationTests = function() {
 	});
 	test("should have an initially null lastPosition property", function() {
   		expect(1);
-  		ok(navigator.orientation.currentOrientation == null, "navigator.orientation.currentOrientation should be initially null.");
+  		ok(typeof navigator.orientation.currentOrientation != 'undefined' && navigator.orientation.currentOrientation == null, "navigator.orientation.currentOrientation should be initially null.");
 	});
 	test("should contain a getCurrentOrientation function", function() {
 		expect(2);
-		ok(navigator.orientation.getCurrentOrientation != null, "navigator.orientation.getCurrentOrientation should not be null.");
+		ok(typeof navigator.orientation.getCurrentOrientation != 'undefined' && navigator.orientation.getCurrentOrientation != null, "navigator.orientation.getCurrentOrientation should not be null.");
 		ok(typeof navigator.orientation.getCurrentOrientation == 'function', "navigator.orientation.getCurrentOrientation should be a function.");
 	});
 	test("should contain a watchOrientation function", function() {
 		expect(2);
-		ok(navigator.orientation.watchOrientation != null, "navigator.orientation.watchOrientation should not be null.");
+		ok(typeof navigator.orientation.watchOrientation != 'undefined' && navigator.orientation.watchOrientation != null, "navigator.orientation.watchOrientation should not be null.");
 		ok(typeof navigator.orientation.watchOrientation == 'function', "navigator.orientation.watchOrientation should be a function.");
 	});
+	// TODO: add tests for DisplayOrientation constants?
 	test("getCurrentOrientation success callback should be called with an Orientation enumeration", function() {
 		expect(2);
 		stop(tests.TEST_TIMEOUT);

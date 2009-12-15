@@ -6,7 +6,7 @@ Tests.prototype.NetworkTests = function() {
 	});
 	test("should contain an isReachable function", function() {
 		expect(2);
-		ok(navigator.network.isReachable != null, "navigator.network.isReachable should not be null.");
+		ok(typeof navigator.network.isReachable != 'undefined' && navigator.network.isReachable != null, "navigator.network.isReachable should not be null.");
 		ok(typeof navigator.network.isReachable == 'function', "navigator.network.isReachable should be a function.");
 	});
 	test("should define constants for network status", function() {
