@@ -27,8 +27,8 @@ Tests.prototype.ContactsTests = function() {
 		expect(2);
 		stop(tests.TEST_TIMEOUT);
 		var win = function(result) {
-			ok(typeof result = 'object', "Object returned in contacts.find success callback is of type 'object' (actually array).");
-			ok(typeof result.length == 'number', "Object returned in contacts.find success callback has a length property which is numerical."
+			ok(typeof result == 'object', "Object returned in contacts.find success callback is of type 'object' (actually array).");
+			ok(typeof result.length == 'number', "Object returned in contacts.find success callback has a length property which is numerical.");
 			start();
 		};
 		var fail = function() { start(); };
