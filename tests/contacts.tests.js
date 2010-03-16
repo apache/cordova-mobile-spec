@@ -8,7 +8,6 @@ Tests.prototype.ContactsTests = function() {
 		ok(con.name.formatted != null, "new Contact()'s 'name' property should, at the very least, contain a 'formatted' property.");
 		ok(con.emails != null, "new Contact() should include an 'emails' array.");
 		ok(con.phones != null, "new Contact() should include a 'phones' array.");
-		ok(con.id != null, "new Contact() should include an 'id' property.");
 	});
 	module('Contacts (navigator.contacts)');
 	test("should exist", function() {
