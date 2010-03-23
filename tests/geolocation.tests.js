@@ -30,7 +30,10 @@ Tests.prototype.GeoLocationTests = function() {
 		var fail = function() { start(); };
 		navigator.geolocation.getCurrentPosition(win, fail);
 	});
+	// TODO: Need to test error callback... how?
 	// TODO: Need to test watchPosition success callback, test that makes sure clearPosition works (how to test that a timer is getting cleared?)
+	// TODO: Need to test options object passed in. Members that need to be tested so far include:
+	//				- options.frequency: this is also labelled differently on some implementations (internval on iPhone/BlackBerry currently). 
 	module('Geolocation model');
 	test("should be able to define a Position object with coords and timestamp properties", function() {
 		expect(3);
