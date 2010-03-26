@@ -20,7 +20,8 @@
 				if (t.indexOf('Tests') > -1) {
 					tests[t]();
 				}
-			} 
+			}
+			alert('Test run complete.');
 		}
 		function loadTests() {
 			// Shitty hack here: check for BlackBerry browser and timeout the test runner, or simply attach test runner
@@ -28,7 +29,12 @@
 			if (navigator.userAgent.indexOf('Browzr') > -1) {
 				setTimeout(run, 250);
 			} else {
-				document.addEventListener('deviceready', run, false);
+				var state = document.readyState;
+				if (state == "loaded" || state == "complete") {
+					run();
+				} else {
+					document.addEventListener('deviceready', run, false);
+				}
 			}
 		}
 	</script>
