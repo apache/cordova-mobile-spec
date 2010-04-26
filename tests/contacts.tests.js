@@ -1,7 +1,7 @@
 Tests.prototype.ContactsTests = function() {
 	module("Contacts model");
-	test("should be able to define a Contacts object with name, emails, phones and id attributes.", function() {
-		expect(6);
+	test("should be able to define a Contacts object with name, emails, and phones attributes.", function() {
+		expect(5);
 		var con = new Contact();
 		ok(con != null, "new Contact() should not be null.");
 		ok(con.name != null, "new Contact() should include a 'name' property.");
