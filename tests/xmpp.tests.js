@@ -19,6 +19,24 @@ Tests.prototype.XmppTests = function() {
     ok(navigator.xmppClient.sendMessageToJid != null, "navigator.xmppClient.sendMessageToJid should not null");
     ok(navigator.xmppClient.sendHtmlMessageToJid != null, "navigator.xmppClient.sendHtmlMessageToJid should not be null");
   }
+  test("should have a way to publish and subscribe"), function()
+  {
+    expect(3);
+    ok(navigator.xmppClient.publish != null, "navigator.xmppClient.publish exists");
+    ok(navigator.xmppClient.subscribe != null, "navigator.xmppClient subscribe exists");
+    ok(navigator.xmppClient.subs != null, "The subscription list exists");
+  }
+  test("should have a way to discover services"), function()
+  {
+    expect(1);
+    ok(navigator.xmppClient.discoverServices != null, "navigator.xmppClient.discoverServices exists");
+  }
+  test("should have a way to send and receive files"), function()
+  {
+    expect(2);
+    ok(navigator.xmppClient.addFileTransferListener != null, "navigator.xmppClient.addFileTransferListener should exist");
+    ok(navigator.xmppClient.sendFile != null, "navigator.xmppClient.sendFile should exist");
+  }
   module("Xmpp Message Model");
   var msg = new XMPPMessage('foo', 'test', 'support@nitobi.com', 'brian@nitobi.com', false);
   test("should be able to define an XMPP message with the following"), function() {
