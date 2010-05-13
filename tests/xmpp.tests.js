@@ -56,4 +56,32 @@ Tests.prototype.XmppTests = function() {
     ok(test.user != null, "Person is not null");
     ok(test.user != null, "status is not null");
   }
+  module("XMPP Chat");
+  navigator.xmppClient.connect('bob', 'phonegap', 'xmpp.phonegap.com', 'resource', 5222);
+  test("should connect"), function(){
+
+  }
+  navigator.xmppClient.sendMessageToJID('alice@xmpp.phonegap.com', 'Test');
+  test("should send and receive messages"), function(){
+
+  }
+  navigator.xmppClient.sendHtmlMessageToJID('alice@xmpp.phonegap.com','<ul><li>HTML</li></ul>', 'Text');
+  test("should send and receive HTML messages"), function(){
+  }
+  navigator.xmppClient.getRoster();
+  test("should be able to get the roster"), function(){
+  }
+  navigator.xmppClient.publish('pubsub.xmpp.phonegap.com', 'book', '', '', '', 'TestBook', true);
+  test("should be able to publish xml data"), function(){
+  }
+  var subscribed = false;
+  navigator.xmppClient.subscribe('pubsub.xmpp.phonegap.com', 'foo', function() { subscribed = true } );
+  test("should be able to subscribe to an event"), function(){
+  
+  }
+  navigator.xmppClient.discoverServices('xmpp.phonegap.com');
+  test("should be able to discover services") {
+
+  }
+  
 }
