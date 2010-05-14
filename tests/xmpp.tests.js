@@ -59,18 +59,26 @@ Tests.prototype.XmppTests = function() {
   module("XMPP Chat");
   navigator.xmppClient.connect('bob', 'phonegap', 'xmpp.phonegap.com', 'resource', 5222);
   test("should connect"), function(){
-    ok(navigator.xmppclient.hostname.length > 0, "XMPP hostname should be present and be non-zero");
+    var handler = function(event)
+    {
+      ok(navigator.xmppclient.hostname.length > 0, "XMPP hostname should be present and be non-zero");
+    };
+    nitobi.xmppClient.addListener('ConnectSuccess',null ,handler );
   }
   navigator.xmppClient.sendMessageToJID('alice@xmpp.phonegap.com', 'Test');
   test("should send and receive messages"), function(){
-    ok(navigator.xmppClient.unread_count > 0, "The Unread message count should be greater than zero");
+    var handler = function(event)
+    {
+    }
   }
   navigator.xmppClient.sendHtmlMessageToJID('alice@xmpp.phonegap.com','<ul><li>HTML</li></ul>', 'Text');
   test("should send and receive HTML messages"), function(){
+    stop(tests.TIMEOUT);
     ok(navigator.xmppClient.unread_count > 0, "The unread message count should be greater than zero");
   }
   navigator.xmppClient.getRoster();
   test("should be able to get the roster"), function(){
+    stop(tests.TIMEOUT);
     ok(roster.length > 0, "The roster should not be empty");
   }
   navigator.xmppClient.publish('pubsub.xmpp.phonegap.com', 'book', '', '', '', 'TestBook', true);
@@ -79,10 +87,12 @@ Tests.prototype.XmppTests = function() {
   var subscribed = false;
   navigator.xmppClient.subscribe('pubsub.xmpp.phonegap.com', 'foo', function() { subscribed = true } );
   test("should be able to subscribe to an event"), function(){
+    stop(tests.TIMEOUT);
     ok(subscribed == true, "The subscription should have been true");  
   }
   navigator.xmppClient.discoverServices('xmpp.phonegap.com');
   test("should be able to discover services") {
+    stop(tests.TIMEOUT);
     ok(this.services.length > 0, "The Services discovered should be greater than zero");
   }
 }
