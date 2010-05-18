@@ -48,8 +48,8 @@ Tests.prototype.XmppTests = function() {
     ok(msg.isRead != null, "XMPP Message should have an isRead property");
     ok(msg.timestamp != null, "XMPP Message should have a timestamp");
   });
-  module("XMPP Resource Model");
-  var res = new XmppResource('test', 'foo', 'bar');
+  module("XMPP RosterItem");
+  var res = new RosterItem('test', 'foo', 'bar');
   test("should exist", function(){
     expect(3);
     ok(test.name != null, "Resource name is not null");
@@ -84,12 +84,41 @@ Tests.prototype.XmppTests = function() {
       navigator.xmppClient.addListener('MessageReceived', null, msg_handler);
       navigator.xmppClient.sendMessageToJID('alice@xmpp.phonegap.com', 'test');
   });
+  /*
+  test("Should send and receive XHTML messages", function() {
+	  expect(2);
+	  stop();
+      var msg_handler = function(event)
+      {
+    	  var from = event.args[0];
+    	  var body = event.args[1].body;
+    	  ok(from == 'alice', "Alice sent a message");
+    	  console.log(body);
+    	  ok(body == "<h2>Foo</h2>", "The text should be bold: " + body);
+    	  start();
+      }
+      navigator.xmppClient.addListener('HtmlMessageReceived', null, msg_handler);
+      navigator.xmppClient.sendHtmlMessageToJID('alice@xmpp.phonegap.com','test','<h2>foo</h2>');
+  });
+  */
+  test("should be able to discover services", function()
+  {
+	  expect(1);
+	  stop();
+	  var servicesHandler = function(event)
+	  {
+		  ok(navigator.xmppClient.services.length > 0, "There are services that have been discovered");
+		  start();
+	  }
+	  navigator.xmppClient.addListener('DiscoveryWin', null, servicesHandler);
+	  navigator.xmppClient.discoverServices('xmpp.phonegap.com');
+  });
   test("should be able to get the roster", function(){
 	expect(1);
 	stop();
     var rosterHandler = function(event)
     {
-      ok(roster.length > 0, "The roster should not be empty");
+      ok(navigator.xmppClient.roster.length > 0, "The roster should not be empty");
       start();
     }
     navigator.xmppClient.addListener('UpdateRoster', null, rosterHandler);
