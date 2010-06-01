@@ -1,4 +1,4 @@
-XmppHook.setDebug(true);
+//XmppHook.setDebug(true);
 Tests.prototype.XmppTests = function() {
   module("Xmpp (navigator.xmppClient)");
   test("should exist", function() {
@@ -78,6 +78,7 @@ Tests.prototype.XmppTests = function() {
     	  var body = event.args[1].body;
     	  ok(from == 'alice', "Alice sent a message");
     	  ok(body == "test", "Alice echoed the text sent by bob");
+    	  navigator.xmppClient.removeListener('MessageReceived');
     	  start();
       }
       navigator.xmppClient.addListener('MessageReceived', null, msg_handler);
@@ -85,7 +86,7 @@ Tests.prototype.XmppTests = function() {
   });
   test("Should send and receive XHTML messages", function() {
 	  //We expect the previous tests, and these tests.
-	  expect(4);
+	  expect(2);
 	  stop();
       var html_handler = function(event)
       {
@@ -93,6 +94,7 @@ Tests.prototype.XmppTests = function() {
     	  var body = event.args[1].body;
     	  ok(from == 'alice', "Alice sent a message");
     	  ok(body != null, "We have a large payload!");
+    	  navigator.xmppClient.removeListener('HtmlMessageReceived');
     	  start();
       }
       navigator.xmppClient.addListener('HtmlMessageReceived', null, html_handler);
@@ -124,25 +126,24 @@ Tests.prototype.XmppTests = function() {
   test("Should be able to receive a file", function() {
 	  expect(1);
 	  stop();
-	  function fileDownHandler()
+	  function fileDownHandler(filename)
 	  {
-		  // Do some stuff
+		  ok(filename != null, "The filename was passed back");
 		  start();
 	  }
-	  navigator.xmppClient.addFileTransferListener(fileDownHandler, "/sdcard/", false, "");
+	  navigator.xmppClient.enableFileTransfer('/sdcard/', false);
+	  navigator.xmppClient.addListener('XmppFileReceived', null, fileDownHandler);
 	  navigator.xmppClient.sendMessageToJID('eve@xmpp.phonegap.com', 'panda');
   });
-  /*
   test("should be able to send a file", function() {
-	  expect(2);
+	  expect(1);
 	  stop();
 	  var fileHandler = function(event)
 	  {
-		  // Do some stuff
+		  ok(true, "The SendComplete handler was called");
 		  start();
 	  }
 	  navigator.xmppClient.addListener('SendComplete', null, fileHandler);
 	  navigator.xmppClient.sendFile('/sdcard/panda.jpg', 'eve@xmpp.phonegap.com/phonegap', 'have a panda');
   });
-  */
 }
