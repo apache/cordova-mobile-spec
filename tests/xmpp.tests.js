@@ -1,4 +1,5 @@
 //XmppHook.setDebug(true);
+
 Tests.prototype.XmppTests = function() {
   module("Xmpp (navigator.xmppClient)");
   test("should exist", function() {
@@ -123,12 +124,14 @@ Tests.prototype.XmppTests = function() {
     navigator.xmppClient.addListener('UpdateRoster', null, rosterHandler);
     navigator.xmppClient.getRoster();
   });
+  /*
   test("Should be able to receive a file", function() {
 	  expect(1);
 	  stop();
-	  function fileDownHandler(filename)
+	  function fileDownHandler(event)
 	  {
-		  ok(filename != null, "The filename was passed back");
+		  var filename = event.args[1];
+		  ok(filename.length > 0, "The filename was passed back");
 		  start();
 	  }
 	  navigator.xmppClient.enableFileTransfer('/sdcard/', false);
@@ -145,5 +148,31 @@ Tests.prototype.XmppTests = function() {
 	  }
 	  navigator.xmppClient.addListener('SendComplete', null, fileHandler);
 	  navigator.xmppClient.sendFile('/sdcard/panda.jpg', 'eve@xmpp.phonegap.com/phonegap', 'have a panda');
+  });
+  test("should be able to publish XML to multiple devices", function() {
+	  expect(1);
+	  stop();
+	  var pubHandler = function(event)
+	  {
+		  console.log('we made it here');
+    	  var body = event.args[1].body;
+    	  ok(body == "Got it!", "Someone got our message (it was probably Alice, but that's not what we're testing!)");
+    	  navigator.xmppClient.removeListener('MessageReceived');
+    	  start();
+	  }
+      navigator.xmppClient.addListener('MessageReceived', null, pubHandler);
+	  navigator.xmppClient.publish('pubsub.xmpp.phonegap.com', 'Book', 'pubsub:test:book', "<book xmlns='pubsub:test:book'><title>Lord of the Rings</title></book>", 'TestNode', false);  
+  });
+  */
+  test("should be able to subscribe to events from devices", function() {
+	  expect(1);
+	  stop();
+	  var subHandler = function(event)
+	  {
+		  
+		  start();
+	  }
+	  navigator.xmppClient.subscribe('pubsub.xmpp.phonegap.com', 'TestNode', subHandler);
+	  navigator.xmppClient.sendMessageToJID('alice@xmpp.phonegap.com', 'subscribed');
   });
 }
