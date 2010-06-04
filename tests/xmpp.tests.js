@@ -1,4 +1,4 @@
-//XmppHook.setDebug(true);
+XmppHook.setDebug(true);
 
 Tests.prototype.XmppTests = function() {
   module("Xmpp (navigator.xmppClient)");
@@ -18,8 +18,8 @@ Tests.prototype.XmppTests = function() {
   test("should have a way to send a message", function()
   {
     expect(2);
-    ok(navigator.xmppClient.sendMessageToJid != null, "navigator.xmppClient.sendMessageToJid should not null");
-    ok(navigator.xmppClient.sendHtmlMessageToJid != null, "navigator.xmppClient.sendHtmlMessageToJid should not be null");
+    ok(navigator.xmppClient.sendMessageToJID != null, "navigator.xmppClient.sendMessageToJid should not null");
+    ok(navigator.xmppClient.sendHtmlMessageToJID != null, "navigator.xmppClient.sendHtmlMessageToJid should not be null");
   });
   test("should have a way to publish and subscribe", function()
   {
@@ -36,7 +36,7 @@ Tests.prototype.XmppTests = function() {
   test("should have a way to send and receive files", function()
   {
     expect(2);
-    ok(navigator.xmppClient.addFileTransferListener != null, "navigator.xmppClient.addFileTransferListener should exist");
+    ok(navigator.xmppClient.enableFileTransfer != null, "navigator.xmppClient.enableFileTransfer should exist");
     ok(navigator.xmppClient.sendFile != null, "navigator.xmppClient.sendFile should exist");
   });
   module("Xmpp Message Model");
@@ -47,7 +47,7 @@ Tests.prototype.XmppTests = function() {
     ok(msg.body != null, "XMPP Message is not null");
     ok(msg.senderJid != null, "XMPP Sender jID is not null");
     ok(msg.receiverJid != null, "XMPP Receiver jID is not null");
-    ok(msg.isRead != null, "XMPP Message should have an isRead property");
+    ok(msg.isread != null, "XMPP Message should have an isRead property");
     ok(msg.timestamp != null, "XMPP Message should have a timestamp");
   });
   module("XMPP RosterItem");
@@ -56,7 +56,7 @@ Tests.prototype.XmppTests = function() {
     expect(3);
     ok(test.name != null, "Resource name is not null");
     ok(test.user != null, "Person is not null");
-    ok(test.user != null, "status is not null");
+    ok(test.status != null, "status is not null");
   });
   module("XMPP Chat");
   test("should connect", function(){
@@ -124,6 +124,56 @@ Tests.prototype.XmppTests = function() {
     navigator.xmppClient.addListener('UpdateRoster', null, rosterHandler);
     navigator.xmppClient.getRoster();
   });
+  test("Should be able to send and receive a form", function() {
+	  expect(1);
+	  stop();
+	  var formHandler = function(event) 
+	  {
+		  var xml = event.args[0];
+		  ok(xml.length > 0, "XML has been passed back");
+		  start();
+	  }
+	  navigator.xmppClient.addListener('XmppHasForm', null, formHandler);
+	  //This IS pretty awful!!!!
+	  var formXml = "<x xmlns='jabber:x:data' type='form'>";
+      formXml += "<title>Bot Configuration</title>";
+      formXml += "<instructions>Fill out this form to configure your new bot!</instructions>";
+      formXml += "<field type='hidden' var='FORM_TYPE'>";
+      formXml += "<value>jabber:bot</value>";
+      formXml += "</field>";
+      formXml += "<field type='fixed'><value>Section 1: Bot Info</value></field>";
+      formXml += "<field type='text-single' label='The name of your bot' var='botname'/>";
+      formXml += "<field type='text-multi' label='Helpful description of your bot' var='description'/>";
+      formXml += "<field type='boolean' label='Public bot?' var='public'><required/></field>";
+      formXml += "<field type='text-private' label='Password for special access' var='password'/>";
+      formXml += "<field type='fixed'><value>Section 2: Features</value></field>";
+      formXml += "<field type='list-multi' label='What features will the bot support?' var='features'>";
+      formXml += "<option label='Contests'><value>contests</value></option>";
+      formXml += "<option label='News'><value>news</value></option>";
+      formXml += "<option label='Polls'><value>polls</value></option>";
+      formXml += "<option label='Reminders'><value>reminders</value></option>";
+      formXml += "<option label='Search'><value>search</value></option>";
+      formXml += "<value>news</value>";
+      formXml += "<value>search</value>";
+      formXml += "</field>";
+      formXml += "<field type='fixed'><value>Section 3: Subscriber List</value></field>";
+      formXml += "<field type='list-single' label='Maximum number of subscribers' var='maxsubs'>";
+      formXml += "<value>20</value>";
+      formXml += "<option label='10'><value>10</value></option>";
+      formXml += "<option label='20'><value>20</value></option>";
+      formXml += "<option label='30'><value>30</value></option>";
+      formXml += "<option label='50'><value>50</value></option>";
+      formXml += "<option label='100'><value>100</value></option>";
+      formXml += "<option label='None'><value>none</value></option>";
+      formXml += "</field>"
+      formXml += "<field type='fixed'><value>Section 4: Invitations</value></field>";
+      formXml += "<field type='jid-multi' label='People to invite' var='invitelist'>";
+      formXml += "<desc>Tell all your friends about your new bot!</desc>";
+      formXml += "</field>";
+      formXml += "</x>"
+	  navigator.xmppClient.sendForm('alice@xmpp.phonegap.com/PhoneGap', formXml);
+  });
+  /*
   test("Should be able to receive a file", function() {
 	  expect(1);
 	  stop();
@@ -166,4 +216,5 @@ Tests.prototype.XmppTests = function() {
 	  navigator.xmppClient.addListener('XmppSubWin', null, subSetHandler);
 	  navigator.xmppClient.subscribe('pubsub.xmpp.phonegap.com', 'TestNode', subHandler);
   });
+  */
 }
