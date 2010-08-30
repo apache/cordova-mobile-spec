@@ -18,6 +18,11 @@ Tests.prototype.GeoLocationTests = function() {
 		ok(typeof navigator.geolocation.watchPosition != 'undefined' && navigator.geolocation.watchPosition != null, "navigator.geolocation.watchPosition should not be null.");
 		ok(typeof navigator.geolocation.watchPosition == 'function', "navigator.geolocation.watchPosition should be a function.");
 	});
+	test("should contain a clearWatch function", function() {
+		expect(2);
+		ok(typeof navigator.geolocation.clearWatch != 'undefined' && navigator.geolocation.clearWatch != null, "navigator.geolocation.watchPosition should not be null.");
+		ok(typeof navigator.geolocation.clearWatch == 'function', "navigator.geolocation.clearWatch should be a function.");
+	});
 	test("getCurrentPosition success callback should be called with a Position object", function() {
 		expect(3);
 		stop(tests.TEST_TIMEOUT);
@@ -42,8 +47,8 @@ Tests.prototype.GeoLocationTests = function() {
 		ok(typeof pos.coords != 'undefined' && pos.coords != null, "new Position() should include a 'coords' property.");
 		ok(typeof pos.timestamp != 'undefined' && pos.timestamp != null, "new Position() should include a 'timestamp' property.");
 	});
-	test("should be able to define a Coordinates object with latitude, longitude, accuracy, altitude, heading and speed properties", function() {
-		expect(7);
+	test("should be able to define a Coordinates object with latitude, longitude, accuracy, altitude, heading, speed and altitudeAccuracy properties", function() {
+		expect(8);
 		var coords = new Coordinates(1,2,3,4,5,6,7);
 		ok(coords != null, "new Coordinates() should not be null.");
 		ok(typeof coords.latitude != 'undefined' && coords.latitude != null, "new Coordinates() should include a 'latitude' property.");
@@ -52,5 +57,6 @@ Tests.prototype.GeoLocationTests = function() {
 		ok(typeof coords.altitude != 'undefined' && coords.altitude != null, "new Coordinates() should include a 'altitude' property.");
 		ok(typeof coords.heading != 'undefined' && coords.heading != null, "new Coordinates() should include a 'heading' property.");
 		ok(typeof coords.speed != 'undefined' && coords.speed != null, "new Coordinates() should include a 'speed' property.");
+		ok(typeof coords.altitudeAccuracy != 'undefined' && coords.altitudeAccuracy != null, "new Coordinates() should include a 'altitudeAccuracy' property.");
 	});
 };
