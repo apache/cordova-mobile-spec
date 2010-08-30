@@ -3,27 +3,60 @@
   <head>
   	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
   	<title>QUnit results for PhoneGap JS API</title>
+
+	<!-- Make sure you copy in phonegap.js from the PhoneGap repository (that's what you're testing, right?) -->
+    <script type="text/javascript" src="phonegap.js"></script>
+
+	<script>
+		// Hook window.addEventListener for 'load' event used by qunit.
+		// The load function must run after deviceready event is received from PhoneGap.
+		var windowEventListener = window.addEventListener;
+		var qunitLoadFunction = null;
+		window.addEventListener = function(type, f, b) {
+			if (type != 'load') {
+				windowEventListener(type, f, b);
+			}
+			else {
+				qunitLoadFunction = f;
+			}
+		}
+	</script>
+
     <!-- You need the following two files in the same directory for QUnit to run. -->
     <link rel="stylesheet" type="text/css" href="qunit.css" />
 	<script type="text/javascript" src="qunit.js"></script>
 	<!-- Make sure you copy in phonegap.js from the PhoneGap repository (that's what you're testing, right?) -->
-    <script type="text/javascript" src="phonegap.js"></script>
 	<script type="text/javascript">
-		function Tests() {
-			this.TEST_TIMEOUT = 15000;
-		};
-		var tests = new Tests();
-		
-		// Runs each function in Tests that contains 'Tests' in the name.
-		function run() {
-			for (var t in tests) {
-				if (t.indexOf('Tests') > -1) {
-					tests[t]();
-				}
-			}
-			alert('Test run complete.');
+
+		// Override QUnit.done function	to display result of tests
+		QUnit.done = function(failures, total) {
+			console.log("Test run complete: "+failures+" tests failed out of "+total+" tests.");
+        	alert("Test run complete: "+failures+" tests failed out of "+total+" tests.");
 		}
+
+		// Tests to run
+       	function Tests() {
+           this.TEST_TIMEOUT = 15000;
+       	};
+       	var tests = new Tests();
+
+       	// Runs each function in Tests that contains 'Tests' in the name.
+       	function run() {
+
+			// Deviceready has fired, so now qunit can be loaded
+			if (qunitLoadFunction) {
+				qunitLoadFunction();
+			}
+
+           	for (var t in tests) {
+               	if (t.indexOf('Tests') > -1) {
+                   	tests[t]();
+               	}
+           	}
+       	}
+
 		document.addEventListener('deviceready', run, false);
+
 	</script>
 	<script type="text/javascript" src="tests/accelerometer.tests.js"></script>
 	<script type="text/javascript" src="tests/contacts.tests.js"></script>
