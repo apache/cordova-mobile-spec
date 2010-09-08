@@ -14,4 +14,9 @@ Tests.prototype.NotificationTests = function() {
 		ok(typeof navigator.notification.beep != 'undefined' && navigator.notification.beep != null, "navigator.notification.beep should not be null.");
 		ok(typeof navigator.notification.beep == 'function', "navigator.notification.beep should be a function.");
 	});
+	test("should contain a alert function", function() {
+		expect(2);
+		ok(typeof navigator.notification.alert != 'undefined' && navigator.notification.alert != null, "navigator.notification.alert should not be null.");
+		ok(typeof navigator.notification.alert == 'function', "navigator.notification.alert should be a function.");
+	});
 };

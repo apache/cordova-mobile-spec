@@ -9,6 +9,19 @@ Tests.prototype.ContactsTests = function() {
 		ok(typeof navigator.service.contacts.find != 'undefined' && navigator.service.contacts.find != null, "navigator.service.contacts.find should not be null.");
 		ok(typeof navigator.service.contacts.find == 'function', "navigator.service.contacts.find should be a function.");
 	});
+	test("contacts.find success callback should be called with an array", function() {
+		expect(2);
+		stop(tests.TEST_TIMEOUT);
+		var win = function(result) {
+			ok(typeof result == 'object', "Object returned in contacts.find success callback is of type 'object' (actually array).");
+			ok(typeof result.length == 'number', "Object returned in contacts.find success callback has a length property which is numerical.");
+			start();
+		};
+		var fail = function() { start(); };
+		var filter = new Contact();
+		filter.name.formatted = '';
+		navigator.service.contacts.find(filter, win, fail);
+	});	
 	module("Contact model");
 	test("should be able to define a Contact object", function() {
 		expect(24);
