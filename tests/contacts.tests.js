@@ -102,4 +102,13 @@ Tests.prototype.ContactsTests = function() {
 		ok(typeof contactAccount.username != 'undefined' && contactAccount.username != null && contactAccount.username == "b", "new ContactAccount() should include a 'username' property.");
 		ok(typeof contactAccount.userid != 'undefined' && contactAccount.userid != null && contactAccount.userid == "c", "new ContactAccount() should include a 'userid' property.");
 	});	
+	test("should be able to define a ContactFindOptions object", function() {
+		expect(5);
+		var contactFindOptions = new ContactFindOptions("a", 1, true, "b");
+		ok(contactFindOptions != null, "new ContactFindOptions() should not be null.");
+		ok(typeof contactFindOptions.filter != 'undefined' && contactFindOptions.filter != null && contactFindOptions.filter == "a", "new ContactFindOptions() should include a 'filter' property.");
+		ok(typeof contactFindOptions.limit != 'undefined' && contactFindOptions.limit != null && contactFindOptions.limit == 1, "new ContactFindOptions() should include a 'limit' property.");
+		ok(typeof contactFindOptions.multiple != 'undefined' && contactFindOptions.multiple != null && contactFindOptions.multiple == true, "new ContactFindOptions() should include a 'multiple' property.");
+		ok(typeof contactFindOptions.updatedSince != 'undefined' && contactFindOptions.updatedSince != null && contactFindOptions.updatedSince == "b", "new ContactFindOptions() should include a 'updatedSince' property.");
+	});	
 };
