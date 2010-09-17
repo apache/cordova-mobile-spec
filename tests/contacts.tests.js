@@ -18,9 +18,10 @@ Tests.prototype.ContactsTests = function() {
 			start();
 		};
 		var fail = function() { start(); };
-		var filter = new Contact();
-		filter.name.formatted = '';
-		navigator.service.contacts.find(filter, win, fail);
+		var obj = new ContactFindOptions();
+		obj.filter="";
+		obj.multiple=true;
+		navigator.service.contacts.find(["displayName", "name", "phoneNumbers", "emails"], win, fail, obj);
 	});	
 	module("Contact model");
 	test("should be able to define a Contact object", function() {
