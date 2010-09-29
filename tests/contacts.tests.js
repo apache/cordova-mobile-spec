@@ -23,6 +23,11 @@ Tests.prototype.ContactsTests = function() {
 		obj.multiple=true;
 		navigator.service.contacts.find(["displayName", "name", "phoneNumbers", "emails"], win, fail, obj);
 	});	
+	test("should contain a create function", function() {
+		expect(2);
+		ok(typeof navigator.service.contacts.create != 'undefined' && navigator.service.contacts.create != null, "navigator.service.contacts.create should not be null.");
+		ok(typeof navigator.service.contacts.create == 'function', "navigator.service.contacts.create should be a function.");
+	});
 	module("Contact model");
 	test("should be able to define a Contact object", function() {
 		expect(24);
@@ -112,4 +117,23 @@ Tests.prototype.ContactsTests = function() {
 		ok(typeof contactFindOptions.limit != 'undefined' && contactFindOptions.limit != null && contactFindOptions.limit == 1, "new ContactFindOptions() should include a 'limit' property.");
 		ok(typeof contactFindOptions.updatedSince != 'undefined' && contactFindOptions.updatedSince != null && contactFindOptions.updatedSince == "b", "new ContactFindOptions() should include a 'updatedSince' property.");
 	});	
+	module("Contact Object");
+	test("should contain a clone function", function() {
+		expect(2);
+		var contact = new Contact();
+		ok(typeof contact.clone != 'undefined' && contact.clone != null, "contact.clone should not be null.");
+		ok(typeof contact.clone == 'function', "contact.clone should be a function.");
+	});
+	test("should contain a remove function", function() {
+		expect(2);
+		var contact = new Contact();
+		ok(typeof contact.remove != 'undefined' && contact.remove != null, "contact.remove should not be null.");
+		ok(typeof contact.remove == 'function', "contact.remove should be a function.");
+	});
+	test("should contain a save function", function() {
+		expect(2);
+		var contact = new Contact();
+		ok(typeof contact.save != 'undefined' && contact.save != null, "contact.save should not be null.");
+		ok(typeof contact.save == 'function', "contact.save should be a function.");
+	});
 };
