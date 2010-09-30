@@ -124,6 +124,27 @@ Tests.prototype.ContactsTests = function() {
 		ok(typeof contact.clone != 'undefined' && contact.clone != null, "contact.clone should not be null.");
 		ok(typeof contact.clone == 'function', "contact.clone should be a function.");
 	});
+	test("clone function should make deep copy of Contact Object", function() {
+		expect(8);
+		var contact = new Contact();
+		contact.id=1;
+		contact.displayName="Test Name";
+		contact.nickname="Testy";
+		contact.gender="male";
+		contact.note="note to be cloned";
+		contact.name = new ContactName("Mr. Test Name");
+		
+		var clonedContact = contact.clone();
+		
+		ok(contact.id == 1, "contact.id should be 1.");
+		ok(clonedContact.id == null, "clonedContact.id should be null.");
+		ok(clonedContact.displayName == contact.displayName, "displayName's should be equal");
+		ok(clonedContact.nickname == contact.nickname, "nickname's should be equal");
+		ok(clonedContact.gender == contact.gender, "gender's should be equal");
+		ok(clonedContact.note == contact.note, "note's should be equal");
+		ok(clonedContact.name.formatted == contact.name.formatted, "name.formatted's should be equal");
+		ok(clonedContact.connected == contact.connected, "connected's should be equal (null)");
+	});
 	test("should contain a remove function", function() {
 		expect(2);
 		var contact = new Contact();
