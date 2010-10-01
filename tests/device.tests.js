@@ -28,4 +28,9 @@ Tests.prototype.DeviceTests = function() {
 			ok(window.device.uuid > 0, "window.device.uuid, as a number, should be greater than 0. (should it, even?)")
 		}
 	});
+	test("should contain a phonegap specification that is a string", function() {
+		expect(2);
+		ok(typeof window.device.phonegap != 'undefined' && window.device.phonegap != null, "window.device.phonegap should not be null.")
+		ok((new String(window.device.phonegap)).length > 0, "window.device.phonegap should contain some kind of description.")
+	});
 };
