@@ -28,6 +28,19 @@ Tests.prototype.ContactsTests = function() {
 		ok(typeof navigator.service.contacts.create != 'undefined' && navigator.service.contacts.create != null, "navigator.service.contacts.create should not be null.");
 		ok(typeof navigator.service.contacts.create == 'function', "navigator.service.contacts.create should be a function.");
 	});
+	test("contacts.create should return a Contact object", function() {
+		expect(9);
+		var obj = navigator.service.contacts.create({"displayName": "test name", "gender": "male", "note": "my note", "name": {"formatted": "Mr. Test Name"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}]});		
+		ok(obj != 'undefined' && obj != null, "navigator.service.contacts.create should return a Contact object.");
+		ok(obj.displayName == 'test name', "Contact should contain a displayName property.");
+		ok(obj.gender == 'male', "Contact should contain a gender property.");
+		ok(obj.note == 'my note', "Contact should contain a note property.");
+		ok(obj.name.formatted == 'Mr. Test Name', "Contact should contain a name.formatted property.");
+		ok(obj.emails.length == 2, "Contact should contain and array of emails with 2 entries");
+		ok(obj.emails[0].value == 'here@there.com', "Contact.emails[1] should contain a value.");
+		ok(obj.emails[1].value == 'there@here.com', "Contact.emails[2] should contain a value.");	
+		ok(obj.birthday == null, "Contact object should not contain a birthday property.");
+	});
 	module("Contact model");
 	test("should be able to define a Contact object", function() {
 		expect(24);
