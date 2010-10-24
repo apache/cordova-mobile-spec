@@ -192,15 +192,15 @@ Tests.prototype.SystemTests = function() {
 		ok(typeof input.keyboards != 'undefined' && input.keyboards != null, "new InputDevicesAttributes() should include a 'keyboards' property.");
 		ok(typeof input.activeKeyboards != 'undefined' && input.activeKeyboards != null, "new InputDevicesAttributes() should include a 'activeKeyboards' property.");
 		ok(typeof input.cameras != 'undefined' && input.cameras != null, "new InputDevicesAttributes() should include a 'cameras' property.");
-		ok(typeof input.activeCameras != 'undefined' && input.activeCameras != null, "new OutputDevicesAttributes() should include a 'activeCameras' property.");
-		ok(typeof input.microphones != 'undefined' && input.microphones != null, "new OutputDevicesAttributes() should include a 'microphones' property.");
-		ok(typeof input.activeMicrophones != 'undefined' && input.activeMicrophones != null, "new OutputDevicesAttributes() should include a 'activeMicrophones' property.");
+		ok(typeof input.activeCameras != 'undefined' && input.activeCameras != null, "new InputDevicesAttributes() should include a 'activeCameras' property.");
+		ok(typeof input.microphones != 'undefined' && input.microphones != null, "new InputDevicesAttributes() should include a 'microphones' property.");
+		ok(typeof input.activeMicrophones != 'undefined' && input.activeMicrophones != null, "new InputDevicesAttributes() should include a 'activeMicrophones' property.");
 	});	
 	module('Pointer Property');
 	test("should be able to define a Pointer Property object", function() {
 		expect(4);
 		var pointer = new PointerAttributes(0,true,"a");
-		ok(pointer  != null, "new PrintingDeviceAttributes() should not be null.");
+		ok(pointer  != null, "new PointerAttributes() should not be null.");
 		ok(typeof pointer.type != 'undefined' && pointer.type != null && pointer.type == 0, "new PointerAttributes() should include a 'type' property.");
 		ok(typeof pointer.supportsMultiTouch != 'undefined' && pointer.supportsMultiTouch != null && pointer.supportsMultiTouch == true, "new PointerAttributes() should include a 'supportsMultiTouch' property.");
 		ok(typeof pointer.info != 'undefined' && pointer.info != null && pointer.info == "a", "new PointerAttributes() should include a 'info' property.");
@@ -228,7 +228,7 @@ Tests.prototype.SystemTests = function() {
 	test("should be able to define a Microphone Property object", function() {
 		expect(7);
 		var mic = new MicrophoneAttributes(0,0,0,"a","b",[]);
-		ok(mic  != null, "new KeyboardAttributes() should not be null.");
+		ok(mic  != null, "new MicrophoneAttributes() should not be null.");
 		ok(typeof mic.type != 'undefined' && mic.type != null && mic.type == 0, "new MicrophoneAttributes() should include a 'type' property.");
 		ok(typeof mic.freqRangeLow != 'undefined' && mic.freqRangeLow != null && mic.freqRangeLow == 0, "new MicrophoneAttributes() should include a 'freqRangeLow' property.");
 		ok(typeof mic.freqRangeHigh != 'undefined' && mic.freqRangeHigh != null && mic.freqRangeHigh == 0, "new MicrophoneAttributes() should include a 'freqRangeHigh' property.");
