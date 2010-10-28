@@ -32,9 +32,11 @@ Tests.prototype.SystemTests = function() {
 	});	
 	module('Power Property');
 	test("should be able to define a Power Property object", function() {
-		expect(5);
-		var power = new PowerAttributes(0.0,0,true,false);
+		expect(7);
+		var power = new PowerAttributes("a","b",0.0,0,true,false);
 		ok(power != null, "new PowerAttributes() should not be null.");
+		ok(typeof power.info != 'undefined' && power.info != null && power.info == "a", "new PowerAttributes() should include a 'info' property.");
+		ok(typeof power.id != 'undefined' && power.id != null && power.id == "b", "new PowerAttributes() should include a 'id' property.");
 		ok(typeof power.level != 'undefined' && power.level != null && power.level == 0.0, "new PowerAttributes() should include a 'level' property.");
 		ok(typeof power.timeRemaining != 'undefined' && power.timeRemaining != null && power.timeRemaining == 0, "new PowerAttributes() should include a 'timeRemaining' property.");
 		ok(typeof power.isBattery != 'undefined' && power.isBattery != null && power.isBattery == true, "new PowerAttributes() should include a 'isBattery' property.");
@@ -42,30 +44,38 @@ Tests.prototype.SystemTests = function() {
 	});	
 	module('CPU Property');
 	test("should be able to define a CPU Property object", function() {
-		expect(2);
-		var cpu = new CPUAttributes(0.0);
+		expect(4);
+		var cpu = new CPUAttributes("a", "b", 0.0);
 		ok(cpu  != null, "new CPUAttributes() should not be null.");
+		ok(typeof cpu.info != 'undefined' && cpu.info != null && cpu.info == "a", "new CPUAttributes() should include a 'info' property.");
+		ok(typeof cpu.id != 'undefined' && cpu.id != null && cpu.id == "b", "new CPUAttributes() should include a 'id' property.");
 		ok(typeof cpu.usage != 'undefined' && cpu.usage != null && cpu.usage == 0.0, "new CPUAttributes() should include a 'usage' property.");
 	});	
 	module('Thermal Property');
 	test("should be able to define a Thermal Property object", function() {
-		expect(2);
-		var thermal = new ThermalAttributes(0.0);
+		expect(4);
+		var thermal = new ThermalAttributes("a", "b", 0.0);
 		ok(thermal  != null, "new ThermalAttributes() should not be null.");
+		ok(typeof thermal.info != 'undefined' && thermal.info != null && thermal.info == "a", "new ThermalAttributes() should include a 'info' property.");
+		ok(typeof thermal.id != 'undefined' && thermal.id != null && thermal.id == "b", "new ThermalAttributes() should include a 'id' property.");
 		ok(typeof thermal.state != 'undefined' && thermal.state != null && thermal.state == 0.0, "new ThermalAttributes() should include a 'state' property.");
 	});	
 	module('Network Property');
 	test("should be able to define a Network Property object", function() {
-		expect(2);
-		var network = new NetworkAttributes([]);
+		expect(4);
+		var network = new NetworkAttributes("a", "b", []);
 		ok(network  != null, "new NetworkAttributes() should not be null.");
+		ok(typeof network.info != 'undefined' && network.info != null && network.info == "a", "new NetworkAttributes() should include a 'info' property.");
+		ok(typeof network.id != 'undefined' && network.id != null && network.id == "b", "new NetworkAttributes() should include a 'id' property.");
 		ok(typeof network.activeConnections != 'undefined' && network.activeConnections != null, "new NetworkAttributes() should include a 'activeConnections' property.");
 	});	
 	module('Connection Type Property');
 	test("should be able to define a display Type Property object", function() {
-		expect(8);
-		var connection = new ConnectionAttributes(ConnectionType.UNKNOWN, 0, 0, 0, 0, 0.0, false);
+		expect(10);
+		var connection = new ConnectionAttributes('a', 'b', ConnectionType.UNKNOWN, 0, 0, 0, 0, 0.0, false);
 		ok(connection  != null, "new displayAttributes() should not be null.");
+		ok(typeof connection.info != 'undefined' && connection.info != null && connection.info == "a", "new ConnectionAttributes() should include a 'info' property.");
+		ok(typeof connection.id != 'undefined' && connection.id != null && connection.id == "b", "new ConnectionAttributes() should include a 'id' property.");
 		ok(typeof connection.type != 'undefined' && connection.type != null && connection.type == 'unknown', "new ConnectionAttributes() should include a 'type' property.");
 		ok(typeof connection.currentDownloadBandwidth != 'undefined' && connection.currentDownloadBandwidth != null && connection.currentDownloadBandwidth == 0, "new ConnectionAttributes() should include a 'currentDownloadBandwidth' property.");
 		ok(typeof connection.currentUploadBandwidth != 'undefined' && connection.currentUploadBandwidth != null && connection.currentUploadBandwidth == 0, "new ConnectionAttributes() should include a 'currentUploadBandwidth' property.");
@@ -86,26 +96,32 @@ Tests.prototype.SystemTests = function() {
 	});	
 	module('AVCodecs Property');
 	test("should be able to define a AVCodecs Property object", function() {
-		expect(3);
-		var avcodecs = new AVCodecsAttributes([], []);
+		expect(5);
+		var avcodecs = new AVCodecsAttributes("a", "b", [], []);
 		ok(avcodecs  != null, "new AVCodecsAttributes() should not be null.");
+		ok(typeof avcodecs.info != 'undefined' && avcodecs.info != null && avcodecs.info == "a", "new AVCodecsAttributes() should include a 'info' property.");
+		ok(typeof avcodecs.id != 'undefined' && avcodecs.id != null && avcodecs.id == "b", "new AVCodecsAttributes() should include a 'id' property.");
 		ok(typeof avcodecs.audioCodecs != 'undefined' && avcodecs.audioCodecs != null, "new AVCodecsAttributes() should include a 'audioCodecs' property.");
 		ok(typeof avcodecs.videoCodecs != 'undefined' && avcodecs.videoCodecs != null, "new AVCodecsAttributes() should include a 'videoCodecs' property.");
 	});	
 	module('Audio Codec Property');
 	test("should be able to define a Audio Codec Property object", function() {
-		expect(4);
-		var codec = new AudioCodecAttributes('a',true,true);
+		expect(6);
+		var codec = new AudioCodecAttributes("a", "b", 'a',true,true);
 		ok(codec != null, "new AudioCodecAttributes() should not be null.");
+		ok(typeof codec.info != 'undefined' && codec.info != null && codec.info == "a", "new AudioCodecAttributes() should include a 'info' property.");
+		ok(typeof codec.id != 'undefined' && codec.id != null && codec.id == "b", "new AudioCodecAttributes() should include a 'id' property.");
 		ok(typeof codec.compFormats != 'undefined' && codec.compFormats != null && codec.compFormats == 'a', "new AudioCodecAttributes() should include a 'compFormats' property.");
 		ok(typeof codec.encode != 'undefined' && codec.encode != null && codec.encode == true, "new AudioCodecAttributes() should include a 'encode' property.");
 		ok(typeof codec.decode != 'undefined' && codec.decode != null && codec.decode == true, "new AudioCodecAttributes() should include a 'decode' property.");
 	});	
 	module('Video Codec Property');
 	test("should be able to define a Video Codec Property object", function() {
-		expect(7);
-		var codec = new VideoCodecAttributes([],[],[],[],[],[]);
+		expect(9);
+		var codec = new VideoCodecAttributes("a", "b", [],[],[],[],[],[]);
 		ok(codec != null, "new VideoCodecAttributes() should not be null.");
+		ok(typeof codec.info != 'undefined' && codec.info != null && codec.info == "a", "new VideoCodecAttributes() should include a 'info' property.");
+		ok(typeof codec.id != 'undefined' && codec.id != null && codec.id == "b", "new VideoCodecAttributes() should include a 'id' property.");
 		ok(typeof codec.compFormats != 'undefined' && codec.compFormats != null, "new VideoCodecAttributes() should include a 'compFormats' property.");
 		ok(typeof codec.containerFormats != 'undefined' && codec.containerFormats != null, "new VideoCodecAttributes() should include a 'containerFormats' property.");
 		ok(typeof codec.hwAccel != 'undefined' && codec.hwAccel != null, "new VideoCodecAttributes() should include a 'hwAccel' property.");
@@ -115,9 +131,11 @@ Tests.prototype.SystemTests = function() {
 	});	
 	module('Storage Unit Property');
 	test("should be able to define a Storage Property object", function() {
-		expect(6);
-		var storage = new StorageUnitAttributes(0,true,0,0,true);
+		expect(8);
+		var storage = new StorageUnitAttributes('a','b',0,true,0,0,true);
 		ok(storage != null, "new StorageUnitAttributes() should not be null.");
+		ok(typeof storage.info != 'undefined' && storage.info != null && storage.info == "a", "new StorageUnitAttributes() should include a 'info' property.");
+		ok(typeof storage.id != 'undefined' && storage.id != null && storage.id == "b", "new StorageUnitAttributes() should include a 'id' property.");
 		ok(typeof storage.type != 'undefined' && storage.type != null && storage.type == 0, "new StorageUnitAttributes() should include a 'type' property.");
 		ok(typeof storage.isWritable != 'undefined' && storage.isWritable != null && storage.isWritable == true, "new StorageUnitAttributes() should include a 'isWritable' property.");
 		ok(typeof storage.capacity != 'undefined' && storage.capacity != null && storage.capacity == 0, "new StorageUnitAttributes() should include a 'capacity' property.");
@@ -126,9 +144,11 @@ Tests.prototype.SystemTests = function() {
 	});	
 	module('Output Devices Property');
 	test("should be able to define a Input Devices Property object", function() {
-		expect(9);
-		var output = new OutputDevicesAttributes([],[],[],"a",[],"a",[],[]);
+		expect(11);
+		var output = new OutputDevicesAttributes('a','b',[],[],[],"a",[],"a",[],[]);
 		ok(output != null, "new OutputDevicesAttributes() should not be null.");
+		ok(typeof output.info != 'undefined' && output.info != null && output.info == "a", "new OutputDevicesAttributes() should include a 'info' property.");
+		ok(typeof output.id != 'undefined' && output.id != null && output.id == "b", "new OutputDevicesAttributes() should include a 'id' property.");
 		ok(typeof output.displayDevices != 'undefined' && output.displayDevices != null, "new OutputDevicesAttributes() should include a 'displayDevices' property.");
 		ok(typeof output.activeDisplayDevices != 'undefined' && output.activeDisplayDevices != null, "new OutputDevicesAttributes() should include a 'activeDisplayDevices' property.");
 		ok(typeof output.printingDevices != 'undefined' && output.printingDevices != null, "new OutputDevicesAttributes() should include a 'printingDevices' property.");
@@ -184,9 +204,11 @@ Tests.prototype.SystemTests = function() {
 	});	
 	module('Input Devices Property');
 	test("should be able to define a Input Devices Property object", function() {
-		expect(9);
-		var input = new InputDevicesAttributes([],[],[],[],[],[],[],[]);
+		expect(11);
+		var input = new InputDevicesAttributes('a','b',[],[],[],[],[],[],[],[]);
 		ok(input != null, "new InputDevicesAttributes() should not be null.");
+		ok(typeof input.info != 'undefined' && input.info != null && input.info == "a", "new InputDevicesAttributes() should include a 'info' property.");
+		ok(typeof input.id != 'undefined' && input.id != null && input.id == "b", "new InputDevicesAttributes() should include a 'id' property.");
 		ok(typeof input.pointingDevices != 'undefined' && input.pointingDevices != null, "new InputDevicesAttributes() should include a 'pointingDevices' property.");
 		ok(typeof input.activePointingDevices != 'undefined' && input.activePointingDevices != null, "new InputDevicesAttributes() should include a 'activePointingDevices' property.");
 		ok(typeof input.keyboards != 'undefined' && input.keyboards != null, "new InputDevicesAttributes() should include a 'keyboards' property.");
