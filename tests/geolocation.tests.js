@@ -42,7 +42,7 @@ Tests.prototype.GeoLocationTests = function() {
 	module('Geolocation model');
 	test("should be able to define a Position object with coords and timestamp properties", function() {
 		expect(3);
-		var pos = new Position({});
+		var pos = new Position({}, new Date());
 		ok(pos != null, "new Position() should not be null.");
 		ok(typeof pos.coords != 'undefined' && pos.coords != null, "new Position() should include a 'coords' property.");
 		ok(typeof pos.timestamp != 'undefined' && pos.timestamp != null, "new Position() should include a 'timestamp' property.");
