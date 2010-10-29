@@ -18,7 +18,7 @@ Tests.prototype.NetworkTests = function() {
 	});
 	test("isReachable function should return an object with a 'code' member as a NetworkStatus constant in its success callback", function() {
 		expect(1);
-		stop(Tests.TEST_TIMEOUT);
+		QUnit.stop(Tests.TEST_TIMEOUT);
 		var hostname = "http://www.google.com";
 		var win = function(p) {
 			ok(p.code == NetworkStatus.NOT_REACHABLE || p.code == NetworkStatus.REACHABLE_VIA_CARRIER_DATA_NETWORK || p.code == NetworkStatus.REACHABLE_VIA_WIFI_NETWORK, "Success callback in isReachable returns a proper object with a 'code' member equal to a NetworkStatus constant.");
