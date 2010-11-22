@@ -39,9 +39,19 @@
            this.TEST_TIMEOUT = 15000;
        	};
        	var tests = new Tests();
+       	FILE_ROOT = "undefined";
 
        	// Runs each function in Tests that contains 'Tests' in the name.
        	function run() {
+           	if (navigator.userAgent.indexOf("Android") != -1) {
+           		FILE_ROOT = "/sdcard/";
+           	}
+           	else if (navigator.userAgent.indexOf("BlackBerry") != -1) {
+           		FILE_ROOT = "file:///SDCard/";
+           	}
+           	else if (navigator.userAgent.indexOf("iPhone") != -1 || navigator.userAgent.indexOf("iPad")) {
+           		FILE_ROOT = "";  // Need to find out
+           	}
 
 			// Deviceready has fired, so now qunit can be loaded
 			if (qunitLoadFunction) {
