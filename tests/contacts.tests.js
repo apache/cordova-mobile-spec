@@ -11,13 +11,13 @@ Tests.prototype.ContactsTests = function() {
 	});
 	test("contacts.find success callback should be called with an array", function() {
 		expect(2);
-		stop(tests.TEST_TIMEOUT);
+		QUnit.stop(tests.TEST_TIMEOUT);
 		var win = function(result) {
 			ok(typeof result == 'object', "Object returned in contacts.find success callback is of type 'object' (actually array).");
 			ok(typeof result.length == 'number', "Object returned in contacts.find success callback has a length property which is numerical.");
-			start();
+			QUnit.start();
 		};
-		var fail = function() { start(); };
+		var fail = function() { QUnit.start(); };
 		var obj = new ContactFindOptions();
 		obj.filter="";
 		obj.multiple=true;
@@ -165,27 +165,27 @@ Tests.prototype.ContactsTests = function() {
 		ok(typeof contact.remove == 'function', "contact.remove should be a function.");
 	});
 	test("calling remove on a contact has an id of null should return ContactError.NOT_FOUND_ERROR", function() {
-        stop(tests.TEST_TIMEOUT);
+        QUnit.stop(tests.TEST_TIMEOUT);
 		expect(2);
 		var win = function(result) {
 		};
 		var fail = function(result) {
 			ok(typeof result == 'object', "Object returned in contact.remove failure callback is of type 'object' (actually ContactError).");
 			ok(result.code == ContactError.NOT_FOUND_ERROR, "Object returned in contacts.remove failure callback has a code property which equal to ContactError.NOT_FOUND_ERROR.");
-			start();
+			QUnit.start();
 		};
 		var rmContact = new Contact();
 		rmContact.remove(win, fail);
 	});
 	test("calling remove on a contact that does not exist should return ContactError.NOT_FOUND_ERROR", function() {
-        stop(tests.TEST_TIMEOUT);
+        QUnit.stop(tests.TEST_TIMEOUT);
 		expect(2);
 		var win = function(result) {
 		};
 		var fail = function(result) {
 			ok(typeof result == 'object', "Object returned in contact.remove failure callback is of type 'object' (actually ContactError).");
 			ok(result.code == ContactError.NOT_FOUND_ERROR, "Object returned in contacts.remove failure callback has a code property which equal to ContactError.NOT_FOUND_ERROR.");
-			start();
+			QUnit.start();
 		};
 		var contact = new Contact(99);
 		contact.remove(win, fail);		

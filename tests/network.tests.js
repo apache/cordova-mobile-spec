@@ -16,12 +16,12 @@ Tests.prototype.NetworkTests = function() {
 		equals(NetworkStatus.REACHABLE_VIA_CARRIER_DATA_NETWORK, 1, "NetworkStatus.REACHABLE_VIA_CARRIER_DATA_NETWORK is equal to 1.");
 		equals(NetworkStatus.REACHABLE_VIA_WIFI_NETWORK, 2, "NetworkStatus.REACHABLE_VIA_WIFI_NETWORK is equal to 2.");
 	});
-	test("isReachable function should return an object with a 'code' member as a NetworkStatus constant in its success callback", function() {
+	test("isReachable function should return one of the defined NetworkStatus constants to its success callback", function() {
 		expect(1);
-		stop(Tests.TEST_TIMEOUT);
+		QUnit.stop(Tests.TEST_TIMEOUT);
 		var hostname = "http://www.google.com";
-		var win = function(p) {
-			ok(p.code == NetworkStatus.NOT_REACHABLE || p.code == NetworkStatus.REACHABLE_VIA_CARRIER_DATA_NETWORK || p.code == NetworkStatus.REACHABLE_VIA_WIFI_NETWORK, "Success callback in isReachable returns a proper object with a 'code' member equal to a NetworkStatus constant.");
+		var win = function(code) {
+			ok(code == NetworkStatus.NOT_REACHABLE || code == NetworkStatus.REACHABLE_VIA_CARRIER_DATA_NETWORK || code == NetworkStatus.REACHABLE_VIA_WIFI_NETWORK, "Success callback in isReachable returns one of the defined NetworkStatus constants.");
 			start();
 		};
 		navigator.network.isReachable(hostname, win);
