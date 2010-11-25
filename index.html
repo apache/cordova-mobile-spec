@@ -44,10 +44,13 @@
        	// Runs each function in Tests that contains 'Tests' in the name.
        	function run() {
            	if (navigator.userAgent.indexOf("Android") != -1) {
-           		FILE_ROOT = "/sdcard/";
+               	var paths = navigator.fileMgr.getRootPaths();
+               	console.log(paths[0]);
+           		FILE_ROOT = paths[0];
            	}
            	else if (navigator.userAgent.indexOf("BlackBerry") != -1) {
-           		FILE_ROOT = "file:///SDCard/";
+                var paths = navigator.fileMgr.getRootPaths();
+                FILE_ROOT = paths[0];
            	}
            	else if (navigator.userAgent.indexOf("iPhone") != -1 || navigator.userAgent.indexOf("iPad")) {
            		FILE_ROOT = "";  // Need to find out
