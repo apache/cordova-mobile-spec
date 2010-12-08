@@ -125,6 +125,66 @@ Tests.prototype.FileTests = function() {
         writer.onwriteend = onwriteend;
         writer.write(rule); 
     });
+    test("should be able to write XML data", function() {
+        QUnit.stop(tests.TEST_TIMEOUT);
+        expect(3);
+
+        // file name and content
+        var filePath = FILE_ROOT+"write.xml";
+        var rule = '<?xml version="1.0" encoding="UTF-8"?>\n<test prop="ack">\nData\n</test>\n';
+        var length = rule.length;
+
+        // delete old file
+        try { 
+            navigator.fileMgr.deleteFile(filePath);
+        }
+        catch (e) {
+            // ok if not found
+        }
+        
+        // 2nd - called when write completes
+        var onwriteend = function(evt) {
+            ok(navigator.fileMgr.testFileExists(filePath) == true, "file should exist");
+            ok(writer.length == length, "should have written " + length + " bytes");
+            ok(writer.position == length, "position should be at " + length);
+            QUnit.start();
+        };
+            
+        // 1st - write to file
+        var writer = new FileWriter(filePath);
+        writer.onwriteend = onwriteend;
+        writer.write(rule); 
+    });
+    test("should be able to write JSON data", function() {
+        QUnit.stop(tests.TEST_TIMEOUT);
+        expect(3);
+
+        // file name and content
+        var filePath = FILE_ROOT+"write.json";
+        var rule = '{ "name": "Guy Incognito", "email": "here@there.com" }';
+        var length = rule.length;
+
+        // delete old file
+        try { 
+            navigator.fileMgr.deleteFile(filePath);
+        }
+        catch (e) {
+            // ok if not found
+        }
+        
+        // 2nd - called when write completes
+        var onwriteend = function(evt) {
+            ok(navigator.fileMgr.testFileExists(filePath) == true, "file should exist");
+            ok(writer.length == length, "should have written " + length + " bytes");
+            ok(writer.position == length, "position should be at " + length);
+            QUnit.start();
+        };
+            
+        // 1st - write to file
+        var writer = new FileWriter(filePath);
+        writer.onwriteend = onwriteend;
+        writer.write(rule); 
+    });
     test("should contain a seek function", function() {
         expect(2);
         var filePath=FILE_ROOT+"temp.txt";
