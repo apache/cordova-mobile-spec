@@ -43,9 +43,9 @@ Tests.prototype.ContactsTests = function() {
 	});
 	module("Contact model");
 	test("should be able to define a Contact object", function() {
-		expect(24);
-		var contact = new Contact("a", "b", new ContactName("a", "b", "c", "d", "e", "f"), "c", [], [], [], [], [], "d", "e", "f", "g", "h", "i", "j", 
-				[], [], [], [], [], "k", "l");
+		expect(18);
+		var contact = new Contact("a", "b", new ContactName("a", "b", "c", "d", "e", "f"), "c", [], [], [], [], [], "d", "f", "h", "i",  
+				[], [], [], "l");
 		ok(contact != null, "new Contact() should not be null.");
 		ok(typeof contact.id != 'undefined' && contact.id != null && contact.id == "a", "new Contact() should include a 'id' property.");
 		ok(typeof contact.displayName != 'undefined' && contact.displayName != null && contact.displayName == "b", "new Contact() should include a 'displayName' property.");
@@ -56,20 +56,14 @@ Tests.prototype.ContactsTests = function() {
 		ok(typeof contact.addresses != 'undefined' && contact.addresses != null, "new Contact() should include a 'addresses' property.");
 		ok(typeof contact.ims != 'undefined' && contact.ims != null, "new Contact() should include a 'ims' property.");
 		ok(typeof contact.organizations != 'undefined' && contact.organizations != null, "new Contact() should include a 'organizations' property.");
-		ok(typeof contact.published != 'undefined' && contact.published != null && contact.published == "d", "new Contact() should include a 'published' property.");
-		ok(typeof contact.updated != 'undefined' && contact.updated != null && contact.updated == "e", "new Contact() should include a 'updated' property.");
+		ok(typeof contact.revision != 'undefined' && contact.revision != null && contact.revision == "d", "new Contact() should include a 'revision' property.");
 		ok(typeof contact.birthday != 'undefined' && contact.birthday != null && contact.birthday == "f", "new Contact() should include a 'birthday' property.");
-		ok(typeof contact.anniversary != 'undefined' && contact.anniversary != null && contact.anniversary == "g", "new Contact() should include a 'anniversary' property.");
 		ok(typeof contact.gender != 'undefined' && contact.gender != null && contact.gender == "h", "new Contact() should include a 'gender' property.");
 		ok(typeof contact.note != 'undefined' && contact.note != null && contact.note == "i", "new Contact() should include a 'note' property.");
-		ok(typeof contact.preferredUsername != 'undefined' && contact.preferredUsername != null && contact.preferredUsername == "j", "new Contact() should include a 'preferredUsername' property.");
 		ok(typeof contact.photos != 'undefined' && contact.photos != null, "new Contact() should include a 'photos' property.");
-		ok(typeof contact.tags != 'undefined' && contact.tags != null, "new Contact() should include a 'tags' property.");
-		ok(typeof contact.relationships != 'undefined' && contact.relationships != null, "new Contact() should include a 'relationships' property.");
+		ok(typeof contact.categories != 'undefined' && contact.categories != null, "new Contact() should include a 'categories' property.");
 		ok(typeof contact.urls != 'undefined' && contact.urls != null, "new Contact() should include a 'urls' property.");
-		ok(typeof contact.accounts != 'undefined' && contact.accounts != null, "new Contact() should include a 'accounts' property.");
-		ok(typeof contact.utcOffset != 'undefined' && contact.utcOffset != null && contact.utcOffset == "k", "new Contact() should include a 'utcOffset' property.");
-		ok(typeof contact.connected != 'undefined' && contact.connected != null && contact.connected == "l", "new Contact() should include a 'connected' property.");
+		ok(typeof contact.timezone != 'undefined' && contact.timezone != null && contact.timezone == "l", "new Contact() should include a 'timezone' property.");
 	});	
 	test("should be able to define a ContactName object", function() {
 		expect(7);
@@ -88,7 +82,7 @@ Tests.prototype.ContactsTests = function() {
 		ok(contactField != null, "new ContactField() should not be null.");
 		ok(typeof contactField.type != 'undefined' && contactField.type != null && contactField.type == "home", "new ContactField() should include a 'type' property.");
 		ok(typeof contactField.value != 'undefined' && contactField.value != null && contactField.value == "8005551212", "new ContactField() should include a 'value' property.");
-		ok(typeof contactField.primary != 'undefined' && contactField.primary != null && contactField.primary == true, "new ContactField() should include a 'primary' property.");
+		ok(typeof contactField.pref != 'undefined' && contactField.pref != null && contactField.pref == true, "new ContactField() should include a 'pref' property.");
 	});	
 	test("should be able to define a ContactAddress object", function() {
 		expect(7);
@@ -102,32 +96,19 @@ Tests.prototype.ContactsTests = function() {
 		ok(typeof contactAddress.country != 'undefined' && contactAddress.country != null && contactAddress.country == "f", "new ContactAddress() should include a 'country' property.");
 	});	
 	test("should be able to define a ContactOrganization object", function() {
-		expect(8);
+		expect(4);
 		var contactOrg = new ContactOrganization("a","b","c","d","e","f","g");
 		ok(contactOrg != null, "new ContactOrganization() should not be null.");
 		ok(typeof contactOrg.name != 'undefined' && contactOrg.name != null && contactOrg.name == "a", "new ContactOrganization() should include a 'name' property.");
 		ok(typeof contactOrg.department != 'undefined' && contactOrg.department != null && contactOrg.department == "b", "new ContactOrganization() should include a 'department' property.");
 		ok(typeof contactOrg.title != 'undefined' && contactOrg.title != null && contactOrg.title == "c", "new ContactOrganization() should include a 'title' property.");
-		ok(typeof contactOrg.startDate != 'undefined' && contactOrg.startDate != null && contactOrg.startDate == "d", "new ContactOrganization() should include a 'startDate' property.");
-		ok(typeof contactOrg.endDate != 'undefined' && contactOrg.endDate != null && contactOrg.endDate == "e", "new ContactOrganization() should include a 'endDate' property.");
-		ok(typeof contactOrg.location != 'undefined' && contactOrg.location != null && contactOrg.location == "f", "new ContactOrganization() should include a 'location' property.");
-		ok(typeof contactOrg.description != 'undefined' && contactOrg.description != null && contactOrg.description == "g", "new ContactOrganization() should include a 'description' property.");
-	});	
-	test("should be able to define a ContactAccount object", function() {
-		expect(4);
-		var contactAccount = new ContactAccount("a", "b", "c");
-		ok(contactAccount != null, "new ContactAccount() should not be null.");
-		ok(typeof contactAccount.domain != 'undefined' && contactAccount.domain != null && contactAccount.domain == "a", "new ContactAccount() should include a 'domain' property.");
-		ok(typeof contactAccount.username != 'undefined' && contactAccount.username != null && contactAccount.username == "b", "new ContactAccount() should include a 'username' property.");
-		ok(typeof contactAccount.userid != 'undefined' && contactAccount.userid != null && contactAccount.userid == "c", "new ContactAccount() should include a 'userid' property.");
 	});	
 	test("should be able to define a ContactFindOptions object", function() {
-		expect(5);
-		var contactFindOptions = new ContactFindOptions("a", true, 1, "b");
+		expect(4);
+		var contactFindOptions = new ContactFindOptions("a", true, "b");
 		ok(contactFindOptions != null, "new ContactFindOptions() should not be null.");
 		ok(typeof contactFindOptions.filter != 'undefined' && contactFindOptions.filter != null && contactFindOptions.filter == "a", "new ContactFindOptions() should include a 'filter' property.");
 		ok(typeof contactFindOptions.multiple != 'undefined' && contactFindOptions.multiple != null && contactFindOptions.multiple == true, "new ContactFindOptions() should include a 'multiple' property.");
-		ok(typeof contactFindOptions.limit != 'undefined' && contactFindOptions.limit != null && contactFindOptions.limit == 1, "new ContactFindOptions() should include a 'limit' property.");
 		ok(typeof contactFindOptions.updatedSince != 'undefined' && contactFindOptions.updatedSince != null && contactFindOptions.updatedSince == "b", "new ContactFindOptions() should include a 'updatedSince' property.");
 	});	
 	module("Contact Object");
