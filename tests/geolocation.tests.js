@@ -4,10 +4,6 @@ Tests.prototype.GeoLocationTests = function() {
   		expect(1);
   		ok(navigator.geolocation != null, "navigator.geolocation should not be null.");
 	});
-	test("should have an initially null lastPosition property", function() {
-  		expect(1);
-  		ok(typeof navigator.geolocation.lastPosition != 'undefined' && navigator.geolocation.lastPosition == null, "navigator.geolocation.lastPosition should be initially null.");
-	});
 	test("should contain a getCurrentPosition function", function() {
 		expect(2);
 		ok(typeof navigator.geolocation.getCurrentPosition != 'undefined' && navigator.geolocation.getCurrentPosition != null, "navigator.geolocation.getCurrentPosition should not be null.");
@@ -24,12 +20,11 @@ Tests.prototype.GeoLocationTests = function() {
 		ok(typeof navigator.geolocation.clearWatch == 'function', "navigator.geolocation.clearWatch should be a function.");
 	});
 	test("getCurrentPosition success callback should be called with a Position object", function() {
-		expect(3);
+		expect(2);
 		QUnit.stop(tests.TEST_TIMEOUT);
 		var win = function(p) {
 			ok(p.coords != null, "Position object returned in getCurrentPosition success callback has a 'coords' property.");
 			ok(p.timestamp != null, "Position object returned in getCurrentPosition success callback has a 'timestamp' property.");
-			equals(p, navigator.geolocation.lastPosition, "Position object returned in getCurrentPosition success callback equals navigator.geolocation.lastPosition.");
 			start();
 		};
 		var fail = function() { start(); };
