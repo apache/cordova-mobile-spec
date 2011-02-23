@@ -39,22 +39,9 @@
            this.TEST_TIMEOUT = 15000;
        	};
        	var tests = new Tests();
-       	FILE_ROOT = "undefined";
 
        	// Runs each function in Tests that contains 'Tests' in the name.
        	function run() {
-           	if (navigator.userAgent.indexOf("Android") != -1) {
-               	var paths = navigator.fileMgr.getRootPaths();
-               	console.log(paths[0]);
-           		FILE_ROOT = paths[0];
-           	}
-           	else if (navigator.userAgent.indexOf("BlackBerry") != -1) {
-                var paths = navigator.fileMgr.getRootPaths();
-                FILE_ROOT = paths[0];
-           	}
-           	else if (navigator.userAgent.indexOf("iPhone") != -1 || navigator.userAgent.indexOf("iPad")) {
-           		FILE_ROOT = "";  // Need to find out
-           	}
 
 			// Deviceready has fired, so now qunit can be loaded
 			if (qunitLoadFunction) {

@@ -1,276 +1,303 @@
-Tests.prototype.FileTests = function() {    
+/**
+ * Retrieves root file system entries once, so it doesn't have to be 
+ * repeated for every test (file system won't change during test run). 
+ */ 
+var getFileSystemRoot = (function() {
+
+    // private
+    var temp_root, persistent_root;
+
+    var onError = function(error) {
+        console.log('unable to retrieve file system: ' + error.code);
+    };
+    
+    // one-time retrieval of the root file system entry
+    var init = function() {
+        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,
+                function(fileSystem) {
+                    persistent_root = fileSystem.root;
+                }, onError);
+        window.requestFileSystem(LocalFileSystem.TEMPORARY, 0,
+                function(fileSystem) {
+                    temp_root = fileSystem.root;
+                }, onError);
+    };
+    document.addEventListener("deviceready", init, true); 
+
+    // public function returns private root entry
+    return function(type) {
+        if (type === LocalFileSystem.TEMPORARY) {
+            return temp_root;
+        }
+        else if (type === LocalFileSystem.PERSISTENT) {
+            return persistent_root;
+        }
+        else {
+            return null;
+        }
+    };
+}()); // execute immediately
+
+Tests.prototype.FileTests = function() {
     module('FileReader model');
-    test("should be able to define a FileReader object", function() {
-        expect(1);
+    test("FileReader object should have correct methods", function() {
+        expect(6);
         var reader = new FileReader();
-        ok(reader != null, "new FileReader() should not be null.");
+        ok(reader !== null, "new FileReader() should not be null.");
+        ok(typeof reader.readAsBinaryString === 'function', "FileReader object should have a readAsBinaryString function.");
+        ok(typeof reader.readAsDataURL === 'function', "FileReader object should have a readAsDataURL function.");
+        ok(typeof reader.readAsText === 'function', "FileReader object should have a readAsText function.");
+        ok(typeof reader.readAsArrayBuffer === 'function', "FileReader object should have a readAsArrayBuffer function.");
+        ok(typeof reader.abort === 'function', "FileReader object should have an abort function.");
     });
-    test("should contain a readAsBinaryString function", function() {
-        expect(2);
-        var reader = new FileReader();
-        ok(typeof reader.readAsBinaryString != 'undefined' && reader.readAsBinaryString != null, "reader.readAsBinaryString should not be null.");
-        ok(typeof reader.readAsBinaryString == 'function', "reader.readAsBinaryString should be a function.");
-    });
-    test("should contain a readAsDataURL function", function() {
-        expect(2);
-        var reader = new FileReader();
-        ok(typeof reader.readAsDataURL != 'undefined' && reader.readAsDataURL != null, "reader.readAsDataURL should not be null.");
-        ok(typeof reader.readAsDataURL == 'function', "reader.readAsDataURL should be a function.");
-    });
-    test("should contain a readAsText function", function() {
-        expect(2);
-        var reader = new FileReader();
-        ok(typeof reader.readAsText != 'undefined' && reader.readAsText != null, "reader.readAsText should not be null.");
-        ok(typeof reader.readAsText == 'function', "reader.readAsText should be a function.");
+    module('FileReader read', {
+        setup: function() {
+            this.root = getFileSystemRoot(LocalFileSystem.PERSISTENT); 
+            this.fail = function(error) {
+                console.log('file error: ' + error.code);
+            };            
+        }
     });
     test("should read file properly", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
         expect(1);
-        
-        // file name and content
-        var filePath = FILE_ROOT+"read.txt";
-        var rule = "There is an exception to every rule.  Except this one.";    
-        
-        // delete old file
-        try { 
-            navigator.fileMgr.deleteFile(filePath);
-        }
-        catch (e) {
-            // ok if not found
-        }
-
-        // 2nd - read the file 
-        var read = function(evt) {
-            var reader = new FileReader();
-            reader.onloadend = function(evt) {
-                console.log("read success");
-                console.log(evt.target.result);
-                ok(evt.target.result === rule, "reader.result should be equal to the text written.");
-                QUnit.start();
+            
+            // path of file
+        var fileName = "read.txt",
+            filePath = this.root.fullPath + '/' + fileName;
+            // file content
+            rule = "There is an exception to every rule.  Except this one.",
+            // creates a FileWriter object
+            create_writer = function(fileEntry) {
+                fileEntry.createWriter(write_file, this.fail);
+            },
+            // writes file and reads it back in
+            write_file = function(writer) {
+                writer.onwriteend = read_file; 
+                writer.write(rule);
+            },
+            // reads file and compares content to what was written
+            read_file = function(evt) {
+                var reader = new FileReader();
+                reader.onloadend = function(evt) {
+                    console.log("read success");
+                    console.log(evt.target.result);
+                    ok(evt.target.result === rule, "reader.result should be equal to the text written.");
+                    QUnit.start();
+                };
+                reader.readAsText(filePath);
             };
-            reader.readAsText(filePath);
-        };
         
-        // 1st - write the file to be read
-        var writer = new FileWriter(filePath);
-        writer.onwriteend = read; 
-        writer.write(rule);
+        // create a file, write to it, and read it in again
+        this.root.getFile(fileName, {create: true}, create_writer, this.fail);
     });
-    test("should contain a readAsArrayBuffer function", function() {
-        expect(2);
-        var reader = new FileReader();
-        ok(typeof reader.readAsArrayBuffer != 'undefined' && reader.readAsArrayBuffer != null, "reader.readAsArrayBuffer should not be null.");
-        ok(typeof reader.readAsArrayBuffer == 'function', "reader.readAsArrayBuffer should be a function.");
-    });
-    test("should contain an abort function", function() {
-        expect(2);
-        var reader = new FileReader();
-        ok(typeof reader.abort != 'undefined' && reader.abort != null, "reader.abort should not be null.");
-        ok(typeof reader.abort == 'function', "reader.abort should be a function.");
-    });
-    module('FileWriter model');    
-    test("should be able to define a FileWriter object", function() {
-        expect(1);
-        var filePath=FILE_ROOT+"temp.txt";
-        var writer = new FileWriter(filePath);
-        ok(writer != null, "new FileWriter() should not be null.");
-    });
-    test("should contain a write function", function() {
-        expect(2);
-        var filePath=FILE_ROOT+"temp.txt";
-        var writer = new FileWriter(filePath);
-        ok(typeof writer.write != 'undefined' && writer.write != null, "writer.write should not be null.");
-        ok(typeof writer.write == 'function', "writer.write should be a function.");
+    module('FileWriter model', {
+        // setup function will run before each test
+        setup: function() {
+            var that = this;
+            this.root = getFileSystemRoot(LocalFileSystem.PERSISTENT); 
+            this.fail = function(error) {
+                console.log('file error: ' + error.code);
+            };
+            // creates the specified file, then invokes the specified callback
+            this.createFile = function(fileName, callback) {
+                // creates file
+                var create_file = function() {
+                    that.root.getFile(fileName, {create: true}, callback, that.fail);                
+                };
+                
+                // deletes file, if it exists
+                that.root.getFile(fileName, null, 
+                        // remove file system entry
+                        function(entry) {
+                            entry.remove(create_file, that.fail); 
+                        },
+                        // doesn't exist, just invoke callback
+                        create_file);
+            };
+        }
+    });    
+    test("FileWriter object should have correct methods", function() {
+        QUnit.stop(tests.TEST_TIMEOUT);
+        expect(5);
+        
+        // retrieve a FileWriter object
+        var fileName = "write.txt",
+            test_writer = function(fileEntry) {
+                fileEntry.createWriter(function(writer) {
+                    ok(typeof writer !== 'undefined' && writer !== null, "FileEntry.createWriter should return a FileWriter object.");
+                    ok(typeof writer.write === 'function', "FileWriter object should have a write function.");
+                    ok(typeof writer.seek === 'function', "FileWriter object should have a seek function.");
+                    ok(typeof writer.truncate === 'function', "FileWriter object should have a truncate function.");
+                    ok(typeof writer.abort === 'function', "FileWriter object should have an abort function.");
+                    QUnit.start();
+                }, this.fail);
+            };
+
+        // test FileWriter
+        this.root.getFile(fileName, {create: true}, test_writer, this.fail);                        
     });
     test("should be able to write and append to file", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
         expect(5);
 
-        // file name and content
-        var filePath = FILE_ROOT+"write.txt";
-        var rule = "There is an exception to every rule.";
-        var length = rule.length;
-
-        // delete old file
-        try { 
-            navigator.fileMgr.deleteFile(filePath);
-        }
-        catch (e) {
-            // ok if not found
-        }
+        var that = this,
+            // file name
+            fileName = "append.txt",
+            // path to file
+            filePath = this.root.fullPath + '/' + fileName,
+            // file content
+            rule = "There is an exception to every rule.",
+            // for testing file length
+            length = rule.length,
+            // writes initial file content
+            write_file = function(fileEntry) {
+                fileEntry.createWriter(function(writer) {
+                    writer.onwriteend = function(evt) {
+                        ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
+                        ok(writer.length === length, "should have written " + length + " bytes");
+                        ok(writer.position === length, "position should be at " + length);
+                        append_file(writer);
+                    };
+                    writer.write(rule); 
+                }, that.fail);
+            }, 
+            // appends to file
+            append_file = function(writer) {
+                var exception = "  Except this one.";            
+                writer.onwriteend = function(evt) {
+                    ok(writer.length === length, "file length should be " + length);
+                    ok(writer.position === length, "position should be at " + length);
+                    QUnit.start();
+                };
+                length += exception.length;
+                writer.seek(writer.length);
+                writer.write(exception); 
+            };
         
-        // 3rd - append to file
-        var append = function() {
-            writer = new FileWriter(filePath, true);
-            writer.onwriteend = function(evt) {
-                ok(writer.length == length, "file length should be " + length);
-                ok(writer.position == length, "position should be at " + length);
-                QUnit.start();
-            }
-            var exception = "  Except this one.";
-            length += exception.length;
-            writer.write(exception); 
-        };
-
-        // 2nd - called when write completes
-        var onwriteend = function(evt) {
-            ok(navigator.fileMgr.testFileExists(filePath) == true, "file should exist");
-            ok(writer.length == length, "should have written " + length + " bytes");
-            ok(writer.position == length, "position should be at " + length);
-            append();
-        };
-            
-        // 1st - write to file
-        var writer = new FileWriter(filePath);
-        writer.onwriteend = onwriteend;
-        writer.write(rule); 
+        // create file, then write and append to it
+        this.createFile(fileName, write_file);
     });
     test("should be able to write XML data", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
         expect(3);
 
-        // file name and content
-        var filePath = FILE_ROOT+"write.xml";
-        var rule = '<?xml version="1.0" encoding="UTF-8"?>\n<test prop="ack">\nData\n</test>\n';
-        var length = rule.length;
-
-        // delete old file
-        try { 
-            navigator.fileMgr.deleteFile(filePath);
-        }
-        catch (e) {
-            // ok if not found
-        }
-        
-        // 2nd - called when write completes
-        var onwriteend = function(evt) {
-            ok(navigator.fileMgr.testFileExists(filePath) == true, "file should exist");
-            ok(writer.length == length, "should have written " + length + " bytes");
-            ok(writer.position == length, "position should be at " + length);
-            QUnit.start();
-        };
+        var that = this,
+            // file name
+            fileName = "append.txt",
+            // path to file
+            filePath = this.root.fullPath + '/' + fileName,
+            // file content
+            rule = '<?xml version="1.0" encoding="UTF-8"?>\n<test prop="ack">\nData\n</test>\n',
+            // for testing file length
+            length = rule.length,
+            // writes file content
+            write_file = function(fileEntry) {
+                fileEntry.createWriter(function(writer) {
+                    writer.onwriteend = function(evt) {
+                        ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
+                        ok(writer.length === length, "should have written " + length + " bytes");
+                        ok(writer.position === length, "position should be at " + length);
+                        QUnit.start();
+                    };
+                    writer.write(rule); 
+                }, that.fail);
+            };
             
-        // 1st - write to file
-        var writer = new FileWriter(filePath);
-        writer.onwriteend = onwriteend;
-        writer.write(rule); 
+        // creates file, then write XML data
+        this.createFile(fileName, write_file);
     });
     test("should be able to write JSON data", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
         expect(3);
 
-        // file name and content
-        var filePath = FILE_ROOT+"write.json";
-        var rule = '{ "name": "Guy Incognito", "email": "here@there.com" }';
-        var length = rule.length;
-
-        // delete old file
-        try { 
-            navigator.fileMgr.deleteFile(filePath);
-        }
-        catch (e) {
-            // ok if not found
-        }
+        var that = this,
+            // file name
+            fileName = "json.txt",
+            // path to file
+            filePath = this.root.fullPath + '/' + fileName,
+            // file content
+            rule = '{ "name": "Guy Incognito", "email": "here@there.com" }',
+            // for testing file length
+            length = rule.length,
+            // writes file content
+            write_file = function(fileEntry) {
+                fileEntry.createWriter(function(writer) {
+                    writer.onwriteend = function(evt) {
+                        ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
+                        ok(writer.length === length, "should have written " + length + " bytes");
+                        ok(writer.position === length, "position should be at " + length);
+                        QUnit.start();
+                    };
+                    writer.write(rule); 
+                }, that.fail);
+            };
         
-        // 2nd - called when write completes
-        var onwriteend = function(evt) {
-            ok(navigator.fileMgr.testFileExists(filePath) == true, "file should exist");
-            ok(writer.length == length, "should have written " + length + " bytes");
-            ok(writer.position == length, "position should be at " + length);
-            QUnit.start();
-        };
-            
-        // 1st - write to file
-        var writer = new FileWriter(filePath);
-        writer.onwriteend = onwriteend;
-        writer.write(rule); 
-    });
-    test("should contain a seek function", function() {
-        expect(2);
-        var filePath=FILE_ROOT+"temp.txt";
-        var writer = new FileWriter(filePath);
-        ok(typeof writer.seek != 'undefined' && writer.seek != null, "writer.seek should not be null.");
-        ok(typeof writer.seek == 'function', "writer.seek should be a function.");
+        // creates file, then write JSON content
+        this.createFile(fileName, write_file);
     });
     test("should be able to seek", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
         expect(5);
         
-        // file name and content
-        var filePath = FILE_ROOT+"seek.txt";
-        var rule = "There is an exception to every rule.  Except this one.";
-        var length = rule.length;
-        
-        // delete old file
-        try { 
-            navigator.fileMgr.deleteFile(filePath);
-        }
-        catch (e) {
-            // ok if not found
-        }
-        
-        // 2nd - seek through file
-        var seek = function(evt) {
-            ok(writer.position == length, "position should be at " + length); 
-            writer.seek(-5);
-            ok(writer.position == (length-5), "position should be at " + (length-5)); 
-            writer.seek(100);
-            ok(writer.position == length, "position should be at " + length); 
-            writer.seek(10);
-            ok(writer.position == 10, "position should be at 10"); 
-            QUnit.start();
-        };
-
-        // 1st - write to file
-        var writer = new FileWriter(filePath);
-        writer.seek(-100);
-        ok(writer.position == 0, "position should be at 0");        
-        writer.onwriteend = seek;
-        writer.write(rule);
-    });
-    test("should contain a truncate function", function() {
-        expect(2);
-        var filePath=FILE_ROOT+"temp.txt";
-        var writer = new FileWriter(filePath);
-        ok(typeof writer.truncate != 'undefined' && writer.truncate != null, "writer.truncate should not be null.");
-        ok(typeof writer.truncate == 'function', "writer.truncate should be a function.");
+        var that = this,
+            // file name
+            fileName = "seek.txt",
+            // file content
+            rule = "There is an exception to every rule.  Except this one.",
+            // for testing file length
+            length = rule.length,
+            // writes file content and tests writer.seek
+            seek_file = function(fileEntry) {
+                fileEntry.createWriter(function(writer) {
+                    writer.onwriteend = function(evt) {
+                        ok(writer.position == length, "position should be at " + length); 
+                        writer.seek(-5);
+                        ok(writer.position == (length-5), "position should be at " + (length-5)); 
+                        writer.seek(100);
+                        ok(writer.position == length, "position should be at " + length); 
+                        writer.seek(10);
+                        ok(writer.position == 10, "position should be at 10"); 
+                        QUnit.start();
+                    };
+                    writer.seek(-100);
+                    ok(writer.position == 0, "position should be at 0");        
+                    writer.write(rule);
+                }, that.fail);
+            };
+            
+        // creates file, then write JSON content
+        this.createFile(fileName, seek_file);
     });
     test("should be able to truncate", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
         expect(2);
         
-        // file name and content
-        var filePath = FILE_ROOT+"truncate.txt";
-        var rule = "There is an exception to every rule.  Except this one.";
+        var that = this,
+            // file name
+            fileName = "truncate.txt",
+            // file content
+            rule = "There is an exception to every rule.  Except this one.",
+            // writes file content 
+            write_file = function(fileEntry) {
+                fileEntry.createWriter(function(writer) {
+                    writer.onwriteend = function(evt) {
+                        truncate_file(writer);
+                    }; 
+                    writer.write(rule);
+                }, that.fail);
+            },
+            // and tests writer.truncate
+            truncate_file = function(writer) {
+                writer.onwriteend = function(evt) {
+                    ok(writer.length == 36, "file length should be 36");
+                    ok(writer.position == 36, "position should be at 36");  
+                    QUnit.start();
+                }; 
+                writer.truncate(36);                
+            };
 
-        // delete old file
-        try { 
-            navigator.fileMgr.deleteFile(filePath);
-        }
-        catch (e) {
-            // ok if not found
-        }
-
-        // 2nd - truncate the file
-        var truncate = function() { 
-            writer.onwriteend = function(evt) {
-                ok(writer.length == 36, "file length should be 36");
-                ok(writer.position == 36, "position should be at 36");  
-                QUnit.start();
-            }; 
-            writer.truncate(36);
-        };
-
-        // 1st - write the file
-        var writer = new FileWriter(filePath);
-        writer.onwriteend = truncate;
-        writer.write(rule);
+        // creates file, writes to it, then truncates it
+        this.createFile(fileName, write_file);
     });
-    test("should contain a abort function", function() {
-        expect(2);
-        var filePath=FILE_ROOT+"temp.txt";
-        var writer = new FileWriter(filePath);
-        ok(typeof writer.abort != 'undefined' && writer.abort != null, "writer.abort should not be null.");
-        ok(typeof writer.abort == 'function', "writer.abort should be a function.");
-    });    
 };
