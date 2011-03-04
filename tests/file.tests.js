@@ -1808,7 +1808,7 @@ Tests.prototype.FileTests = function() {
             };            
         }
     });
-    test("should read file properly", function() {
+    test("should read file properly, File object", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
         expect(1);
             
@@ -1835,7 +1835,44 @@ Tests.prototype.FileTests = function() {
                     ok(evt.target.result === rule, "reader.result should be equal to the text written.");
                     QUnit.start();
                 };
-                reader.readAsText(filePath);
+                var myFile = new File();
+                myFile.fullPath = filePath; 
+                reader.readAsText(myFile);
+            };
+        
+        // create a file, write to it, and read it in again
+        this.root.getFile(fileName, {create: true}, create_writer, this.fail);
+    });
+    test("should read file properly, Data URL", function() {
+        QUnit.stop(tests.TEST_TIMEOUT);
+        expect(1);
+            
+            // path of file
+        var fileName = "reader.txt",
+            filePath = this.root.fullPath + '/' + fileName;
+            // file content
+            rule = "There is an exception to every rule.  Except this one.",
+            // creates a FileWriter object
+            create_writer = function(fileEntry) {
+                fileEntry.createWriter(write_file, this.fail);
+            },
+            // writes file and reads it back in
+            write_file = function(writer) {
+                writer.onwriteend = read_file; 
+                writer.write(rule);
+            },
+            // reads file and compares content to what was written
+            read_file = function(evt) {
+                var reader = new FileReader();
+                reader.onloadend = function(evt) {
+                    console.log("read success");
+                    console.log(evt.target.result);
+                    ok(evt.target.result.substr(0,23) === "data:text/plain;base64,", "reader.result should be base64 encoded.");
+                    QUnit.start();
+                };
+                var myFile = new File();
+                myFile.fullPath = filePath; 
+                reader.readAsDataURL(myFile);
             };
         
         // create a file, write to it, and read it in again
@@ -1895,7 +1932,7 @@ Tests.prototype.FileTests = function() {
         // test FileWriter
         this.root.getFile(fileName, {create: true}, test_writer, this.fail);                        
     });
-    test("should be able to write and append to file", function() {
+    test("should be able to write and append to file, createWriter", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
         expect(5);
 
@@ -1936,6 +1973,49 @@ Tests.prototype.FileTests = function() {
         
         // create file, then write and append to it
         this.createFile(fileName, write_file);
+    });
+    test("should be able to write and append to file, File object", function() {
+        QUnit.stop(tests.TEST_TIMEOUT);
+        expect(5);
+
+        var that = this,
+            fileName = "writer.append",
+            filePath = this.root.fullPath + '/' + fileName,
+            // file content
+            rule = "There is an exception to every rule.",
+            // for testing file length
+            length = rule.length,
+            // writes initial file content
+            write_file = function(file) {
+                var writer = new FileWriter(file);
+                    writer.onwriteend = function(evt) {
+                        ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
+                        ok(writer.length === length, "should have written " + length + " bytes");
+                        ok(writer.position === length, "position should be at " + length);
+                        append_file(writer);
+                    };
+                    writer.write(rule); 
+            }, 
+            // appends to file
+            append_file = function(writer) {
+                var exception = "  Except this one.";            
+                writer.onwriteend = function(evt) {
+                    ok(writer.length === length, "file length should be " + length);
+                    ok(writer.position === length, "position should be at " + length);
+
+                    // cleanup
+                    that.deleteFile(fileName);
+                    QUnit.start();
+                };
+                length += exception.length;
+                writer.seek(writer.length);
+                writer.write(exception); 
+            };
+        
+        // create file, then write and append to it
+		var file = new File();
+		file.fullPath = filePath;
+        write_file(file);
     });
     test("should be able to write XML data", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
