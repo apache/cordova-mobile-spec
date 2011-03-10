@@ -62,4 +62,15 @@ Tests.prototype.CaptureTests = function() {
         ok(error !== null, "CaptureError object should not be null.");
         ok(typeof error.code !== 'undefined', "CaptureError object should have a 'code' property.");
     });
+    module('MediaFileData');
+    test("MediaFileData constructor should exist", function() {
+        expect(6);
+        var fileData = new MediaFileData();
+        ok(fileData !== null, "MediaFileData object should not be null.");
+        ok(typeof fileData.bitrate !== 'undefined', "MediaFileData object should have a 'bitrate' property.");
+        ok(typeof fileData.codecs !== 'undefined', "MediaFileData object should have a 'codecs' property.");
+        ok(typeof fileData.duration !== 'undefined', "MediaFileData object should have a 'duration' property.");
+        ok(typeof fileData.height !== 'undefined', "MediaFileData object should have a 'height' property.");
+        ok(typeof fileData.width !== 'undefined', "MediaFileData object should have a 'width' property.");
+    });
 };
