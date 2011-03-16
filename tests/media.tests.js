@@ -23,4 +23,5 @@ Tests.prototype.MediaTests = function() {
 		ok(audio.loop == false, "Instantiated 'Audio' object's 'loop' property should initially be false.");
 		ok(typeof audio.error != 'undefined', "Instantiated 'Audio' object's 'error' property should not undefined.");
 		ok(audio.error == null, "Instantiated 'Audio' object's 'error' should initially be null.");
+	});
 };
