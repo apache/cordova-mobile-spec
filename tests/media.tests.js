@@ -1,8 +1,12 @@
+//
+// @TODO Update to Latest HTML5 Audio Element Spec
+// @see http://www.whatwg.org/specs/web-apps/current-work/multipage/video.html#audio
+//
 Tests.prototype.MediaTests = function() {	
 	module('Media (Audio)');
 	test("should exist", function() {
   		expect(1);
-  		ok(typeof Audio == "function", "'Audio' should be defined as a function in global scope.");
+		ok(typeof Audio === "function" || typeof Audio === "object", "'Audio' should be defined as a function in global scope.");
 	});
 	test("should define constants for Media errors", function() {
 		expect(5);
@@ -18,7 +22,7 @@ Tests.prototype.MediaTests = function() {
 		var audio = new Audio(audioSrc);
   		ok(typeof audio == "object", "Instantiated 'Audio' object instance should be of type 'object.'");
 		ok(audio.src != null && typeof audio.src != 'undefined', "Instantiated 'Audio' object's 'src' property should not be null or undefined.");
-		ok(audio.src == audioSrc, "Instantiated 'Audio' object's 'src' property should match constructor parameter.");
+		ok(audio.src.indexOf(audioSrc) >= 0, "Instantiated 'Audio' object's 'src' property should match constructor parameter.");
 		ok(audio.loop != null && typeof audio.loop != 'undefined', "Instantiated 'Audio' object's 'loop' property should not be null or undefined.");
 		ok(audio.loop == false, "Instantiated 'Audio' object's 'loop' property should initially be false.");
 		ok(typeof audio.error != 'undefined', "Instantiated 'Audio' object's 'error' property should not undefined.");
