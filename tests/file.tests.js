@@ -192,9 +192,10 @@ Tests.prototype.FileTests = function() {
                 ok(typeof entry.getDirectory === 'function', "entry object should have a 'getDirectory' function.");
                 ok(typeof entry.removeRecursively === 'function', "entry object should have a 'removeRecursively' function.");
                 QUnit.start();
-            };
+		 };
+		 
+		window.resolveLocalFileSystemURI(root.toURI(), testFSRoot, null);
         
-        window.resolveLocalFileSystemURI(root.toURI(), testFSRoot, null);
     });
     module('DirectoryEntry interface', {
         // setup function will run before each test
@@ -202,12 +203,15 @@ Tests.prototype.FileTests = function() {
             this.root = getFileSystemRoot();
             this.fail = function(error) {
                 console.log('file error: ' + error.code);
-            };   
+            };
+		   this.unexpectedSuccess = function() {
+				console.log('!!! success function called when not expected !!!');
+		   };
         }
     });
     test("DirectoryEntry.getFile: get Entry for file that does not exist", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(2);
         
         var fileName = "de.no.file",
             filePath = this.root.fullPath + '/' + fileName,
@@ -215,7 +219,6 @@ Tests.prototype.FileTests = function() {
             testFile = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "retrieving a file that does not exist is an error");
                 equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-                ok(navigator.fileMgr.testFileExists(filePath) === false, "file should NOT exist");
                 
                 // cleanup
                 QUnit.start();
@@ -226,7 +229,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryEntry.getFile: create new file", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(6);
+        expect(5);
         
         var fileName = "de.create.file",
             filePath = this.root.fullPath + '/' + fileName,
@@ -237,7 +240,6 @@ Tests.prototype.FileTests = function() {
                 equal(entry.isDirectory, false, "entry 'isDirectory' attribute should be false");
                 equal(entry.name, fileName, "entry 'name' attribute should be set");
                 equal(entry.fullPath, filePath, "entry 'fullPath' attribute should be set");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
                 
                 // cleanup
                 entry.remove(null, that.fail);
@@ -249,7 +251,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryEntry.getFile: create new file (exclusive)", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(6);
+        expect(5);
         
         var fileName = "de.create.exclusive.file",
             filePath = this.root.fullPath + '/' + fileName,
@@ -260,7 +262,6 @@ Tests.prototype.FileTests = function() {
                 equal(entry.isDirectory, false, "entry 'isDirectory' attribute should be false");
                 equal(entry.name, fileName, "entry 'name' attribute should be set");
                 equal(entry.fullPath, filePath, "entry 'fullPath' attribute should be set");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
                 
                 // cleanup
                 entry.remove(null, that.fail);
@@ -272,7 +273,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryEntry.getFile: create file that already exists", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(6);
+        expect(5);
         
         var fileName = "de.create.existing.file",
             filePath = this.root.fullPath + '/' + fileName,
@@ -287,7 +288,6 @@ Tests.prototype.FileTests = function() {
                 equal(entry.isDirectory, false, "entry 'isDirectory' attribute should be false");
                 equal(entry.name, fileName, "entry 'name' attribute should be set");
                 equal(entry.fullPath, filePath, "entry 'fullPath' attribute should be set");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
                 
                 // cleanup
                 entry.remove(null, that.fail);
@@ -299,7 +299,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryEntry.getFile: create file that already exists (exclusive)", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(2);
         
         var fileName = "de.create.exclusive.existing.file",
             filePath = this.root.fullPath + '/' + fileName,
@@ -313,8 +313,7 @@ Tests.prototype.FileTests = function() {
             testFile = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "creating exclusive file that already exists is an error");
                 equal(error.code, FileError.PATH_EXISTS_ERR, "error code should be FileError.PATH_EXISTS_ERR");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
-                
+               
                 // cleanup
                 existingFile.remove(null, that.fail);
                 QUnit.start();
@@ -325,7 +324,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryEntry.getFile: get Entry for existing file", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(6);
+        expect(5);
         
         var fileName = "de.get.file",
             filePath = this.root.fullPath + '/' + fileName,
@@ -340,9 +339,8 @@ Tests.prototype.FileTests = function() {
                 equal(entry.isDirectory, false, "entry 'isDirectory' attribute should be false");
                 equal(entry.name, fileName, "entry 'name' attribute should be set");
                 equal(entry.fullPath, filePath, "entry 'fullPath' attribute should be set");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
-                
-                // cleanup
+				
+				// cleanup
                 entry.remove(null, that.fail);
                 QUnit.start();
             };
@@ -369,7 +367,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryEntry.getDirectory: get Entry for directory that does not exist", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(2);
         
         var dirName = "de.no.dir",
             dirPath = this.root.fullPath + '/' + dirName,
@@ -377,7 +375,6 @@ Tests.prototype.FileTests = function() {
             testDir = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "retrieving a directory that does not exist is an error");
                 equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-                ok(navigator.fileMgr.testDirectoryExists(dirPath) === false, "directory should NOT exist");
                 
                 // cleanup
                 QUnit.start();
@@ -388,7 +385,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryEntry.getDirectory: create new directory", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(6);
+        expect(5);
         
         var dirName = "de.create.dir",
             dirPath = this.root.fullPath + '/' + dirName,
@@ -399,7 +396,6 @@ Tests.prototype.FileTests = function() {
                 equal(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
                 equal(directory.name, dirName, "directory 'name' attribute should be set");
                 equal(directory.fullPath, dirPath, "directory 'fullPath' attribute should be set");
-                ok(navigator.fileMgr.testDirectoryExists(dirPath) === true, "directory should exist");
                 
                 // cleanup
                 directory.remove(null, that.fail);
@@ -411,7 +407,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryEntry.getDirectory: create new directory (exclusive)", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(6);
+        expect(5);
         
         var dirName = "de.create.exclusive.dir",
             dirPath = this.root.fullPath + '/' + dirName,
@@ -422,8 +418,7 @@ Tests.prototype.FileTests = function() {
                 equal(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
                 equal(directory.name, dirName, "directory 'name' attribute should be set");
                 equal(directory.fullPath, dirPath, "directory 'fullPath' attribute should be set");
-                ok(navigator.fileMgr.testDirectoryExists(dirPath) === true, "directory should exist");
-                
+               
                 // cleanup
                 directory.remove(null, that.fail);
                 QUnit.start();
@@ -434,7 +429,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryEntry.getDirectory: create directory that already exists", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(6);
+        expect(5);
         
         var dirName = "de.create.existing.dir",
             dirPath = this.root.fullPath + '/' + dirName,
@@ -449,7 +444,6 @@ Tests.prototype.FileTests = function() {
                 equal(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
                 equal(directory.name, dirName, "directory 'name' attribute should be set");
                 equal(directory.fullPath, dirPath, "directory 'fullPath' attribute should be set");
-                ok(navigator.fileMgr.testDirectoryExists(dirPath) === true, "directory should exist");
                 
                 // cleanup
                 directory.remove(null, that.fail);
@@ -461,7 +455,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryEntry.getDirectory: create directory that already exists (exclusive)", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(2);
         
         var dirName = "de.create.exclusive.existing.dir",
             dirPath = this.root.fullPath + '/' + dirName,
@@ -475,7 +469,6 @@ Tests.prototype.FileTests = function() {
             testDir = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "creating exclusive directory that already exists is an error");
                 equal(error.code, FileError.PATH_EXISTS_ERR, "error code should be FileError.PATH_EXISTS_ERR");
-                ok(navigator.fileMgr.testDirectoryExists(dirPath) === true, "directory should exist");
                 
                 // cleanup
                 existingDir.remove(null, that.fail);
@@ -487,7 +480,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryEntry.getDirectory: get Entry for existing directory", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(6);
+        expect(5);
         
         var dirName = "de.get.dir",
             dirPath = this.root.fullPath + '/' + dirName,
@@ -502,7 +495,6 @@ Tests.prototype.FileTests = function() {
                 equal(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
                 equal(directory.name, dirName, "directory 'name' attribute should be set");
                 equal(directory.fullPath, dirPath, "directory 'fullPath' attribute should be set");
-                ok(navigator.fileMgr.testDirectoryExists(dirPath) === true, "directory should exist");
                 
                 // cleanup
                 directory.remove(null, that.fail);
@@ -531,7 +523,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryEntry.getDirectory: get DirectoryEntry for existing file", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(2);
         
         var fileName = "de.existing.file",
             existingFile,
@@ -545,7 +537,6 @@ Tests.prototype.FileTests = function() {
             testDir = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "retrieving directory for existing file is an error");
                 equal(error.code, FileError.TYPE_MISMATCH_ERR, "error code should be FileError.TYPE_MISMATCH_ERR");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
                 
                 // cleanup
                 existingFile.remove(null, that.fail);
@@ -557,7 +548,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryEntry.getFile: get FileEntry for existing directory", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(2);
         
         var dirName = "de.existing.dir",
             existingDir,
@@ -571,8 +562,7 @@ Tests.prototype.FileTests = function() {
             testFile = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "retrieving file for existing directory is an error");
                 equal(error.code, FileError.TYPE_MISMATCH_ERR, "error code should be FileError.TYPE_MISMATCH_ERR");
-                ok(navigator.fileMgr.testDirectoryExists(dirPath) === true, "file should exist");
-                
+               
                 // cleanup
                 existingDir.remove(null, that.fail);
                 QUnit.start();
@@ -588,21 +578,26 @@ Tests.prototype.FileTests = function() {
         var dirName = "de.removeRecursively",
             subDirName = "dir",
             dirPath = this.root.fullPath + '/' + dirName,
-            subDirPath = this.root.fullPath + '/' + subDirName,
+            //subDirPath = this.root.fullPath + '/' + subDirName,
+			subDirPath = dirPath + '/' + subDirName,
             that = this,
             entryCallback = function(entry) {
                 // delete directory
-                var deleteDirectory = function(directory) {
+				var deleteDirectory = function(directory) {
                     entry.removeRecursively(testRemove, that.fail);  
                 }; 
                 // create a sub-directory within directory
                 entry.getDirectory(subDirName, {create: true}, deleteDirectory, that.fail);
-            },
-            testRemove = function() {
-                ok(navigator.fileMgr.testDirectoryExists(dirPath) === false, "directory should not exist.");
-                ok(navigator.fileMgr.testDirectoryExists(subDirPath) === false, "sub-directory should not exist.");
-                QUnit.start();
-            };
+				},
+				testRemove = function() {
+					// test that removed directory no longer exists
+					that.root.getDirectory(dirName, {create:false}, null, testDirExists);
+				},
+				testDirExists = function(error){
+					ok(typeof error !== 'undefined' && error !== null, "removed directory should not exist");
+					equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
+					QUnit.start();
+				};
 
         // create a new directory entry to kick off test
         this.root.getDirectory(dirName, {create:true}, entryCallback, this.fail);
@@ -629,7 +624,7 @@ Tests.prototype.FileTests = function() {
         expect(4);
         
         var reader,
-            testEntries = function(entries) {
+		 testEntries = function(entries) {
                 ok(typeof entries !== 'undefined' && entries !== null, "directory entries should not be null");
                 ok(entries.constructor === Array, "readEntries should return an array of entries");
                 QUnit.start();
@@ -645,7 +640,7 @@ Tests.prototype.FileTests = function() {
     });
     test("DirectoryReader.readEntries: read contents of directory that has been removed", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(4);
         
         var dirName = "de.createReader.notfound",
             dirPath = this.root.fullPath + '/' + dirName,
@@ -660,10 +655,14 @@ Tests.prototype.FileTests = function() {
                 directory.removeRecursively(readEntries, that.fail);  
             },
             testReader = function(error) {
+				var testDirectoryExists = function(error) {
+					ok(typeof error !== 'undefined' && error !== null, "reading entries on a directory that does not exist is an error")
+					equal(error.code, FileError.NOT_FOUND_ERR, "removed directory should not exist");
+					QUnit.start();
+				};
                 ok(typeof error !== 'undefined' && error !== null, "reading entries on a directory that does not exist is an error")
                 equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-                equal(navigator.fileMgr.testDirectoryExists(dirPath), false, "directory should not exist.");
-                QUnit.start();
+				that.root.getDirectory(dirName, {create:false}, null, testDirectoryExists);
             };
 
         // create a new directory entry to kick off test
@@ -801,6 +800,9 @@ Tests.prototype.FileTests = function() {
             this.fail = function(error) {
                 console.log('file error: ' + error.code);
             };
+			this.unexpectedSuccess = function() {
+				console.log('!!! success function called when not expected !!!');
+			};
             // deletes specified file or directory
             this.deleteEntry = function(name, success, error) {
                 // deletes entry, if it exists
@@ -954,7 +956,7 @@ Tests.prototype.FileTests = function() {
         expect(2);
         
         var rootPath = this.root.fullPath,
-            testParent = function(parent) {
+		 testParent = function(parent) {
                 ok(typeof parent !== 'undefined' && parent !== null, "parent directory should not be null.");
                 equal(parent.fullPath, rootPath, "parent fullPath should be root file system");
                 QUnit.start();
@@ -1005,18 +1007,21 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.remove on file", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(2);
+        expect(3);
         
         var fileName = "entry.rm.file",
             that = this,
             fullPath = this.root.fullPath + '/' + fileName,
-            entryCallback = function(entry) {
+		 entryCallback = function(entry) {
+				var checkRemove = function() {
+					that.root.getFile(fileName, null, that.unexpectedSuccess, testRemove);  
+				};
                 ok(typeof entry !== 'undefined' && entry !== null, "entry should not be null.");
-                entry.remove(testRemove, that.fail);
+                entry.remove(checkRemove, that.fail);
             },
-            testRemove = function() {
-                ok(navigator.fileMgr.testFileExists(fullPath) === false, "file should not exist.");
-
+			testRemove = function(error) {
+				ok(typeof error !== 'undefined' && error !== null, "file should not exist");
+				equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR"); 
                 // cleanup
                 that.deleteEntry(fileName);
                 QUnit.start();
@@ -1027,18 +1032,21 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.remove on empty directory", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(2);
+        expect(3);
         
         var dirName = "entry.rm.dir",
             that = this,
             fullPath = this.root.fullPath + '/' + dirName,
             entryCallback = function(entry) {
+				var checkRemove = function() {
+					that.root.getDirectory(dirName, null, that.unexpectedSuccess, testRemove);  
+				};
                 ok(typeof entry !== 'undefined' && entry !== null, "entry should not be null.");
-                entry.remove(testRemove, that.fail);
+                entry.remove(checkRemove, that.fail);
             },
-            testRemove = function() {
-                ok(navigator.fileMgr.testDirectoryExists(fullPath) === false, "directory should not exist.");
-
+            testRemove = function(error) {
+				ok(typeof error !== 'undefined' && error !== null, "directory should not exist");
+				equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR"); 
                 // cleanup
                 that.deleteEntry(dirName);                
                 QUnit.start();
@@ -1049,25 +1057,29 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.remove on non-empty directory", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(4);
         
         var dirName = "entry.rm.dir.not.empty",
             that = this,
             fullPath = this.root.fullPath + '/' + dirName,
             fileName = "remove.txt",
             entryCallback = function(entry) {
+				var checkFile = function(error) {
+					ok(typeof error !== 'undefined' && error !== null, "removing non-empty directory should generate an error");
+					equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
+					// verify that dir still exists
+					that.root.getDirectory(dirName, null, testRemove, that.fail);  
+				};
                 // delete directory
                 var deleteDirectory = function(fileEntry) {
-                    entry.remove(null, testRemove);  
+                    entry.remove(that.unexpectedSuccess, checkFile);  
                 }; 
                 // create a file within directory, then try to delete directory
                 entry.getFile(fileName, {create: true}, deleteDirectory, that.fail);
             },
-            testRemove = function(error) {
-                ok(typeof error !== 'undefined' && error !== null, "removing non-empty directory should generate an error");
-                equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                ok(navigator.fileMgr.testDirectoryExists(fullPath) === true, "directory should exist.");
-
+			testRemove = function(entry) {
+				ok(typeof entry !== 'undefined' && entry !== null, "entry should not be null.");
+				equal(entry.fullPath, fullPath, "dir entry should still exisit");
                 // cleanup
                 that.deleteEntry(dirName);
                 QUnit.start();
@@ -1091,7 +1103,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.copyTo: file", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(6);
+        expect(10);
         
         var file1 = "entry.copy.file1",
             file2 = "entry.copy.file2",
@@ -1101,19 +1113,29 @@ Tests.prototype.FileTests = function() {
                 // copy file1 to file2
                 entry.copyTo(that.root, file2, testCopy, that.fail);
             },
-            testCopy = function(entry) {
-                ok(typeof entry !== 'undefined' && entry !== null, "copied file entry should not be null");
-                equals(entry.isFile, true, "entry 'isFile' attribute should be set to true");
-                equals(entry.isDirectory, false, "entry 'isDirectory' attribute should be set to false");
-                equals(entry.fullPath, fullPath, "entry 'fullPath' should be set correctly");
-                equals(entry.name, file2, "entry 'name' attribute should be set correctly");
-                ok(navigator.fileMgr.testFileExists(fullPath) === true, "copied file should exist.");
-
-                // cleanup
-                that.deleteEntry(file1);
-                that.deleteEntry(file2);
-                QUnit.start();
-            };
+			testCopy = function(entry) {
+				
+				ok(typeof entry !== 'undefined' && entry !== null, "copied file entry should not be null");
+				equals(entry.isFile, true, "entry 'isFile' attribute should be set to true");
+				equals(entry.isDirectory, false, "entry 'isDirectory' attribute should be set to false");
+				equals(entry.fullPath, fullPath, "entry 'fullPath' should be set correctly");
+				equals(entry.name, file2, "entry 'name' attribute should be set correctly");
+				that.root.getFile(file2, {create:false}, testFileExists, null);							  
+                
+            },
+			testFileExists = function(entry2) {
+				// a bit redundant since copy returned this entry already
+				ok(typeof entry2 !== 'undefined' && entry2 !== null, "copied file entry should not be null");
+				equals(entry2.isFile, true, "entry 'isFile' attribute should be set to true");
+				equals(entry2.isDirectory, false, "entry 'isDirectory' attribute should be set to false");
+				equals(entry2.fullPath, fullPath, "entry 'fullPath' should be set correctly");
+				equals(entry2.name, file2, "entry 'name' attribute should be set correctly");
+		 
+				// cleanup
+				that.deleteEntry(file1);
+				that.deleteEntry(file2);
+				QUnit.start();
+			};
 
         // create a new file entry to kick off test
         this.createFile(file1, entryCallback, this.fail);
@@ -1128,7 +1150,7 @@ Tests.prototype.FileTests = function() {
                 // copy file1 onto itself
                 entry.copyTo(that.root, null, null, testCopy);
             },
-            testCopy = function(error) {
+		 testCopy = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "it is an error to copy an entry into its parent if a different name is not specified");
                 equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
 
@@ -1142,7 +1164,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.copyTo: directory", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(7);
+        expect(15);
         
         var file1 = "file1",
             srcDir = "entry.copy.srcDir",
@@ -1159,13 +1181,32 @@ Tests.prototype.FileTests = function() {
               directory.getFile(file1, {create: true}, copyDir, that.fail);
             },
             testCopy = function(directory) {
+				
                 ok(typeof directory !== 'undefined' && directory !== null, "copied directory entry should not be null");
                 equals(directory.isFile, false, "entry 'isFile' attribute should be false");
                 equals(directory.isDirectory, true, "entry 'isDirectory' attribute should be true");
                 equals(directory.fullPath, dstPath, "entry 'fullPath' should be set correctly");
                 equals(directory.name, dstDir, "entry 'name' attribute should be set correctly");
-                ok(navigator.fileMgr.testDirectoryExists(dstPath) === true, "copied directory should exist.");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "directory contents should have been copied.");
+		 
+				that.root.getDirectory(dstDir, {create:false}, testDirExists, that.fail);
+		   },
+			testDirExists = function(dirEntry) {
+				 ok(typeof dirEntry !== 'undefined' && dirEntry !== null, "copied directory entry should not be null");
+				 equals(dirEntry.isFile, false, "entry 'isFile' attribute should be false");
+				 equals(dirEntry.isDirectory, true, "entry 'isDirectory' attribute should be true");
+				 equals(dirEntry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
+				 equals(dirEntry.name, dstDir, "entry 'name' attribute should be set correctly");
+				 
+				 dirEntry.getFile(file1, {create:false}, testFileExists, that.fail);
+		 
+		 };
+			testFileExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "copied directory entry should not be null");
+				equals(fileEntry.isFile, true, "entry 'isFile' attribute should be true");
+				equals(fileEntry.isDirectory, false, "entry 'isDirectory' attribute should be false");
+				equals(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
+				equals(fileEntry.name, file1, "entry 'name' attribute should be set correctly");
+                
 
                 // cleanup
                 that.deleteEntry(srcDir);
@@ -1178,7 +1219,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.copyTo: directory onto itself", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(4);
+        expect(6);
         
         var file1 = "file1",
             srcDir = "entry.copy.dos.srcDir",
@@ -1196,9 +1237,20 @@ Tests.prototype.FileTests = function() {
             testCopy = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "it is an error to copy an entry into its parent if a different name is not specified");
                 equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                ok(navigator.fileMgr.testDirectoryExists(srcPath) === true, "original directory should exist.");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "original directory contents should exist.");
-
+                
+				that.root.getDirectory(srcDir, {create:false}, testDirectoryExists, null);
+			},
+			 testDirectoryExists = function(dirEntry) {
+				// returning confirms existence so just check fullPath entry
+				ok(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory should exist.");
+				equals(dirEntry.fullPath, srcPath, "entry 'fullPath' should be set correctly");
+			 
+				dirEntry.getFile(file1, {create:false}, testFileExists, null);
+			 },
+			testFileExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
+				equals(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
+                
                 // cleanup
                 that.deleteEntry(srcDir);
                 QUnit.start();
@@ -1209,7 +1261,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.copyTo: directory into itself", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(4);
         
         var srcDir = "entry.copy.dis.srcDir",
             dstDir = "entry.copy.dis.dstDir",
@@ -1222,8 +1274,14 @@ Tests.prototype.FileTests = function() {
             testCopy = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "it is an error to copy a directory into itself");
                 equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                ok(navigator.fileMgr.testDirectoryExists(srcPath) === true, "original directory should exist.");
-
+                
+				that.root.getDirectory(srcDir, {create:false}, testDirectoryExists, null);
+			},
+			testDirectoryExists = function(dirEntry) {
+				// returning confirms existence so just check fullPath entry
+				ok(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory should exist.");
+				equals(dirEntry.fullPath, srcPath, "entry 'fullPath' should be set correctly");
+		 
                 // cleanup
                 that.deleteEntry(srcDir);
                 QUnit.start();
@@ -1234,7 +1292,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.copyTo: directory that does not exist", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(4);
         
         var file1 = "entry.copy.dnf.file1", 
             dstDir = "entry.copy.dnf.dstDir",
@@ -1243,14 +1301,19 @@ Tests.prototype.FileTests = function() {
             that = this,
             entryCallback = function(entry) {
                 // copy file to target directory that does not exist
-                directory = new DirectoryEntry({fullPath: dstPath});
+                directory = new DirectoryEntry();
+				directory.fullPath = dstPath;
                 entry.copyTo(directory, null, null, testCopy);                 
             },
             testCopy = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "it is an error to copy to a directory that does not exist");
                 equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "original file should exist");
-
+				that.root.getFile(file1, {create: false}, testFileExists, null);
+			},
+			testFileExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "original file should exist");
+				equals(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
+		 
                 // cleanup
                 that.deleteEntry(file1);
                 QUnit.start();
@@ -1285,7 +1348,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.moveTo: file to same parent", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(7);
+        expect(9);
         
         var file1 = "entry.move.fsp.file1",
             file2 = "entry.move.fsp.file2",
@@ -1302,9 +1365,21 @@ Tests.prototype.FileTests = function() {
                 equals(entry.isDirectory, false, "entry 'isDirectory' attribute should be set to false");
                 equals(entry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
                 equals(entry.name, file2, "entry 'name' attribute should be set correctly");
-                ok(navigator.fileMgr.testFileExists(dstPath) === true, "moved file should exist.");
-                ok(navigator.fileMgr.testFileExists(srcPath) === false, "original file should not exist.");
-
+		 
+				that.root.getFile(file2, {create:false}, testMovedExists, null);
+			},
+			testMovedExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "moved file should exist");
+				equals(fileEntry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
+               
+				that.root.getFile(file1, {create:false}, null, testOrig);
+			},
+			testOrig = function(error) {
+                //ok(navigator.fileMgr.testFileExists(srcPath) === false, "original file should not exist.");
+				ok(typeof error !== 'undefined' && error !== null, "it is an error if original file exists after a move");
+				equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
+		 
+		 
                 // cleanup
                 that.deleteEntry(file1);
                 that.deleteEntry(file2);
@@ -1316,7 +1391,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.moveTo: file to new parent", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(7);
+        expect(9);
         
         var file1 = "entry.move.fnp.file1",
             dir = "entry.move.fnp.dir",
@@ -1326,21 +1401,34 @@ Tests.prototype.FileTests = function() {
             entryCallback = function(entry) {
                 // move file1 to new directory
                 var moveFile = function(directory) {
-                    entry.moveTo(directory, null, testMove, that.fail);
-                };
+					
+					var testMove = function(entry) {
+						ok(typeof entry !== 'undefined' && entry !== null, "file entry should not be null");
+						equals(entry.isFile, true, "entry 'isFile' attribute should be set to true");
+						equals(entry.isDirectory, false, "entry 'isDirectory' attribute should be set to false");
+						equals(entry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
+						equals(entry.name, file1, "entry 'name' attribute should be set correctly");
+						// test the moved file exists
+						directory.getFile(file1, {create:false}, testMovedExists, null);
+					};
+					// move the file
+					entry.moveTo(directory, null, testMove, that.fail);
+				};
+		 
                 // create a parent directory to move file to
                 that.root.getDirectory(dir, {create: true}, moveFile, that.fail);
             },
-            testMove = function(entry) {
-                ok(typeof entry !== 'undefined' && entry !== null, "file entry should not be null");
-                equals(entry.isFile, true, "entry 'isFile' attribute should be set to true");
-                equals(entry.isDirectory, false, "entry 'isDirectory' attribute should be set to false");
-                equals(entry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-                equals(entry.name, file1, "entry 'name' attribute should be set correctly");
-                ok(navigator.fileMgr.testFileExists(dstPath) === true, "moved file should exist.");
-                ok(navigator.fileMgr.testFileExists(srcPath) === false, "original file should not exist.");
-
-                // cleanup
+			testMovedExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "moved file should exist");
+				equals(fileEntry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
+		 
+				that.root.getFile(file1, {create:false}, null, testOrig);
+			},
+			testOrig = function(error) {
+				ok(typeof error !== 'undefined' && error !== null, "it is an error if original file exists after a move");
+				equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
+				
+				// cleanup
                 that.deleteEntry(file1);
                 that.deleteEntry(dir);
                 QUnit.start();
@@ -1354,7 +1442,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.moveTo: directory to same parent", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(8);
+        expect(9);
         
         var file1 = "file1",
             srcDir = "entry.move.dsp.srcDir",
@@ -1377,11 +1465,20 @@ Tests.prototype.FileTests = function() {
                 equals(directory.isDirectory, true, "entry 'isDirectory' attribute should be true");
                 equals(directory.fullPath, dstPath, "entry 'fullPath' should be set correctly");
                 equals(directory.name, dstDir, "entry 'name' attribute should be set correctly");
-                ok(navigator.fileMgr.testDirectoryExists(dstPath) === true, "new directory should exist.");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "old directory contents should have been moved.");
-                ok(navigator.fileMgr.testDirectoryExists(srcPath) === false, "old directory should not exist.");
-
-                // cleanup
+				// test that moved file exists in destination dir
+				directory.getFile(file1, {create:false}, testMovedExists, null);
+			},
+			testMovedExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "moved file should exist within moved directory");
+				equals(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
+				// test that the moved file no longer exists in original dir
+				that.root.getFile(file1, {create:false}, null, testOrig);
+			},
+			testOrig = function(error) {
+				ok(typeof error !== 'undefined' && error !== null, "it is an error if original file exists after a move");
+				equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
+		 
+				// cleanup
                 that.deleteEntry(srcDir);
                 that.deleteEntry(dstDir);
                 QUnit.start();
@@ -1395,7 +1492,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.moveTo: directory to new parent", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(8);
+        expect(9);
         
         var file1 = "file1",
             srcDir = "entry.move.dnp.srcDir",
@@ -1418,11 +1515,20 @@ Tests.prototype.FileTests = function() {
                 equals(directory.isDirectory, true, "entry 'isDirectory' attribute should be true");
                 equals(directory.fullPath, dstPath, "entry 'fullPath' should be set correctly");
                 equals(directory.name, dstDir, "entry 'name' attribute should be set correctly");
-                ok(navigator.fileMgr.testDirectoryExists(dstPath) === true, "new directory should exist.");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "old directory contents should have been moved.");
-                ok(navigator.fileMgr.testDirectoryExists(srcPath) === false, "old directory should not exist.");
-
-                // cleanup
+				// test that moved file exists in destination dir
+				directory.getFile(file1, {create:false}, testMovedExists, null);
+			},
+			testMovedExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "moved file should exist within moved directory");
+				equals(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
+				// test that the moved file no longer exists in original dir
+				that.root.getFile(file1, {create:false}, null, testOrig);
+			},
+			testOrig = function(error) {
+				ok(typeof error !== 'undefined' && error !== null, "it is an error if original file exists after a move");
+				equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
+				
+				// cleanup
                 that.deleteEntry(srcDir);
                 that.deleteEntry(dstDir);
                 QUnit.start();
@@ -1436,7 +1542,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.moveTo: directory onto itself", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(4);
+        expect(6);
         
         var file1 = "file1",
             srcDir = "entry.move.dos.srcDir",
@@ -1454,10 +1560,22 @@ Tests.prototype.FileTests = function() {
             testMove = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "it is an error to move an entry into its parent if a different name is not specified");
                 equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                ok(navigator.fileMgr.testDirectoryExists(srcPath) === true, "original directory should exist.");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "original directory contents should exist.");
-
-                // cleanup
+                
+				// test that original dir still exists
+				that.root.getDirectory(srcDir, {create:false}, testDirectoryExists, null);
+			},
+			testDirectoryExists = function(dirEntry) {
+				// returning confirms existence so just check fullPath entry
+				ok(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory should exist.");
+				equals(dirEntry.fullPath, srcPath, "entry 'fullPath' should be set correctly");
+		 
+				dirEntry.getFile(file1, {create:false}, testFileExists, null);
+			},
+			testFileExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
+				equals(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
+						
+				// cleanup
                 that.deleteEntry(srcDir);
                 QUnit.start();
             };
@@ -1467,7 +1585,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.moveTo: directory into itself", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(4);
         
         var srcDir = "entry.move.dis.srcDir",
             dstDir = "entry.move.dis.dstDir",
@@ -1480,9 +1598,14 @@ Tests.prototype.FileTests = function() {
             testMove = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "it is an error to move a directory into itself");
                 equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                ok(navigator.fileMgr.testDirectoryExists(srcPath) === true, "original directory should exist.");
-
-                // cleanup
+				// make sure original directory still exists
+				that.root.getDirectory(srcDir, {create:false}, testDirectoryExists, null);
+			},
+			testDirectoryExists = function(entry) {
+				ok(typeof entry !== 'undefined' && entry !== null, "original directory should exist.");
+				equals(entry.fullPath, srcPath, "entry 'fullPath' should be set correctly");
+		 
+				// cleanup
                 that.deleteEntry(srcDir);
                 QUnit.start();
             };
@@ -1492,7 +1615,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.moveTo: file onto itself", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(4);
         
         var file1 = "entry.move.fos.file1",
             filePath = this.root.fullPath + '/' + file1,
@@ -1504,8 +1627,14 @@ Tests.prototype.FileTests = function() {
             testMove = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "it is an error to move an entry into its parent if a different name is not specified");
                 equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "original file should exist");
-
+                
+				//test that original file still exists
+				that.root.getFile(file1, {create:false}, testFileExists, null);
+			},
+			testFileExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
+				equals(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
+		 
                 // cleanup
                 that.deleteEntry(file1);
                 QUnit.start();
@@ -1516,7 +1645,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.moveTo: file onto existing directory", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(4);
+        expect(6);
         
         var file1 = "entry.move.fod.file1",
             dstDir = "entry.move.fod.dstDir",
@@ -1527,6 +1656,12 @@ Tests.prototype.FileTests = function() {
             entryCallback = function(entry) {
                 var createSubDirectory = function(directory) {
                     var moveFile = function(subDirectory) {
+						var testMove = function(error) {
+							ok(typeof error !== 'undefined' && error !== null, "it is an error to move a file onto an existing directory");
+							equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
+							// test that original dir still exists
+							directory.getDirectory(subDir, {create:false}, testDirectoryExists, null);
+						};
                         // move file1 onto sub-directory
                         entry.moveTo(directory, subDir, null, testMove);                    
                     };
@@ -1536,11 +1671,15 @@ Tests.prototype.FileTests = function() {
                 // create top level directory 
                 that.root.getDirectory(dstDir, {create: true}, createSubDirectory, that.fail);
             },
-            testMove = function(error) {
-                ok(typeof error !== 'undefined' && error !== null, "it is an error to move a file onto an existing directory");
-                equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "original file should exist");
-                ok(navigator.fileMgr.testDirectoryExists(dirPath) === true, "original directory should exist");
+			testDirectoryExists = function(dirEntry) {
+				ok(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory contents should exist.");
+				equals(dirEntry.fullPath, dirPath, "entry 'fullPath' should be set correctly");
+				// test that original file still exists
+				that.root.getFile(file1, {create:false},testFileExists, null);
+			},
+			testFileExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
+				equals(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
 
                 // cleanup
                 that.deleteEntry(file1);
@@ -1556,7 +1695,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.moveTo: directory onto existing file", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(4);
+        expect(6);
         
         var file1 = "entry.move.dof.file1",
             srcDir = "entry.move.dof.srcDir",
@@ -1574,9 +1713,21 @@ Tests.prototype.FileTests = function() {
             testMove = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "it is an error to move a directory onto an existing file");
                 equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                ok(navigator.fileMgr.testDirectoryExists(dirPath) === true, "original directory should exist");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "original file should exist");
-
+                // test that original directory exists
+				that.root.getDirectory(srcDir, {create:false}, testDirectoryExists, null);
+			},
+			testDirectoryExists = function(dirEntry) {
+				// returning confirms existence so just check fullPath entry
+				ok(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory should exist.");
+				equals(dirEntry.fullPath, dirPath, "entry 'fullPath' should be set correctly");
+				// test that original file exists
+				that.root.getFile(file1, {create:false}, testFileExists, null);
+			},
+			testFileExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
+				equals(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
+		 
+		 
                 // cleanup
                 that.deleteEntry(file1);
                 that.deleteEntry(srcDir);
@@ -1588,7 +1739,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.copyTo: directory onto existing file", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(4);
+        expect(6);
         
         var file1 = "entry.copy.dof.file1",
             srcDir = "entry.copy.dof.srcDir",
@@ -1606,9 +1757,20 @@ Tests.prototype.FileTests = function() {
             testMove = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "it is an error to copy a directory onto an existing file");
                 equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                ok(navigator.fileMgr.testDirectoryExists(dirPath) === true, "original directory should exist");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "original file should exist");
-
+                //test that original dir still exists
+				that.root.getDirectory(srcDir, {create:false}, testDirectoryExists, null);
+			},
+			testDirectoryExists = function(dirEntry) {
+				// returning confirms existence so just check fullPath entry
+				ok(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory should exist.");
+				equals(dirEntry.fullPath, dirPath, "entry 'fullPath' should be set correctly");
+				// test that original file still exists
+				that.root.getFile(file1, {create:false}, testFileExists, null);
+			},
+			testFileExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
+				equals(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
+		 
                 // cleanup
                 that.deleteEntry(file1);
                 that.deleteEntry(srcDir);
@@ -1620,7 +1782,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.moveTo: directory onto directory that is not empty", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(4);
+        expect(6);
         
         var srcDir = "entry.move.dod.srcDir",
             dstDir = "entry.move.dod.dstDir",
@@ -1634,18 +1796,29 @@ Tests.prototype.FileTests = function() {
                         // move srcDir onto dstDir (not empty)
                         entry.moveTo(that.root, dstDir, null, testMove);                    
                     };
+					var testMove = function(error) {
+						ok(typeof error !== 'undefined' && error !== null, "it is an error to move a directory onto a directory that is not empty");
+						equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
+		 
+						// test that destination directory still exists
+						directory.getDirectory(subDir, {create:false}, testDirectoryExists, null);
+					};
                     // create sub-directory 
                     directory.getDirectory(subDir, {create: true}, moveDir, that.fail);                    
                 };
                 // create top level directory 
                 that.root.getDirectory(dstDir, {create: true}, createSubDirectory, that.fail);
             },
-            testMove = function(error) {
-                ok(typeof error !== 'undefined' && error !== null, "it is an error to move a directory onto a directory that is not empty");
-                equal(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                ok(navigator.fileMgr.testDirectoryExists(srcPath) === true, "source directory should exist");
-                ok(navigator.fileMgr.testDirectoryExists(dstPath) === true, "destination directory should exist");
-
+			testDirectoryExists = function(dirEntry) {
+				// returning confirms existence so just check fullPath entry
+				ok(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory should exist.");
+				equals(dirEntry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
+				// test that source directory exists
+				that.root.getDirectory(srcDir,{create:false}, testSrcDirectoryExists, null);
+			},
+			testSrcDirectoryExists = function(srcEntry){
+				ok(typeof srcEntry !== 'undefined' && srcEntry !== null, "original directory should exist.");
+				equals(srcEntry.fullPath, srcPath, "entry 'fullPath' should be set correctly");
                 // cleanup
                 that.deleteEntry(srcDir);
                 that.deleteEntry(dstDir);
@@ -1660,7 +1833,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.moveTo: file replace existing file", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(7);
+        expect(9);
         
         var file1 = "entry.move.frf.file1",
             file2 = "entry.move.frf.file2",
@@ -1675,15 +1848,26 @@ Tests.prototype.FileTests = function() {
                 // create file
                 that.root.getFile(file2, {create: true}, moveFile, that.fail);
             },
-            testMove = function(entry) {
+		 testMove = function(entry) {
                 ok(typeof entry !== 'undefined' && entry !== null, "file entry should not be null")
                 equals(entry.isFile, true, "entry 'isFile' attribute should be true");
                 equals(entry.isDirectory, false, "entry 'isDirectory' attribute should be false");
                 equals(entry.fullPath, file2Path, "entry 'fullPath' should be set correctly");
                 equals(entry.name, file2, "entry 'name' attribute should be set correctly");
-                ok(navigator.fileMgr.testFileExists(file1Path) === false, "old file should not exist");
-                ok(navigator.fileMgr.testFileExists(file2Path) === true, "new file should exist");
-
+                
+				// test that old file does not exists
+				that.root.getFile(file1, {create:false}, null, testFileMoved);
+			},
+		 testFileMoved = function(error){
+				ok(typeof error !== 'undefined' && error !== null, "it is an error if original file exists after a move");
+				equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
+				// test that new file exists
+				that.root.getFile(file2, {create:false}, testFileExists, null);
+			},
+		 testFileExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
+				equals(fileEntry.fullPath, file2Path, "entry 'fullPath' should be set correctly");
+		 
                 // cleanup
                 that.deleteEntry(file1);
                 that.deleteEntry(file2);
@@ -1695,7 +1879,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.moveTo: directory replace empty directory", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(8);
+        expect(9);
         
         var file1 = "file1",
             srcDir = "entry.move.drd.srcDir",
@@ -1722,10 +1906,20 @@ Tests.prototype.FileTests = function() {
                 equals(directory.isDirectory, true, "entry 'isDirectory' attribute should be true");
                 equals(directory.fullPath, dstPath, "entry 'fullPath' should be set correctly");
                 equals(directory.name, dstDir, "entry 'name' attribute should be set correctly");
-                ok(navigator.fileMgr.testDirectoryExists(dstPath) === true, "new directory should exist");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "old directory contents should have been moved");
-                ok(navigator.fileMgr.testDirectoryExists(srcPath) === false, "old directory should not exist");
-
+                // test that old directory contents have been moved
+				directory.getFile(file1, {create:false}, testFileExists, null);
+			},
+			testFileExists = function(fileEntry) {
+				ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
+				equals(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
+		 
+                // test that old directory no longer exists
+				that.root.getDirectory(srcDir, {create:false}, null, testRemoved);
+			},
+			testRemoved = function(error){
+				ok(typeof error !== 'undefined' && error !== null, "it is an error if original file exists after a move");
+				equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
+                
                 // cleanup
                 that.deleteEntry(srcDir);
                 that.deleteEntry(dstDir);
@@ -1740,7 +1934,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.moveTo: directory that does not exist", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(2);
         
         var file1 = "entry.move.dnf.file1", 
             dstDir = "entry.move.dnf.dstDir",
@@ -1749,15 +1943,15 @@ Tests.prototype.FileTests = function() {
             that = this,
             entryCallback = function(entry) {
                 // move file to directory that does not exist
-                directory = new DirectoryEntry({fullPath: dstPath});
+                directory = new DirectoryEntry();
+				directory.fullPath = dstPath;
                 entry.moveTo(directory, null, null, testMove);                 
             },
             testMove = function(error) {
                 ok(typeof error !== 'undefined' && error !== null, "it is an error to move to a directory that does not exist");
                 equal(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-                ok(navigator.fileMgr.testFileExists(filePath) === true, "original file should exist");
-
-                // cleanup
+				
+				// cleanup
                 that.deleteEntry(file1);
                 QUnit.start();
             };
@@ -1934,7 +2128,7 @@ Tests.prototype.FileTests = function() {
     });
     test("should be able to write and append to file, createWriter", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(5);
+        expect(4);
 
         var that = this,
             fileName = "writer.append",
@@ -1947,7 +2141,6 @@ Tests.prototype.FileTests = function() {
             write_file = function(fileEntry) {
                 fileEntry.createWriter(function(writer) {
                     writer.onwriteend = function(evt) {
-                        ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
                         ok(writer.length === length, "should have written " + length + " bytes");
                         ok(writer.position === length, "position should be at " + length);
                         append_file(writer);
@@ -1976,7 +2169,7 @@ Tests.prototype.FileTests = function() {
     });
     test("should be able to write and append to file, File object", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(5);
+        expect(4);
 
         var that = this,
             fileName = "writer.append",
@@ -1989,7 +2182,8 @@ Tests.prototype.FileTests = function() {
             write_file = function(file) {
                 var writer = new FileWriter(file);
                     writer.onwriteend = function(evt) {
-                        ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
+		 console.log("first writer.length = " + writer.length);
+		 console.log("first writer.position = " + writer.position);
                         ok(writer.length === length, "should have written " + length + " bytes");
                         ok(writer.position === length, "position should be at " + length);
                         append_file(writer);
@@ -2000,6 +2194,8 @@ Tests.prototype.FileTests = function() {
             append_file = function(writer) {
                 var exception = "  Except this one.";            
                 writer.onwriteend = function(evt) {
+		 console.log("next writer.length = " + writer.length);
+		 console.log("next writer.position = " + writer.position);
                     ok(writer.length === length, "file length should be " + length);
                     ok(writer.position === length, "position should be at " + length);
 
@@ -2019,7 +2215,7 @@ Tests.prototype.FileTests = function() {
     });
     test("should be able to write XML data", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(2);
 
         var that = this,
             fileName = "writer.xml",
@@ -2032,8 +2228,7 @@ Tests.prototype.FileTests = function() {
             write_file = function(fileEntry) {
                 fileEntry.createWriter(function(writer) {
                     writer.onwriteend = function(evt) {
-                        ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
-                        ok(writer.length === length, "should have written " + length + " bytes");
+						ok(writer.length === length, "should have written " + length + " bytes");
                         ok(writer.position === length, "position should be at " + length);
 
                         // cleanup
@@ -2049,7 +2244,7 @@ Tests.prototype.FileTests = function() {
     });
     test("should be able to write JSON data", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
-        expect(3);
+        expect(2);
 
         var that = this,
             fileName = "writer.json",
@@ -2062,7 +2257,6 @@ Tests.prototype.FileTests = function() {
             write_file = function(fileEntry) {
                 fileEntry.createWriter(function(writer) {
                     writer.onwriteend = function(evt) {
-                        ok(navigator.fileMgr.testFileExists(filePath) === true, "file should exist");
                         ok(writer.length === length, "should have written " + length + " bytes");
                         ok(writer.position === length, "position should be at " + length);
 
@@ -2077,6 +2271,44 @@ Tests.prototype.FileTests = function() {
         // creates file, then write JSON content
         this.createFile(fileName, write_file);
     });
+	test("should write and read special characters", function() {
+		 QUnit.stop(tests.TEST_TIMEOUT);
+		 expect(1);
+		 
+		 var that = this,
+			// path of file
+			fileName = "reader.txt",
+			filePath = this.root.fullPath + '/' + fileName,
+			// file content
+			rule = "H\u00EBll\u00F5 Euro \u20AC\u00A1",
+			// creates a FileWriter object
+			create_writer = function(fileEntry) {
+				fileEntry.createWriter(write_file, this.fail);
+			},
+			// writes file and reads it back in
+			write_file = function(writer) {
+				writer.onwriteend = read_file; 
+				writer.write(rule);
+			},
+			// reads file and compares content to what was written
+			read_file = function(evt) {
+				var reader = new FileReader();
+					reader.onloadend = function(evt) {
+					console.log("read success");
+					console.log(evt.target.result);
+					ok(evt.target.result === rule, "reader.result should be equal to the text written.");
+					// cleanup
+					that.deleteFile(fileName);
+					QUnit.start();
+				};
+				var myFile = new File();
+				myFile.fullPath = filePath; 
+				reader.readAsText(myFile);
+			};
+		 
+		 // create a file, write to it, and read it in again
+		 this.createFile(fileName, create_writer, this.fail);
+		 });
     test("should be able to seek", function() {
         QUnit.stop(tests.TEST_TIMEOUT);
         expect(5);
