@@ -2,9 +2,9 @@
 QUnit.config.autostart = false;
 sessionStorage.clear();
 
-var Tests = function() {
-    this.TEST_TIMEOUT = 500;
-};
+var Tests = function() {};
+Tests.TEST_TIMEOUT = 500;
+
 
 document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('deviceready', function() {

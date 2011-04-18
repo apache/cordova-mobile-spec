@@ -65,7 +65,7 @@ Tests.prototype.FileTests = function() {
         equal(LocalFileSystem.PERSISTENT, 1, "LocalFileSystem.PERSISTENT should be defined");
     });
     test("retrieve PERSISTENT file system", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(4);
 
         var testPersistent = function(fileSystem) {
@@ -83,7 +83,7 @@ Tests.prototype.FileTests = function() {
                 });            
     });
     test("retrieve TEMPORARY file system", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(4);
 
         var testTemporary = function(fileSystem) {
@@ -101,7 +101,7 @@ Tests.prototype.FileTests = function() {
                 });            
     });
     test("request a file system that is too large", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
 
         var failFS = function(error) {
@@ -114,7 +114,7 @@ Tests.prototype.FileTests = function() {
         window.requestFileSystem(LocalFileSystem.TEMPORARY, 1000000000000000, null, failFS);
     });
     test("request a file system that does not exist", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
 
         var failFS = function(error) {
@@ -127,7 +127,7 @@ Tests.prototype.FileTests = function() {
         window.requestFileSystem(-1, 0, null, failFS);
     });
     test("resolve invalid file name", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
 
         var failURI = function(error) {
@@ -140,7 +140,7 @@ Tests.prototype.FileTests = function() {
         window.resolveLocalFileSystemURI("file:///this.is.not.a.valid.file.txt", null, failURI);
     });
     test("resolve invalid URI", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
 
         var failURI = function(error) {
@@ -171,7 +171,7 @@ Tests.prototype.FileTests = function() {
     });
     module('FileSystem interface');
     test("FileSystem root should be a DirectoryEntry", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(15);
 
         var root = getFileSystemRoot(),
@@ -210,7 +210,7 @@ Tests.prototype.FileTests = function() {
         }
     });
     test("DirectoryEntry.getFile: get Entry for file that does not exist", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var fileName = "de.no.file",
@@ -228,7 +228,7 @@ Tests.prototype.FileTests = function() {
         this.root.getFile(fileName, {create:false}, null, testFile); 
     });
     test("DirectoryEntry.getFile: create new file", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
         
         var fileName = "de.create.file",
@@ -250,7 +250,7 @@ Tests.prototype.FileTests = function() {
         this.root.getFile(fileName, {create: true}, testFile, this.fail); 
     });
     test("DirectoryEntry.getFile: create new file (exclusive)", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
         
         var fileName = "de.create.exclusive.file",
@@ -272,7 +272,7 @@ Tests.prototype.FileTests = function() {
         this.root.getFile(fileName, {create: true, exclusive:true}, testFile, this.fail); 
     });
     test("DirectoryEntry.getFile: create file that already exists", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
         
         var fileName = "de.create.existing.file",
@@ -298,7 +298,7 @@ Tests.prototype.FileTests = function() {
         this.root.getFile(fileName, {create:true}, getFile, this.fail); 
     });
     test("DirectoryEntry.getFile: create file that already exists (exclusive)", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var fileName = "de.create.exclusive.existing.file",
@@ -323,7 +323,7 @@ Tests.prototype.FileTests = function() {
         this.root.getFile(fileName, {create:true}, getFile, this.fail); 
     });
     test("DirectoryEntry.getFile: get Entry for existing file", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
         
         var fileName = "de.get.file",
@@ -349,7 +349,7 @@ Tests.prototype.FileTests = function() {
         this.root.getFile(fileName, {create:true}, getFile, this.fail); 
     });
     test("DirectoryEntry.getFile: get FileEntry for invalid path", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var fileName = "de:invalid:path",
@@ -366,7 +366,7 @@ Tests.prototype.FileTests = function() {
         this.root.getFile(fileName, {create:false}, null, testFile); 
     });
     test("DirectoryEntry.getDirectory: get Entry for directory that does not exist", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var dirName = "de.no.dir",
@@ -384,7 +384,7 @@ Tests.prototype.FileTests = function() {
         this.root.getDirectory(dirName, {create:false}, null, testDir); 
     });
     test("DirectoryEntry.getDirectory: create new directory", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
         
         var dirName = "de.create.dir",
@@ -406,7 +406,7 @@ Tests.prototype.FileTests = function() {
         this.root.getDirectory(dirName, {create: true}, testDir, this.fail); 
     });
     test("DirectoryEntry.getDirectory: create new directory (exclusive)", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
         
         var dirName = "de.create.exclusive.dir",
@@ -428,7 +428,7 @@ Tests.prototype.FileTests = function() {
         this.root.getDirectory(dirName, {create: true, exclusive:true}, testDir, this.fail); 
     });
     test("DirectoryEntry.getDirectory: create directory that already exists", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
         
         var dirName = "de.create.existing.dir",
@@ -454,7 +454,7 @@ Tests.prototype.FileTests = function() {
         this.root.getDirectory(dirName, {create:true}, getDir, this.fail); 
     });
     test("DirectoryEntry.getDirectory: create directory that already exists (exclusive)", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var dirName = "de.create.exclusive.existing.dir",
@@ -479,7 +479,7 @@ Tests.prototype.FileTests = function() {
         this.root.getDirectory(dirName, {create:true}, getDir, this.fail); 
     });
     test("DirectoryEntry.getDirectory: get Entry for existing directory", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
         
         var dirName = "de.get.dir",
@@ -505,7 +505,7 @@ Tests.prototype.FileTests = function() {
         this.root.getDirectory(dirName, {create:true}, getDir, this.fail); 
     });
     test("DirectoryEntry.getDirectory: get DirectoryEntry for invalid path", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var dirName = "de:invalid:path",
@@ -522,7 +522,7 @@ Tests.prototype.FileTests = function() {
         this.root.getDirectory(dirName, {create:false}, null, testDir); 
     });
     test("DirectoryEntry.getDirectory: get DirectoryEntry for existing file", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var fileName = "de.existing.file",
@@ -547,7 +547,7 @@ Tests.prototype.FileTests = function() {
         this.root.getFile(fileName, {create:true}, getDir, this.fail); 
     });
     test("DirectoryEntry.getFile: get FileEntry for existing directory", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var dirName = "de.existing.dir",
@@ -572,7 +572,7 @@ Tests.prototype.FileTests = function() {
         this.root.getDirectory(dirName, {create:true}, getFile, this.fail); 
     });
     test("DirectoryEntry.removeRecursively on directory", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var dirName = "de.removeRecursively",
@@ -620,7 +620,7 @@ Tests.prototype.FileTests = function() {
         }
     });
     test("DirectoryReader.readEntries: read contents of existing directory", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(4);
         
         var reader,
@@ -639,7 +639,7 @@ Tests.prototype.FileTests = function() {
         reader.readEntries(testEntries, this.fail);
     });
     test("DirectoryReader.readEntries: read contents of directory that has been removed", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(4);
         
         var dirName = "de.createReader.notfound",
@@ -669,7 +669,7 @@ Tests.prototype.FileTests = function() {
         this.root.getDirectory(dirName, {create:true}, entryCallback, this.fail);
     });
     test("DirectoryEntry.removeRecursively on root file system", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var testRemove = function(error) {
@@ -705,7 +705,7 @@ Tests.prototype.FileTests = function() {
         }
     });
     test("FileEntry methods should be defined", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(3);
         
         var fileName = "fe.methods",
@@ -724,7 +724,7 @@ Tests.prototype.FileTests = function() {
         this.root.getFile(fileName, {create:true}, testFileEntry, this.fail);
     });
     test("FileEntry.createWriter should return a FileWriter object", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var fileName = "fe.createWriter",
@@ -747,7 +747,7 @@ Tests.prototype.FileTests = function() {
         this.root.getFile(fileName, {create:true}, entryCallback, this.fail);
     });
     test("FileEntry.file should return a File object", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var fileName = "fe.file",
@@ -770,7 +770,7 @@ Tests.prototype.FileTests = function() {
         this.root.getFile(fileName, {create:true}, entryCallback, this.fail);
     });
     test("FileEntry.file: on File that has been removed", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var fileName = "fe.no.file",
@@ -836,7 +836,7 @@ Tests.prototype.FileTests = function() {
         }
     });
     test("Entry object", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(13);
 
         var fileName = "entry",
@@ -866,7 +866,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(fileName, testEntry, this.fail);
     });
     test("Entry.getMetadata on file", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var fileName = "entry.metadata.file",
@@ -887,7 +887,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(fileName, entryCallback, this.fail);
     });
     test("Entry.getMetadata on directory", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var dirName = "entry.metadata.dir",
@@ -908,7 +908,7 @@ Tests.prototype.FileTests = function() {
         this.createDirectory(dirName, entryCallback, this.fail);
     });
     test("Entry.getParent on file in root file system", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var fileName = "entry.parent.file",
@@ -930,7 +930,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(fileName, entryCallback, this.fail);
     });
     test("Entry.getParent on directory in root file system", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var dirName = "entry.parent.dir",
@@ -952,7 +952,7 @@ Tests.prototype.FileTests = function() {
         this.createDirectory(dirName, entryCallback, this.fail);
     });
     test("Entry.getParent on root file system", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var rootPath = this.root.fullPath,
@@ -966,7 +966,7 @@ Tests.prototype.FileTests = function() {
         this.root.getParent(testParent, this.fail);
     });
     test("Entry.toURI on file", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var fileName = "entry.uri.file",
@@ -986,7 +986,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(fileName, testURI, this.fail);
     });
     test("Entry.toURI on directory", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var dirName = "entry.uri.dir",
@@ -1006,7 +1006,7 @@ Tests.prototype.FileTests = function() {
         this.createDirectory(dirName, testURI, this.fail);
     });
     test("Entry.remove on file", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(3);
         
         var fileName = "entry.rm.file",
@@ -1031,7 +1031,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(fileName, entryCallback, this.fail);
     });
     test("Entry.remove on empty directory", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(3);
         
         var dirName = "entry.rm.dir",
@@ -1056,7 +1056,7 @@ Tests.prototype.FileTests = function() {
         this.createDirectory(dirName, entryCallback, this.fail);
     });
     test("Entry.remove on non-empty directory", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(4);
         
         var dirName = "entry.rm.dir.not.empty",
@@ -1089,7 +1089,7 @@ Tests.prototype.FileTests = function() {
         this.createDirectory(dirName, entryCallback, this.fail);
     });
     test("Entry.remove on root file system", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var testRemove = function(error) {
@@ -1102,7 +1102,7 @@ Tests.prototype.FileTests = function() {
         this.root.remove(null, testRemove);
     });
     test("Entry.copyTo: file", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(10);
         
         var file1 = "entry.copy.file1",
@@ -1141,7 +1141,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(file1, entryCallback, this.fail);
     });
     test("Entry.copyTo: file onto itself", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var file1 = "entry.copy.fos.file1",
@@ -1163,7 +1163,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(file1, entryCallback, this.fail);
     });
     test("Entry.copyTo: directory", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(15);
         
         var file1 = "file1",
@@ -1218,7 +1218,7 @@ Tests.prototype.FileTests = function() {
         this.createDirectory(srcDir, entryCallback, this.fail);
     });
     test("Entry.copyTo: directory onto itself", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(6);
         
         var file1 = "file1",
@@ -1260,7 +1260,7 @@ Tests.prototype.FileTests = function() {
         this.createDirectory(srcDir, entryCallback, this.fail);
     });
     test("Entry.copyTo: directory into itself", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(4);
         
         var srcDir = "entry.copy.dis.srcDir",
@@ -1291,7 +1291,7 @@ Tests.prototype.FileTests = function() {
         this.createDirectory(srcDir, entryCallback, this.fail);
     });
     test("Entry.copyTo: directory that does not exist", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(4);
         
         var file1 = "entry.copy.dnf.file1", 
@@ -1323,7 +1323,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(file1, entryCallback, this.fail);
     });
     test("Entry.copyTo: invalid target name", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var file1 = "entry.copy.itn.file1",
@@ -1347,7 +1347,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(file1, entryCallback, this.fail);
     });
     test("Entry.moveTo: file to same parent", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(9);
         
         var file1 = "entry.move.fsp.file1",
@@ -1390,7 +1390,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(file1, entryCallback, this.fail);
     });
     test("Entry.moveTo: file to new parent", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(9);
         
         var file1 = "entry.move.fnp.file1",
@@ -1441,7 +1441,7 @@ Tests.prototype.FileTests = function() {
         }, this.fail);
     });
     test("Entry.moveTo: directory to same parent", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(9);
         
         var file1 = "file1",
@@ -1491,7 +1491,7 @@ Tests.prototype.FileTests = function() {
         }, this.fail);
     });
     test("Entry.moveTo: directory to new parent", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(9);
         
         var file1 = "file1",
@@ -1541,7 +1541,7 @@ Tests.prototype.FileTests = function() {
         }, this.fail);
     });
     test("Entry.moveTo: directory onto itself", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(6);
         
         var file1 = "file1",
@@ -1584,7 +1584,7 @@ Tests.prototype.FileTests = function() {
         this.createDirectory(srcDir, entryCallback, this.fail);
     });
     test("Entry.moveTo: directory into itself", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(4);
         
         var srcDir = "entry.move.dis.srcDir",
@@ -1614,7 +1614,7 @@ Tests.prototype.FileTests = function() {
         this.createDirectory(srcDir, entryCallback, this.fail);
     });
     test("Entry.moveTo: file onto itself", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(4);
         
         var file1 = "entry.move.fos.file1",
@@ -1644,7 +1644,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(file1, entryCallback, this.fail);
     });
     test("Entry.moveTo: file onto existing directory", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(6);
         
         var file1 = "entry.move.fod.file1",
@@ -1694,7 +1694,7 @@ Tests.prototype.FileTests = function() {
         }, this.fail);
     });
     test("Entry.moveTo: directory onto existing file", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(6);
         
         var file1 = "entry.move.dof.file1",
@@ -1738,7 +1738,7 @@ Tests.prototype.FileTests = function() {
           this.createDirectory(srcDir, entryCallback, this.fail);
     });
     test("Entry.copyTo: directory onto existing file", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(6);
         
         var file1 = "entry.copy.dof.file1",
@@ -1781,7 +1781,7 @@ Tests.prototype.FileTests = function() {
           this.createDirectory(srcDir, entryCallback, this.fail);
     });
     test("Entry.moveTo: directory onto directory that is not empty", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(6);
         
         var srcDir = "entry.move.dod.srcDir",
@@ -1832,7 +1832,7 @@ Tests.prototype.FileTests = function() {
         }, this.fail);
     });
     test("Entry.moveTo: file replace existing file", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(9);
         
         var file1 = "entry.move.frf.file1",
@@ -1878,7 +1878,7 @@ Tests.prototype.FileTests = function() {
           this.createFile(file1, entryCallback, this.fail);
     });
     test("Entry.moveTo: directory replace empty directory", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(9);
         
         var file1 = "file1",
@@ -1933,7 +1933,7 @@ Tests.prototype.FileTests = function() {
         }, this.fail);
     });
     test("Entry.moveTo: directory that does not exist", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var file1 = "entry.move.dnf.file1", 
@@ -1960,7 +1960,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(file1, entryCallback, this.fail);
     });
     test("Entry.moveTo: invalid target name", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var file1 = "entry.move.itn.file1",
@@ -2003,7 +2003,7 @@ Tests.prototype.FileTests = function() {
         }
     });
     test("should read file properly, File object", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(1);
             
             // path of file
@@ -2038,7 +2038,7 @@ Tests.prototype.FileTests = function() {
         this.root.getFile(fileName, {create: true}, create_writer, this.fail);
     });
     test("should read file properly, Data URL", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(1);
             
             // path of file
@@ -2103,7 +2103,7 @@ Tests.prototype.FileTests = function() {
         }
     });    
     test("FileWriter object should have correct methods", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
         
         // retrieve a FileWriter object
@@ -2127,7 +2127,7 @@ Tests.prototype.FileTests = function() {
         this.root.getFile(fileName, {create: true}, test_writer, this.fail);                        
     });
     test("should be able to write and append to file, createWriter", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(4);
 
         var that = this,
@@ -2168,7 +2168,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(fileName, write_file);
     });
     test("should be able to write and append to file, File object", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(4);
 
         var that = this,
@@ -2214,7 +2214,7 @@ Tests.prototype.FileTests = function() {
         write_file(file);
     });
     test("should be able to write XML data", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
 
         var that = this,
@@ -2243,7 +2243,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(fileName, write_file);
     });
     test("should be able to write JSON data", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
 
         var that = this,
@@ -2272,7 +2272,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(fileName, write_file);
     });
 	test("should write and read special characters", function() {
-		 QUnit.stop(tests.TEST_TIMEOUT);
+		 QUnit.stop(Tests.TEST_TIMEOUT);
 		 expect(1);
 		 
 		 var that = this,
@@ -2310,7 +2310,7 @@ Tests.prototype.FileTests = function() {
 		 this.createFile(fileName, create_writer, this.fail);
 		 });
     test("should be able to seek", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
         
         var that = this,
@@ -2345,7 +2345,7 @@ Tests.prototype.FileTests = function() {
         this.createFile(fileName, seek_file);
     });
     test("should be able to truncate", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var that = this,

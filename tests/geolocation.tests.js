@@ -21,7 +21,7 @@ Tests.prototype.GeoLocationTests = function() {
 	});
 	test("getCurrentPosition success callback should be called with a Position object", function() {
 		expect(2);
-		QUnit.stop(tests.TEST_TIMEOUT);
+		QUnit.stop(Tests.TEST_TIMEOUT);
 		var win = function(p) {
 			ok(p.coords != null, "Position object returned in getCurrentPosition success callback has a 'coords' property.");
 			ok(p.timestamp != null, "Position object returned in getCurrentPosition success callback has a 'timestamp' property.");

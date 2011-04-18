@@ -21,7 +21,7 @@ Tests.prototype.OrientationTests = function() {
 	// TODO: add tests for DisplayOrientation constants?
 	test("getCurrentOrientation success callback should be called with an Orientation enumeration", function() {
 		expect(2);
-		QUnit.stop(tests.TEST_TIMEOUT);
+		QUnit.stop(Tests.TEST_TIMEOUT);
 		var win = function(orient) {
 			ok(0 <= orient <= 6, "Position object returned in getCurrentPosition success callback is a valid DisplayOrientation value.");
 			equals(orient, navigator.orientation.currentOrientation, "Orientation value returned in getCurrentOrientation success callback equals navigator.orientation.currentOrientation.");

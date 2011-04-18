@@ -11,7 +11,7 @@ Tests.prototype.ContactsTests = function() {
 	});
 	test("contacts.find success callback should be called with an array", function() {
 		expect(2);
-		QUnit.stop(tests.TEST_TIMEOUT);
+		QUnit.stop(Tests.TEST_TIMEOUT);
 		var win = function(result) {
 			ok(typeof result == 'object', "Object returned in contacts.find success callback is of type 'object' (actually array).");
 			ok(typeof result.length == 'number', "Object returned in contacts.find success callback has a length property which is numerical.");
@@ -146,7 +146,7 @@ Tests.prototype.ContactsTests = function() {
 		ok(typeof contact.remove == 'function', "contact.remove should be a function.");
 	});
 	test("calling remove on a contact has an id of null should return ContactError.NOT_FOUND_ERROR", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
 		expect(2);
 		var win = function(result) {
 		};
@@ -159,7 +159,7 @@ Tests.prototype.ContactsTests = function() {
 		rmContact.remove(win, fail);
 	});
 	test("calling remove on a contact that does not exist should return ContactError.NOT_FOUND_ERROR", function() {
-        QUnit.stop(tests.TEST_TIMEOUT);
+        QUnit.stop(Tests.TEST_TIMEOUT);
 		expect(2);
 		var win = function(result) {
 		};

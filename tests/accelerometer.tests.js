@@ -11,7 +11,7 @@ Tests.prototype.AccelerometerTests = function() {
 	});
 	test("getCurrentAcceleration success callback should be called with an Acceleration object", function() {
 		expect(7);
-		QUnit.stop(tests.TEST_TIMEOUT);
+		QUnit.stop(Tests.TEST_TIMEOUT);
 		var win = function(a) {
 			ok(typeof a == 'object', "Acceleration object returned in getCurrentAcceleration success callback should be of type 'object'.");
 			ok(a.x != null, "Acceleration object returned in getCurrentAcceleration success callback should have an 'x' property.");
