@@ -26,4 +26,25 @@ Tests.prototype.NetworkTests = function() {
 		};
 		navigator.network.isReachable(hostname, win);
 	});
+    module('Network Information API');
+    test("connection should exist", function() {
+        expect(1);
+        ok(navigator.connection != null, "navigator.connection should not be null.");
+    });
+    test("should contain connection properties", function() {
+        expect(3);
+        ok(typeof navigator.connection.type != 'undefined', "navigator.connection.type is defined.");
+        ok(typeof navigator.connection.homeNW != 'undefined', "navigator.connection.homeNW is defined.");
+        ok(typeof navigator.connection.currentNW != 'undefined', "navigator.connection.currentNW is defined.");
+    });
+    test("should define constants for connection status", function() {
+        expect(7);
+        equals(Connection.UNKNOWN, 0, "Connection.UNKNOWN is equal to 0.");
+        equals(Connection.ETHERNET, 1, "Connection.ETHERNET is equal to 1.");
+        equals(Connection.WIFI, 2, "Connection.WIFI is equal to 2.");
+        equals(Connection.CELL_2G, 3, "Connection.CELL_2G is equal to 3.");
+        equals(Connection.CELL_3G, 4, "Connection.CELL_3G is equal to 4.");
+        equals(Connection.CELL_4G, 5, "Connection.CELL_4G is equal to 5.");
+        equals(Connection.NONE, 20, "Connection.NONE is equal to 20.");
+    });
 };
