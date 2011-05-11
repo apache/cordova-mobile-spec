@@ -7,9 +7,9 @@ Tests.prototype.CaptureTests = function() {
     });
     test("should have the correct properties ", function() {
         expect(3);
-        ok(typeof navigator.device.capture.supportedAudioFormats != 'undefined' && navigator.device.capture.supportedAudioFormats != null , "there should be a supported audio formats property");
-        ok(typeof navigator.device.capture.supportedImageFormats != 'undefined' && navigator.device.capture.supportedImageFormats != null , "there should be a supported image formats property");
-        ok(typeof navigator.device.capture.supportedVideoFormats != 'undefined' && navigator.device.capture.supportedVideoFormats != null , "there should be a supported video formats property");
+        ok(typeof navigator.device.capture.supportedAudioModes != 'undefined' && navigator.device.capture.supportedAudioModes != null , "there should be a supported audio modes property");
+        ok(typeof navigator.device.capture.supportedImageModes != 'undefined' && navigator.device.capture.supportedImageModes != null , "there should be a supported image modes property");
+        ok(typeof navigator.device.capture.supportedVideoModes != 'undefined' && navigator.device.capture.supportedVideoModes != null , "there should be a supported video modes property");
     });
     test("should contain a captureAudio function", function() {
         expect(2);
@@ -28,33 +28,37 @@ Tests.prototype.CaptureTests = function() {
     });
 	module('CaptureAudioOptions');
     test("CaptureAudioOptions constructor should exist", function() {
-        expect(2);
+        expect(4);
         var options = new CaptureAudioOptions();
         ok(options !== null, "CaptureAudioOptions object should not be null.");
         ok(typeof options.limit !== 'undefined', "CaptureAudioOptions object should have a 'limit' property.");
+        ok(typeof options.duration !== 'undefined', "CaptureAudioOptions object should have a 'duration' property.");
+        ok(typeof options.mode !== 'undefined', "CaptureAudioOptions object should have a 'mode' property.");
     });
     module('CaptureImageOptions');
     test("CaptureImageOptions constructor should exist", function() {
-        expect(2);
+        expect(3);
         var options = new CaptureImageOptions();
         ok(options !== null, "CaptureImageOptions object should not be null.");
         ok(typeof options.limit !== 'undefined', "CaptureImageOptions object should have a 'limit' property.");
+        ok(typeof options.mode !== 'undefined', "CaptureImageOptions object should have a 'mode' property.");
     });
     module('CaptureVideoOptions');
     test("CaptureVideoOptions constructor should exist", function() {
-        expect(3);
+        expect(4);
         var options = new CaptureVideoOptions();
         ok(options !== null, "CaptureVideoOptions object should not be null.");
         ok(typeof options.limit !== 'undefined', "CaptureVideoOptions object should have a 'limit' property.");
         ok(typeof options.duration !== 'undefined', "CaptureVideoOptions object should have a 'duration' property.");
+        ok(typeof options.mode !== 'undefined', "CaptureVideoOptions object should have a 'mode' property.");
     });
     module('CaptureError interface');
     test("CaptureError constants should be defined", function() {
         expect(4);
         equal(CaptureError.CAPTURE_INTERNAL_ERR, 0, "CaptureError.CAPTURE_INTERNAL_ERR should be defined");
         equal(CaptureError.CAPTURE_APPLICATION_BUSY, 1, "CaptureError.CAPTURE_APPLICATION_BUSY should be defined");
-        equal(CaptureError.CAPTURE_INVALID_ARGUMENT, 0, "CaptureError.CAPTURE_INVALID_ARGUMENT should be defined");
-        equal(CaptureError.CAPTURE_NO_MEDIA_FILES, 0, "CaptureError.CAPTURE_NO_MEDIA_FILES should be defined");
+        equal(CaptureError.CAPTURE_INVALID_ARGUMENT, 2, "CaptureError.CAPTURE_INVALID_ARGUMENT should be defined");
+        equal(CaptureError.CAPTURE_NO_MEDIA_FILES, 3, "CaptureError.CAPTURE_NO_MEDIA_FILES should be defined");
     });
     test("CaptureError properties should exist", function() {
         expect(2);
