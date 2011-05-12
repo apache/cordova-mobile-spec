@@ -400,7 +400,7 @@ var QUnit = {
 
 				config.blocking = false;
 				process();
-			}, 13);
+			}, 250);
 		} else {
 			config.blocking = false;
 			process();
@@ -848,7 +848,7 @@ function process() {
 		if ( config.updateRate <= 0 || (((new Date()).getTime() - start) < config.updateRate) ) {
 			config.queue.shift()();
 		} else {
-			window.setTimeout( process, 13 );
+			window.setTimeout( process, 250 );
 			break;
 		}
 	}
