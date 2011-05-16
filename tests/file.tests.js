@@ -2037,6 +2037,46 @@ Tests.prototype.FileTests = function() {
         // create a file, write to it, and read it in again
         this.root.getFile(fileName, {create: true}, create_writer, this.fail);
     });
+    test("should read empty file properly", function() {
+        QUnit.stop(Tests.TEST_TIMEOUT);
+        expect(1);
+            
+            // path of file
+        var fileName = "empty.txt",
+            filePath = this.root.fullPath + '/' + fileName;
+            // file content
+            rule = "",
+            // reads file and compares content to what was written
+            read_file = function(evt) {
+                var reader = new FileReader();
+                reader.onloadend = function(evt) {
+                    console.log("read success");
+                    console.log(evt.target.result);
+                    ok(evt.target.result === rule, "reader.result should be equal to the empty string.");
+                    QUnit.start();
+                };
+                var myFile = new File();
+                myFile.fullPath = filePath; 
+                reader.readAsText(myFile);
+            };
+        
+        // create a file, write to it, and read it in again
+        this.root.getFile(fileName, {create: true}, read_file, this.fail);
+    });
+    test("should error out on non-existent file", function() {
+        QUnit.stop(Tests.TEST_TIMEOUT);
+        expect(1);
+            
+        var reader = new FileReader();
+		reader.onerror = function(evt) {
+			console.log("Properly got a file error as no file exists.");
+			ok(evt.target.error.code === 1, "Should throw a NOT_FOUND_ERR.");
+			QUnit.start();
+		}
+        var myFile = new File();
+        myFile.fullPath = this.root.fullPath + '/' + "doesnotexist.err"; 
+        reader.readAsText(myFile);
+    });
     test("should read file properly, Data URL", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
         expect(1);
@@ -2182,8 +2222,6 @@ Tests.prototype.FileTests = function() {
             write_file = function(file) {
                 var writer = new FileWriter(file);
                     writer.onwriteend = function(evt) {
-		 console.log("first writer.length = " + writer.length);
-		 console.log("first writer.position = " + writer.position);
                         ok(writer.length === length, "should have written " + length + " bytes");
                         ok(writer.position === length, "position should be at " + length);
                         append_file(writer);
@@ -2194,8 +2232,6 @@ Tests.prototype.FileTests = function() {
             append_file = function(writer) {
                 var exception = "  Except this one.";            
                 writer.onwriteend = function(evt) {
-		 console.log("next writer.length = " + writer.length);
-		 console.log("next writer.position = " + writer.position);
                     ok(writer.length === length, "file length should be " + length);
                     ok(writer.position === length, "position should be at " + length);
 
@@ -2212,6 +2248,88 @@ Tests.prototype.FileTests = function() {
 		var file = new File();
 		file.fullPath = filePath;
         write_file(file);
+    });
+    test("should be able to seek to the middle of the file and write more data than file.length", function() {
+        QUnit.stop(Tests.TEST_TIMEOUT);
+        expect(4);
+
+        var that = this,
+            fileName = "writer.seek.write",
+            filePath = this.root.fullPath + '/' + fileName,
+            // file content
+            rule = "This is our sentence.",
+            // for testing file length
+            length = rule.length,
+            // writes initial file content
+            write_file = function(fileEntry) {
+                fileEntry.createWriter(function(writer) {
+                    writer.onwriteend = function(evt) {
+                        ok(writer.length === length, "should have written " + length + " bytes");
+                        ok(writer.position === length, "position should be at " + length);
+                        append_file(writer);
+                    };
+                    writer.write(rule); 
+                }, that.fail);
+            }, 
+            // appends to file
+            append_file = function(writer) {
+                var exception = "newer sentence.";            
+                writer.onwriteend = function(evt) {
+                    ok(writer.length === length, "file length should be " + length);
+                    ok(writer.position === length, "position should be at " + length);
+
+                    // cleanup
+                    that.deleteFile(fileName);
+                    QUnit.start();
+                };
+                length = 12 + exception.length;
+                writer.seek(12);
+                writer.write(exception); 
+            };
+        
+        // create file, then write and append to it
+        this.createFile(fileName, write_file);
+    });
+    test("should be able to seek to the middle of the file and write less data than file.length", function() {
+        QUnit.stop(Tests.TEST_TIMEOUT);
+        expect(4);
+
+        var that = this,
+            fileName = "writer.seek.write2",
+            filePath = this.root.fullPath + '/' + fileName,
+            // file content
+            rule = "This is our sentence.",
+            // for testing file length
+            length = rule.length,
+            // writes initial file content
+            write_file = function(fileEntry) {
+                fileEntry.createWriter(function(writer) {
+                    writer.onwriteend = function(evt) {
+                        ok(writer.length === length, "should have written " + length + " bytes");
+                        ok(writer.position === length, "position should be at " + length);
+                        append_file(writer);
+                    };
+                    writer.write(rule); 
+                }, that.fail);
+            }, 
+            // appends to file
+            append_file = function(writer) {
+                var exception = "new.";            
+                writer.onwriteend = function(evt) {
+                    ok(writer.length === length, "file length should be " + length);
+                    ok(writer.position === length, "position should be at " + length);
+
+                    // cleanup
+                    that.deleteFile(fileName);
+                    QUnit.start();
+                };
+                length = 8 + exception.length;
+                writer.seek(8);
+                writer.write(exception); 
+            };
+        
+        // create file, then write and append to it
+        this.createFile(fileName, write_file);
     });
     test("should be able to write XML data", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
