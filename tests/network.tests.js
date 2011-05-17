@@ -29,13 +29,13 @@ Tests.prototype.NetworkTests = function() {
     module('Network Information API');
     test("connection should exist", function() {
         expect(1);
-        ok(navigator.connection != null, "navigator.connection should not be null.");
+        ok(navigator.network.connection != null, "navigator.network.connection should not be null.");
     });
     test("should contain connection properties", function() {
         expect(3);
-        ok(typeof navigator.connection.type != 'undefined', "navigator.connection.type is defined.");
-        ok(typeof navigator.connection.homeNW != 'undefined', "navigator.connection.homeNW is defined.");
-        ok(typeof navigator.connection.currentNW != 'undefined', "navigator.connection.currentNW is defined.");
+        ok(typeof navigator.network.connection.type != 'undefined', "navigator.network.connection.type is defined.");
+        ok(typeof navigator.network.connection.homeNW != 'undefined', "navigator.network.connection.homeNW is defined.");
+        ok(typeof navigator.network.connection.currentNW != 'undefined', "navigator.network.connection.currentNW is defined.");
     });
     test("should define constants for connection status", function() {
         expect(7);
