@@ -32,19 +32,18 @@ Tests.prototype.NetworkTests = function() {
         ok(navigator.network.connection != null, "navigator.network.connection should not be null.");
     });
     test("should contain connection properties", function() {
-        expect(3);
+        expect(2);
         ok(typeof navigator.network.connection.type != 'undefined', "navigator.network.connection.type is defined.");
-        ok(typeof navigator.network.connection.homeNW != 'undefined', "navigator.network.connection.homeNW is defined.");
-        ok(typeof navigator.network.connection.currentNW != 'undefined', "navigator.network.connection.currentNW is defined.");
+        ok(typeof navigator.network.connection.networkName != 'undefined', "navigator.network.connection.networkName is defined.");
     });
     test("should define constants for connection status", function() {
         expect(7);
-        equals(Connection.UNKNOWN, 0, "Connection.UNKNOWN is equal to 0.");
-        equals(Connection.ETHERNET, 1, "Connection.ETHERNET is equal to 1.");
-        equals(Connection.WIFI, 2, "Connection.WIFI is equal to 2.");
-        equals(Connection.CELL_2G, 3, "Connection.CELL_2G is equal to 3.");
-        equals(Connection.CELL_3G, 4, "Connection.CELL_3G is equal to 4.");
-        equals(Connection.CELL_4G, 5, "Connection.CELL_4G is equal to 5.");
-        equals(Connection.NONE, 20, "Connection.NONE is equal to 20.");
+        equals(Connection.UNKNOWN, "unknown", "Connection.UNKNOWN is equal to 'unknown'.");
+        equals(Connection.ETHERNET, "ethernet", "Connection.ETHERNET is equal to 'ethernet'.");
+        equals(Connection.WIFI, "wifi", "Connection.WIFI is equal to 'wifi'.");
+        equals(Connection.CELL_2G, "2g", "Connection.CELL_2G is equal to '2g'.");
+        equals(Connection.CELL_3G, "3g", "Connection.CELL_3G is equal to '3g'.");
+        equals(Connection.CELL_4G, "4g", "Connection.CELL_4G is equal to '4g'.");
+        equals(Connection.NONE, "none", "Connection.NONE is equal to 'none'.");
     });
 };
