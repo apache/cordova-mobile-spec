@@ -32,9 +32,8 @@ Tests.prototype.NetworkTests = function() {
         ok(navigator.network.connection != null, "navigator.network.connection should not be null.");
     });
     test("should contain connection properties", function() {
-        expect(2);
+        expect(1);
         ok(typeof navigator.network.connection.type != 'undefined', "navigator.network.connection.type is defined.");
-        ok(typeof navigator.network.connection.networkName != 'undefined', "navigator.network.connection.networkName is defined.");
     });
     test("should define constants for connection status", function() {
         expect(7);
