@@ -383,6 +383,65 @@ Tests.prototype.FileTests = function() {
         // create:false, exclusive:false, directory does not exist
         this.root.getDirectory(dirName, {create:false}, null, testDir); 
     });
+    test("DirectoryEntry.getDirectory: create new dir with space then resolveFileSystemURI", function() {
+        QUnit.stop(Tests.TEST_TIMEOUT);
+        expect(5);
+        
+        var dirName = "de create dir",
+        dirPath = this.root.fullPath + '/' + dirName,
+        that = this,
+        getDir = function(dirEntry) {
+            
+            var dirURI = dirEntry.toURI();
+            // now encode URI and try to resolve
+            window.resolveLocalFileSystemURI(dirURI, testDirFromURI, that.fail);
+            
+        },
+        testDirFromURI = function(directory) {
+            ok(typeof directory !== 'undefined' && directory !== null, "directory entry should not be null");
+            equal(directory.isFile, false, "directory 'isFile' attribute should be false");
+            equal(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
+            equal(directory.name, dirName, "directory 'name' attribute should be set");
+            equal(directory.fullPath, dirPath, "directory 'fullPath' attribute should be set");
+            
+            // cleanup
+            directory.remove(null, that.fail);
+            QUnit.start();
+        };
+        
+        // create:true, exclusive:false, directory does not exist
+        this.root.getDirectory(dirName, {create: true}, getDir, this.fail); 
+    });
+    test("DirectoryEntry.getDirectory: create new dir with space resolveFileSystemURI with encoded URI", function() {
+        QUnit.stop(Tests.TEST_TIMEOUT);
+        expect(5);
+        
+        var dirName = "de create dir",
+        dirPath = this.root.fullPath + '/' + dirName,
+        that = this,
+        getDir = function(dirEntry) {
+            
+            var dirURI = dirEntry.toURI();
+            // now encode URI and try to resolve
+            window.resolveLocalFileSystemURI(encodeURI(dirURI), testDirFromURI, that.fail);
+            
+        },
+        testDirFromURI = function(directory) {
+            ok(typeof directory !== 'undefined' && directory !== null, "directory entry should not be null");
+            equal(directory.isFile, false, "directory 'isFile' attribute should be false");
+            equal(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
+            equal(directory.name, dirName, "directory 'name' attribute should be set");
+            equal(directory.fullPath, dirPath, "directory 'fullPath' attribute should be set");
+        
+            // cleanup
+            directory.remove(null, that.fail);
+            QUnit.start();
+        };
+        
+        // create:true, exclusive:false, directory does not exist
+        this.root.getDirectory(dirName, {create: true}, getDir, this.fail); 
+    });
+
     test("DirectoryEntry.getDirectory: create new directory", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
@@ -405,6 +464,7 @@ Tests.prototype.FileTests = function() {
         // create:true, exclusive:false, directory does not exist
         this.root.getDirectory(dirName, {create: true}, testDir, this.fail); 
     });
+    
     test("DirectoryEntry.getDirectory: create new directory (exclusive)", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
