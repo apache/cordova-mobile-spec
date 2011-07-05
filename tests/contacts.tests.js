@@ -173,20 +173,20 @@ Tests.prototype.ContactsTests = function() {
 		ok(typeof contact.remove != 'undefined' && contact.remove != null, "contact.remove should not be null.");
 		ok(typeof contact.remove == 'function', "contact.remove should be a function.");
 	});
-	test("calling remove on a contact has an id of null should return ContactError.NOT_FOUND_ERROR", function() {
+	test("calling remove on a contact has an id of null should return ContactError.UNKNOWN_ERROR", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
 		expect(2);
 		var win = function(result) {
 		};
 		var fail = function(result) {
 			ok(typeof result == 'object', "Object returned in contact.remove failure callback is of type 'object' (actually ContactError).");
-			ok(result.code == ContactError.NOT_FOUND_ERROR, "Object returned in contacts.remove failure callback has a code property which equal to ContactError.NOT_FOUND_ERROR.");
+			ok(result.code == ContactError.UNKNOWN_ERROR, "Object returned in contacts.remove failure callback has a code property which equal to ContactError.UNKNOWN_ERROR.");
 			QUnit.start();
 		};
 		var rmContact = new Contact();
 		rmContact.remove(win, fail);
 	});
-	test("calling remove on a contact that does not exist should return ContactError.NOT_FOUND_ERROR", function() {
+	test("calling remove on a contact that does not exist should return ContactError.UNKNOWN_ERROR", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
 		expect(2);
 		var win = function(result) {
