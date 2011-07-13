@@ -1,41 +1,35 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, height=device-height, user-scalable=yes, initial-scale=1.0;" />
+    <meta name="viewport" content="width=320; user-scalable=no" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>PhoneGap</title>
+	  <link rel="stylesheet" href="master.css" type="text/css" media="screen" title="no title" charset="utf-8">
+	  <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
+	  <script type="text/javascript" charset="utf-8" src="main.js"></script>
 
-    <title>PhoneGap API Spec</title>
-
-    <!-- Load QUnit -->
-    <link rel="stylesheet" type="text/css" href="qunit.css" />
-    <script type="text/javascript" src="qunit.js"></script>
-
-    <!-- Load Test Runner -->
-    <script type="text/javascript" src="test-runner.js"></script>
-    
-    <!-- Source -->
-    <script type="text/javascript" src="phonegap.0.9.6.1.js"></script>
-    
-    <!-- Tests -->
-    <script type="text/javascript" src="tests/accelerometer.tests.js"></script>
-    <script type="text/javascript" src="tests/capture.tests.js"></script>
-    <script type="text/javascript" src="tests/contacts.tests.js"></script>
-    <script type="text/javascript" src="tests/camera.tests.js"></script>
-    <script type="text/javascript" src="tests/device.tests.js"></script>
-    <script type="text/javascript" src="tests/file.tests.js"></script>
-    <script type="text/javascript" src="tests/geolocation.tests.js"></script>
-    <script type="text/javascript" src="tests/network.tests.js"></script>
-    <script type="text/javascript" src="tests/notification.tests.js"></script>
-    <script type="text/javascript" src="tests/orientation.tests.js"></script>
-    <script type="text/javascript" src="tests/storage.tests.js"></script>
   </head>
-    <body>
-        <h1 id="qunit-header">PhoneGap API Spec</h1>
-        <h2 id="qunit-banner"></h2>
-        <h2 id="qunit-userAgent"></h2>
-        <ol id="qunit-tests"></ol>
-        <div id="qunit-fixture">
-            <!-- Populated by tests -->
-        </div>
-    </body>
+  <body onload="init();" id="stage" class="theme">
+    <h1>PhoneGap Tests</h1>
+    <div id="info">
+        <h4>Platform: <span id="platform"> &nbsp;</span></h4>
+        <h4>Version: <span id="version">&nbsp;</span></h4>
+        <h4>UUID: <span id="uuid"> &nbsp;</span></h4>
+        <h4>Name: <span id="name">&nbsp;</span></h4>
+        <h4>Width: <span id="width"> &nbsp;</span>,   Height: <span id="height">&nbsp;
+                   </span>, Color Depth: <span id="colorDepth"></span></h4>
+     </div>
+    <a href="autotest/index.html" class="btn large">Automatic Test</a>
+    <a href="accelerometer/index.html" class="btn large">Accelerometer</a>
+    <a href="audio/index.html" class="btn large">Audio Play/Record</a>
+    <a href="camera/index.html" class="btn large">Camera</a>
+    <a href="compass/index.html" class="btn large">Compass</a>
+    <a href="contacts/index.html" class="btn large">Contacts</a>
+    <a href="events/index.html" class="btn large">Events</a>
+    <a href="location/index.html" class="btn large">Location</a>
+    <a href="misc/index.html" class="btn large">Misc Content</a>
+    <a href="notification/index.html" class="btn large">Notification</a>
+    <a href="sql/index.html" class="btn large">Web SQL</a>
+    <a href="storage/index.html" class="btn large">Local Storage</a>
+  </body>
 </html>
