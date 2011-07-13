@@ -4,8 +4,15 @@ These specs are designed to run inside the mobile device that implements it - _i
 
 These set of tests is designed to be used with PhoneGap. You should initialize a fresh PhoneGap repository (git clone 
 git://github.com/phonegap/phonegap.git) and then toss these files into the www or assets folder, replacing the
-contents. Make sure you include phonegap.js - each platform directory in the PhoneGap repository has a build or make
-file, which will create a phonegap.js file for you (and in most cases copy it into the www or assets folder).
+contents. 
+
+Make sure you include phonegap-*.js in the www folder.  You also need to edit phonegap.js to reference the phonegap-*.js file you are testing.
+For example, to test with phonegap-0.9.6.1, the phonegap.js file would be:
+
+ document.write('<script type="text/javascript" charset="utf-8" src="../phonegap-0.9.6.1.js"></script>');
+ document.write('<script type="text/javascript" charset="utf-8" src="phonegap-0.9.6.1.js"></script>');
+
+This is done so that you don't have to modify every HTML file when you want to test a new version of PhoneGap.
 
 The goal is to test mobile device functionality inside a mobile browser.
 Where possible, the PhoneGap API lines up with HTML 5 spec. Maybe down
@@ -15,7 +22,8 @@ the road we could use this spec for parts of HTML 5, too :)
 LICENSE
 ---
 
-_Copyright (c) 2009 Rob Ellis, Brian LeRoux, Brock Whitten, Nitobi Software_
+_Copyright (c) 2009-2011 Rob Ellis, Brian LeRoux, Brock Whitten, Nitobi Software_
+_Copyright (c) 2010-2011, IBM Corporation
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
