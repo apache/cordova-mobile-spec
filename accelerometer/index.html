@@ -108,14 +108,6 @@
                 deviceReady = true;
                 console.log("Device="+device.platform+" "+device.version);
             }, false);
-        dijit.byId("switch1").onStateChanged = function(s) {
-            if (s == "off") {
-                stopAccel();            
-            }
-            else {
-                watchAccel();
-            }
-        };
         window.setTimeout(function() {
         	if (!deviceReady) {
         		alert("Error: PhoneGap did not initialize.  Demo will not run correctly.");
