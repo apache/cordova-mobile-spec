@@ -17,7 +17,6 @@
      * Function called when page has finished loading.
      */
     function init() {
-        console.log("accelerometer.init()");
         document.addEventListener("deviceready", function() {
                 deviceReady = true;
                 console.log("Device="+device.platform+" "+device.version);
@@ -47,5 +46,6 @@
     document.getElementById('count').textContent = localStorage.pageLoadCount;
     </script>
 
+    <h2>&nbsp</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a>
   </body>
 </html>      

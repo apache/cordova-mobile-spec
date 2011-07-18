@@ -93,4 +93,18 @@
   	width:308px;
   	padding:1.2em 0;
   }
-
+  #stage.theme a.backBtn{
+   border: 1px solid #555;
+   -webkit-border-radius: 5px;
+   border-radius: 5px;
+   text-align:center;
+   display:block;
+   float:right;
+   background:#666;
+   width:75px;
+   color:#9ab;
+   font-size:1.1em;
+   text-decoration:none;
+   padding:1.2em 0;
+   margin:3px 5px 3px 5px;
+  }

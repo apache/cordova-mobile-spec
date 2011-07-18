@@ -91,7 +91,6 @@
      * Function called when page has finished loading.
      */
     function init() {
-        console.log("accelerometer.init()");
         document.addEventListener("deviceready", function() {
                 deviceReady = true;
                 console.log("Device="+device.platform+" "+device.version);
@@ -120,6 +119,6 @@
     <a href="javascript:" class="btn large" onclick="getLocation();">Get Location</a>
     <a href="javascript:" class="btn large" onclick="watchLocation();">Start Watching Location</a>
     <a href="javascript:" class="btn large" onclick="stopLocation();">Stop Watching Location</a>
-    
+    <h2>&nbsp</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a>    
   </body>
 </html>      
