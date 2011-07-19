@@ -3,7 +3,7 @@ document.write('<script type="text/javascript" charset="utf-8" src="phonegap-0.9
 
 function backHome() {
 	if (device.platform.toLowerCase() == 'android') {
-		app.exitApp();
+		navigator.app.exitApp();
 	}
 	else {
 		document.location = "../index.html";
