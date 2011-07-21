@@ -39,7 +39,7 @@
         navigator.notification.confirm(message,
             function(r) {
                 console.log("You selected " + r);
-                prompt("You selected " + r);
+                alert("You selected " + (buttons.split(","))[r-1]);
             },
             title,
             buttons);
@@ -74,9 +74,9 @@
     <a href="javascript:" class="btn large" onclick="vibrate();">Vibrate</a>
     <a href="javascript:" class="btn large" onclick="alertDialog('You pressed alert.', 'Alert Dialog', 'Continue');">Alert Dialog</a>
     <a href="javascript:" class="btn large" onclick="confirmDialog('You pressed confirm.', 'Confirm Dialog', 'Yes,No,Maybe');">Confirm Dialog</a>
-    <a href="javascript:" class="btn large" onclick="alert('You pressed alert.', 'Alert Dialog', 'Continue');">Built-in Alert Dialog</a>
-    <a href="javascript:" class="btn large" onclick="alert('You entered '+ confirm('You pressed confirm.', 'Confirm Dialog', 'Yes,No,Maybe'));">Built-in Confirm Dialog</a>
-    <a href="javascript:" class="btn large" onclick="alert('You entered ' + prompt('This is a prompt.', 'Default value'));">Built-in Prompt Dialog</a>
+    <a href="javascript:" class="btn large" onclick="alert('You pressed alert.');">Built-in Alert Dialog</a>
+    <a href="javascript:" class="btn large" onclick="confirm('You selected confirm');">Built-in Confirm Dialog</a>
+    <a href="javascript:" class="btn large" onclick="prompt('This is a prompt.', 'Default value');">Built-in Prompt Dialog</a>
     <h2>&nbsp</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a>
   </body>
 </html>      

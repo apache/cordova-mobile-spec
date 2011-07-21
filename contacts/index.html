@@ -20,7 +20,6 @@
         obj = new ContactFindOptions();
         obj.filter = "D"; //Brooks";
         obj.multiple = true;
-        obj.limit = 1000;
         navigator.contacts.find(
             ["displayName", "name", "phoneNumbers", "emails", "urls", "note"],
             function(contacts) {
@@ -33,11 +32,11 @@
                     for (var i=0; i<contacts.length; i++) {
                         var contact = contacts[i];
                         s = s + "<tr><td>" + contact.name.formatted + "</td><td>";
-                        if (contact.phoneNumbers.length > 0) {
+                        if (contact.phoneNumbers && contact.phoneNumbers.length > 0) {
                             s = s + contact.phoneNumbers[0].value;
                         }
                         s = s + "</td><td>"
-                        if (contact.emails.length > 0) {
+                        if (contact.emails && contact.emails.length > 0) {
                             s = s + contact.emails[0].value;
                         }
                         s = s + "</td></tr>";
@@ -47,7 +46,7 @@
                 document.getElementById('contacts_results').innerHTML = s;
             },
             function(e) {
-                document.getElementById('contacts_results').innerHTML = "Error: "+e;
+                document.getElementById('contacts_results').innerHTML = "Error: "+e.code;
             },
             obj);
     };
@@ -72,7 +71,7 @@
 
             contact.save(
                 function() { alert("Contact saved.");},
-                function(e) { alert("Contact save failed: " + e); }
+                function(e) { alert("Contact save failed: " + e.code); }
             );
             console.log("you have saved the contact");
         }

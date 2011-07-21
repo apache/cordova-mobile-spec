@@ -19,6 +19,7 @@
     var media1 = null;
     var media1Timer = null;
     var audioSrc = null;
+    var recordSrc = "myRecording.mp3";
 
     /**
      * Play audio
@@ -76,10 +77,10 @@
                 });
         }
         audioSrc = src;
-
+        document.getElementById('audio_duration').innerHTML = "";
         // Play audio
         media1.play();
-        if (media1Timer == null) {
+        if (media1Timer == null && media1.getCurrentPosition) {
             media1Timer = setInterval(
                 function() {
                     media1.getCurrentPosition(
@@ -165,7 +166,7 @@
         console.log(" -- media="+mediaRec);
         if (mediaRec == null) {
 
-            var src = "myrecording.mp3";
+            var src = recordSrc;
             mediaRec = new Media(src,
                     function() {
                         console.log("recordAudio():Audio Success");
@@ -193,7 +194,11 @@
             setAudioPosition(recTime+" sec");
             if (recTime >= 10) {
                 clearInterval(recInterval);
-                mediaRec.stopRecord();
+                if (mediaRec.stopAudioRecord){
+                    mediaRec.stopAudioRecord();
+                } else {
+                    mediaRec.stopRecord();
+                }
                 console.log("recordAudio(): stop");
                 navigator.notification.beep(1);
             }
@@ -204,7 +209,24 @@
      * Play back recorded audio
      */
     function playRecording() {
-        playAudio("myrecording.mp3");
+        playAudio(recordSrc);
+    }
+    
+    /**
+     * Function to create a file for iOS recording
+     */
+    function getRecordSrc() {
+        var fsFail = function(error) {
+            console.log("error creating file for iOS recording");
+        };
+        var gotFile = function(file) {
+            recordSrc = file.fullPath;
+            //console.log("recording Src: " + recordSrc);
+        };
+        var gotFS = function(fileSystem) {
+            fileSystem.root.getFile("iOSRecording.wav", {create: true}, gotFile, fsFail);
+        };
+        window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, gotFS, fsFail);
     }
     
     /**
@@ -213,6 +235,10 @@
     function init() {
         document.addEventListener("deviceready", function() {
                 deviceReady = true;
+                if (device.platform.indexOf("iPhone") !=-1 || device.platform.indexOf("iPad") !=-1)
+                {
+                     getRecordSrc();
+                }
                 console.log("Device="+device.platform+" "+device.version);
             }, false);
         window.setTimeout(function() {
@@ -230,7 +256,7 @@
     <h1>Audio</h1>  
     <div id="info">
         <table width="100%">
-        <tr><td><b>Status:</b></td><td id="audio_status">Stopped</td></tr>
+        <tr><td><b>Status:</b></td><td id="audio_status">&nbsp;</td></tr>
         <tr><td><b>Duration:</b></td><td id="audio_duration"></td></tr>
         <tr><td><b>Position:</b></td><td id="audio_position"></td></tr>
         </table>
@@ -241,6 +267,7 @@
     <a href="javascript:" class="btn large" onclick="stopAudio();">Stop Playing Audio</a>
     <a href="javascript:" class="btn large" onclick="recordAudio();">Record Audio for 10 sec</a>
     <a href="javascript:" class="btn large" onclick="playRecording();">Play/Unpause Recording</a>
-    <h2>&nbsp</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a>    
+      <h2>&nbsp</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a>
+    
   </body>
 </html>      
