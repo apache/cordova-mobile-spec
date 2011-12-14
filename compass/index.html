@@ -31,7 +31,7 @@
 
         // Success callback
         var success = function(a){
-            document.getElementById('compassHeading').innerHTML = roundNumber(a);
+            document.getElementById('compassHeading').innerHTML = roundNumber(a.magneticHeading);
         };
 
         // Fail callback
@@ -71,7 +71,7 @@
 
         // Success callback
         var success = function(a){
-            document.getElementById('compassHeading').innerHTML = roundNumber(a);
+            document.getElementById('compassHeading').innerHTML = roundNumber(a.magneticHeading);
         };
 
         // Fail callback
