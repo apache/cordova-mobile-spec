@@ -2,5 +2,10 @@ document.write('<script type="text/javascript" charset="utf-8" src="../phonegap-
 document.write('<script type="text/javascript" charset="utf-8" src="phonegap-1.2.0.js"></script>');
 
 function backHome() {
-	document.location = "../index.html";
+	if (device.platform.toLowerCase() == 'android') {
+            navigator.app.backHistory();
+	}
+	else {
+	    document.location = "../index.html";
+	}
 }
