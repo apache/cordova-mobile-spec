@@ -37,7 +37,8 @@
                 console.log("Error getting picture: " + e);
                 document.getElementById('camera_status').innerHTML = "Error getting picture.";
             },
-            { quality: 50, destinationType: navigator.camera.DestinationType.FILE_URI, sourceType : navigator.camera.PictureSourceType.CAMERA});
+            { quality: 50, destinationType:
+            Camera.DestinationType.FILE_URI, sourceType : Camera.PictureSourceType.CAMERA});
     };
 
     /**
@@ -57,7 +58,8 @@
                 console.log("Error getting picture: " + e);
                 document.getElementById('camera_status').innerHTML = "Error getting picture.";
             },
-            { quality: 50, destinationType: navigator.camera.DestinationType.FILE_URI, sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY});
+            { quality: 50, destinationType:
+            Camera.DestinationType.FILE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
     };
 
     
@@ -89,6 +91,6 @@
     <h2>Action</h2>
     <a href="javascript:" class="btn large" onclick="getPicture();">Take Picture</a>
     <a href="javascript:" class="btn large" onclick="getImage();">Select Image from Library</a>
-    <h2>&nbsp</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a>
+    <h2>&nbsp;</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a>
   </body>
 </html>      
