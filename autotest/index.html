@@ -10,12 +10,12 @@
     <link rel="stylesheet" type="text/css" href="qunit.css" />
     <script type="text/javascript" src="qunit.js"></script>
 
-    <!-- Load Test Runner -->
-    <script type="text/javascript" src="test-runner.js"></script>
-    
     <!-- Source -->
     <script type="text/javascript" src="../phonegap.js"></script>
-    
+
+    <!-- Load Test Runner -->
+    <script type="text/javascript" src="test-runner.js"></script>
+
     <!-- Tests -->
     <script type="text/javascript" src="tests/accelerometer.tests.js"></script>
     <script type="text/javascript" src="tests/battery.tests.js"></script>
@@ -29,6 +29,25 @@
     <script type="text/javascript" src="tests/notification.tests.js"></script>
     <script type="text/javascript" src="tests/orientation.tests.js"></script>
     <script type="text/javascript" src="tests/storage.tests.js"></script>
+    <script type="text/javascript">
+      document.addEventListener('deviceready', function() {
+        console.log('running tests');
+          var tests = new Tests();
+
+          // Each group of tests are declared as a function in the object `Tests`.
+          // A group of tests are identified by a name that contains the word 'Tests'.
+          //
+          // Load each group of tests into QUnit
+          for (var t in tests) {
+              if (t.indexOf('Tests') > -1) {
+                  tests[t]();
+              }
+          }
+          
+          // Start the QUnit test suite
+          QUnit.start();
+      }, false);
+    </script>
   </head>
     <body>
         <h1 id="qunit-header">PhoneGap API Spec</h1>
