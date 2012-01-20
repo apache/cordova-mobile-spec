@@ -38,7 +38,7 @@
         var fail = function(e){
             console.log("watchCompass fail callback with error code "+e);
             stopCompass();
-            setCompassStatus(navigator.compass.ERROR_MSG[e]);
+            setCompassStatus(e);
         };
 
         // Update heading every 1 sec
@@ -77,7 +77,7 @@
         // Fail callback
         var fail = function(e){
             console.log("getCompass fail callback with error code "+e);
-            setCompassStatus(navigator.compass.ERROR_MSG[e]);
+            setCompassStatus(e);
         };
 
         // Make call
@@ -116,13 +116,13 @@
     <div id="info">
         <b>Status:</b> <span id="compass_status">Stopped</span>
         <table width="100%"><tr>
-            <td width="33%">Heading: <span id="compassHeading">&nbsp;</td>
+            <td width="33%">Heading: <span id="compassHeading">&nbsp;</span></td>
         </tr></table>
     </div>
     <h2>Action</h2>
     <a href="javascript:" class="btn large" onclick="getCompass();">Get Compass</a>
     <a href="javascript:" class="btn large" onclick="watchCompass();">Start Watching Compass</a>
     <a href="javascript:" class="btn large" onclick="stopCompass();">Stop Watching Compass</a>
-    <h2>&nbsp</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a>
+    <h2>&nbsp;</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a>
   </body>
 </html>      
