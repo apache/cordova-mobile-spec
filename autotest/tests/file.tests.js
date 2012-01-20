@@ -50,6 +50,7 @@ Tests.prototype.FileTests = function() {
         equal(FileError.TYPE_MISMATCH_ERR, 11, "FileError.TYPE_MISMATCH_ERR should be defined");
         equal(FileError.PATH_EXISTS_ERR, 12, "FileError.PATH_EXISTS_ERR should be defined");
     });
+
     module('LocalFileSystem interface');
     test("window.requestFileSystem function should be defined", function() {
         expect(1);
@@ -152,6 +153,7 @@ Tests.prototype.FileTests = function() {
         // lookup file system entry
         window.resolveLocalFileSystemURI("/this.is.not.a.valid.url", null, failURI);
     });
+
     module('Metadata interface');
     test("Metadata constructor should exist", function() {
         expect(2);
