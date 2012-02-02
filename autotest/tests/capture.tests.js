@@ -86,8 +86,8 @@ Tests.prototype.CaptureTests = function() {
     module('MediaFile');
     test("MediaFile constructor should exist", function() {
         expect(6);
-        var fileData = new MediaFileData();
-        ok(fileData !== null, "MediaFileData object should not be null.");
+        var fileData = new MediaFile();
+        ok(fileData !== null, "MediaFile object should not be null.");
         ok(typeof fileData.name !== 'undefined', "MediaFile object should have a 'name' property.");
         ok(typeof fileData.fullPath !== 'undefined', "MediaFile object should have a 'fullPath' property.");
         ok(typeof fileData.type !== 'undefined', "MediaFile object should have a 'type' property.");
