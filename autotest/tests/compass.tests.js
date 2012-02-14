@@ -21,7 +21,7 @@ Tests.prototype.CompassTests = function() {
 			ok(a.headingAccuracy !== null, "Heading object returned in getCurrentHeading success callback should have a 'headingAccuracy' property.");
 			ok(typeof a.headingAccuracy == 'number', "Heading object's 'headingAccuracy' property returned in getCurrentHeading success callback should be of type 'number'.");
 			ok(a.timestamp !== null, "Heading object returned in getCurrentHeading success callback should have a 'timestamp' property.");
-			ok(a.timestamp instanceof Date, "Heading object's 'timestamp' property returned in getCurrentHeading success callback should be an instance of Date.");
+			ok(a.timestamp instanceof Date, "Heading object's 'timestamp' property returned in getCurrentHeading success callback should be of type 'Date'.");
 			QUnit.start();
 		};
 		var fail = function() { QUnit.start(); };
