@@ -61,7 +61,6 @@ Tests.prototype.ContactsTests = function() {
 		var obj = navigator.contacts.create({"displayName": "test name", "gender": "male", "note": "my note", "name": {"formatted": "Mr. Test Name"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}]});		
 		ok(obj != 'undefined' && obj != null, "navigator.contacts.create should return a Contact object.");
 		ok(obj.displayName == 'test name', "Contact should contain a displayName property.");
-		ok(obj.gender == 'male', "Contact should contain a gender property.");
 		ok(obj.note == 'my note', "Contact should contain a note property.");
 		ok(obj.name.formatted == 'Mr. Test Name', "Contact should contain a name.formatted property.");
 		ok(obj.emails.length == 2, "Contact should contain and array of emails with 2 entries");
