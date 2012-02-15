@@ -11,7 +11,7 @@ Tests.prototype.ContactsTests = function() {
 	});
     test("contacts.find success callback should be called with an array", function() {
         expect(2);
-        QUnit.stop(Tests.TEST_TIMEOUT);
+        QUnit.stop(15000);
         var win = function(result) {
             ok(typeof result == 'object', "Object returned in contacts.find success callback is of type 'object' (actually array).");
             ok(typeof result.length == 'number', "Object returned in contacts.find success callback has a length property which is numerical.");
