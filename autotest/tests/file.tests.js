@@ -22,7 +22,7 @@ var getFileSystemRoot = (function() {
                     temp_root = fileSystem.root;
                 }, onError);
     };
-    document.addEventListener("deviceready", init, true); 
+    document.addEventListener("deviceready", init, true);
 
     // public function returns private root entry
     return function() {
@@ -131,27 +131,27 @@ Tests.prototype.FileTests = function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
 
-        var failURI = function(error) {
+        var failURL = function(error) {
             ok(typeof error !== 'undefined' && error !== null, "error should not be null.");
             equal(error.code, FileError.NOT_FOUND_ERR, "Shoud receive error code FileError.NOT_FOUND_ERR");
             QUnit.start();
         };
         
         // lookup file system entry
-        window.resolveLocalFileSystemURI("file:///this.is.not.a.valid.file.txt", null, failURI);
+        window.resolveLocalFileSystemURI("file:///this.is.not.a.valid.file.txt", null, failURL);
     });
-    test("resolve invalid URI", function() {
+    test("resolve invalid URL", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
 
-        var failURI = function(error) {
+        var failURL = function(error) {
             ok(typeof error !== 'undefined' && error !== null, "error should not be null.");
             equal(error.code, FileError.ENCODING_ERR, "Shoud receive an error code FileError.ENCODING_ERR");
             QUnit.start();
         };
         
         // lookup file system entry
-        window.resolveLocalFileSystemURI("/this.is.not.a.valid.url", null, failURI);
+        window.resolveLocalFileSystemURI("/this.is.not.a.valid.url", null, failURL);
     });
 
     module('Metadata interface');
@@ -169,7 +169,7 @@ Tests.prototype.FileTests = function() {
         ok(typeof flags.create !== 'undefined' && flags.create !== null, "Flags object should have a 'create' property.");
         equal(flags.create, false, "Flags.create should be set properly");
         ok(typeof flags.exclusive !== 'undefined' && flags.exclusive !== null, "Flags object should have an 'exclusive' property.");
-        equal(flags.exclusive, true, "flags.exclusive should be set properly")
+        equal(flags.exclusive, true, "flags.exclusive should be set properly");
     });
     module('FileSystem interface');
     test("FileSystem root should be a DirectoryEntry", function() {
@@ -186,7 +186,7 @@ Tests.prototype.FileTests = function() {
                 ok(typeof entry.getMetadata === 'function', "entry object should have a 'getMetadata' function.");
                 ok(typeof entry.moveTo === 'function', "entry object should have a 'moveTo' function.");
                 ok(typeof entry.copyTo === 'function', "entry object should have a 'copyTo' function.");
-                ok(typeof entry.toURI === 'function', "entry object should have a 'toURI' function.");
+                ok(typeof entry.toURL === 'function', "entry object should have a 'toURL' function.");
                 ok(typeof entry.remove === 'function', "entry object should have a 'remove' function.");
                 ok(typeof entry.getParent === 'function', "entry object should have a 'getParent' function.");
                 ok(typeof entry.createReader === 'function', "entry object should have a 'createReader' function.");
@@ -194,10 +194,10 @@ Tests.prototype.FileTests = function() {
                 ok(typeof entry.getDirectory === 'function', "entry object should have a 'getDirectory' function.");
                 ok(typeof entry.removeRecursively === 'function', "entry object should have a 'removeRecursively' function.");
                 QUnit.start();
-		 };
-		 
-		window.resolveLocalFileSystemURI(root.toURI(), testFSRoot, null);
-        
+		};
+	
+		window.resolveLocalFileSystemURI(root.toURL(), testFSRoot, null);
+
     });
     module('DirectoryEntry interface', {
         // setup function will run before each test
@@ -206,9 +206,9 @@ Tests.prototype.FileTests = function() {
             this.fail = function(error) {
                 console.log('file error: ' + error.code);
             };
-		   this.unexpectedSuccess = function() {
-				console.log('!!! success function called when not expected !!!');
-		   };
+            this.unexpectedSuccess = function() {
+                console.log('!!! success function called when not expected !!!');
+            };
         }
     });
     test("DirectoryEntry.getFile: get Entry for file that does not exist", function() {
@@ -385,7 +385,7 @@ Tests.prototype.FileTests = function() {
         // create:false, exclusive:false, directory does not exist
         this.root.getDirectory(dirName, {create:false}, null, testDir); 
     });
-    test("DirectoryEntry.getDirectory: create new dir with space then resolveFileSystemURI", function() {
+    test("DirectoryEntry.getDirectory: create new dir with space then resolveFileSystemURL", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
         
@@ -394,12 +394,12 @@ Tests.prototype.FileTests = function() {
         that = this,
         getDir = function(dirEntry) {
             
-            var dirURI = dirEntry.toURI();
-            // now encode URI and try to resolve
-            window.resolveLocalFileSystemURI(dirURI, testDirFromURI, that.fail);
+            var dirURL = dirEntry.toURL();
+            // now encode URL and try to resolve
+            window.resolveLocalFileSystemURI(dirURL, testDirFromURL, that.fail);
             
         },
-        testDirFromURI = function(directory) {
+        testDirFromURL = function(directory) {
             ok(typeof directory !== 'undefined' && directory !== null, "directory entry should not be null");
             equal(directory.isFile, false, "directory 'isFile' attribute should be false");
             equal(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
@@ -414,7 +414,7 @@ Tests.prototype.FileTests = function() {
         // create:true, exclusive:false, directory does not exist
         this.root.getDirectory(dirName, {create: true}, getDir, this.fail); 
     });
-    test("DirectoryEntry.getDirectory: create new dir with space resolveFileSystemURI with encoded URI", function() {
+    test("DirectoryEntry.getDirectory: create new dir with space resolveFileSystemURL with encoded URL", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
         expect(5);
         
@@ -423,12 +423,12 @@ Tests.prototype.FileTests = function() {
         that = this,
         getDir = function(dirEntry) {
             
-            var dirURI = dirEntry.toURI();
-            // now encode URI and try to resolve
-            window.resolveLocalFileSystemURI(encodeURI(dirURI), testDirFromURI, that.fail);
+            var dirURL = dirEntry.toURL();
+            // now encode URL and try to resolve
+            window.resolveLocalFileSystemURI(encodeURL(dirURL), testDirFromURL, that.fail);
             
         },
-        testDirFromURI = function(directory) {
+        testDirFromURL = function(directory) {
             ok(typeof directory !== 'undefined' && directory !== null, "directory entry should not be null");
             equal(directory.isFile, false, "directory 'isFile' attribute should be false");
             equal(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
@@ -862,13 +862,13 @@ Tests.prototype.FileTests = function() {
             this.fail = function(error) {
                 console.log('file error: ' + error.code);
             };
-			this.unexpectedSuccess = function() {
-				console.log('!!! success function called when not expected !!!');
-			};
+            this.unexpectedSuccess = function() {
+                console.log('!!! success function called when not expected !!!');
+            };
             // deletes specified file or directory
             this.deleteEntry = function(name, success, error) {
                 // deletes entry, if it exists
-                window.resolveLocalFileSystemURI(that.root.toURI() + '/' + name, 
+                window.resolveLocalFileSystemURI(that.root.toURL() + '/' + name, 
                         function(entry) {
                             console.log('Deleting: ' + entry.fullPath);
                             if (entry.isDirectory === true) {
@@ -913,7 +913,7 @@ Tests.prototype.FileTests = function() {
                 ok(typeof entry.getMetadata === 'function', "entry object should have a 'getMetadata' function.");
                 ok(typeof entry.moveTo === 'function', "entry object should have a 'moveTo' function.");
                 ok(typeof entry.copyTo === 'function', "entry object should have a 'copyTo' function.");
-                ok(typeof entry.toURI === 'function', "entry object should have a 'toURI' function.");
+                ok(typeof entry.toURL === 'function', "entry object should have a 'toURL' function.");
                 ok(typeof entry.remove === 'function', "entry object should have a 'remove' function.");
                 ok(typeof entry.getParent === 'function', "entry object should have a 'getParent' function.");
                 ok(typeof entry.createWriter === 'function', "entry object should have a 'createWriter' function.");
@@ -1027,17 +1027,17 @@ Tests.prototype.FileTests = function() {
         // create a new directory entry
         this.root.getParent(testParent, this.fail);
     });
-    test("Entry.toURI on file", function() {
+    test("Entry.toURL on file", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var fileName = "entry.uri.file",
             that = this,
             rootPath = this.root.fullPath,
-            testURI = function(entry) {
-                var uri = entry.toURI();
-                ok(typeof uri !== 'undefined' && uri !== null, "URI should not be null.");
-                ok(uri.indexOf(rootPath) !== -1, "URI should contain root file system path");
+            testURL = function(entry) {
+                var uri = entry.toURL();
+                ok(typeof uri !== 'undefined' && uri !== null, "URL should not be null.");
+                ok(uri.indexOf(rootPath) !== -1, "URL should contain root file system path");
 
                 // cleanup
                 that.deleteEntry(fileName);
@@ -1045,19 +1045,19 @@ Tests.prototype.FileTests = function() {
             };
     
         // create a new file entry
-        this.createFile(fileName, testURI, this.fail);
+        this.createFile(fileName, testURL, this.fail);
     });
-    test("Entry.toURI on directory", function() {
+    test("Entry.toURL on directory", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
         expect(2);
         
         var dirName = "entry.uri.dir",
             that = this,
             rootPath = this.root.fullPath,
-            testURI = function(entry) {
-                var uri = entry.toURI();
-                ok(typeof uri !== 'undefined' && uri !== null, "URI should not be null.");
-                ok(uri.indexOf(rootPath) !== -1, "URI should contain root file system path");
+            testURL = function(entry) {
+                var uri = entry.toURL();
+                ok(typeof uri !== 'undefined' && uri !== null, "URL should not be null.");
+                ok(uri.indexOf(rootPath) !== -1, "URL should contain root file system path");
 
                 // cleanup
                 that.deleteEntry(dirName);
@@ -1065,7 +1065,7 @@ Tests.prototype.FileTests = function() {
             };
 
         // create a new directory entry
-        this.createDirectory(dirName, testURI, this.fail);
+        this.createDirectory(dirName, testURL, this.fail);
     });
     test("Entry.remove on file", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
