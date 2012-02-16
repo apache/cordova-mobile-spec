@@ -57,7 +57,7 @@ Tests.prototype.ContactsTests = function() {
 		ok(typeof navigator.contacts.create == 'function', "navigator.contacts.create should be a function.");
 	});
 	test("contacts.create should return a Contact object", function() {
-		expect(9);
+		expect(8);
 		var obj = navigator.contacts.create({"displayName": "test name", "gender": "male", "note": "my note", "name": {"formatted": "Mr. Test Name"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}]});		
 		ok(obj != 'undefined' && obj != null, "navigator.contacts.create should return a Contact object.");
 		ok(obj.displayName == 'test name', "Contact should contain a displayName property.");
