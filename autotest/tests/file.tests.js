@@ -425,7 +425,7 @@ Tests.prototype.FileTests = function() {
             
             var dirURL = dirEntry.toURL();
             // now encode URL and try to resolve
-            window.resolveLocalFileSystemURI(encodeURL(dirURL), testDirFromURL, that.fail);
+            window.resolveLocalFileSystemURI(encodeURI(dirURL), testDirFromURL, that.fail);
             
         },
         testDirFromURL = function(directory) {
