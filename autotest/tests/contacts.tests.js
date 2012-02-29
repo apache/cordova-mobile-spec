@@ -1,3 +1,7 @@
+// global to store a contact so it doesn't have to be created or retrieved multiple times
+var gContactObj = null;
+var gContactId = null;
+
 Tests.prototype.ContactsTests = function() {
 	module("Contacts (navigator.contacts)");
 	test("should exist", function() {
@@ -57,8 +61,9 @@ Tests.prototype.ContactsTests = function() {
 		ok(typeof navigator.contacts.create == 'function', "navigator.contacts.create should be a function.");
 	});
 	test("contacts.create should return a Contact object", function() {
-		expect(8);
-		var obj = navigator.contacts.create({"displayName": "test name", "gender": "male", "note": "my note", "name": {"formatted": "Mr. Test Name"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}]});		
+		expect(9);
+         var bDay = new Date(1976, 7,4);
+		var obj = navigator.contacts.create({"displayName": "test name", "gender": "male", "note": "my note", "name": {"formatted": "Mr. Test Name"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], "birthday": bDay});		
 		ok(obj != 'undefined' && obj != null, "navigator.contacts.create should return a Contact object.");
 		ok(obj.displayName == 'test name', "Contact should contain a displayName property.");
 		ok(obj.note == 'my note', "Contact should contain a note property.");
@@ -66,7 +71,8 @@ Tests.prototype.ContactsTests = function() {
 		ok(obj.emails.length == 2, "Contact should contain and array of emails with 2 entries");
 		ok(obj.emails[0].value == 'here@there.com', "Contact.emails[1] should contain a value.");
 		ok(obj.emails[1].value == 'there@here.com', "Contact.emails[2] should contain a value.");	
-		ok(obj.birthday == null, "Contact object should not contain a birthday property.");
+		ok(obj.nickname == null, "Contact object should not contain a nickname property.");
+        ok(obj.birthday instanceof Date && obj.birthday == bDay, "Contact should be a Date object equal to " + bDay);
 	});
 	module("Contact model");
 	test("should be able to define a Contact object", function() {
@@ -166,38 +172,7 @@ Tests.prototype.ContactsTests = function() {
 		ok(clonedContact.name.formatted == contact.name.formatted, "name.formatted's should be equal");
 		ok(clonedContact.connected == contact.connected, "connected's should be equal (null)");
 	});
-	test("should contain a remove function", function() {
-		expect(2);
-		var contact = new Contact();
-		ok(typeof contact.remove != 'undefined' && contact.remove != null, "contact.remove should not be null.");
-		ok(typeof contact.remove == 'function', "contact.remove should be a function.");
-	});
-	test("calling remove on a contact has an id of null should return ContactError.UNKNOWN_ERROR", function() {
-        QUnit.stop(Tests.TEST_TIMEOUT);
-		expect(2);
-		var win = function(result) {
-		};
-		var fail = function(result) {
-			ok(typeof result == 'object', "Object returned in contact.remove failure callback is of type 'object' (actually ContactError).");
-			ok(result.code == ContactError.UNKNOWN_ERROR, "Object returned in contacts.remove failure callback has a code property which equal to ContactError.UNKNOWN_ERROR.");
-			QUnit.start();
-		};
-		var rmContact = new Contact();
-		rmContact.remove(win, fail);
-	});
-	test("calling remove on a contact that does not exist should return ContactError.UNKNOWN_ERROR", function() {
-        QUnit.stop(Tests.TEST_TIMEOUT);
-		expect(2);
-		var win = function(result) {
-		};
-		var fail = function(result) {
-			ok(typeof result == 'object', "Object returned in contact.remove failure callback is of type 'object' (actually ContactError).");
-			ok(result.code == ContactError.UNKNOWN_ERROR, "Object returned in contacts.remove failure callback has a code property which equal to ContactError.UNKNOWN_ERROR.");
-			QUnit.start();
-		};
-		var contact = new Contact(99);
-		contact.remove(win, fail);		
-	});
+	
 	test("should contain a save function", function() {
 		expect(2);
 		var contact = new Contact();
@@ -215,4 +190,167 @@ Tests.prototype.ContactsTests = function() {
         equal(ContactError.NOT_SUPPORTED_ERROR, 5, "ContactError.NOT_SUPPORTED_ERROR should be defined");
         equal(ContactError.PERMISSION_DENIED_ERROR, 20, "ContactError.PERMISSION_DENIED_ERROR should be defined");
     });
+    test("should be able to save a contact", function() {
+         QUnit.stop(Tests.TEST_TIMEOUT);
+         expect(9);
+         
+         var bDay = new Date(1976, 6,4);
+         var testContact = navigator.contacts.create({"gender": "male", "note": "my note", "name": {"familyName": "Delete", "givenName": "Test"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], "birthday": bDay});	
+         
+         var saveSuccess = function(obj) {
+            gContactObj = obj; // save contact so can delete later
+         
+            ok(obj != 'undefined' && obj != null, "navigator.contacts.save should return a Contact object.");
+            ok(obj.note == 'my note', "Contact should contain a note property.");
+            ok(obj.name.familyName == 'Delete', "Contact familyName should equal 'Delete'.");
+            ok(obj.name.givenName == 'Test', "Contact givenName should equal 'Test'.");
+            ok(obj.emails.length == 2, "Contact should contain and array of emails with 2 entries.");
+            ok(obj.emails[0].value == 'here@there.com', "Contact.emails[1] should contain a value.");
+            ok(obj.emails[1].value == 'there@here.com', "Contact.emails[2] should contain a value.");	
+            ok(obj.birthday instanceof Date && obj.birthday.toDateString() == bDay.toDateString(), "Contact should be a date object equal to " + bDay.toDateString());
+            ok(obj.addresses == null, "Contact should return null for addresses.");
+             QUnit.start();
+    
+         };
+         
+         testContact.save(saveSuccess, null);
+         QUnit.start();
+    });
+    test("find a contact by name", function() {
+        expect(3);
+        QUnit.stop(7000);
+        var win = function(object) {
+        	var foundName = function(result) {
+        		var bFound = false;
+        		try {
+        			for (var i=0; i < result.length; i++) {
+        				if (result[i].name.familyName == "Delete") {
+        					bFound = true;
+                            gContactObj = result[i]; // save contact for later tests
+        					break;
+        				}
+        			}
+        		}  catch(e) {
+        			return false;
+        		}
+        		return bFound;
+        	}
+			
+            ok(object instanceof Array, "Object returned in contacts.find success callback should be instanceof array.");
+            ok(object.length >= 1, "length of Object returned in contacts.find success callback should have length property >= 1");
+            ok(foundName(object) == true, "returned contact array should contain a contact with familyName of 'Delete'.");
+            QUnit.start();
+        };
+        var fail = function() { QUnit.start(); };
+        var obj = new ContactFindOptions();
+        obj.filter="Delete";
+        obj.multiple=true;
+        navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], win, fail, obj);
+    });
+    test("update a contact", function() {
+         expect(6);
+         var bDay = new Date(1975, 5,4);
+         var noteText = "an UPDATED note";
+         
+         ok(gContactObj != null, "Should be a contact object to update");
+         QUnit.stop(7000);
+         var win = function(obj) {
+            ok(obj != 'undefined' && obj != null, "navigator.contacts.save should return a Contact object.");
+            ok(obj.id == gContactObj.id, "Contact id should not have changed");
+            ok(obj.note == noteText, "Contact should contain a note property.");
+            ok(obj.birthday instanceof Date && obj.birthday.toDateString() == bDay.toDateString(), "Contact should be a date object equal to " + bDay.toDateString());
+            ok(obj.emails.length == 1 && obj.emails[0].value == 'here@there.com', "Contact should contain only one email with value 'here@there.com'");
+            gContactObj = obj;
+            QUnit.start();
+         };
+         var fail = function(obj) {
+            ok(1, "update Contact should not fail");
+            QUnit.start();
+         }
+         
+         // remove an email
+         gContactObj.emails[1].value = "";
+        // change birthday
+         gContactObj.birthday = bDay;
+         // update note
+         gContactObj.note = noteText;
+         gContactObj.save(win, fail);
+         
+    });
+    
+    test("should contain a remove function", function() {
+         expect(2);
+         var contact = new Contact();
+         ok(typeof contact.remove != 'undefined' && contact.remove != null, "contact.remove should not be null.");
+         ok(typeof contact.remove == 'function', "contact.remove should be a function.");
+    });
+    
+	test("calling remove on a contact has an id of null should return ContactError.UNKNOWN_ERROR", function() {
+         QUnit.stop(Tests.TEST_TIMEOUT);
+         expect(2);
+         var win = function(result) {
+         };
+         var fail = function(result) {
+         ok(typeof result == 'object', "Object returned in contact.remove failure callback is of type 'object' (actually ContactError).");
+         ok(result.code == ContactError.UNKNOWN_ERROR, "Object returned in contacts.remove failure callback has a code property which equal to ContactError.UNKNOWN_ERROR.");
+         QUnit.start();
+         };
+         var rmContact = new Contact();
+         rmContact.remove(win, fail);
+    });
+    
+    test("calling remove on a contact that does not exist should return ContactError.UNKNOWN_ERROR", function() {
+         QUnit.stop(Tests.TEST_TIMEOUT);
+         expect(2);
+         var win = function(result) {
+         };
+         var fail = function(result) {
+         ok(typeof result == 'object', "Object returned in contact.remove failure callback is of type 'object' (actually ContactError).");
+         ok(result.code == ContactError.UNKNOWN_ERROR, "Object returned in contacts.remove failure callback has a code property which equal to ContactError.UNKNOWN_ERROR.");
+         QUnit.start();
+         };
+         // this is a bit risky as some devices may have contact ids that large
+         var contact = new Contact(999);
+         contact.remove(win, fail);		
+    });
+    
+    test("remove a contact", function() {
+         expect(2);
+        
+         ok(gContactObj != null, "Should be a contact object to delete");
+         QUnit.stop(7000);
+         var win = function() {
+            gContactObj = null;
+            ok(1,"Contact should have been removed");
+            QUnit.start();
+         };
+         var fail = function() {
+            QUnit.start();
+         };
+         
+         if(gContactObj) {
+            gContactID = gContactObj.id; // save this so we can try to delete a contact that does not exist (below)
+            gContactObj.remove(win,fail);
+         }
+                  
+         
+    });
+   
+    test("calling remove on a contact that was already removed should return ContactError.UNKNOWN_ERROR", function() {
+         QUnit.stop(Tests.TEST_TIMEOUT);
+         expect(2);
+         var win = function(result) {
+         };
+         var fail = function(result) {
+         ok(typeof result == 'object', "Object returned in contact.remove failure callback is of type 'object' (actually ContactError).");
+         ok(result.code == ContactError.UNKNOWN_ERROR, "Object returned in contacts.remove failure callback has a code property which equal to ContactError.UNKNOWN_ERROR.");
+         QUnit.start();
+         };
+         var badId = gContactId ? gContactId : 999;
+         var contact = new Contact(badId);
+         gContactId = null;
+         contact.remove(win, fail);		
+    });
+    
+    
 };
