@@ -61,8 +61,8 @@
                     console.log("playAudio():Audio Success");
                 },
                 function(err) {
-                    console.log("playAudio():Audio Error: "+err);
-                    setAudioStatus("Error: " + err);
+                    console.log("playAudio():Audio Error: "+err.code);
+                    setAudioStatus("Error: " + err.code);
                 },
                 function(status) {
                     console.log("playAudio():Audio Status: "+status);
@@ -171,8 +171,8 @@
                         console.log("recordAudio():Audio Success");
                     },
                     function(err) {
-                        console.log("recordAudio():Audio Error: "+err);
-                        setAudioStatus("Error: " + err);
+                        console.log("recordAudio():Audio Error: "+err.code);
+                        setAudioStatus("Error: " + err.code);
                     },
                     function(status) {
                         console.log("recordAudio():Audio Status: "+status);
