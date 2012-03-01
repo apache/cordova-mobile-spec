@@ -85,7 +85,7 @@
                     media1.getCurrentPosition(
                         function(position) {
                             console.log("Pos="+position);
-                            if (position > -1) {
+                            if (position >= 0.0) {
                                 setAudioPosition(position+" sec");
                             }
                         },
@@ -132,6 +132,7 @@
         console.log("stopAudio()");
         if (media1) {
             media1.stop();
+            media1.release();
         }
         clearInterval(media1Timer);
         media1Timer = null;
