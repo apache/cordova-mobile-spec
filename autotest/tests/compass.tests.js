@@ -17,9 +17,9 @@ Tests.prototype.CompassTests = function() {
 			ok(a.magneticHeading !== null, "Heading object returned in getCurrentHeading success callback should have an 'magneticHeading' property.");
 			ok(typeof a.magneticHeading == 'number', "Heading object's 'magneticHeading' property returned in getCurrentHeading success callback should be of type 'number'.");
 			ok(a.trueHeading !== undefined, "Heading object returned in getCurrentHeading success callback should have a 'trueHeading' property.");
-			ok(typeof a.trueHeading == 'number', "Heading object's 'trueHeading' property returned in getCurrentHeading success callback should be of type 'number'.");
+			ok(typeof a.trueHeading == 'number' || a.trueHeading === null, "Heading object's 'trueHeading' property returned in getCurrentHeading success callback should be of type 'number', or should be null if not available.");
 			ok(a.headingAccuracy !== undefined, "Heading object returned in getCurrentHeading success callback should have a 'headingAccuracy' property.");
-			ok(typeof a.headingAccuracy == 'number', "Heading object's 'headingAccuracy' property returned in getCurrentHeading success callback should be of type 'number'.");
+			ok(typeof a.headingAccuracy == 'number' || a.headingAccuracy === null, "Heading object's 'headingAccuracy' property returned in getCurrentHeading success callback should be of type 'number', or should be null if not available.");
 			ok(a.timestamp !== null, "Heading object returned in getCurrentHeading success callback should have a 'timestamp' property.");
 			ok(a.timestamp instanceof Date, "Heading object's 'timestamp' property returned in getCurrentHeading success callback should be of type 'Date'.");
 			QUnit.start();
