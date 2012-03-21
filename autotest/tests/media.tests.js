@@ -92,6 +92,27 @@ Tests.prototype.MediaTests = function() {
         ok(typeof media1.setVolume == 'function', "Media.setVolume should be a function.");
         media1.release();
     });
+	test("should return MediaError for bad filename", function() {
+		expect(2);
+		QUnit.stop(10000);
+		var badMedia = null;
+		var releaseMedia = function() {
+			badMedia.release();
+		};
+		var win = function() {
+			ok(0, "should NOT succeed with bad media file name");
+			releaseMedia();
+			QUnit.start();
+		};
+		var fail = function(result){
+			ok(typeof result == 'object', "Object returned in media.play failure callback is of type 'object' (actually MediaError).");
+			ok(result.code == MediaError.MEDIA_ERR_ABORTED, "Object returned in media.find failure callback has a code property which equal to MediaError.MEDIA_ERR_ABORTED");
+			releaseMedia();
+			QUnit.start(); 
+		};
+		badMedia = new Media("invalid.file.name", win,fail);
+		badMedia.play();
+	});
     test("position should be set properly", function() {
         var media1 = new Media("http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3");
         media1.play();
