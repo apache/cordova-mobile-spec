@@ -20,33 +20,33 @@
     /**
      * Start watching location
      */
-    var watchLocation = function() {
+    var watchLocation = function(geo) {
         console.log("watchLocation()");
 
         // Success callback
         var success = function(p){
-            document.getElementById('latitude').innerHTML = p.coords.latitude;
-            document.getElementById('longitude').innerHTML = p.coords.longitude;
+              console.log('watch location success');
+              setLocationDetails(p);
         };
 
         // Fail callback
         var fail = function(e){
             console.log("watchLocation fail callback with error code "+e);
-            stopLocation();
+            stopLocation(geo);
         };
 
         // Get location
-        watchLocationId = navigator.geolocation.watchPosition(success, fail, {enableHighAccuracy: true});
+        watchLocationId = geo.watchPosition(success, fail, {enableHighAccuracy: true});
         setLocationStatus("Running");
     };
 
     /**
      * Stop watching the location
      */
-    var stopLocation = function() {
+    var stopLocation = function(geo) {
         setLocationStatus("Stopped");
         if (watchLocationId) {
-            navigator.geolocation.clearWatch(watchLocationId);
+            geo.clearWatch(watchLocationId);
             watchLocationId = null;
         }
     };
@@ -54,16 +54,16 @@
     /**
      * Get current location
      */
-    var getLocation = function() {
+    var getLocation = function(geo, opts) {
         console.log("getLocation()");
 
         // Stop location if running
-        stopLocation();
+        stopLocation(geo);
 
         // Success callback
         var success = function(p){
-            document.getElementById('latitude').innerHTML = p.coords.latitude;
-            document.getElementById('longitude').innerHTML = p.coords.longitude;
+            console.log('get location success');
+            setLocationDetails(p);
             setLocationStatus("Done");
         };
 
@@ -74,7 +74,7 @@
         };
 
         // Get location
-        navigator.geolocation.getCurrentPosition(success, fail, {enableHighAccuracy: true}); //, {timeout: 10000});
+        geo.getCurrentPosition(success, fail, opts || {enableHighAccuracy: true}); //, {timeout: 10000});
         setLocationStatus("Retrieving location...");
 
     };
@@ -85,6 +85,17 @@
     var setLocationStatus = function(status) {
         document.getElementById('location_status').innerHTML = status;
     };
+var setLocationDetails = function(p) {
+var date = (new Date(p.timestamp));
+            document.getElementById('latitude').innerHTML = p.coords.latitude;
+            document.getElementById('longitude').innerHTML = p.coords.longitude;
+            document.getElementById('altitude').innerHTML = p.coords.altitude;
+            document.getElementById('accuracy').innerHTML = p.coords.accuracy;
+            document.getElementById('heading').innerHTML = p.coords.heading;
+            document.getElementById('speed').innerHTML = p.coords.speed;
+            document.getElementById('altitude_accuracy').innerHTML = p.coords.altitudeAccuracy;
+            document.getElementById('timestamp').innerHTML =  date.toDateString() + " " + date.toTimeString();
+    }
     
     /**
      * Function called when page has finished loading.
@@ -110,14 +121,27 @@
     <div id="info">
         <b>Status:</b> <span id="location_status">Stopped</span>
         <table width="100%">
-            <tr><td><b>Latitude:</b></td><td id="latitude"> </td></tr>
-            <tr><td><b>Longitude:</b></td><td id="longitude"> </td></tr>
+            <tr><td><b>Latitude:</b></td><td id="latitude">&nbsp;</td></tr>
+            <tr><td><b>Longitude:</b></td><td id="longitude">&nbsp;</td></tr>
+            <tr><td><b>Altitude:</b></td><td id="altitude">&nbsp;</td></tr>
+            <tr><td><b>Accuracy:</b></td><td id="accuracy">&nbsp;</td></tr>
+            <tr><td><b>Heading:</b></td><td id="heading">&nbsp;</td></tr>
+            <tr><td><b>Speed:</b></td><td id="speed">&nbsp;</td></tr>
+            <tr><td><b>Altitude Accuracy:</b></td><td id="altitude_accuracy">&nbsp;</td></tr>
+            <tr><td><b>Time:</b></td><td id="timestamp">&nbsp;</td></tr>
         </table>
     </div>
     <h2>Action</h2>
-    <div class="btn large" onclick="getLocation();">Get Location</div>
-    <div class="btn large" onclick="watchLocation();">Start Watching Location</div>
-    <div class="btn large" onclick="stopLocation();">Stop Watching Location</div>
-    <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>    
+    <h3>Use Built-in WebView navigator.geolocation</h3>
+    <a href="javascript:" class="btn large" onclick="getLocation(navigator.geolocation);">Get Location</a>
+    <a href="javascript:" class="btn large" onclick="watchLocation(navigator.geolocation);">Start Watching Location</a>
+    <a href="javascript:" class="btn large" onclick="stopLocation(navigator.geolocation);">Stop Watching Location</a>
+    <a href="javascript:" class="btn large" onclick="getLocation(navigator.geolocation, {maximumAge:30000});">Get Location Up to 30 Seconds Old</a>
+    <h3>USe Cordova Geolocation Plugin</h3>
+    <a href="javascript:" class="btn large" onclick="getLocation(cordova.require('cordova/plugin/geolocation'));">Get Location</a>
+    <a href="javascript:" class="btn large" onclick="watchLocation(cordova.require('cordova/plugin/geolocation'));">Start Watching Location</a>
+    <a href="javascript:" class="btn large" onclick="stopLocation(cordova.require('cordova/plugin/geolocation')));">Stop Watching Location</a>
+    <a href="javascript:" class="btn large" onclick="getLocation(cordova.require('cordova/plugin/geolocation'), {maximumAge:30000});">Get Location Up to 30 Seconds Old</a>
+    <h2>&nbsp</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a>    
   </body>
 </html>      
