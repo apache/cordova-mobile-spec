@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Prevent QUnit from running when the DOM load event fires
 QUnit.config.autostart = false;
 if (window.sessionStorage != null) {
@@ -9,10 +10,14 @@ if (window.sessionStorage != null) {
 sessionStorage.clear();
 >>>>>>> updated test-runner and changed title of battery tests
 =======
+=======
+>>>>>>> updated test-runner and changed title of battery tests
 sessionStorage.clear();
 =======
 // Prevent QUnit from running when the DOM load event fires
 QUnit.config.autostart = false;
+=======
+>>>>>>> updated test-runner and changed title of battery tests
 if (window.sessionStorage != null) {
     window.sessionStorage.clear();
 }
