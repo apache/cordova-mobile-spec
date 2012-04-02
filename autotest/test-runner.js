@@ -1,8 +1,12 @@
+<<<<<<< HEAD
 // Prevent QUnit from running when the DOM load event fires
 QUnit.config.autostart = false;
 if (window.sessionStorage != null) {
     window.sessionStorage.clear();
 }
+=======
+sessionStorage.clear();
+>>>>>>> updated test-runner and changed title of battery tests
 
 // Timeout is 2 seconds to allow physical devices enough
 // time to query the response. This is important for some
