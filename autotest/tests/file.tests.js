@@ -1057,7 +1057,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.getParent on file in root file system", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
-        expect(2);
+        expect(3);
         
         var fileName = "entry.parent.file",
             that = this,
@@ -1068,6 +1068,7 @@ Tests.prototype.FileTests = function() {
             testParent = function(parent) {
                 ok(typeof parent !== 'undefined' && parent !== null, "parent directory should not be null.");
                 equal(parent.fullPath, rootPath, "parent fullPath should be root file system");
+                ok(typeof parent.getParent === 'function', "entry object should have a 'getParent' function.");
 
                 // cleanup
                 that.deleteEntry(fileName);
@@ -1079,7 +1080,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.getParent on directory in root file system", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
-        expect(2);
+        expect(3);
         
         var dirName = "entry.parent.dir",
             that = this,
@@ -1090,6 +1091,7 @@ Tests.prototype.FileTests = function() {
             testParent = function(parent) {
                 ok(typeof parent !== 'undefined' && parent !== null, "parent directory should not be null.");
                 equal(parent.fullPath, rootPath, "parent fullPath should be root file system");
+                ok(typeof parent.getParent === 'function', "entry object should have a 'getParent' function.");
 
                 // cleanup
                 that.deleteEntry(dirName);
@@ -1101,12 +1103,13 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.getParent on root file system", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
-        expect(2);
+        expect(3);
         
         var rootPath = this.root.fullPath,
 		 testParent = function(parent) {
                 ok(typeof parent !== 'undefined' && parent !== null, "parent directory should not be null.");
                 equal(parent.fullPath, rootPath, "parent fullPath should be root file system");
+                ok(typeof parent.getParent === 'function', "entry object should have a 'getParent' function.");
                 QUnit.start();
             };
 
