@@ -2,6 +2,7 @@
 <html>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
     <meta name="viewport" content="width=device-width, height=device-height, user-scalable=yes, initial-scale=1.0;" />
@@ -53,6 +54,10 @@
 =======
 =======
 >>>>>>> fixed html errors, and various html tweaks, doctype, &nbsp; javascript:
+=======
+=======
+>>>>>>> converted capture tests
+>>>>>>> converted capture tests
 <head>
   <title>Cordova: Capture API Specs</title>
 
@@ -74,6 +79,7 @@
 
   <!-- Tests -->
   <script type="text/javascript" src="../tests/capture.tests.js"></script>
+<<<<<<< HEAD
 =======
   <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
@@ -123,6 +129,30 @@
             <!-- Populated by tests -->
         </div>
     </body>
+=======
+
+  <script type="text/javascript">
+    document.addEventListener('deviceready', function () {
+      var jasmineEnv = jasmine.getEnv();
+      jasmineEnv.updateInterval = 1000;
+
+      var htmlReporter = new jasmine.HtmlReporter();
+
+      jasmineEnv.addReporter(htmlReporter);
+
+      jasmineEnv.specFilter = function(spec) {
+        return htmlReporter.specFilter(spec);
+      };
+
+      jasmineEnv.execute();
+    }, false);
+  </script>
+</head>
+
+<body>
+  <a href="javascript:" class="backBtn" onclick="backHome();">Back</a>
+</body>
+>>>>>>> converted capture tests
 </html>
 >>>>>>> fixed html errors, and various html tweaks, doctype, &nbsp; javascript:
 
