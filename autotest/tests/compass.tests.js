@@ -8,6 +8,7 @@ describe('Compass (navigator.compass)', function () {
 		expect(typeof navigator.compass.getCurrentHeading == 'function').toBe(true);
 	});
 <<<<<<< HEAD
+<<<<<<< HEAD
 	test("getCurrentHeading success callback should be called with a Heading object", function() {
 		expect(9);
 		QUnit.stop(Tests.TEST_TIMEOUT);
@@ -26,6 +27,8 @@ describe('Compass (navigator.compass)', function () {
 		var fail = function() { QUnit.start(); };
 		navigator.compass.getCurrentHeading(win, fail);
 =======
+=======
+>>>>>>> Fixes CB-439 Compass timestamp specified in milliseconds
 
 	it("getCurrentHeading success callback should be called with a Heading object", function() {
 		var win = jasmine.createSpy().andCallFake(function(a) {
@@ -49,7 +52,29 @@ describe('Compass (navigator.compass)', function () {
         runs(function () {
             expect(fail).not.toHaveBeenCalled();
         });
+<<<<<<< HEAD
 >>>>>>> converted some more tests to jasmine
+=======
+=======
+	test("getCurrentHeading success callback should be called with a Heading object", function() {
+		expect(9);
+		QUnit.stop(Tests.TEST_TIMEOUT);
+		var win = function(a) {
+			ok(a instanceof CompassHeading, "Heading object returned in getCurrentHeading success callback should be an instance of CompassHeading.");
+			ok(a.magneticHeading !== null, "Heading object returned in getCurrentHeading success callback should have an 'magneticHeading' property.");
+			ok(typeof a.magneticHeading == 'number', "Heading object's 'magneticHeading' property returned in getCurrentHeading success callback should be of type 'number'.");
+			ok(a.trueHeading !== undefined, "Heading object returned in getCurrentHeading success callback should have a 'trueHeading' property.");
+			ok(typeof a.trueHeading == 'number' || a.trueHeading === null, "Heading object's 'trueHeading' property returned in getCurrentHeading success callback should be of type 'number', or should be null if not available.");
+			ok(a.headingAccuracy !== undefined, "Heading object returned in getCurrentHeading success callback should have a 'headingAccuracy' property.");
+			ok(typeof a.headingAccuracy == 'number' || a.headingAccuracy === null, "Heading object's 'headingAccuracy' property returned in getCurrentHeading success callback should be of type 'number', or should be null if not available.");
+			ok(a.timestamp !== null, "Heading object returned in getCurrentHeading success callback should have a 'timestamp' property.");
+			ok(typeof a.timestamp == 'number', "Heading object's 'timestamp' property returned in getCurrentHeading success callback should be of type 'number'.");
+			QUnit.start();
+		};
+		var fail = function() { QUnit.start(); };
+		navigator.compass.getCurrentHeading(win, fail);
+>>>>>>> Fixes CB-439 Compass timestamp specified in milliseconds
+>>>>>>> Fixes CB-439 Compass timestamp specified in milliseconds
 	});
 
 	it("should contain a watchHeading function", function() {
@@ -84,6 +109,7 @@ describe('Compass (navigator.compass)', function () {
         });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   module('Compass Heading model (CompassHeading)');
   test("CompassHeading function should exist", function() {
     expect(1);
@@ -109,6 +135,8 @@ describe('Compass (navigator.compass)', function () {
   });
 };
 =======
+=======
+>>>>>>> Fixes CB-439 Compass timestamp specified in milliseconds
         it("Creating a new CompassHeading instance with parameters", function() {
             var h = new CompassHeading(1,2,3,4);
             expect(h.magneticHeading).toBe(1);
@@ -119,4 +147,33 @@ describe('Compass (navigator.compass)', function () {
         });
     });
 });
+<<<<<<< HEAD
 >>>>>>> converted some more tests to jasmine
+=======
+=======
+  module('Compass Heading model (CompassHeading)');
+  test("CompassHeading function should exist", function() {
+    expect(1);
+    ok(typeof CompassHeading != 'undefined' && CompassHeading !== null, 'CompassHeading should not be null');
+  });
+  test("Creating a new CompassHeading instance with no parameters", function() {
+    expect(5);
+    var h = new CompassHeading();
+    equals(h.magneticHeading, null, "CompassHeading instance should have null magneticHeading property by default");
+    equals(h.trueHeading, null, "CompassHeading instance should have null trueHeading property by default");
+    equals(h.headingAccuracy, null, "CompassHeading instance should have null headingAccuracy property by default");
+    ok(h.timestamp !== null, "CompassHeading instance should have timestamp that is not null by default");
+    ok(typeof h.timestamp == 'number', "CompassHeading instance should have timestamp that is a number.");
+  });
+  test("Creating a new CompassHeading instance with parameters", function() {
+    expect(5);
+    var h = new CompassHeading(1,2,3,4);
+    equals(h.magneticHeading, 1, "CompassHeading instance should have specified magneticHeading.");
+    equals(h.trueHeading, 2, "CompassHeading instance should have specified trueHeading.");
+    equals(h.headingAccuracy, 3, "CompassHeading instance should have specified headingAccuracy.");
+    equals(h.timestamp.valueOf(), 4, "CompassHeading instance should have specified timestamp.");
+    ok(typeof h.timestamp == 'number', "CompassHeading instance should have timestamp that is a number");
+  });
+};
+>>>>>>> Fixes CB-439 Compass timestamp specified in milliseconds
+>>>>>>> Fixes CB-439 Compass timestamp specified in milliseconds
