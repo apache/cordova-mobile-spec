@@ -1015,7 +1015,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.getMetadata on file", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
-        expect(2);
+        expect(3);
         
         var fileName = "entry.metadata.file",
             that = this,
@@ -1025,6 +1025,7 @@ Tests.prototype.FileTests = function() {
             testMetadata = function(metadata) {
                 ok(typeof metadata !== 'undefined' && metadata !== null, "metadata should not be null.");
                 ok(metadata.modificationTime instanceof Date, "metadata.modificationTime should be Date object");
+                ok(isNaN(metadata.modificationTime.getTime()) !== true, "metadata.modificationTime should not be an Invalid Date");
 
                 // cleanup
                 that.deleteEntry(fileName);
@@ -1036,7 +1037,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.getMetadata on directory", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
-        expect(2);
+        expect(3);
         
         var dirName = "entry.metadata.dir",
             that = this,
@@ -1046,6 +1047,7 @@ Tests.prototype.FileTests = function() {
             testMetadata = function(metadata) {
                 ok(typeof metadata !== 'undefined' && metadata !== null, "metadata should not be null.");
                 ok(metadata.modificationTime instanceof Date, "metadata.modificationTime should be Date object");
+                ok(isNaN(metadata.modificationTime.getTime()) !== true, "metadata.modificationTime should not be an Invalid Date");
 
                 // cleanup
                 that.deleteEntry(dirName);
