@@ -9,6 +9,7 @@ describe('Compass (navigator.compass)', function () {
 	});
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	test("getCurrentHeading success callback should be called with a Heading object", function() {
 		expect(9);
 		QUnit.stop(Tests.TEST_TIMEOUT);
@@ -29,6 +30,10 @@ describe('Compass (navigator.compass)', function () {
 =======
 =======
 >>>>>>> Fixes CB-439 Compass timestamp specified in milliseconds
+=======
+=======
+>>>>>>> converted some more tests to jasmine
+>>>>>>> converted some more tests to jasmine
 
 	it("getCurrentHeading success callback should be called with a Heading object", function() {
 		var win = jasmine.createSpy().andCallFake(function(a) {
@@ -53,8 +58,11 @@ describe('Compass (navigator.compass)', function () {
             expect(fail).not.toHaveBeenCalled();
         });
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> converted some more tests to jasmine
 =======
+=======
+>>>>>>> converted some more tests to jasmine
 =======
 	test("getCurrentHeading success callback should be called with a Heading object", function() {
 		expect(9);
@@ -74,7 +82,12 @@ describe('Compass (navigator.compass)', function () {
 		var fail = function() { QUnit.start(); };
 		navigator.compass.getCurrentHeading(win, fail);
 >>>>>>> Fixes CB-439 Compass timestamp specified in milliseconds
+<<<<<<< HEAD
 >>>>>>> Fixes CB-439 Compass timestamp specified in milliseconds
+=======
+=======
+>>>>>>> converted some more tests to jasmine
+>>>>>>> converted some more tests to jasmine
 	});
 
 	it("should contain a watchHeading function", function() {
@@ -110,6 +123,7 @@ describe('Compass (navigator.compass)', function () {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   module('Compass Heading model (CompassHeading)');
   test("CompassHeading function should exist", function() {
     expect(1);
@@ -137,6 +151,10 @@ describe('Compass (navigator.compass)', function () {
 =======
 =======
 >>>>>>> Fixes CB-439 Compass timestamp specified in milliseconds
+=======
+=======
+>>>>>>> converted some more tests to jasmine
+>>>>>>> converted some more tests to jasmine
         it("Creating a new CompassHeading instance with parameters", function() {
             var h = new CompassHeading(1,2,3,4);
             expect(h.magneticHeading).toBe(1);
@@ -148,8 +166,11 @@ describe('Compass (navigator.compass)', function () {
     });
 });
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> converted some more tests to jasmine
 =======
+=======
+>>>>>>> converted some more tests to jasmine
 =======
   module('Compass Heading model (CompassHeading)');
   test("CompassHeading function should exist", function() {
@@ -176,4 +197,9 @@ describe('Compass (navigator.compass)', function () {
   });
 };
 >>>>>>> Fixes CB-439 Compass timestamp specified in milliseconds
+<<<<<<< HEAD
 >>>>>>> Fixes CB-439 Compass timestamp specified in milliseconds
+=======
+=======
+>>>>>>> converted some more tests to jasmine
+>>>>>>> converted some more tests to jasmine
