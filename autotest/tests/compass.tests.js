@@ -21,7 +21,7 @@ Tests.prototype.CompassTests = function() {
 			ok(a.headingAccuracy !== undefined, "Heading object returned in getCurrentHeading success callback should have a 'headingAccuracy' property.");
 			ok(typeof a.headingAccuracy == 'number' || a.headingAccuracy === null, "Heading object's 'headingAccuracy' property returned in getCurrentHeading success callback should be of type 'number', or should be null if not available.");
 			ok(a.timestamp !== null, "Heading object returned in getCurrentHeading success callback should have a 'timestamp' property.");
-			ok(a.timestamp instanceof Date, "Heading object's 'timestamp' property returned in getCurrentHeading success callback should be of type 'Date'.");
+			ok(typeof a.timestamp == 'number', "Heading object's 'timestamp' property returned in getCurrentHeading success callback should be of type 'number'.");
 			QUnit.start();
 		};
 		var fail = function() { QUnit.start(); };
@@ -58,7 +58,7 @@ Tests.prototype.CompassTests = function() {
     equals(h.trueHeading, null, "CompassHeading instance should have null trueHeading property by default");
     equals(h.headingAccuracy, null, "CompassHeading instance should have null headingAccuracy property by default");
     ok(h.timestamp !== null, "CompassHeading instance should have timestamp that is not null by default");
-    ok(h.timestamp instanceof Date, "CompassHeading instance should have timestamp that is an instance of a Date object.");
+    ok(typeof h.timestamp == 'number', "CompassHeading instance should have timestamp that is a number.");
   });
   test("Creating a new CompassHeading instance with parameters", function() {
     expect(5);
@@ -66,7 +66,7 @@ Tests.prototype.CompassTests = function() {
     equals(h.magneticHeading, 1, "CompassHeading instance should have specified magneticHeading.");
     equals(h.trueHeading, 2, "CompassHeading instance should have specified trueHeading.");
     equals(h.headingAccuracy, 3, "CompassHeading instance should have specified headingAccuracy.");
-    equals(h.timestamp.valueOf(), 4, "CompassHeading instance should have specified timestamp cast as a Date object");
-    ok(h.timestamp instanceof Date, "CompassHeading instance should have timestamp that is an instance of a Date object.");
+    equals(h.timestamp.valueOf(), 4, "CompassHeading instance should have specified timestamp.");
+    ok(typeof h.timestamp == 'number', "CompassHeading instance should have timestamp that is a number");
   });
 };
