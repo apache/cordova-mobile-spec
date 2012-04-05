@@ -2503,7 +2503,7 @@ Tests.prototype.FileTests = function() {
     });
     test("should be able to write and append to file in Chinese Traditional, createWriter", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
-        expect(4);
+        expect(2);
 
         var that = this,
             fileName = "writer.append",
@@ -2516,8 +2516,8 @@ Tests.prototype.FileTests = function() {
             write_file = function(fileEntry) {
                 fileEntry.createWriter(function(writer) {
                     writer.onwriteend = function(evt) {
-                        ok(writer.length === length, "should have written " + length + " bytes");
-                        ok(writer.position === length, "position should be at " + length);
+                        // valid writing of non-ascii file was already validated in previous test.
+                        // Append to file to verify writer.length and writer.position are set correctly
                         append_file(writer);
                     };
                     writer.write(rule); 
@@ -2527,12 +2527,19 @@ Tests.prototype.FileTests = function() {
             append_file = function(writer) {
                 var exception = "  除了這一個";            
                 writer.onwriteend = function(evt) {
-                    ok(writer.length === length, "file length should be " + length);
-                    ok(writer.position === length, "position should be at " + length);
-
-                    // cleanup
-                    that.deleteFile(fileName);
-                    QUnit.start();
+                    // read back file to verify that data was appended
+                    var reader = new FileReader();
+                    reader.onloadend = function(evt) {
+                        console.log(evt.target.result);
+                        ok(evt.target.result === (rule + exception), "reader.result after append should be equal to the text written.");
+                        ok(evt.target.result.length === length, "reader.result length should equal initial length.");
+                        // cleanup
+                        that.deleteFile(fileName);
+                        QUnit.start();
+                    };
+                    var myFile = new File();
+                    myFile.fullPath = filePath; 
+                    reader.readAsText(myFile);
                 };
                 length += exception.length;
                 writer.seek(writer.length);
