@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 // Prevent QUnit from running when the DOM load event fires
 QUnit.config.autostart = false;
 if (window.sessionStorage != null) {
@@ -7,6 +8,16 @@ if (window.sessionStorage != null) {
 =======
 sessionStorage.clear();
 >>>>>>> updated test-runner and changed title of battery tests
+=======
+sessionStorage.clear();
+=======
+// Prevent QUnit from running when the DOM load event fires
+QUnit.config.autostart = false;
+if (window.sessionStorage != null) {
+    window.sessionStorage.clear();
+}
+>>>>>>> on wp7 sessionStorage does not exist until just before device ready
+>>>>>>> on wp7 sessionStorage does not exist until just before device ready
 
 // Timeout is 2 seconds to allow physical devices enough
 // time to query the response. This is important for some
