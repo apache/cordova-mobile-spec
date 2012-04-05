@@ -21,19 +21,52 @@ Tests.prototype.GeoLocationTests = function() {
 	});
 	test("getCurrentPosition success callback should be called with a Position object", function() {
 		expect(2);
-		QUnit.stop(Tests.TEST_TIMEOUT);
+		QUnit.stop(15000);
 		var win = function(p) {
 			ok(p.coords != null, "Position object returned in getCurrentPosition success callback has a 'coords' property.");
 			ok(p.timestamp != null, "Position object returned in getCurrentPosition success callback has a 'timestamp' property.");
-			start();
+			QUnit.start();
 		};
-		var fail = function() { start(); };
-		navigator.geolocation.getCurrentPosition(win, fail);
+		var fail = function() { 
+        ok(false, "Error callback fired, test failed.");
+        QUnit.start();
+    };
+		navigator.geolocation.getCurrentPosition(win, fail, {
+        maximumAge:300000 // 5 minutes maximum age of cached position
+    });
 	});
+  test("getCurrentPosition success callback should be called with a cached Position", function() {
+    expect(1);
+    QUnit.stop(Tests.TEST_TIMEOUT);
+    var win = function(p) {
+      ok(p.coords instanceof Position, "Position object returned is an instance of Position");
+      QUnit.start();
+    };
+    var fail = function(e) {
+      ok(false, "Error callback called, test failed.");
+    };
+    navigator.geolocation.getCurrentPosition(win, fail, {
+        maximumAge:300000 // 5 minutes
+    });
+  });
+  test("getCurrentPosition error callback should be called if we set timeout to 0 and maximumAge to a very small number", function() {
+    expect(1);
+    QUnit.stop(Tests.TEST_TIMEOUT);
+    var win = function(p) {
+      ok(false, "success callback called, test failed.");
+      QUnit.start();
+    };
+    var fail = function(e) {
+      ok(true, "error callback called");
+      QUnit.start();
+    };
+    navigator.geolocation.getCurrentPosition(win, fail, {
+        maximumAge: 0,
+        timeout: 0
+    });
+  });
 	// TODO: Need to test error callback... how?
 	// TODO: Need to test watchPosition success callback, test that makes sure clearPosition works (how to test that a timer is getting cleared?)
-	// TODO: Need to test options object passed in. Members that need to be tested so far include:
-	//				- options.frequency: this is also labelled differently on some implementations (internval on iPhone/BlackBerry currently). 
 	module('Geolocation model');
 	test("should be able to define a Position object with coords and timestamp properties", function() {
 		expect(3);

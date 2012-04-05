@@ -51,7 +51,49 @@ Tests.prototype.FileTests = function() {
         equal(FileError.PATH_EXISTS_ERR, 12, "FileError.PATH_EXISTS_ERR should be defined");
     });
 
-    module('LocalFileSystem interface');
+    module('LocalFileSystem interface', {
+        // setup function will run before each test
+        setup: function() {
+            var that = this;
+            this.root = getFileSystemRoot();
+            this.fail = function(error) {
+                console.log('file error: ' + error.code);
+            };
+            this.unexpectedSuccess = function() {
+                console.log('!!! success function called when not expected !!!');
+            };
+            // deletes specified file or directory
+            this.deleteEntry = function(name, success, error) {
+                // deletes entry, if it exists
+                window.resolveLocalFileSystemURI(that.root.toURL() + '/' + name, 
+                        function(entry) {
+                            console.log('Deleting: ' + entry.fullPath);
+                            if (entry.isDirectory === true) {
+                                entry.removeRecursively(success, error); 
+                            }
+                            else {
+                                entry.remove(success, error);
+                            }
+                        }, 
+                        // doesn't exist
+                        success);
+            };
+            // deletes and re-creates the specified file
+            this.createFile = function(fileName, success, error) {
+                that.deleteEntry(fileName, function() {
+                    console.log('Creating file: ' + that.root.fullPath + '/' + fileName);
+                    that.root.getFile(fileName, {create: true}, success, error);                
+                }, error);
+            };
+            // deletes and re-creates the specified directory
+            this.createDirectory = function(dirName, success, error) {
+                that.deleteEntry(dirName, function() {
+                   console.log('Creating directory: ' + that.root.fullPath + '/' + dirName);
+                   that.root.getDirectory(dirName, {create: true}, success, error); 
+                }, error);
+            };
+        }
+    });
     test("window.requestFileSystem function should be defined", function() {
         expect(1);
         ok(typeof window.requestFileSystem === 'function', "window.requestFileSystem should be a function.");
@@ -126,6 +168,50 @@ Tests.prototype.FileTests = function() {
         
         // Request the file system
         window.requestFileSystem(-1, 0, null, failFS);
+    });
+    test("resolve valid file name", function() {
+        QUnit.stop(Tests.TEST_TIMEOUT);
+        expect(2);
+        
+        var fileName = "resolve.file.uri",
+            that = this,
+            resolveCallback = function(entry) {
+                // lookup file system entry
+                window.resolveLocalFileSystemURI(entry.toURI(), testEntry, this.fail);
+            },
+            testEntry = function(fileEntry) {
+                ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "fileEntry should not be null.");
+                ok(fileEntry.name == fileName, "fileEntry.name should equal 'resolve.file.uri'");
+
+                // cleanup
+                that.deleteEntry(fileName);
+                QUnit.start();
+            };
+        
+        // create a new file entry
+        this.createFile(fileName, resolveCallback, this.fail);
+    });
+    test("resolve valid file name with parameters", function() {
+        QUnit.stop(Tests.TEST_TIMEOUT);
+        expect(2);
+        
+        var fileName = "resolve.file.uri.params",
+            that = this,
+            resolveCallback = function(entry) {
+                // lookup file system entry
+                window.resolveLocalFileSystemURI(entry.toURI() + "?1234567890", testEntry, this.fail);
+            },
+            testEntry = function(fileEntry) {
+                ok(typeof fileEntry !== 'undefined' && fileEntry !== null, "fileEntry should not be null.");
+                ok(fileEntry.name == fileName, "fileEntry.name should equal 'resolve.file.uri.params'");
+
+                // cleanup
+                that.deleteEntry(fileName);
+                QUnit.start();
+            };
+        
+        // create a new file entry
+        this.createFile(fileName, resolveCallback, this.fail);
     });
     test("resolve invalid file name", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
@@ -929,7 +1015,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.getMetadata on file", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
-        expect(2);
+        expect(3);
         
         var fileName = "entry.metadata.file",
             that = this,
@@ -939,6 +1025,7 @@ Tests.prototype.FileTests = function() {
             testMetadata = function(metadata) {
                 ok(typeof metadata !== 'undefined' && metadata !== null, "metadata should not be null.");
                 ok(metadata.modificationTime instanceof Date, "metadata.modificationTime should be Date object");
+                ok(isNaN(metadata.modificationTime.getTime()) !== true, "metadata.modificationTime should not be an Invalid Date");
 
                 // cleanup
                 that.deleteEntry(fileName);
@@ -950,7 +1037,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.getMetadata on directory", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
-        expect(2);
+        expect(3);
         
         var dirName = "entry.metadata.dir",
             that = this,
@@ -960,6 +1047,7 @@ Tests.prototype.FileTests = function() {
             testMetadata = function(metadata) {
                 ok(typeof metadata !== 'undefined' && metadata !== null, "metadata should not be null.");
                 ok(metadata.modificationTime instanceof Date, "metadata.modificationTime should be Date object");
+                ok(isNaN(metadata.modificationTime.getTime()) !== true, "metadata.modificationTime should not be an Invalid Date");
 
                 // cleanup
                 that.deleteEntry(dirName);
@@ -971,7 +1059,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.getParent on file in root file system", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
-        expect(2);
+        expect(3);
         
         var fileName = "entry.parent.file",
             that = this,
@@ -982,6 +1070,7 @@ Tests.prototype.FileTests = function() {
             testParent = function(parent) {
                 ok(typeof parent !== 'undefined' && parent !== null, "parent directory should not be null.");
                 equal(parent.fullPath, rootPath, "parent fullPath should be root file system");
+                ok(typeof parent.getParent === 'function', "entry object should have a 'getParent' function.");
 
                 // cleanup
                 that.deleteEntry(fileName);
@@ -993,7 +1082,7 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.getParent on directory in root file system", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
-        expect(2);
+        expect(3);
         
         var dirName = "entry.parent.dir",
             that = this,
@@ -1004,6 +1093,7 @@ Tests.prototype.FileTests = function() {
             testParent = function(parent) {
                 ok(typeof parent !== 'undefined' && parent !== null, "parent directory should not be null.");
                 equal(parent.fullPath, rootPath, "parent fullPath should be root file system");
+                ok(typeof parent.getParent === 'function', "entry object should have a 'getParent' function.");
 
                 // cleanup
                 that.deleteEntry(dirName);
@@ -1015,12 +1105,13 @@ Tests.prototype.FileTests = function() {
     });
     test("Entry.getParent on root file system", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
-        expect(2);
+        expect(3);
         
         var rootPath = this.root.fullPath,
          testParent = function(parent) {
                 ok(typeof parent !== 'undefined' && parent !== null, "parent directory should not be null.");
                 equal(parent.fullPath, rootPath, "parent fullPath should be root file system");
+                ok(typeof parent.getParent === 'function', "entry object should have a 'getParent' function.");
                 QUnit.start();
             };
 
