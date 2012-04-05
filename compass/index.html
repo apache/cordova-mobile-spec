@@ -1,9 +1,9 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width,height=device-height,user-scalable=no,maximum-scale=1.0,initial-scale=1.0" />
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"> <!-- ISO-8859-1 -->
-    <title>PhoneGap</title>
+    <title>Cordova Mobile Spec</title>
     <link rel="stylesheet" href="../master.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <script type="text/javascript" charset="utf-8" src="../phonegap.js"></script>      
 
@@ -116,13 +116,13 @@
     <div id="info">
         <b>Status:</b> <span id="compass_status">Stopped</span>
         <table width="100%"><tr>
-            <td width="33%">Heading: <span id="compassHeading">&nbsp;</span></td>
+            <td width="33%">Heading: <span id="compassHeading"> </span></td>
         </tr></table>
     </div>
     <h2>Action</h2>
-    <a href="javascript:" class="btn large" onclick="getCompass();">Get Compass</a>
-    <a href="javascript:" class="btn large" onclick="watchCompass();">Start Watching Compass</a>
-    <a href="javascript:" class="btn large" onclick="stopCompass();">Stop Watching Compass</a>
-    <h2>&nbsp;</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a>
+    <div class="btn large" onclick="getCompass();">Get Compass</div>
+    <div class="btn large" onclick="watchCompass();">Start Watching Compass</div>
+    <div class="btn large" onclick="stopCompass();">Stop Watching Compass</div>
+    <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
 </html>      

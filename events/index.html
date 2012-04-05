@@ -1,9 +1,9 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width,height=device-height,user-scalable=no,maximum-scale=1.0,initial-scale=1.0" />
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"> <!-- ISO-8859-1 -->
-    <title>PhoneGap</title>
+    <title>Cordova Mobile Spec</title>
     <link rel="stylesheet" href="../master.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <script type="text/javascript" charset="utf-8" src="../phonegap.js"></script>      
 
@@ -61,12 +61,12 @@
     </div>
 
     <h2>Action</h2>
-    <a href="javascript:" class="btn large" onclick="document.addEventListener('backbutton', interceptBackbutton, false);">Intercept backbutton</a>
-    <a href="javascript:" class="btn large" onclick="document.removeEventListener('backbutton', interceptBackbutton, false);">Stop intercept of backbutton</a>
-    <a href="javascript:" class="btn large" onclick="document.addEventListener('menubutton', interceptMenubutton, false);">Intercept menubutton</a>
-    <a href="javascript:" class="btn large" onclick="document.removeEventListener('menubutton', interceptMenubutton, false);">Stop intercept of menubutton</a>
-    <a href="javascript:" class="btn large" onclick="document.addEventListener('searchbutton', interceptSearchbutton, false);">Intercept searchbutton</a>
-    <a href="javascript:" class="btn large" onclick="document.removeEventListener('searchbutton', interceptSearchbutton, false);">Stop intercept of searchbutton</a>
-    <h2>&nbsp</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a>
+    <div class="btn large" onclick="document.addEventListener('backbutton', interceptBackbutton, false);">Intercept backbutton</div>
+    <div class="btn large" onclick="document.removeEventListener('backbutton', interceptBackbutton, false);">Stop intercept of backbutton</div>
+    <div class="btn large" onclick="document.addEventListener('menubutton', interceptMenubutton, false);">Intercept menubutton</div>
+    <div class="btn large" onclick="document.removeEventListener('menubutton', interceptMenubutton, false);">Stop intercept of menubutton</div>
+    <div class="btn large" onclick="document.addEventListener('searchbutton', interceptSearchbutton, false);">Intercept searchbutton</div>
+    <div class="btn large" onclick="document.removeEventListener('searchbutton', interceptSearchbutton, false);">Stop intercept of searchbutton</div>
+    <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
 </html>      
