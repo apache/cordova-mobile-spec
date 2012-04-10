@@ -52,10 +52,11 @@ describe('Compass (navigator.compass)', function () {
 		    navigator.compass.getCurrentHeading(win, fail);
         });
 
-        waitsFor(function () { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
+        waitsFor(function () { return win.wasCalled; }, "success callback never called", Tests.TEST_TIMEOUT);
 
         runs(function () {
             expect(fail).not.toHaveBeenCalled();
+            expect(win).toHaveBeenCalled();
         });
 <<<<<<< HEAD
 <<<<<<< HEAD
