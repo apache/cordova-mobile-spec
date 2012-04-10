@@ -2592,6 +2592,47 @@ Tests.prototype.FileTests = function() {
         file.fullPath = filePath;
         write_file(file);
     });
+    test("should be able to seek to the beginning of the file and write more data than file.length", function() {
+        QUnit.stop(Tests.TEST_TIMEOUT);
+        expect(4);
+
+        var that = this,
+            fileName = "writer.seek.write",
+            filePath = this.root.fullPath + '/' + fileName,
+            // file content
+            rule = "This is our sentence.",
+            // for testing file length
+            length = rule.length,
+            // writes initial file content
+            write_file = function(fileEntry) {
+                fileEntry.createWriter(function(writer) {
+                    writer.onwriteend = function(evt) {
+                        ok(writer.length === length, "should have written " + length + " bytes");
+                        ok(writer.position === length, "position should be at " + length);
+                        append_file(writer);
+                    };
+                    writer.write(rule); 
+                }, that.fail);
+            }, 
+            // appends to file
+            append_file = function(writer) {
+                var exception = "This is our newer sentence.";            
+                writer.onwriteend = function(evt) {
+                    ok(writer.length === length, "file length should be " + length);
+                    ok(writer.position === length, "position should be at " + length);
+
+                    // cleanup
+                    that.deleteFile(fileName);
+                    QUnit.start();
+                };
+                length = exception.length;
+                writer.seek(0);
+                writer.write(exception); 
+            };
+        
+        // create file, then write and append to it
+        this.createFile(fileName, write_file);
+    });
     test("should be able to seek to the middle of the file and write more data than file.length", function() {
         QUnit.stop(Tests.TEST_TIMEOUT);
         expect(4);
@@ -2627,6 +2668,47 @@ Tests.prototype.FileTests = function() {
                 };
                 length = 12 + exception.length;
                 writer.seek(12);
+                writer.write(exception); 
+            };
+        
+        // create file, then write and append to it
+        this.createFile(fileName, write_file);
+    });
+    test("should be able to seek to the beginning of the file and write less data than file.length", function() {
+        QUnit.stop(Tests.TEST_TIMEOUT);
+        expect(4);
+
+        var that = this,
+            fileName = "writer.seek.write2",
+            filePath = this.root.fullPath + '/' + fileName,
+            // file content
+            rule = "This is our sentence.",
+            // for testing file length
+            length = rule.length,
+            // writes initial file content
+            write_file = function(fileEntry) {
+                fileEntry.createWriter(function(writer) {
+                    writer.onwriteend = function(evt) {
+                        ok(writer.length === length, "should have written " + length + " bytes");
+                        ok(writer.position === length, "position should be at " + length);
+                        append_file(writer);
+                    };
+                    writer.write(rule); 
+                }, that.fail);
+            }, 
+            // appends to file
+            append_file = function(writer) {
+                var exception = "new.";            
+                writer.onwriteend = function(evt) {
+                    ok(writer.length === length, "file length should be " + length);
+                    ok(writer.position === length, "position should be at " + length);
+
+                    // cleanup
+                    that.deleteFile(fileName);
+                    QUnit.start();
+                };
+                length = exception.length;
+                writer.seek(0);
                 writer.write(exception); 
             };
         
