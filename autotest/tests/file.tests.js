@@ -399,11 +399,11 @@ describe('File API', function() {
             var fileName = "de.create.exclusive.file",
                 filePath = root.fullPath + '/' + fileName,
                 win = jasmine.createSpy().andCallFake(function(entry) {
-                    expect(typeof entry !== 'undefined' && entry !== null, "file entry should not be null");
-                    expect(entry.isFile, true, "entry 'isFile' attribute should be true");
-                    expect(entry.isDirectory, false, "entry 'isDirectory' attribute should be false");
-                    expect(entry.name, fileName, "entry 'name' attribute should be set");
-                    expect(entry.fullPath, filePath, "entry 'fullPath' attribute should be set");
+                    expect(entry).toBeDefined();
+                    expect(entry.isFile).toBe(true);
+                    expect(entry.isDirectory).toBe(false);
+                    expect(entry.name).toBe(fileName);
+                    expect(entry.fullPath).toBe(filePath);
                     
                     // cleanup
                     entry.remove(null, null);
@@ -425,2386 +425,3033 @@ describe('File API', function() {
         it("DirectoryEntry.getFile: create file that already exists", function() {
             var fileName = "de.create.existing.file",
                 filePath = root.fullPath + '/' + fileName,
-                getFile = function(file) {
+                getFile = jasmine.createSpy().andCallFake(function(file) {
                     // create:true, exclusive:false, file exists
-                    root.getFile(fileName, {create:true}, win, fail);
-                },
-                itFile = function(entry) {
-                    expect(typeof entry !== 'undefined' && entry !== null, "file entry should not be null");
-                    expect(entry.isFile, true, "entry 'isFile' attribute should be true");
-                    expect(entry.isDirectory, false, "entry 'isDirectory' attribute should be false");
-                    expect(entry.name, fileName, "entry 'name' attribute should be set");
-                    expect(entry.fullPath, filePath, "entry 'fullPath' attribute should be set");
+                    runs(function() {
+                        root.getFile(fileName, {create:true}, win, fail);
+                    });
+
+                    waitsFor(function() { return win.wasCalled; }, "win was never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                fail = createFail('DirectoryEntry'),
+                win = jasmine.createSpy().andCallFake(function(entry) {
+                    expect(entry).toBeDefined();
+                    expect(entry.isFile).toBe(true);
+                    expect(entry.isDirectory).toBe(false);
+                    expect(entry.name).toBe(fileName);
+                    expect(entry.fullPath).toBe(filePath);
                     
                     // cleanup
-                    entry.remove(null, that.fail);
-                    QUnit.start();
-                };
-                    
+                    entry.remove(null, fail);
+                });
             // create file to kick off it
-            root.getFile(fileName, {create:true}, getFile, this.fail); 
+            runs(function() {
+                root.getFile(fileName, {create:true}, getFile, fail);
+            }):
+
+            waitsFor(function() { return getFile.wasCalled; }, "getFile was never called", Tests.TEST_TIMEOUT);
         });
         it("DirectoryEntry.getFile: create file that already exists (exclusive)", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(2);
-            
             var fileName = "de.create.exclusive.existing.file",
-                filePath = this.root.fullPath + '/' + fileName,
-                that = this,
+                filePath = root.fullPath + '/' + fileName,
                 existingFile,
-                getFile = function(file) {
+                getFile = jasmine.createSpy().andCallFake(function(file) {
                     existingFile = file;
                     // create:true, exclusive:true, file exists
-                    that.root.getFile(fileName, {create:true, exclusive:true}, null, itFile);             
-                },
-                itFile = function(error) {
-                    expect(typeof error !== 'undefined' && error !== null, "creating exclusive file that already exists is an error");
-                    expect(error.code, FileError.PATH_EXISTS_ERR, "error code should be FileError.PATH_EXISTS_ERR");
+                    runs(function() {
+                        root.getFile(fileName, {create:true, exclusive:true}, win, fail);
+                    });
+
+                    waitsFor(function() { return fail.wasCalled; }, "fail never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(fail).toHaveBeenCalled();
+                        expect(win).not.toHaveBeenCalled();
+                    });
+                }),
+                fail = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.PATH_EXISTS_ERR);
                    
                     // cleanup
-                    existingFile.remove(null, that.fail);
-                    QUnit.start();
-                };
+                    existingFile.remove(null, fail);
+                }),
+                win = createWin('DirectoryEntry');
                     
             // create file to kick off it
-            this.root.getFile(fileName, {create:true}, getFile, this.fail); 
+            runs(function() {
+                root.getFile(fileName, {create:true}, getFile, fail);
+            });
+
+            waitsFor(function() { return getFile.wasCalled; }, "getFile never called", Tests.TEST_TIMEOUT);
         });
         it("DirectoryEntry.getFile: get Entry for existing file", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(5);
-            
             var fileName = "de.get.file",
-                filePath = this.root.fullPath + '/' + fileName,
-                that = this,
-                getFile = function(file) {
+                filePath = root.fullPath + '/' + fileName,
+                getFile = jasmine.createSpy().andCallFake(function(file) {
                     // create:false, exclusive:false, file exists
-                    that.root.getFile(fileName, {create:false}, itFile, that.fail);             
+                    runs(function() {
+                        root.getFile(fileName, {create:false}, win, fail);
+                    });
+
+                    waitsFor(function() { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
                 },
-                itFile = function(entry) {
-                    expect(typeof entry !== 'undefined' && entry !== null, "file entry should not be null");
-                    expect(entry.isFile, true, "entry 'isFile' attribute should be true");
-                    expect(entry.isDirectory, false, "entry 'isDirectory' attribute should be false");
-                    expect(entry.name, fileName, "entry 'name' attribute should be set");
-                    expect(entry.fullPath, filePath, "entry 'fullPath' attribute should be set");
+                win = function(entry) {
+                    expect(entry).toBeDefined();
+                    expect(entry.isFile).toBe(true);
+                    expect(entry.isDirectory).toBe(false);
+                    expect(entry.name).toBe(fileName);
+                    expect(entry.fullPath).toBe(filePath);
             
-            // cleanup
-                    entry.remove(null, that.fail);
-                    QUnit.start();
-                };
-                    
+                    entry.remove(null, fail); //clean up
+                }),
+                fail = createFail('DirectoryEntry');
+            
             // create file to kick off it
-            this.root.getFile(fileName, {create:true}, getFile, this.fail); 
+            runs(function() {
+                root.getFile(fileName, {create:true}, getFile, fail);
+            });
+
+            waitsFor(function() { return getFile.wasCalled; }, "getFile never called", Tests.TEST_TIMEOUT);
         });
         it("DirectoryEntry.getFile: get FileEntry for invalid path", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(2);
-            
             var fileName = "de:invalid:path",
-                that = this,
-                itFile = function(error) {
-                    expect(typeof error !== 'undefined' && error !== null, "retrieving a file using an invalid path is an error");
-                    expect(error.code, FileError.ENCODING_ERR, "error code should be FileError.ENCODING_ERR");
-                    
-                    // cleanup
-                    QUnit.start();
-                };
-                    
+                fail = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.ENCODING_ERR);
+                }),
+                win = createWin('DirectoryEntry');
+            
             // create:false, exclusive:false, invalid path
-            this.root.getFile(fileName, {create:false}, null, itFile); 
+            runs(function() {
+                root.getFile(fileName, {create:false}, win, fail);
+            });
+
+            waitsFor(function() { return fail.wasCalled; }, "fail never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+            });
+
         });
         it("DirectoryEntry.getDirectory: get Entry for directory that does not exist", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(2);
-            
             var dirName = "de.no.dir",
-                dirPath = this.root.fullPath + '/' + dirName,
-                that = this,
-                itDir = function(error) {
-                    expect(typeof error !== 'undefined' && error !== null, "retrieving a directory that does not exist is an error");
-                    expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-                    
-                    // cleanup
-                    QUnit.start();
-                };
+                dirPath = root.fullPath + '/' + dirName,
+                fail = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+                }),
+                win = createWin('DirectoryEntry');
                     
             // create:false, exclusive:false, directory does not exist
-            this.root.getDirectory(dirName, {create:false}, null, itDir); 
+            runs(function() {
+                root.getDirectory(dirName, {create:false}, win, fail);
+            });
+
+            waitsFor(function() { return fail.wasCalled; }, "fail never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+            });
         });
         it("DirectoryEntry.getDirectory: create new dir with space then resolveFileSystemURL", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(5);
-            
             var dirName = "de create dir",
-            dirPath = this.root.fullPath + '/' + dirName,
-            that = this,
-            getDir = function(dirEntry) {
+                dirPath = root.fullPath + '/' + dirName,
+                getDir = jasmine.createSpy().andCallFake(function(dirEntry) {
+                    var dirURL = dirEntry.toURL();
+                    // now encode URL and try to resolve
+                    runs(function() {
+                        window.resolveLocalFileSystemURI(dirURL, win, fail);
+                    });
+
+                    waitsFor(function() { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
                 
-                var dirURL = dirEntry.toURL();
-                // now encode URL and try to resolve
-                window.resolveLocalFileSystemURI(dirURL, itDirFromURL, that.fail);
-                
-            },
-            itDirFromURL = function(directory) {
-                expect(typeof directory !== 'undefined' && directory !== null, "directory entry should not be null");
-                expect(directory.isFile, false, "directory 'isFile' attribute should be false");
-                expect(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
-                expect(directory.name, dirName, "directory 'name' attribute should be set");
-                expect(directory.fullPath, dirPath, "directory 'fullPath' attribute should be set");
-                
-                // cleanup
-                directory.remove(null, that.fail);
-                QUnit.start();
-            };
+                }), win = jasmine.createSpy().andCallFake(function(directory) {
+                    expect(directory).toBeDefined();
+                    expect(directory.isFile).toBe(false);
+                    expect(directory.isDirectory).toBe(true);
+                    expect(directory.name).toBe(dirName);
+                    expect(directory.fullPath).toBe(dirPath);
+                    
+                    // cleanup
+                    directory.remove(null, fail);
+                }),
+                fail = createFail('DirectoryEntry');
             
             // create:true, exclusive:false, directory does not exist
-            this.root.getDirectory(dirName, {create: true}, getDir, this.fail); 
+            runs(function() {
+                root.getDirectory(dirName, {create: true}, getDir, fail);
+            });
+
+            waitsFor(function() { return getDir.wasCalled; }, "getDir never called", Tests.TEST_TIMEOUT);
         });
         it("DirectoryEntry.getDirectory: create new dir with space resolveFileSystemURL with encoded URL", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(5);
-            
             var dirName = "de create dir",
-            dirPath = this.root.fullPath + '/' + dirName,
-            that = this,
-            getDir = function(dirEntry) {
-                
-                var dirURL = dirEntry.toURL();
-                // now encode URL and try to resolve
-                window.resolveLocalFileSystemURI(encodeURI(dirURL), itDirFromURL, that.fail);
-                
-            },
-            itDirFromURL = function(directory) {
-                expect(typeof directory !== 'undefined' && directory !== null, "directory entry should not be null");
-                expect(directory.isFile, false, "directory 'isFile' attribute should be false");
-                expect(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
-                expect(directory.name, dirName, "directory 'name' attribute should be set");
-                expect(directory.fullPath, dirPath, "directory 'fullPath' attribute should be set");
-            
-                // cleanup
-                directory.remove(null, that.fail);
-                QUnit.start();
-            };
+                dirPath = root.fullPath + '/' + dirName,
+                getDir = jasmine.createSpy().andCallFake(function(dirEntry) {
+                    var dirURL = dirEntry.toURL();
+                    // now encode URL and try to resolve
+                    runs(function() {
+                        window.resolveLocalFileSystemURI(encodeURI(dirURL), win, fail);
+                    });
+
+                    waitsFor(function() { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                win = jasmine.createSpy().andCallFake(function(directory) {
+                    expect(directory).toBeDefined();
+                    expect(directory.isFile).toBe(false);
+                    expect(directory.isDirectory).toBe(true);
+                    expect(directory.name).toBe(dirName);
+                    expect(directory.fullPath).toBe(dirPath);
+                    // cleanup
+                    directory.remove(null, fail);
+                }),
+                fail = createFail('DirectoryEntry');
             
             // create:true, exclusive:false, directory does not exist
-            this.root.getDirectory(dirName, {create: true}, getDir, this.fail); 
+            runs(function() {
+                root.getDirectory(dirName, {create: true}, getDir, fail);
+            });
+
+            waitsFor(function() { return getDir.wasCalled; }, "getDir never called", Tests.TEST_TIMEOUT);
         });
 
         it("DirectoryEntry.getDirectory: create new directory", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(5);
-            
             var dirName = "de.create.dir",
-                dirPath = this.root.fullPath + '/' + dirName,
-                that = this,
-                itDir = function(directory) {
-                    expect(typeof directory !== 'undefined' && directory !== null, "directory entry should not be null");
-                    expect(directory.isFile, false, "directory 'isFile' attribute should be false");
-                    expect(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
-                    expect(directory.name, dirName, "directory 'name' attribute should be set");
-                    expect(directory.fullPath, dirPath, "directory 'fullPath' attribute should be set");
+                dirPath = root.fullPath + '/' + dirName,
+                win = jasmine.createSpy().andCallFake(function(directory) {
+                    expect(directory).toBeDefined();
+                    expect(directory.isFile).toBe(false);
+                    expect(directory.isDirectory).toBe(true);
+                    expect(directory.name).toBe(dirName);
+                    expect(directory.fullPath).toBe(dirPath);
                     
                     // cleanup
-                    directory.remove(null, that.fail);
-                    QUnit.start();
-                };
+                    directory.remove(null, fail);
+                }),
+                fail = createFail('DirectoryEntry');
                     
             // create:true, exclusive:false, directory does not exist
-            this.root.getDirectory(dirName, {create: true}, itDir, this.fail); 
+            runs(function() {
+                root.getDirectory(dirName, {create: true}, win, fail); 
+            });
+
+            waitsFor(function() { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(win).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
         });
         
         it("DirectoryEntry.getDirectory: create new directory (exclusive)", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(5);
-            
             var dirName = "de.create.exclusive.dir",
-                dirPath = this.root.fullPath + '/' + dirName,
-                that = this,
-                itDir = function(directory) {
-                    expect(typeof directory !== 'undefined' && directory !== null, "directory entry should not be null");
-                    expect(directory.isFile, false, "directory 'isFile' attribute should be false");
-                    expect(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
-                    expect(directory.name, dirName, "directory 'name' attribute should be set");
-                    expect(directory.fullPath, dirPath, "directory 'fullPath' attribute should be set");
+                dirPath = root.fullPath + '/' + dirName,
+                win = jasmine.createSpy().andCallFake(function(directory) {
+                    expect(directory).toBeDefined();
+                    expect(directory.isFile).toBe(false);
+                    expect(directory.isDirectory).toBe(true);
+                    expect(directory.name).toBe(dirName);
+                    expect(directory.fullPath).toBe(dirPath);
                    
                     // cleanup
-                    directory.remove(null, that.fail);
-                    QUnit.start();
-                };
-                    
+                    directory.remove(null, fail);
+                }),
+                fail = createFail('DirectoryEntry');
             // create:true, exclusive:true, directory does not exist
-            this.root.getDirectory(dirName, {create: true, exclusive:true}, itDir, this.fail); 
+            runs(function() {
+                root.getDirectory(dirName, {create: true, exclusive:true}, win, fail); 
+            });
+
+            waitsFor(function() { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(win).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
         });
         it("DirectoryEntry.getDirectory: create directory that already exists", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(5);
-            
             var dirName = "de.create.existing.dir",
-                dirPath = this.root.fullPath + '/' + dirName,
-                that = this,
-                getDir = function(directory) {
+                dirPath = root.fullPath + '/' + dirName,
+                getDir = jasmine.createSpy().andCallFake(function(directory) {
                     // create:true, exclusive:false, directory exists
-                    that.root.getDirectory(dirName, {create:true}, itDir, that.fail);             
-                },
-                itDir = function(directory) {
-                    expect(typeof directory !== 'undefined' && directory !== null, "directory entry should not be null");
-                    expect(directory.isFile, false, "directory 'isFile' attribute should be false");
-                    expect(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
-                    expect(directory.name, dirName, "directory 'name' attribute should be set");
-                    expect(directory.fullPath, dirPath, "directory 'fullPath' attribute should be set");
+                    runs(function() {
+                        root.getDirectory(dirName, {create:true}, win, fail);
+                    });
+
+                    waitsFor(function() { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                win = jasmine.createSpy().andCallFake(function(directory) {
+                    expect(directory).toBeDefined();
+                    expect(directory.isFile).toBe(false);
+                    expect(directory.isDirectory).toBe(true);
+                    expect(directory.name).toBe(dirName);
+                    expect(directory.fullPath).toBe(dirPath);
                     
                     // cleanup
-                    directory.remove(null, that.fail);
-                    QUnit.start();
-                };
+                    directory.remove(null, fail);
+                }),
+                fail = createFail('DirectoryEntry');
                     
             // create directory to kick off it
-            this.root.getDirectory(dirName, {create:true}, getDir, this.fail); 
+            runs(function() {
+                root.getDirectory(dirName, {create:true}, getDir, this.fail); 
+            });
+
+            waitsFor(function() { return getDir.wasCalled; }, "getDir never called", Tests.TEST_TIMEOUT);
         });
         it("DirectoryEntry.getDirectory: create directory that already exists (exclusive)", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(2);
-            
             var dirName = "de.create.exclusive.existing.dir",
-                dirPath = this.root.fullPath + '/' + dirName,
-                that = this,
+                dirPath = root.fullPath + '/' + dirName,
                 existingDir,
-                getDir = function(directory) {
+                getDir = jasmine.createSpy().andCallFake(function(directory) {
                     existingDir = directory;
                     // create:true, exclusive:true, directory exists
-                    that.root.getDirectory(dirName, {create:true, exclusive:true}, null, itDir);             
-                },
-                itDir = function(error) {
-                    expect(typeof error !== 'undefined' && error !== null, "creating exclusive directory that already exists is an error");
-                    expect(error.code, FileError.PATH_EXISTS_ERR, "error code should be FileError.PATH_EXISTS_ERR");
+                    runs(function() {
+                        root.getDirectory(dirName, {create:true, exclusive:true}, win, fail);
+                    });
+
+                    waitsFor(function() { return fail.wasCalled; }, "fail never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(fail).toHaveBeenCalled();
+                        expect(win).not.toHaveBeenCalled();
+                    });
+                }),
+                fail = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.PATH_EXISTS_ERR);
                     
                     // cleanup
-                    existingDir.remove(null, that.fail);
-                    QUnit.start();
-                };
+                    existingDir.remove(null, fail);
+                }),
+                win = createWin('DirectoryEntry');
                     
             // create directory to kick off it
-            this.root.getDirectory(dirName, {create:true}, getDir, this.fail); 
+            runs(function() {
+                root.getDirectory(dirName, {create:true}, getDir, fail);
+            });
+            
+            waitsFor(function() { return getDir.wasCalled; }, "getDir never called", Tests.TEST_TIMEOUT);
         });
         it("DirectoryEntry.getDirectory: get Entry for existing directory", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(5);
-            
             var dirName = "de.get.dir",
-                dirPath = this.root.fullPath + '/' + dirName,
-                that = this,
-                getDir = function(directory) {
+                dirPath = root.fullPath + '/' + dirName,
+                getDir = jasmine.createSpy().andCallFake(function(directory) {
                     // create:false, exclusive:false, directory exists
-                    that.root.getDirectory(dirName, {create:false}, itDir, that.fail);             
-                },
-                itDir = function(directory) {
-                    expect(typeof directory !== 'undefined' && directory !== null, "directory entry should not be null");
-                    expect(directory.isFile, false, "directory 'isFile' attribute should be false");
-                    expect(directory.isDirectory, true, "directory 'isDirectory' attribute should be true");
-                    expect(directory.name, dirName, "directory 'name' attribute should be set");
-                    expect(directory.fullPath, dirPath, "directory 'fullPath' attribute should be set");
+                    runs(function() {
+                        root.getDirectory(dirName, {create:false}, win, fail);
+                    });
+
+                    waitsFor(function() { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                win = jasmine.createSpy().andCallFake(function(directory) {
+                    expect(directory).toBeDefined();
+                    expect(directory.isFile).toBe(false);
+                    expect(directory.isDirectory).toBe(true);
+                    expect(directory.name).toBe(dirName);
+                    
+                    expect(directory.fullPath).toBe(dirPath);
                     
                     // cleanup
-                    directory.remove(null, that.fail);
-                    QUnit.start();
-                };
+                    directory.remove(null, fail);
+                }),
+                fail = createFail('DirectoryEntry');
                     
             // create directory to kick off it
-            this.root.getDirectory(dirName, {create:true}, getDir, this.fail); 
+            root.getDirectory(dirName, {create:true}, getDir, fail);
         });
         it("DirectoryEntry.getDirectory: get DirectoryEntry for invalid path", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(2);
-            
             var dirName = "de:invalid:path",
-                that = this,
-                itDir = function(error) {
-                    expect(typeof error !== 'undefined' && error !== null, "retrieving a directory using an invalid path is an error");
-                    expect(error.code, FileError.ENCODING_ERR, "error code should be FileError.ENCODING_ERR");
-                    
-                    // cleanup
-                    QUnit.start();
-                };
+                fail = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.ENCODING_ERR);
+                }),
+                win = createWin('DirectoryEntry');
                     
             // create:false, exclusive:false, invalid path
-            this.root.getDirectory(dirName, {create:false}, null, itDir); 
+            runs(function() {
+                root.getDirectory(dirName, {create:false}, win, fail); 
+            });
+
+            waitsFor(function() { return fail.wasCalled; }, "fail never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+            });
         });
         it("DirectoryEntry.getDirectory: get DirectoryEntry for existing file", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(2);
-            
             var fileName = "de.existing.file",
                 existingFile,
-                filePath = this.root.fullPath + '/' + fileName,
-                that = this,
-                getDir = function(file) {
+                filePath = root.fullPath + '/' + fileName,
+                getDir = jasmine.createSpy().andCallFake(function(file) {
                     existingFile = file;
                     // create:false, exclusive:false, existing file
-                    that.root.getDirectory(fileName, {create:false}, null, itDir);             
-                },
-                itDir = function(error) {
-                    expect(typeof error !== 'undefined' && error !== null, "retrieving directory for existing file is an error");
-                    expect(error.code, FileError.TYPE_MISMATCH_ERR, "error code should be FileError.TYPE_MISMATCH_ERR");
+                    runs(function() {
+                        root.getDirectory(fileName, {create:false}, win, fail);
+                    });
+
+                    waitsFor(function() { return fail.wasCalled; }, "fail never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(fail).toHaveBeenCalled();
+                        expect(win).not.toHaveBeenCalled();
+                    });
+                }),
+                fail = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.TYPE_MISMATCH_ERR);
                     
                     // cleanup
-                    existingFile.remove(null, that.fail);
-                    QUnit.start();
-                };
+                    existingFile.remove(null, null);
+                }),
+                win = createWin('DirectoryEntry');
                     
             // create file to kick off it
-            this.root.getFile(fileName, {create:true}, getDir, this.fail); 
+            runs(function() {
+                root.getFile(fileName, {create:true}, getDir, fail);
+            });
+
+            waitsFor(function() { return getDir.wasCalled; }, "getDir was called", Tests.TEST_TIMEOUT);
         });
         it("DirectoryEntry.getFile: get FileEntry for existing directory", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(2);
-            
             var dirName = "de.existing.dir",
                 existingDir,
-                dirPath = this.root.fullPath + '/' + dirName,
-                that = this,
-                getFile = function(directory) {
+                dirPath = root.fullPath + '/' + dirName,
+                getFile = jasmine.createSpy().andCallFake(function(directory) {
                     existingDir = directory;
                     // create:false, exclusive:false, existing directory
-                    that.root.getFile(dirName, {create:false}, null, itFile);             
-                },
-                itFile = function(error) {
-                    expect(typeof error !== 'undefined' && error !== null, "retrieving file for existing directory is an error");
-                    expect(error.code, FileError.TYPE_MISMATCH_ERR, "error code should be FileError.TYPE_MISMATCH_ERR");
+                    runs(function() {
+                        root.getFile(dirName, {create:false}, win, fail);
+                    });
+
+                    waitsFor(function() { return fail.wasCalled; }, "fail never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(fail).toHaveBeenCalled();
+                        expect(win).not.toHaveBeenCalled();
+                    });
+                }),
+                fail = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.TYPE_MISMATCH_ERR);
                    
                     // cleanup
-                    existingDir.remove(null, that.fail);
-                    QUnit.start();
-                };
+                    existingDir.remove(null, null);
+                }),
+                win = createWin('DirectoryEntry');
                     
             // create directory to kick off it
-            this.root.getDirectory(dirName, {create:true}, getFile, this.fail); 
+            runs(function() {
+                root.getDirectory(dirName, {create:true}, getFile, fail);
+            });
+
+            waitsFor(function() { return getFile.wasCalled; }, "getFile never called", Tests.TEST_TIMEOUT);
         });
         it("DirectoryEntry.removeRecursively on directory", function() {
-            QUnit.stop(its.it_TIMEOUT);
-            expect(2);
-            
             var dirName = "de.removeRecursively",
                 subDirName = "dir",
-                dirPath = this.root.fullPath + '/' + dirName,
+                dirPath = root.fullPath + '/' + dirName,
                 //subDirPath = this.root.fullPath + '/' + subDirName,
-          subDirPath = dirPath + '/' + subDirName,
-                that = this,
-                entryCallback = function(entry) {
+                subDirPath = dirPath + '/' + subDirName,
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
                     // delete directory
-            var deleteDirectory = function(directory) {
-                        entry.removeRecursively(itRemove, that.fail);  
-                    }; 
+                    var deleteDirectory = jasmine.createSpy().andCallFake(function(directory) {
+                        runs(function() {
+                            entry.removeRecursively(remove, fail);
+                        });
+
+                        waitsFor(function() { return remove.wasCalled; }, "remove never called", Tests.TEST_TIMEOUT);
+                    });
                     // create a sub-directory within directory
-                    entry.getDirectory(subDirName, {create: true}, deleteDirectory, that.fail);
-            },
-            itRemove = function() {
-              // it that removed directory no longer exists
-              that.root.getDirectory(dirName, {create:false}, null, itDirExists);
-            },
-            itDirExists = function(error){
-              expect(typeof error !== 'undefined' && error !== null, "removed directory should not exist");
-              expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-              QUnit.start();
-            };
+                    runs(function() {
+                        entry.getDirectory(subDirName, {create: true}, deleteDirectory, fail);
+                    });
+
+                    waitsFor(function() { return deleteDirectory.wasCalled; }, "deleteDirectory never called", Tests.TEST_TIMEOUT);
+                }),
+                remove = jasmine.createSpy().andCallFake(function() {
+                    // it that removed directory no longer exists
+                    runs(function() {
+                        root.getDirectory(dirName, {create:false}, win, dirExists);
+                    });
+
+                    waitsFor(function() { return dirExists.wasCalled; }, "dirExists never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(dirExists).toHaveBeenCalled();
+                        expect(win).not.toHaveBeenCalled();
+                    });
+                }),
+                dirExists = jasmine.createSpy().andCallFake(function(error){
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+                }),
+                fail = createFail('DirectoryEntry'),
+                win = createWin('DirectoryEntry');
 
             // create a new directory entry to kick off it
-            this.root.getDirectory(dirName, {create:true}, entryCallback, this.fail);
+            runs(function() {
+                root.getDirectory(dirName, {create:true}, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
         it("DirectoryEntry.createReader: create reader on existing directory", function() {
-            expect(2);
-            
             // create reader for root directory 
-            var reader = this.root.createReader();
-            expect(typeof reader !== 'undefined' && reader !== null, "reader object should not be null");
-            expect(typeof reader.readEntries === 'function', "reader object should have a 'readEntries' method");
+            var reader = root.createReader();
+            expect(reader).toBeDefined();
+            expect(reader.readEntries).toBe(jasmine.any(Function));
+        });
+        it("DirectoryEntry.removeRecursively on root file system", function() {
+            var remove = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NO_MODIFICATION_ALLOWED_ERR);
+                }),
+                win = createWin('DirectoryEntry');
+
+            // remove root file system
+            runs(function() {
+                root.removeRecursively(win, remove);
+            });
+
+            waitsFor(function() { return remove.wasCalled; }, "remove never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(win).not.toHaveBeenCalled();
+                expect(fail).toHaveBeenCalled();
+            });
         });
     });
-    module('DirectoryReader interface', {
-        // setup function will run before each it
-        setup: function() {
-            this.root = getFileSystemRoot();
-            this.fail = function(error) {
-                console.log('file error: ' + error.code);
-            };   
-        }
-    });
-    it("DirectoryReader.readEntries: read contents of existing directory", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(4);
-        
-        var reader,
-		 itEntries = function(entries) {
-                expect(typeof entries !== 'undefined' && entries !== null, "directory entries should not be null");
-                expect(entries.constructor === Array, "readEntries should return an array of entries");
-                QUnit.start();
-            };
+
+    describe('DirectoryReader interface', function() {
+        describe("readEntries", function() {
+            it("should read contents of existing directory", function() {
+                var reader,
+                    win = jasmine.createSpy().andCallFake(function(entries) {
+                        expect(entries).toBeDefined();
+                        expect(entries.constructor).toBe(jasmine.any(Array));
+                    }),
+                    fail = createFail('DirectoryReader');
                 
-        // create reader for root directory 
-        reader = this.root.createReader();
-        expect(typeof reader !== 'undefined' && reader !== null, "reader object should not be null");
-        expect(typeof reader.readEntries === 'function', "reader object should have a 'readEntries' method");
-        
-        // read entries
-        reader.readEntries(itEntries, this.fail);
-    });
-    it("DirectoryReader.readEntries: read contents of directory that has been removed", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(4);
-        
-        var dirName = "de.createReader.notfound",
-            dirPath = this.root.fullPath + '/' + dirName,
-            that = this,
-            entryCallback = function(directory) {
+                // create reader for root directory 
+                reader = root.createReader();
                 // read entries
-                var readEntries = function() {
-                    var reader = directory.createReader();
-                    reader.readEntries(null, itReader);
-                };
-                // delete directory
-                directory.removeRecursively(readEntries, that.fail);  
-            },
-            itReader = function(error) {
-				var itDirectoryExists = function(error) {
-					expect(typeof error !== 'undefined' && error !== null, "reading entries on a directory that does not exist is an error")
-					expect(error.code, FileError.NOT_FOUND_ERR, "removed directory should not exist");
-					QUnit.start();
-				};
-                expect(typeof error !== 'undefined' && error !== null, "reading entries on a directory that does not exist is an error")
-                expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-				that.root.getDirectory(dirName, {create:false}, null, itDirectoryExists);
-            };
+                runs(function() {
+                    reader.readEntries(win, fail);
+                });
 
-        // create a new directory entry to kick off it
-        this.root.getDirectory(dirName, {create:true}, entryCallback, this.fail);
-    });
-    it("DirectoryEntry.removeRecursively on root file system", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var itRemove = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "removing root file system should generate an error");
-                expect(error.code, FileError.NO_MODIFICATION_ALLOWED_ERR, "error code should be FileError.NO_MODIFICATION_ALLOWED_ERR");
-                QUnit.start();
-            };
+                waitsFor(function() { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
 
-        // remove root file system
-        this.root.removeRecursively(null, itRemove);
-    });
-    module('File interface');
-    it("File constructor should be defined", function() {
-        expect(1);
-        expect(typeof File === 'function', "File constructor should be a function.");
-    });
-    it("File attributes should be defined", function() {
-        expect(5);
-        var file = new File();
-        expect(typeof file.name !== 'undefined', "File object should have a 'name' attribute");
-        expect(typeof file.fullPath !== 'undefined', "File object should have a 'fullPath' attribute");
-        expect(typeof file.type !== 'undefined', "File object should have a 'type' attribute");
-        expect(typeof file.lastModifiedDate !== 'undefined', "File object should have a 'lastModifiedDate' attribute");
-        expect(typeof file.size !== 'undefined', "File object should have a 'size' attribute");
-    });
-    module('FileEntry interface', {
-        // setup function will run before each it
-        setup: function() {
-            this.root = getFileSystemRoot();
-            this.fail = function(error) {
-                console.log('file error: ' + error.code);
-            };   
-        }
-    });
-    it("FileEntry methods should be defined", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(3);
-        
-        var fileName = "fe.methods",
-            that = this,
-            itFileEntry = function(fileEntry) {
-                expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "FileEntry should not be null");
-                expect(typeof fileEntry.createWriter === 'function', "FileEntry should have a 'createWriter' method");
-                expect(typeof fileEntry.file === 'function', "FileEntry should have a 'file' method");
-                
-                // cleanup 
-                fileEntry.remove(null, that.fail);
-                QUnit.start();
-            };
-                
-        // create a new file entry to kick off it
-        this.root.getFile(fileName, {create:true}, itFileEntry, this.fail);
-    });
-    it("FileEntry.createWriter should return a FileWriter object", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var fileName = "fe.createWriter",
-            that = this,
-            itFile,
-            entryCallback = function(fileEntry) {
-                itFile = fileEntry;
-                fileEntry.createWriter(itWriter, that.fail);
-            },
-            itWriter = function(writer) {
-                expect(typeof writer !== 'undefined' && writer !== null, "FileWriter object should not be null");
-                expect(writer.constructor === FileWriter, "writer should be a FileWriter object");
-                
-                // cleanup 
-                itFile.remove(null, that.fail);
-                QUnit.start();                
-            };
-                
-        // create a new file entry to kick off it
-        this.root.getFile(fileName, {create:true}, entryCallback, this.fail);
-    });
-    it("FileEntry.file should return a File object", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var fileName = "fe.file",
-            that = this,
-            newFile,
-            entryCallback = function(fileEntry) {
-                newFile = fileEntry;
-                fileEntry.file(itFile, that.fail);
-            },
-            itFile = function(file) {
-                expect(typeof file !== 'undefined' && file !== null, "File object should not be null");
-                expect(file.constructor === File, "File object should be a File");
-                
-                // cleanup 
-                newFile.remove(null, that.fail);
-                QUnit.start();                
-            };
-                
-        // create a new file entry to kick off it
-        this.root.getFile(fileName, {create:true}, entryCallback, this.fail);
-    });
-    it("FileEntry.file: on File that has been removed", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var fileName = "fe.no.file",
-            that = this,
-            entryCallback = function(fileEntry) {
-                // create File object
-                var getFile = function() {
-                    fileEntry.file(null, itFile);
-                };
-                // delete file
-                fileEntry.remove(getFile, that.fail);
-            },
-            itFile = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "invexpecting FileEntry.file on a file that does not exist is an error");
-                expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-                QUnit.start();                
-            };
-                
-        // create a new file entry to kick off it
-        this.root.getFile(fileName, {create:true}, entryCallback, this.fail);
-    });
-    module('Entry interface', {
-        // setup function will run before each it
-        setup: function() {
-            var that = this;
-            this.root = getFileSystemRoot();
-            this.fail = function(error) {
-                console.log('file error: ' + error.code);
-            };
-            this.unexpectedSuccess = function() {
-                console.log('!!! success function called when not expected !!!');
-            };
-            // deletes specified file or directory
-            this.deleteEntry = function(name, success, error) {
-                // deletes entry, if it exists
-                window.resolveLocalFileSystemURI(that.root.toURL() + '/' + name, 
-                        function(entry) {
-                            console.log('Deleting: ' + entry.fullPath);
-                            if (entry.isDirectory === true) {
-                                entry.removeRecursively(success, error); 
-                            }
-                            else {
-                                entry.remove(success, error);
-                            }
-                        }, 
-                        // doesn't exist
-                        success);
-            };
-            // deletes and re-creates the specified file
-            this.createFile = function(fileName, success, error) {
-                that.deleteEntry(fileName, function() {
-                    console.log('Creating file: ' + that.root.fullPath + '/' + fileName);
-                    that.root.getFile(fileName, {create: true}, success, error);                
-                }, error);
-            };
-            // deletes and re-creates the specified directory
-            this.createDirectory = function(dirName, success, error) {
-                that.deleteEntry(dirName, function() {
-                   console.log('Creating directory: ' + that.root.fullPath + '/' + dirName);
-                   that.root.getDirectory(dirName, {create: true}, success, error); 
-                }, error);
-            };
-        }
-    });
-    it("Entry object", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(13);
+                runs(function() {
+                    expect(win).toHaveBeenCalled();
+                    expect(fail).not.toHaveBeenCalled();
+                });
+            });
+            it("should read contents of directory that has been removed", function() {
+                var dirName = "de.createReader.notfound",
+                    dirPath = root.fullPath + '/' + dirName,
+                    entryCallback = jasmine.createSpy().andCallFake(function(directory) {
+                        // read entries
+                        var readEntries = jasmine.createSpy().andCallFake(function() {
+                            var reader = directory.createReader();
+                            
+                            runs(function() {
+                                reader.readEntries(win, itReader);
+                            });
 
-        var fileName = "entry",
-            that = this,
-            fullPath = this.root.fullPath + '/' + fileName,
-            itEntry = function(entry) {
-                expect(typeof entry !== 'undefined' && entry !== null, "entry should not be null.");
-                expect(entry.isFile, true, "entry.isFile should be true");
-                expect(entry.isDirectory, false, "entry.isDirectory should be false");
-                expect(entry.name, fileName, "entry object 'name' property should be set");
-                expect(entry.fullPath, fullPath, "entry object 'fullPath' property should be set");
-                expect(typeof entry.getMetadata === 'function', "entry object should have a 'getMetadata' function.");
-                expect(typeof entry.moveTo === 'function', "entry object should have a 'moveTo' function.");
-                expect(typeof entry.copyTo === 'function', "entry object should have a 'copyTo' function.");
-                expect(typeof entry.toURL === 'function', "entry object should have a 'toURL' function.");
-                expect(typeof entry.remove === 'function', "entry object should have a 'remove' function.");
-                expect(typeof entry.getParent === 'function', "entry object should have a 'getParent' function.");
-                expect(typeof entry.createWriter === 'function', "entry object should have a 'createWriter' function.");
-                expect(typeof entry.file === 'function', "entry object should have a 'file' function.");
-                
-                // cleanup
-                that.deleteEntry(fileName);
-                QUnit.start();
-            };
+                            waitsFor(function() { return itReader.wasCalled; }, "itReader never called", Tests.TEST_TIMEOUT);
+                        });
+                        // delete directory
+                        runs(function() {
+                            directory.removeRecursively(readEntries, fail);
+                        });
 
-        // create a new file entry
-        this.createFile(fileName, itEntry, this.fail);
+                        waitsFor(function() { return readEntries.wasCalled; }, "readEntries never called", Tests.TEST_TIMEOUT);
+                    }),
+                    itReader = jasmine.createSpy().andCallFake(function(error) {
+                        var itDirectoryExists = jasmine.createSpy().andCallFake(function(error) {
+                            expect(error).toBeDefined();
+                            expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+                        });
+
+                        expect(error).toBeDefined();
+                        expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+
+                        runs(function() {
+                            root.getDirectory(dirName, {create:false}, win, itDirectoryExists);
+                        });
+
+                        waitsFor(function() { return itDirectoryExists.wasCalled; }, "itDirectoryExists never called", Tests.TEST_TIMEOUT);
+
+                        runs(function() {
+                            expect(itDirectoryExists).toHaveBeenCalled();
+                            expect(win).not.toHaveBeenCalled();
+                        });
+                    }),
+                    fail = createFail('DirectoryReader'),
+                    win = createWin('DirectoryReader');
+
+                // create a new directory entry to kick off it
+                runs(function() {
+                    root.getDirectory(dirName, {create:true}, entryCallback, fail);
+                });
+
+                waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+            });
+        });
     });
-    it("Entry.getMetadata on file", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var fileName = "entry.metadata.file",
-            that = this,
-            entryCallback = function(entry) {
-                entry.getMetadata(itMetadata, this.fail);
-            },
-            itMetadata = function(metadata) {
-                expect(typeof metadata !== 'undefined' && metadata !== null, "metadata should not be null.");
-                expect(metadata.modificationTime instanceof Date, "metadata.modificationTime should be Date object");
 
-                // cleanup
-                that.deleteEntry(fileName);
-                QUnit.start();
-            };
-        
-        // create a new file entry
-        this.createFile(fileName, entryCallback, this.fail);
+    describe('File interface', function() {
+        it("constructor should be defined", function() {
+            expect(File).toBe(jasmine.any(Function));
+        });
+        it("should be define File attributes", function() {
+            var file = new File();
+            expect(file.name).toBeDefined();
+            expect(file.fullPath).toBeDefined();
+            expect(file.type).toBeDefined();
+            expect(file.lastModifiedDate).toBeDefined();
+            expect(file.size).toBeDefined();
+        });
     });
-    it("Entry.getMetadata on directory", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var dirName = "entry.metadata.dir",
-            that = this,
-            entryCallback = function(entry) {
-                entry.getMetadata(itMetadata, this.fail);
-            },
-            itMetadata = function(metadata) {
-                expect(typeof metadata !== 'undefined' && metadata !== null, "metadata should not be null.");
-                expect(metadata.modificationTime instanceof Date, "metadata.modificationTime should be Date object");
 
-                // cleanup
-                that.deleteEntry(dirName);
-                QUnit.start();
-            };
-        
-        // create a new directory entry
-        this.createDirectory(dirName, entryCallback, this.fail);
+    describe('FileEntry interface', function() {
+        it("should be define FileEntry methods", function() {
+            var fileName = "fe.methods",
+                itFileEntry = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.createWriter).toBe(jasmine.any(Function));
+                    expect(fileEntry.file).toBe(jasmine.any(Function));
+                    
+                    // cleanup 
+                    fileEntry.remove(null, fail);
+                }),
+                fail = createFail('FileEntry');
+                    
+            // create a new file entry to kick off it
+            runs(function() {
+                root.getFile(fileName, {create:true}, itFileEntry, fail);
+            });
+
+            waitsFor(function() { return itFileEntry.wasCalled; }, "itFileEntry never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(itFileEntry).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("FileEntry.createWriter should return a FileWriter object", function() {
+            var fileName = "fe.createWriter",
+                itFile,
+                entryCallback = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    itFile = fileEntry;
+
+                    runs(function() {
+                        fileEntry.createWriter(itWriter, fail);
+                    });
+
+                    waitsFor(function() { return itWriter.wasCalled; }, "itWriter never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(itWriter).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                itWriter = jasmine.createSpy().andCallFake(function(writer) {
+                    expect(writer).toBeDefined();
+                    expect(writer.constructor).toBe(jasmine.any(FileWriter));
+                    
+                    // cleanup 
+                    itFile.remove(null, fail);
+                }),
+                fail = createFail('FileEntry');
+                    
+            // create a new file entry to kick off it
+            runs(function() {
+                root.getFile(fileName, {create:true}, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("FileEntry.file should return a File object", function() {
+            var fileName = "fe.file",
+                newFile,
+                entryCallback = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    newFile = fileEntry;
+                    
+                    runs(function() {
+                        fileEntry.file(itFile, fail);
+                    });
+
+                    waitsFor(function() { return itFile.wasCalled; }, "itFile never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(itFile).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                itFile = jasmine.createSpy().andCallFake(function(file) {
+                    expect(file).toBeDefined();
+                    expect(file.constructor).toBe(jasmine.any(File));
+                    
+                    // cleanup 
+                    newFile.remove(null, fail);
+                }),
+                fail = createFail('FileEntry');
+             
+            // create a new file entry to kick off it
+            runs(function() {
+                root.getFile(fileName, {create:true}, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("FileEntry.file: on File that has been removed", function() {
+            var fileName = "fe.no.file",
+                entryCallback = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    // create File object
+                    var getFile = jasmine.createSpy().andCallFake(function() {
+                        runs(function() {
+                            fileEntry.file(win, itFile);
+                        });
+
+                        waitsFor(function() { return itFile.wasCalled; }, "itFile never called", Tests.TEST_TIMEOUT);
+
+                        runs(function() {
+                            expect(itFile).toHaveBeenCalled();
+                            expect(win).not.toHaveBeenCalled();
+                        });
+                    });
+                    // delete file
+                    runs(function() {
+                        fileEntry.remove(getFile, fail);
+                    });
+
+                    waitsFor(function() { return getFile.wasCalled; }, "getFile never called", Tests.TEST_TIMEOUT);
+                }),
+                itFile = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+                }),
+                fail = createFail('FileEntry'),
+                win = createWin('FileEntry');
+                    
+            // create a new file entry to kick off it
+            runs(function() {
+                root.getFile(fileName, {create:true}, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
     });
-    it("Entry.getParent on file in root file system", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
+    describe('Entry interface', function() {
+        it("Entry object", function() {
+            var fileName = "entry",
+                fullPath = root.fullPath + '/' + fileName,
+                fail = createFail('Entry'),
+                itEntry = jasmine.createSpy().andCallFake(function(entry) {
+                    expect(entry).toBeDefined();
+                    expect(entry.isFile).toBe(true);
+                    expect(entry.isDirectory).toBe(false);
+                    expect(entry.name).toBe(fileName);
+                    expect(entry.fullPath).toBe(fullPath);
+                    expect(entry.getMetadata).toBe(jasmine.any(Function));
+                    expect(entry.moveTo).toBe(jasmine.any(Function));
+                    expect(entry.copyTo).toBe(jasmine.any(Function));
+                    expect(entry.toURL).toBe(jasmine.any(Function));
+                    expect(entry.remove).toBe(jasmine.any(Function));
+                    expect(entry.getParent).toBe(jasmine.any(Function));
+                    expect(entry.createWriter).toBe(jasmine.any(Function));
+                    expect(entry.file).toBe(jasmine.any(Function));
+
+                    // cleanup
+                    deleteEntry(fileName);
+                });
+
+            // create a new file entry
+            runs(function() {
+                createFile(fileName, itEntry, fail);
+            });
+
+            waitsFor(function() { return itEntry.wasCalled; }, "itEntry never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(itEntry).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("Entry.getMetadata on file", function() {
+            var fileName = "entry.metadata.file",
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    runs(function() {
+                        entry.getMetadata(itMetadata, fail);
+                    });
+
+                    waitsFor(function() { return itMetadata.wasCalled; }, "itMetadata never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(itMetadata).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                fail = createFail('Entry'),
+                itMetadata = jasmine.createSpy().andCallFake(function(metadata) {
+                    expect(metadata).toBeDefined();
+                    expect(metadata.modificationTime).toBe(jasmine.any(Date));
+
+                    // cleanup
+                    deleteEntry(fileName);
+                });
+            
+            // create a new file entry
+            createFile(fileName, entryCallback, fail);
+        });
+        it("Entry.getMetadata on directory", function() {
+            var dirName = "entry.metadata.dir",
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    runs(function() {
+                        entry.getMetadata(itMetadata, fail);
+                    });
+
+                    waitsFor(function() { return itMetadata.wasCalled; }, "itMetadata never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(itMetadata).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                fail = createFail('Entry'),
+                itMetadata = jasmine.createSpy().andCallFake(function(metadata) {
+                    expect(metadata).toBeDefined();
+                    expect(metadata.modificationTime).toBe(jasmine.any(Date));
+
+                    // cleanup
+                    deleteEntry(dirName);
+                });
+            
+            // create a new directory entry
+            runs(function() {
+                createDirectory(dirName, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.getParent on file in root file system", function() {
+            var fileName = "entry.parent.file",
+                rootPath = root.fullPath,
+                fail = createFail('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    runs(function() {
+                        entry.getParent(itParent, fail);
+                    });
+
+                    waitsFor(function() { return itParent.wasCalled; }, "itCalled never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(itParent).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                itParent = jasmine.createSpy().andCallFake(function(parent) {
+                    expect(parent).toBeDefined();
+                    expect(parent.fullPath).toBe(rootPath);
+
+                    // cleanup
+                    deleteEntry(fileName);
+                });
         
-        var fileName = "entry.parent.file",
-            that = this,
-            rootPath = this.root.fullPath,
-            entryCallback = function(entry) {
-                entry.getParent(itParent, this.fail);
-            },
-            itParent = function(parent) {
-                expect(typeof parent !== 'undefined' && parent !== null, "parent directory should not be null.");
-                expect(parent.fullPath, rootPath, "parent fullPath should be root file system");
+            // create a new file entry
+            runs(function() {
+                createFile(fileName, entryCallback, fail);
+            });
 
-                // cleanup
-                that.deleteEntry(fileName);
-                QUnit.start();
-            };
-    
-        // create a new file entry
-        this.createFile(fileName, entryCallback, this.fail);
-    });
-    it("Entry.getParent on directory in root file system", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.getParent on directory in root file system", function() {
+            var dirName = "entry.parent.dir",
+                rootPath = root.fullPath,
+                fail = createFail('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    runs(function() {
+                        entry.getParent(itParent, fail);
+                    });
+
+                    waitsFor(function() { return itParent.wasCalled; }, "itParent never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(itParent).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                itParent = jasmine.createSpy().andCallFake(function(parent) {
+                    expect(parent).toBeDefined();
+                    expect(parent.fullPath).toBe(rootPath);
+
+                    // cleanup
+                    deleteEntry(dirName);
+                });
+
+            // create a new directory entry
+            runs(function() {
+                createDirectory(dirName, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.getParent on root file system", function() {
+            var rootPath = root.fullPath,
+                itParent = jasmine.createSpy().andCallFake(function(parent) {
+                    expect(parent).toBeDefined();
+                    expect(parent.fullPath).toBe(rootPath);
+                }),
+                fail = createFail('Entry');
+
+            // create a new directory entry
+            runs(function() {
+                root.getParent(itParent, fail);
+            });
+
+            waitsFor(function() { return itParent.wasCalled; }, "itParent never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(itParent).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("Entry.toURL on file", function() {
+            var fileName = "entry.uri.file",
+                rootPath = root.fullPath,
+                itURL = jasmine.createSpy().andCallFake(function(entry) {
+                    var uri = entry.toURL();
+                    expect(uri).toBeDefined();
+                    expect(uri.indexOf(rootPath)).not.toBe(-1);
+
+                    // cleanup
+                    deleteEntry(fileName);
+                }),
+                fail = createFail('Entry');
         
-        var dirName = "entry.parent.dir",
-            that = this,
-            rootPath = this.root.fullPath,
-            entryCallback = function(entry) {
-                entry.getParent(itParent, this.fail);
-            },
-            itParent = function(parent) {
-                expect(typeof parent !== 'undefined' && parent !== null, "parent directory should not be null.");
-                expect(parent.fullPath, rootPath, "parent fullPath should be root file system");
+            // create a new file entry
+            runs(function() {
+                createFile(fileName, itURL, fail);
+            });
 
-                // cleanup
-                that.deleteEntry(dirName);
-                QUnit.start();
-            };
+            waitsFor(function() { return itURL.wasCalled; }, "itURL never called", Tests.TEST_TIMEOUT);
 
-        // create a new directory entry
-        this.createDirectory(dirName, entryCallback, this.fail);
-    });
-    it("Entry.getParent on root file system", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
+            runs(function() {
+                expect(itURL).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("Entry.toURL on directory", function() {
+            var dirName = "entry.uri.dir",
+                rootPath = root.fullPath,
+                itURL = jasmine.createSpy().andCallFake(function(entry) {
+                    var uri = entry.toURL();
+                    expect(uri).toBeDefined();
+                    expect(uri.indexOf(rootPath)).not.toBe(-1);
+
+                    // cleanup
+                    deleteEntry(dirName);
+                }),
+                fail = createFail('Entry');
+
+            // create a new directory entry
+            runs(function() {
+                createDirectory(dirName, itURL, fail);
+            });
+
+            waitsFor(function() { return itURL.wasCalled; }, "itURL never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(itURL).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("Entry.remove on file", function() {
+            var fileName = "entry.rm.file",
+                fullPath = root.fullPath + '/' + fileName,
+                win = createWin('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    var checkRemove = jasmine.createSpy().andCallFake(function() {
+                        runs(function() {
+                            root.getFile(fileName, null, win, itRemove);
+                        });
+
+                        waitsFor(function() { return itRemove.wasCalled; }, "itRemove never called", Tests.TEST_TIMEOUT);
+
+                        runs(function() {
+                            expect(win).not.toHaveBeenCalled();
+                            expect(fail).not.toHaveBeenCalled();
+                            expect(itRemove).toHaveBeenCalled();
+                        });
+                    });
+                    expect(entry).toBeDefined();
+                    
+                    runs(function() {
+                        entry.remove(checkRemove, fail);
+                    });
+
+                    waitsFor(function() { return checkRemove.wasCalled; }, "checkRemove never called", Tests.TEST_TIMEOUT);
+                }),
+                itRemove = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+                    // cleanup
+                    deleteEntry(fileName);
+                }),
+                fail = createFail('Entry');
         
-        var rootPath = this.root.fullPath,
-		 itParent = function(parent) {
-                expect(typeof parent !== 'undefined' && parent !== null, "parent directory should not be null.");
-                expect(parent.fullPath, rootPath, "parent fullPath should be root file system");
-                QUnit.start();
-            };
+            // create a new file entry
+            runs(function() {
+                createFile(fileName, entryCallback, fail);
+            });
 
-        // create a new directory entry
-        this.root.getParent(itParent, this.fail);
-    });
-    it("Entry.toURL on file", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var fileName = "entry.uri.file",
-            that = this,
-            rootPath = this.root.fullPath,
-            itURL = function(entry) {
-                var uri = entry.toURL();
-                expect(typeof uri !== 'undefined' && uri !== null, "URL should not be null.");
-                expect(uri.indexOf(rootPath) !== -1, "URL should contain root file system path");
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.remove on empty directory", function() {
+            var dirName = "entry.rm.dir",
+                fullPath = root.fullPath + '/' + dirName,
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    var checkRemove = jasmine.createSpy().andCallFake(function() {
+                        runs(function() {
+                            root.getDirectory(dirName, null, win, itRemove);
+                        });
 
-                // cleanup
-                that.deleteEntry(fileName);
-                QUnit.start();
-            };
-    
-        // create a new file entry
-        this.createFile(fileName, itURL, this.fail);
-    });
-    it("Entry.toURL on directory", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var dirName = "entry.uri.dir",
-            that = this,
-            rootPath = this.root.fullPath,
-            itURL = function(entry) {
-                var uri = entry.toURL();
-                expect(typeof uri !== 'undefined' && uri !== null, "URL should not be null.");
-                expect(uri.indexOf(rootPath) !== -1, "URL should contain root file system path");
+                        waitsFor(function() { return itRemove.wasCalled; }, "itRemove never called", Tests.TEST_TIMEOUT);
 
-                // cleanup
-                that.deleteEntry(dirName);
-                QUnit.start();
-            };
+                        runs(function() {
+                            expect(itRemove).toHaveBeenCalled();
+                            expect(win).not.toHaveBeenCalled();
+                            expect(fail).not.toHaveBeenCalled();
+                        });
+                    });
 
-        // create a new directory entry
-        this.createDirectory(dirName, itURL, this.fail);
-    });
-    it("Entry.remove on file", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(3);
-        
-        var fileName = "entry.rm.file",
-            that = this,
-            fullPath = this.root.fullPath + '/' + fileName,
-		 entryCallback = function(entry) {
-				var checkRemove = function() {
-					that.root.getFile(fileName, null, that.unexpectedSuccess, itRemove);  
-				};
-                expect(typeof entry !== 'undefined' && entry !== null, "entry should not be null.");
-                entry.remove(checkRemove, that.fail);
-            },
-			itRemove = function(error) {
-				expect(typeof error !== 'undefined' && error !== null, "file should not exist");
-				expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR"); 
-                // cleanup
-                that.deleteEntry(fileName);
-                QUnit.start();
-            };
-    
-        // create a new file entry
-        this.createFile(fileName, entryCallback, this.fail);
-    });
-    it("Entry.remove on empty directory", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(3);
-        
-        var dirName = "entry.rm.dir",
-            that = this,
-            fullPath = this.root.fullPath + '/' + dirName,
-            entryCallback = function(entry) {
-				var checkRemove = function() {
-					that.root.getDirectory(dirName, null, that.unexpectedSuccess, itRemove);  
-				};
-                expect(typeof entry !== 'undefined' && entry !== null, "entry should not be null.");
-                entry.remove(checkRemove, that.fail);
-            },
-            itRemove = function(error) {
-				expect(typeof error !== 'undefined' && error !== null, "directory should not exist");
-				expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR"); 
-                // cleanup
-                that.deleteEntry(dirName);                
-                QUnit.start();
-            };
+                    expect(entry).toBeDefined();
 
-        // create a new directory entry
-        this.createDirectory(dirName, entryCallback, this.fail);
-    });
-    it("Entry.remove on non-empty directory", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(4);
-        
-        var dirName = "entry.rm.dir.not.empty",
-            that = this,
-            fullPath = this.root.fullPath + '/' + dirName,
-            fileName = "remove.txt",
-            entryCallback = function(entry) {
-				var checkFile = function(error) {
-					expect(typeof error !== 'undefined' && error !== null, "removing non-empty directory should generate an error");
-					expect(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-					// verify that dir still exists
-					that.root.getDirectory(dirName, null, itRemove, that.fail);  
-				};
-                // delete directory
-                var deleteDirectory = function(fileEntry) {
-                    entry.remove(that.unexpectedSuccess, checkFile);  
-                }; 
-                // create a file within directory, then try to delete directory
-                entry.getFile(fileName, {create: true}, deleteDirectory, that.fail);
-            },
-			itRemove = function(entry) {
-				expect(typeof entry !== 'undefined' && entry !== null, "entry should not be null.");
-				expect(entry.fullPath, fullPath, "dir entry should still exisit");
-                // cleanup
-                that.deleteEntry(dirName);
-                QUnit.start();
-            };
+                    runs(function() {
+                        entry.remove(checkRemove, fail);
+                    });
 
-        // create a new directory entry
-        this.createDirectory(dirName, entryCallback, this.fail);
-    });
-    it("Entry.remove on root file system", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var itRemove = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "removing root file system should generate an error");
-                expect(error.code, FileError.NO_MODIFICATION_ALLOWED_ERR, "error code should be FileError.NO_MODIFICATION_ALLOWED_ERR");
-                QUnit.start();
-            };
+                    waitsFor(function() { return checkRemove.wasCalled; }, "checkRemove never called", Tests.TEST_TIMEOUT);
+                }),
+                itRemove = function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+                    // cleanup
+                    deleteEntry(dirName);
+                },
+                win = createWin('Entry'),
+                fail = createFail('Entry');
 
-        // remove entry that doesn't exist
-        this.root.remove(null, itRemove);
-    });
-    it("Entry.copyTo: file", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(10);
-        
-        var file1 = "entry.copy.file1",
-            file2 = "entry.copy.file2",
-            that = this,
-            fullPath = this.root.fullPath + '/' + file2,
-            entryCallback = function(entry) {
-                // copy file1 to file2
-                entry.copyTo(that.root, file2, itCopy, that.fail);
-            },
-			itCopy = function(entry) {
-				
-				expect(typeof entry !== 'undefined' && entry !== null, "copied file entry should not be null");
-				expects(entry.isFile, true, "entry 'isFile' attribute should be set to true");
-				expects(entry.isDirectory, false, "entry 'isDirectory' attribute should be set to false");
-				expects(entry.fullPath, fullPath, "entry 'fullPath' should be set correctly");
-				expects(entry.name, file2, "entry 'name' attribute should be set correctly");
-				that.root.getFile(file2, {create:false}, itFileExists, null);							  
-                
-            },
-			itFileExists = function(entry2) {
-				// a bit redundant since copy returned this entry already
-				expect(typeof entry2 !== 'undefined' && entry2 !== null, "copied file entry should not be null");
-				expects(entry2.isFile, true, "entry 'isFile' attribute should be set to true");
-				expects(entry2.isDirectory, false, "entry 'isDirectory' attribute should be set to false");
-				expects(entry2.fullPath, fullPath, "entry 'fullPath' should be set correctly");
-				expects(entry2.name, file2, "entry 'name' attribute should be set correctly");
-		 
-				// cleanup
-				that.deleteEntry(file1);
-				that.deleteEntry(file2);
-				QUnit.start();
-			};
+            // create a new directory entry
+            runs(function() {
+                createDirectory(dirName, entryCallback, fail);
+            });
 
-        // create a new file entry to kick off it
-        this.createFile(file1, entryCallback, this.fail);
-    });
-    it("Entry.copyTo: file onto itself", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var file1 = "entry.copy.fos.file1",
-            that = this,
-            entryCallback = function(entry) {
-                // copy file1 onto itself
-                entry.copyTo(that.root, null, null, itCopy);
-            },
-		 itCopy = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "it is an error to copy an entry into its parent if a different name is not specified");
-                expect(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.remove on non-empty directory", function() {
+            var dirName = "entry.rm.dir.not.empty",
+                fullPath = root.fullPath + '/' + dirName,
+                fileName = "remove.txt",
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    var checkFile = jasmine.createSpy().andCallFake(function(error) {
+                        expect(error).toBeDefined();
+                        expect(error.code).toBe(FileError.INVALID_MODIFICATION_ERR);
+                        // verify that dir still exists
+                        runs(function() {
+                            root.getDirectory(dirName, null, itRemove, fail);
+                        });
 
-                // cleanup
-                that.deleteEntry(file1);
-                QUnit.start();
-            };
+                        waitsFor(function() { return itRemove.wasCalled; }, "itRemove never called", Tests.TEST_TIMEOUT);
 
-        // create a new file entry to kick off it
-        this.createFile(file1, entryCallback, this.fail);
-    });
-    it("Entry.copyTo: directory", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(15);
-        
-        var file1 = "file1",
-            srcDir = "entry.copy.srcDir",
-            dstDir = "entry.copy.dstDir",
-            dstPath = this.root.fullPath + '/' + dstDir,
-            filePath = dstPath + '/' + file1,
-            that = this,
-            entryCallback = function(directory) {
-                var copyDir = function(fileEntry) {
-                    // copy srcDir to dstDir
-                    directory.copyTo(that.root, dstDir, itCopy, that.fail);                    
-                };
-              // create a file within new directory
-              directory.getFile(file1, {create: true}, copyDir, that.fail);
-            },
-            itCopy = function(directory) {
-                
-                expect(typeof directory !== 'undefined' && directory !== null, "copied directory entry should not be null");
-                expects(directory.isFile, false, "entry 'isFile' attribute should be false");
-                expects(directory.isDirectory, true, "entry 'isDirectory' attribute should be true");
-                expects(directory.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-                expects(directory.name, dstDir, "entry 'name' attribute should be set correctly");
-         
-                that.root.getDirectory(dstDir, {create:false}, itDirExists, that.fail);
-           },
-            itDirExists = function(dirEntry) {
-                 expect(typeof dirEntry !== 'undefined' && dirEntry !== null, "copied directory entry should not be null");
-                 expects(dirEntry.isFile, false, "entry 'isFile' attribute should be false");
-                 expects(dirEntry.isDirectory, true, "entry 'isDirectory' attribute should be true");
-                 expects(dirEntry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-                 expects(dirEntry.name, dstDir, "entry 'name' attribute should be set correctly");
+                        runs(function() {
+                            expect(win).not.toHaveBeenCalled();
+                            expect(fail).not.toHaveBeenCalled();
+                            expect(itRemove).toHaveBeenCalled();
+                        });
+                    });
+                    // delete directory
+                    var deleteDirectory = jasmine.createSpy().andCallFake(function(fileEntry) {
+                        runs(function() {
+                            entry.remove(win, checkFile);
+                        });
+
+                        waitsFor(function() { return checkFile.wasCalled; }, "checkFile never called", Tests.TEST_TIMEOUT);
+                    });
+                    // create a file within directory, then try to delete directory
+                    runs(function() {
+                        entry.getFile(fileName, {create: true}, deleteDirectory, fail);
+                    });
+
+                    waitsFor(function() { return deleteDirectory.wasCalled; }, "deleteDirectory never called", Tests.TEST_TIMEOUT);
+                }),
+                itRemove = jasmine.createSpy().andCallFake(function(entry) {
+                    expect(entry).toBeDefined();
+                    expect(entry.fullPath).toBe(fullPath);
+                    // cleanup
+                    deleteEntry(dirName);
+                }),
+                win = createWin('Entry'),
+                fail = createFail('Entry');
+
+            // create a new directory entry
+            runs(function() {
+                createDirectory(dirName, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.remove on root file system", function() {
+            var itRemove = jasmine.createSpy().andCallFake(function(error) {
+                expect(error).toBeDefined();
+                expect(error.code).toBe(FileError.NO_MODIFICATION_ALLOWED_ERR);
+            }),
+            win = createWin('Entry');
+
+            // remove entry that doesn't exist
+            runs(function() {
+                root.remove(win, itRemove);
+            });
+
+            waitsFor(function() { return itRemove.wasCalled; }, "itRemove never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(win).not.toHaveBeenCalled();
+                expect(itRemove).toHaveBeenCalled();
+            });
+        });
+        it("Entry.copyTo: file", function() {
+            var file1 = "entry.copy.file1",
+                file2 = "entry.copy.file2",
+                fullPath = root.fullPath + '/' + file2,
+                fail = createFail('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    // copy file1 to file2
+                    runs(function() {
+                        entry.copyTo(that.root, file2, itCopy, fail);
+                    });
+
+                    waitsFor(function() { return itCopy.wasCalled; }, "itCopy never called", Tests.TEST_TIMEOUT);
+                }),
+                itCopy = jasmine.createSpy().andCallFake(function(entry) {
+                    expect(entry).toBeDefined();
+                    expects(entry.isFile).toBe(true);
+                    expects(entry.isDirectory).toBe(false);
+                    expects(entry.fullPath).toBe(fullPath);
+                    expects(entry.name).toBe(file2);
+
+                    runs(function() {
+                        root.getFile(file2, {create:false}, itFileExists, fail);
+                    });
+
+                    waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(fail).not.toHaveBeenCalled();
+                        expect(itFileExists).toHaveBeenCalled();
+                    });
+                }),
+                itFileExists = jasmine.createSpy().andCallFake(function(entry2) {
+                    // a bit redundant since copy returned this entry already
+                    expect(entry2).toBeDefined();
+                    expect(entry2.isFile).toBe(true);
+                    expect(entry2.isDirectory).toBe(false);
+                    expect(entry2.fullPath).toBe(fullPath);
+                    expect(entry2.name).toBe(file2);
                  
-                 dirEntry.getFile(file1, {create:false}, itFileExists, that.fail);
-         
-         };
-            itFileExists = function(fileEntry) {
-                expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "copied directory entry should not be null");
-                expects(fileEntry.isFile, true, "entry 'isFile' attribute should be true");
-                expects(fileEntry.isDirectory, false, "entry 'isDirectory' attribute should be false");
-                expects(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
-                expects(fileEntry.name, file1, "entry 'name' attribute should be set correctly");
-                
+                    // cleanup
+                    deleteEntry(file1);
+                    deleteEntry(file2);
+                });
 
-                // cleanup
-                that.deleteEntry(srcDir);
-                that.deleteEntry(dstDir);
-                QUnit.start();
-            };
-
-        // create a new directory entry to kick off it
-        this.createDirectory(srcDir, entryCallback, this.fail);
-    });
-    it("Entry.copyTo: directory to backup at same root directory", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(15);
-        
-        var file1 = "file1",
-            srcDir = "entry.copy.srcDir",
-            dstDir = "entry.copy.srcDir-backup",
-            dstPath = this.root.fullPath + '/' + dstDir,
-            filePath = dstPath + '/' + file1,
-            that = this,
-            entryCallback = function(directory) {
-                var copyDir = function(fileEntry) {
-                    // copy srcDir to dstDir
-                    directory.copyTo(that.root, dstDir, itCopy, that.fail);                    
-                };
-              // create a file within new directory
-              directory.getFile(file1, {create: true}, copyDir, that.fail);
-            },
-            itCopy = function(directory) {
-                
-                expect(typeof directory !== 'undefined' && directory !== null, "copied directory entry should not be null");
-                expects(directory.isFile, false, "entry 'isFile' attribute should be false");
-                expects(directory.isDirectory, true, "entry 'isDirectory' attribute should be true");
-                expects(directory.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-                expects(directory.name, dstDir, "entry 'name' attribute should be set correctly");
-         
-                that.root.getDirectory(dstDir, {create:false}, itDirExists, that.fail);
-           },
-            itDirExists = function(dirEntry) {
-                 expect(typeof dirEntry !== 'undefined' && dirEntry !== null, "copied directory entry should not be null");
-                 expects(dirEntry.isFile, false, "entry 'isFile' attribute should be false");
-                 expects(dirEntry.isDirectory, true, "entry 'isDirectory' attribute should be true");
-                 expects(dirEntry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-                 expects(dirEntry.name, dstDir, "entry 'name' attribute should be set correctly");
-                 
-                 dirEntry.getFile(file1, {create:false}, itFileExists, that.fail);
-         
-         };
-            itFileExists = function(fileEntry) {
-                expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "copied directory entry should not be null");
-                expects(fileEntry.isFile, true, "entry 'isFile' attribute should be true");
-                expects(fileEntry.isDirectory, false, "entry 'isDirectory' attribute should be false");
-                expects(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
-                expects(fileEntry.name, file1, "entry 'name' attribute should be set correctly");
-                
-
-                // cleanup
-                that.deleteEntry(srcDir);
-                that.deleteEntry(dstDir);
-                QUnit.start();
-            };
-
-        // create a new directory entry to kick off it
-        this.createDirectory(srcDir, entryCallback, this.fail);
-    });
-    it("Entry.copyTo: directory onto itself", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(6);
-        
-        var file1 = "file1",
-            srcDir = "entry.copy.dos.srcDir",
-            srcPath = this.root.fullPath + '/' + srcDir,
-            filePath = srcPath + '/' + file1,
-            that = this,
-            entryCallback = function(directory) {
-                var copyDir = function(fileEntry) {
-                    // copy srcDir onto itself
-                    directory.copyTo(that.root, null, null, itCopy);                    
-                };
-              // create a file within new directory
-              directory.getFile(file1, {create: true}, copyDir, that.fail);
-            },
-            itCopy = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "it is an error to copy an entry into its parent if a different name is not specified");
-                expect(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                
-				that.root.getDirectory(srcDir, {create:false}, itDirectoryExists, null);
-			},
-			 itDirectoryExists = function(dirEntry) {
-				// returning confirms existence so just check fullPath entry
-				expect(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory should exist.");
-				expects(dirEntry.fullPath, srcPath, "entry 'fullPath' should be set correctly");
-			 
-				dirEntry.getFile(file1, {create:false}, itFileExists, null);
-			 },
-			itFileExists = function(fileEntry) {
-				expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
-				expects(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
-                
-                // cleanup
-                that.deleteEntry(srcDir);
-                QUnit.start();
-            };
-
-        // create a new directory entry to kick off it
-        this.createDirectory(srcDir, entryCallback, this.fail);
-    });
-    it("Entry.copyTo: directory into itself", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(4);
-        
-        var srcDir = "entry.copy.dis.srcDir",
-            dstDir = "entry.copy.dis.dstDir",
-            srcPath = this.root.fullPath + '/' + srcDir,
-            that = this,
-            entryCallback = function(directory) {
-                // copy source directory into itself
-                directory.copyTo(directory, dstDir, null, itCopy);                    
-            },
-            itCopy = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "it is an error to copy a directory into itself");
-                expect(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                
-				that.root.getDirectory(srcDir, {create:false}, itDirectoryExists, null);
-			},
-			itDirectoryExists = function(dirEntry) {
-				// returning confirms existence so just check fullPath entry
-				expect(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory should exist.");
-				expects(dirEntry.fullPath, srcPath, "entry 'fullPath' should be set correctly");
-		 
-                // cleanup
-                that.deleteEntry(srcDir);
-                QUnit.start();
-            };
-
-        // create a new directory entry to kick off it
-        this.createDirectory(srcDir, entryCallback, this.fail);
-    });
-    it("Entry.copyTo: directory that does not exist", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(4);
-        
-        var file1 = "entry.copy.dnf.file1", 
-            dstDir = "entry.copy.dnf.dstDir",
-            filePath = this.root.fullPath + '/' + file1,
-            dstPath = this.root.fullPath + '/' + dstDir,
-            that = this,
-            entryCallback = function(entry) {
-                // copy file to target directory that does not exist
-                directory = new DirectoryEntry();
-				directory.fullPath = dstPath;
-                entry.copyTo(directory, null, null, itCopy);                 
-            },
-            itCopy = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "it is an error to copy to a directory that does not exist");
-                expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-				that.root.getFile(file1, {create: false}, itFileExists, null);
-			},
-			itFileExists = function(fileEntry) {
-				expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "original file should exist");
-				expects(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
-		 
-                // cleanup
-                that.deleteEntry(file1);
-                QUnit.start();
-            };
-
-        // create a new file entry to kick off it
-        this.createFile(file1, entryCallback, this.fail);
-    });
-    it("Entry.copyTo: invalid target name", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var file1 = "entry.copy.itn.file1",
-            file2 = "bad:file:name",
-            that = this,
-            filePath = this.root.fullPath + '/' + file1,
-            entryCallback = function(entry) {
-                // copy file1 to file2
-                entry.copyTo(that.root, file2, null, itCopy);
-            },
-            itCopy = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "invalid file name should result in error");
-                expect(error.code, FileError.ENCODING_ERR, "error code should be FileError.ENCODING_ERR");
-
-                // cleanup
-                that.deleteEntry(file1);
-                QUnit.start();
-            };
-
-        // create a new file entry
-        this.createFile(file1, entryCallback, this.fail);
-    });
-    it("Entry.moveTo: file to same parent", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(9);
-        
-        var file1 = "entry.move.fsp.file1",
-            file2 = "entry.move.fsp.file2",
-            that = this,
-            srcPath = this.root.fullPath + '/' + file1,
-            dstPath = this.root.fullPath + '/' + file2,
-            entryCallback = function(entry) {
-                // move file1 to file2
-                entry.moveTo(that.root, file2, itMove, that.fail);
-            },
-            itMove = function(entry) {
-                expect(typeof entry !== 'undefined' && entry !== null, "file entry should not be null");
-                expects(entry.isFile, true, "entry 'isFile' attribute should be set to true");
-                expects(entry.isDirectory, false, "entry 'isDirectory' attribute should be set to false");
-                expects(entry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-                expects(entry.name, file2, "entry 'name' attribute should be set correctly");
-		 
-				that.root.getFile(file2, {create:false}, itMovedExists, null);
-			},
-			itMovedExists = function(fileEntry) {
-				expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "moved file should exist");
-				expects(fileEntry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-               
-				that.root.getFile(file1, {create:false}, null, itOrig);
-			},
-			itOrig = function(error) {
-                //expect(navigator.fileMgr.itFileExists(srcPath) === false, "original file should not exist.");
-				expect(typeof error !== 'undefined' && error !== null, "it is an error if original file exists after a move");
-				expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-		 
-		 
-                // cleanup
-                that.deleteEntry(file1);
-                that.deleteEntry(file2);
-                QUnit.start();
-            };
-
-        // create a new file entry to kick off it
-        this.createFile(file1, entryCallback, this.fail);
-    });
-    it("Entry.moveTo: file to new parent", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(9);
-        
-        var file1 = "entry.move.fnp.file1",
-            dir = "entry.move.fnp.dir",
-            that = this,
-            srcPath = this.root.fullPath + '/' + file1,
-            dstPath = this.root.fullPath + '/' + dir + '/' + file1,
-            entryCallback = function(entry) {
-                // move file1 to new directory
-                var moveFile = function(directory) {
-					
-					var itMove = function(entry) {
-						expect(typeof entry !== 'undefined' && entry !== null, "file entry should not be null");
-						expects(entry.isFile, true, "entry 'isFile' attribute should be set to true");
-						expects(entry.isDirectory, false, "entry 'isDirectory' attribute should be set to false");
-						expects(entry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-						expects(entry.name, file1, "entry 'name' attribute should be set correctly");
-						// it the moved file exists
-						directory.getFile(file1, {create:false}, itMovedExists, null);
-					};
-					// move the file
-					entry.moveTo(directory, null, itMove, that.fail);
-				};
-		 
-                // create a parent directory to move file to
-                that.root.getDirectory(dir, {create: true}, moveFile, that.fail);
-            },
-			itMovedExists = function(fileEntry) {
-				expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "moved file should exist");
-				expects(fileEntry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-		 
-				that.root.getFile(file1, {create:false}, null, itOrig);
-			},
-			itOrig = function(error) {
-				expect(typeof error !== 'undefined' && error !== null, "it is an error if original file exists after a move");
-				expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-				
-				// cleanup
-                that.deleteEntry(file1);
-                that.deleteEntry(dir);
-                QUnit.start();
-            };
-
-        // ensure destination directory is cleaned up before it
-        this.deleteEntry(dir, function() {
             // create a new file entry to kick off it
-            that.createFile(file1, entryCallback, that.fail);            
-        }, this.fail);
-    });
-    it("Entry.moveTo: directory to same parent", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(9);
-        
-        var file1 = "file1",
-            srcDir = "entry.move.dsp.srcDir",
-            dstDir = "entry.move.dsp.dstDir",
-            srcPath = this.root.fullPath + '/' + srcDir,
-            dstPath = this.root.fullPath + '/' + dstDir,
-            filePath = dstPath + '/' + file1,
-            that = this,
-            entryCallback = function(directory) {
-                var moveDir = function(fileEntry) {
-                    // move srcDir to dstDir
-                    directory.moveTo(that.root, dstDir, itMove, that.fail);                    
-                };
-              // create a file within directory
-              directory.getFile(file1, {create: true}, moveDir, that.fail);
-            },
-            itMove = function(directory) {
-                expect(typeof directory !== 'undefined' && directory !== null, "new directory entry should not be null");
-                expects(directory.isFile, false, "entry 'isFile' attribute should be false");
-                expects(directory.isDirectory, true, "entry 'isDirectory' attribute should be true");
-                expects(directory.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-                expects(directory.name, dstDir, "entry 'name' attribute should be set correctly");
-                // it that moved file exists in destination dir
-                directory.getFile(file1, {create:false}, itMovedExists, null);
-            },
-            itMovedExists = function(fileEntry) {
-                expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "moved file should exist within moved directory");
-                expects(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
-                // it that the moved file no longer exists in original dir
-                that.root.getFile(file1, {create:false}, null, itOrig);
-            },
-            itOrig = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "it is an error if original file exists after a move");
-                expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-         
-                // cleanup
-                that.deleteEntry(srcDir);
-                that.deleteEntry(dstDir);
-                QUnit.start();
-            };
+            runs(function() {
+                createFile(file1, entryCallback, fail);
+            });
 
-        // ensure destination directory is cleaned up before it
-        this.deleteEntry(dstDir, function() {
-            // create a new directory entry to kick off it
-            that.createDirectory(srcDir, entryCallback, that.fail);
-        }, this.fail);
-    });
-    it("Entry.moveTo: directory to same parent with same name", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(9);
-        
-        var file1 = "file1",
-            srcDir = "entry.move.dsp.srcDir",
-            dstDir = "entry.move.dsp.srcDir-backup",
-            srcPath = this.root.fullPath + '/' + srcDir,
-            dstPath = this.root.fullPath + '/' + dstDir,
-            filePath = dstPath + '/' + file1,
-            that = this,
-            entryCallback = function(directory) {
-                var moveDir = function(fileEntry) {
-                    // move srcDir to dstDir
-                    directory.moveTo(that.root, dstDir, itMove, that.fail);                    
-                };
-              // create a file within directory
-              directory.getFile(file1, {create: true}, moveDir, that.fail);
-            },
-            itMove = function(directory) {
-                expect(typeof directory !== 'undefined' && directory !== null, "new directory entry should not be null");
-                expects(directory.isFile, false, "entry 'isFile' attribute should be false");
-                expects(directory.isDirectory, true, "entry 'isDirectory' attribute should be true");
-                expects(directory.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-                expects(directory.name, dstDir, "entry 'name' attribute should be set correctly");
-                // it that moved file exists in destination dir
-                directory.getFile(file1, {create:false}, itMovedExists, null);
-            },
-            itMovedExists = function(fileEntry) {
-                expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "moved file should exist within moved directory");
-                expects(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
-                // it that the moved file no longer exists in original dir
-                that.root.getFile(file1, {create:false}, null, itOrig);
-            },
-            itOrig = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "it is an error if original file exists after a move");
-                expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-         
-                // cleanup
-                that.deleteEntry(srcDir);
-                that.deleteEntry(dstDir);
-                QUnit.start();
-            };
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.copyTo: file onto itself", function() {
+            var file1 = "entry.copy.fos.file1",
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    // copy file1 onto itself
+                    runs(function() {
+                        entry.copyTo(root, null, win, itCopy);
+                    });
 
-        // ensure destination directory is cleaned up before it
-        this.deleteEntry(dstDir, function() {
-            // create a new directory entry to kick off it
-            that.createDirectory(srcDir, entryCallback, that.fail);
-        }, this.fail);
-    });
-    it("Entry.moveTo: directory to new parent", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(9);
-        
-        var file1 = "file1",
-            srcDir = "entry.move.dnp.srcDir",
-            dstDir = "entry.move.dnp.dstDir",
-            srcPath = this.root.fullPath + '/' + srcDir,
-            dstPath = this.root.fullPath + '/' + dstDir,
-            filePath = dstPath + '/' + file1,
-            that = this,
-            entryCallback = function(directory) {
-                var moveDir = function(fileEntry) {
-                    // move srcDir to dstDir
-                    directory.moveTo(that.root, dstDir, itMove, that.fail);                    
-                };
-              // create a file within directory
-              directory.getFile(file1, {create: true}, moveDir, that.fail);
-            },
-            itMove = function(directory) {
-                expect(typeof directory !== 'undefined' && directory !== null, "new directory entry should not be null");
-                expects(directory.isFile, false, "entry 'isFile' attribute should be false");
-                expects(directory.isDirectory, true, "entry 'isDirectory' attribute should be true");
-                expects(directory.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-                expects(directory.name, dstDir, "entry 'name' attribute should be set correctly");
-				// it that moved file exists in destination dir
-				directory.getFile(file1, {create:false}, itMovedExists, null);
-			},
-			itMovedExists = function(fileEntry) {
-				expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "moved file should exist within moved directory");
-				expects(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
-				// it that the moved file no longer exists in original dir
-				that.root.getFile(file1, {create:false}, null, itOrig);
-			},
-			itOrig = function(error) {
-				expect(typeof error !== 'undefined' && error !== null, "it is an error if original file exists after a move");
-				expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-				
-				// cleanup
-                that.deleteEntry(srcDir);
-                that.deleteEntry(dstDir);
-                QUnit.start();
-            };
+                    waitsFor(function() { return itCopy.wasCalled; }, "itCopy never called", Tests.TEST_TIMEOUT);
 
-        // ensure destination directory is cleaned up before it
-        this.deleteEntry(dstDir, function() {
-            // create a new directory entry to kick off it
-            that.createDirectory(srcDir, entryCallback, that.fail);
-        }, this.fail);
-    });
-    it("Entry.moveTo: directory onto itself", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(6);
-        
-        var file1 = "file1",
-            srcDir = "entry.move.dos.srcDir",
-            srcPath = this.root.fullPath + '/' + srcDir,
-            filePath = srcPath + '/' + file1,
-            that = this,
-            entryCallback = function(directory) {
-                var moveDir = function(fileEntry) {
-                    // move srcDir onto itself
-                    directory.moveTo(that.root, null, null, itMove);                    
-                };
-              // create a file within new directory
-              directory.getFile(file1, {create: true}, moveDir, that.fail);
-            },
-            itMove = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "it is an error to move an entry into its parent if a different name is not specified");
-                expect(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                
-				// it that original dir still exists
-				that.root.getDirectory(srcDir, {create:false}, itDirectoryExists, null);
-			},
-			itDirectoryExists = function(dirEntry) {
-				// returning confirms existence so just check fullPath entry
-				expect(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory should exist.");
-				expects(dirEntry.fullPath, srcPath, "entry 'fullPath' should be set correctly");
-		 
-				dirEntry.getFile(file1, {create:false}, itFileExists, null);
-			},
-			itFileExists = function(fileEntry) {
-				expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
-				expects(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
-						
-				// cleanup
-                that.deleteEntry(srcDir);
-                QUnit.start();
-            };
+                    runs(function() {
+                        expect(itCopy).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                        expect(win).not.toHaveBeenCalled();
+                    });
+                }),
+                fail = createFail('Entry'),
+                win = createWin('Entry'),
+                itCopy = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.INVALID_MODIFICATION_ERR);
 
-        // create a new directory entry to kick off it
-        this.createDirectory(srcDir, entryCallback, this.fail);
-    });
-    it("Entry.moveTo: directory into itself", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(4);
-        
-        var srcDir = "entry.move.dis.srcDir",
-            dstDir = "entry.move.dis.dstDir",
-            srcPath = this.root.fullPath + '/' + srcDir,
-            that = this,
-            entryCallback = function(directory) {
-                // move source directory into itself
-                directory.moveTo(directory, dstDir, null, itMove);                    
-            },
-            itMove = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "it is an error to move a directory into itself");
-                expect(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-				// make sure original directory still exists
-				that.root.getDirectory(srcDir, {create:false}, itDirectoryExists, null);
-			},
-			itDirectoryExists = function(entry) {
-				expect(typeof entry !== 'undefined' && entry !== null, "original directory should exist.");
-				expects(entry.fullPath, srcPath, "entry 'fullPath' should be set correctly");
-		 
-				// cleanup
-                that.deleteEntry(srcDir);
-                QUnit.start();
-            };
+                    // cleanup
+                    deleteEntry(file1);
+                });
 
-        // create a new directory entry to kick off it
-        this.createDirectory(srcDir, entryCallback, this.fail);
-    });
-    it("Entry.moveTo: file onto itself", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(4);
-        
-        var file1 = "entry.move.fos.file1",
-            filePath = this.root.fullPath + '/' + file1,
-            that = this,
-            entryCallback = function(entry) {
-                // move file1 onto itself
-                entry.moveTo(that.root, null, null, itMove);
-            },
-            itMove = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "it is an error to move an entry into its parent if a different name is not specified");
-                expect(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                
-				//it that original file still exists
-				that.root.getFile(file1, {create:false}, itFileExists, null);
-			},
-			itFileExists = function(fileEntry) {
-				expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
-				expects(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
-		 
-                // cleanup
-                that.deleteEntry(file1);
-                QUnit.start();
-            };
-
-        // create a new file entry to kick off it
-        this.createFile(file1, entryCallback, this.fail);
-    });
-    it("Entry.moveTo: file onto existing directory", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(6);
-        
-        var file1 = "entry.move.fod.file1",
-            dstDir = "entry.move.fod.dstDir",
-            subDir = "subDir",
-            dirPath = this.root.fullPath + '/' + dstDir + '/' + subDir,
-            filePath = this.root.fullPath + '/' + file1,
-            that = this,
-            entryCallback = function(entry) {
-                var createSubDirectory = function(directory) {
-                    var moveFile = function(subDirectory) {
-						var itMove = function(error) {
-							expect(typeof error !== 'undefined' && error !== null, "it is an error to move a file onto an existing directory");
-							expect(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-							// it that original dir still exists
-							directory.getDirectory(subDir, {create:false}, itDirectoryExists, null);
-						};
-                        // move file1 onto sub-directory
-                        entry.moveTo(directory, subDir, null, itMove);                    
-                    };
-                    // create sub-directory 
-                    directory.getDirectory(subDir, {create: true}, moveFile, that.fail);                    
-                };
-                // create top level directory 
-                that.root.getDirectory(dstDir, {create: true}, createSubDirectory, that.fail);
-            },
-			itDirectoryExists = function(dirEntry) {
-				expect(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory contents should exist.");
-				expects(dirEntry.fullPath, dirPath, "entry 'fullPath' should be set correctly");
-				// it that original file still exists
-				that.root.getFile(file1, {create:false},itFileExists, null);
-			},
-			itFileExists = function(fileEntry) {
-				expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
-				expects(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
-
-                // cleanup
-                that.deleteEntry(file1);
-                that.deleteEntry(dstDir);
-                QUnit.start();
-            };
-
-        // ensure destination directory is cleaned up before it
-        this.deleteEntry(dstDir, function() {
             // create a new file entry to kick off it
-            that.createFile(file1, entryCallback, that.fail);
-        }, this.fail);
-    });
-    it("Entry.moveTo: directory onto existing file", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(6);
-        
-        var file1 = "entry.move.dof.file1",
-            srcDir = "entry.move.dof.srcDir",
-            dirPath = this.root.fullPath + '/' + srcDir,
-            filePath = this.root.fullPath + '/' + file1,
-            that = this,
-            entryCallback = function(entry) {
-                    var moveDir = function(fileEntry) {
-                        // move directory onto file
-                        entry.moveTo(that.root, file1, null, itMove);                    
-                    };
-                // create file
-                that.root.getFile(file1, {create: true}, moveDir, that.fail);
-            },
-            itMove = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "it is an error to move a directory onto an existing file");
-                expect(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                // it that original directory exists
-				that.root.getDirectory(srcDir, {create:false}, itDirectoryExists, null);
-			},
-			itDirectoryExists = function(dirEntry) {
-				// returning confirms existence so just check fullPath entry
-				expect(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory should exist.");
-				expects(dirEntry.fullPath, dirPath, "entry 'fullPath' should be set correctly");
-				// it that original file exists
-				that.root.getFile(file1, {create:false}, itFileExists, null);
-			},
-			itFileExists = function(fileEntry) {
-				expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
-				expects(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
-		 
-		 
-                // cleanup
-                that.deleteEntry(file1);
-                that.deleteEntry(srcDir);
-                QUnit.start();
-            };
+            runs(function() {
+                createFile(file1, entryCallback, fail);
+            });
 
-          // create a new directory entry to kick off it
-          this.createDirectory(srcDir, entryCallback, this.fail);
-    });
-    it("Entry.copyTo: directory onto existing file", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(6);
-        
-        var file1 = "entry.copy.dof.file1",
-            srcDir = "entry.copy.dof.srcDir",
-            dirPath = this.root.fullPath + '/' + srcDir,
-            filePath = this.root.fullPath + '/' + file1,
-            that = this,
-            entryCallback = function(entry) {
-                    var copyDir = function(fileEntry) {
-                        // move directory onto file
-                        entry.copyTo(that.root, file1, null, itMove);                    
-                    };
-                // create file
-                that.root.getFile(file1, {create: true}, copyDir, that.fail);
-            },
-            itMove = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "it is an error to copy a directory onto an existing file");
-                expect(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-                //it that original dir still exists
-				that.root.getDirectory(srcDir, {create:false}, itDirectoryExists, null);
-			},
-			itDirectoryExists = function(dirEntry) {
-				// returning confirms existence so just check fullPath entry
-				expect(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory should exist.");
-				expects(dirEntry.fullPath, dirPath, "entry 'fullPath' should be set correctly");
-				// it that original file still exists
-				that.root.getFile(file1, {create:false}, itFileExists, null);
-			},
-			itFileExists = function(fileEntry) {
-				expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
-				expects(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
-		 
-                // cleanup
-                that.deleteEntry(file1);
-                that.deleteEntry(srcDir);
-                QUnit.start();
-            };
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.copyTo: directory", function() {
+            var file1 = "file1",
+                srcDir = "entry.copy.srcDir",
+                dstDir = "entry.copy.dstDir",
+                dstPath = root.fullPath + '/' + dstDir,
+                filePath = dstPath + '/' + file1,
+                entryCallback = jasmine.createSpy().andCallFake(function(directory) {
+                    var copyDir = jasmine.createSpy().andCallFake(function(fileEntry) {
+                        // copy srcDir to dstDir
+                        runs(function() {
+                            directory.copyTo(root, dstDir, itCopy, fail);
+                        });
 
-          // create a new directory entry to kick off it
-          this.createDirectory(srcDir, entryCallback, this.fail);
-    });
-    it("Entry.moveTo: directory onto directory that is not empty", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(6);
-        
-        var srcDir = "entry.move.dod.srcDir",
-            dstDir = "entry.move.dod.dstDir",
-            subDir = "subDir",
-            srcPath = this.root.fullPath + '/' + srcDir,
-            dstPath = this.root.fullPath + '/' + dstDir + '/' + subDir,
-            that = this,
-            entryCallback = function(entry) {
-                var createSubDirectory = function(directory) {
-                    var moveDir = function(subDirectory) {
-                        // move srcDir onto dstDir (not empty)
-                        entry.moveTo(that.root, dstDir, null, itMove);                    
-                    };
-					var itMove = function(error) {
-						expect(typeof error !== 'undefined' && error !== null, "it is an error to move a directory onto a directory that is not empty");
-						expect(error.code, FileError.INVALID_MODIFICATION_ERR, "error code should be FileError.INVALID_MODIFICATION_ERR");
-		 
-						// it that destination directory still exists
-						directory.getDirectory(subDir, {create:false}, itDirectoryExists, null);
-					};
-                    // create sub-directory 
-                    directory.getDirectory(subDir, {create: true}, moveDir, that.fail);                    
-                };
-                // create top level directory 
-                that.root.getDirectory(dstDir, {create: true}, createSubDirectory, that.fail);
-            },
-			itDirectoryExists = function(dirEntry) {
-				// returning confirms existence so just check fullPath entry
-				expect(typeof dirEntry !== 'undefined' && dirEntry !== null, "original directory should exist.");
-				expects(dirEntry.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-				// it that source directory exists
-				that.root.getDirectory(srcDir,{create:false}, itSrcDirectoryExists, null);
-			},
-			itSrcDirectoryExists = function(srcEntry){
-				expect(typeof srcEntry !== 'undefined' && srcEntry !== null, "original directory should exist.");
-				expects(srcEntry.fullPath, srcPath, "entry 'fullPath' should be set correctly");
-                // cleanup
-                that.deleteEntry(srcDir);
-                that.deleteEntry(dstDir);
-                QUnit.start();
-            };
+                        waitsFor(function() { return itCopy.wasCalled; }, "itCopy never called", Tests.TEST_TIMEOUT);
+                    });
 
-        // ensure destination directory is cleaned up before it
-        this.deleteEntry(dstDir, function() {
-            // create a new file entry to kick off it
-            that.createDirectory(srcDir, entryCallback, that.fail);
-        }, this.fail);
-    });
-    it("Entry.moveTo: file replace existing file", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(9);
-        
-        var file1 = "entry.move.frf.file1",
-            file2 = "entry.move.frf.file2",
-            file1Path = this.root.fullPath + '/' + file1,
-            file2Path = this.root.fullPath + '/' + file2,
-            that = this,
-            entryCallback = function(entry) {
-                    var moveFile = function(fileEntry) {
-                        // replace file2 with file1
-                        entry.moveTo(that.root, file2, itMove, that.fail);                    
-                    };
-                // create file
-                that.root.getFile(file2, {create: true}, moveFile, that.fail);
-            },
-		 itMove = function(entry) {
-                expect(typeof entry !== 'undefined' && entry !== null, "file entry should not be null")
-                expects(entry.isFile, true, "entry 'isFile' attribute should be true");
-                expects(entry.isDirectory, false, "entry 'isDirectory' attribute should be false");
-                expects(entry.fullPath, file2Path, "entry 'fullPath' should be set correctly");
-                expects(entry.name, file2, "entry 'name' attribute should be set correctly");
-                
-				// it that old file does not exists
-				that.root.getFile(file1, {create:false}, null, itFileMoved);
-			},
-		 itFileMoved = function(error){
-				expect(typeof error !== 'undefined' && error !== null, "it is an error if original file exists after a move");
-				expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-				// it that new file exists
-				that.root.getFile(file2, {create:false}, itFileExists, null);
-			},
-		 itFileExists = function(fileEntry) {
-				expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
-				expects(fileEntry.fullPath, file2Path, "entry 'fullPath' should be set correctly");
-		 
-                // cleanup
-                that.deleteEntry(file1);
-                that.deleteEntry(file2);
-                QUnit.start();
-            };
+                    // create a file within new directory
+                    runs(function() {
+                        directory.getFile(file1, {create: true}, copyDir, fail);
+                    });
 
-          // create a new directory entry to kick off it
-          this.createFile(file1, entryCallback, this.fail);
-    });
-    it("Entry.moveTo: directory replace empty directory", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(9);
-        
-        var file1 = "file1",
-            srcDir = "entry.move.drd.srcDir",
-            dstDir = "entry.move.drd.dstDir",
-            srcPath = this.root.fullPath + '/' + srcDir,
-            dstPath = this.root.fullPath + '/' + dstDir,
-            filePath = dstPath + '/' + file1,
-            that = this,
-            entryCallback = function(directory) {
-                var mkdir = function(fileEntry) {
-                    // create destination directory
-                    that.root.getDirectory(dstDir, {create: true}, moveDir, that.fail);
-                };
-                var moveDir = function(fileEntry) {
-                    // move srcDir to dstDir
-                    directory.moveTo(that.root, dstDir, itMove, that.fail);                    
-                };
-              // create a file within source directory
-              directory.getFile(file1, {create: true}, mkdir, that.fail);
-            },
-            itMove = function(directory) {
-                expect(typeof directory !== 'undefined' && directory !== null, "new directory entry should not be null");
-                expects(directory.isFile, false, "entry 'isFile' attribute should be false");
-                expects(directory.isDirectory, true, "entry 'isDirectory' attribute should be true");
-                expects(directory.fullPath, dstPath, "entry 'fullPath' should be set correctly");
-                expects(directory.name, dstDir, "entry 'name' attribute should be set correctly");
-                // it that old directory contents have been moved
-				directory.getFile(file1, {create:false}, itFileExists, null);
-			},
-			itFileExists = function(fileEntry) {
-				expect(typeof fileEntry !== 'undefined' && fileEntry !== null, "original directory contents should exist.");
-				expects(fileEntry.fullPath, filePath, "entry 'fullPath' should be set correctly");
-		 
-                // it that old directory no longer exists
-				that.root.getDirectory(srcDir, {create:false}, null, itRemoved);
-			},
-			itRemoved = function(error){
-				expect(typeof error !== 'undefined' && error !== null, "it is an error if original file exists after a move");
-				expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-                
-                // cleanup
-                that.deleteEntry(srcDir);
-                that.deleteEntry(dstDir);
-                QUnit.start();
-            };
+                    waitsFor(function() { retun copyDir.wasCalled; }, "copyDir never called", Tests.TEST_TIMEOUT);
+                }),
+                itCopy = jasmine.createSpy().andCallFake(function(directory) {
+                    expect(directory).toBeDefined();
+                    expect(directory.isFile).toBe(false);
+                    expect(directory.isDirectory).toBe(true);
+                    expect(directory.fullPath).toBe(dstPath);
+                    expect(directory.name).toBe(dstDir);
+             
+                    runs(function() {
+                        root.getDirectory(dstDir, {create:false}, itDirExists, fail);
+                    });
 
-        // ensure destination directory is cleaned up before it
-        this.deleteEntry(dstDir, function() {
+                    waitsFor(function() { return itDirExists.wasCalled; }, "itDirExists never called", Tests.TEST_TIMEOUT);
+                }),
+                itDirExists = jasmine.createSpy().andCallFake(function(dirEntry) {
+                     expect(dirEntry).toBeDefined();
+                     expect(dirEntry.isFile).toBe(false);
+                     expect(dirEntry.isDirectory).toBe(true);
+                     expect(dirEntry.fullPath).toBe(dstPath);
+                     expect(dirEntry.name).toBe(dstDir);
+                     
+                     runs(function() {
+                         dirEntry.getFile(file1, {create:false}, itFileExists, fail);
+                     });
+
+                     waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists never called", Tests.TEST_TIMEOUT);
+
+                     runs(function() {
+                         expect(itFileExists).toHaveBeenCalled();
+                         expect(fail).not.toHaveBeenCalled();
+                     });
+                }),
+                itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.isFile).toBe(true);
+                    expect(fileEntry.isDirectory).toBe(false);
+                    expect(fileEntry.fullPath).toBe(filePath);
+                    expect(fileEntry.name).toBe(file1);
+
+                    // cleanup
+                    deleteEntry(srcDir);
+                    deleteEntry(dstDir);
+                }),
+                fail = createFail('Entry');
+
             // create a new directory entry to kick off it
-            that.createDirectory(srcDir, entryCallback, that.fail);
-        }, this.fail);
-    });
-    it("Entry.moveTo: directory that does not exist", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var file1 = "entry.move.dnf.file1", 
-            dstDir = "entry.move.dnf.dstDir",
-            filePath = this.root.fullPath + '/' + file1,
-            dstPath = this.root.fullPath + '/' + dstDir,
-            that = this,
-            entryCallback = function(entry) {
-                // move file to directory that does not exist
-                directory = new DirectoryEntry();
-				directory.fullPath = dstPath;
-                entry.moveTo(directory, null, null, itMove);                 
-            },
-            itMove = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "it is an error to move to a directory that does not exist");
-                expect(error.code, FileError.NOT_FOUND_ERR, "error code should be FileError.NOT_FOUND_ERR");
-				
-				// cleanup
-                that.deleteEntry(file1);
-                QUnit.start();
-            };
+            runs(function() {
+                createDirectory(srcDir, entryCallback, fail);
+            });
 
-        // create a new file entry to kick off it
-        this.createFile(file1, entryCallback, this.fail);
-    });
-    it("Entry.moveTo: invalid target name", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var file1 = "entry.move.itn.file1",
-            file2 = "bad:file:name",
-            that = this,
-            filePath = this.root.fullPath + '/' + file1,
-            entryCallback = function(entry) {
-                // move file1 to file2
-                entry.moveTo(that.root, file2, null, itMove);
-            },
-            itMove = function(error) {
-                expect(typeof error !== 'undefined' && error !== null, "invalid file name should result in error");
-                expect(error.code, FileError.ENCODING_ERR, "error code should be FileError.ENCODING_ERR");
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.copyTo: directory to backup at same root directory", function() {
+            var file1 = "file1",
+                srcDir = "entry.copy.srcDir",
+                dstDir = "entry.copy.srcDir-backup",
+                dstPath = root.fullPath + '/' + dstDir,
+                filePath = dstPath + '/' + file1,
+                fail = createFail('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(directory) {
+                    var copyDir = jasmine.createSpy().andCallFake(function(fileEntry) {
+                        // copy srcDir to dstDir
+                        runs(function() {
+                            directory.copyTo(root, dstDir, itCopy, fail);
+                        });
 
-                // cleanup
-                that.deleteEntry(file1);
-                QUnit.start();
-            };
+                        waitsFor(function() { return itCopy.wasCalled; } , "itCopy never called", Tests.TEST_TIMEOUT);
+                    });
+                    // create a file within new directory
+                    runs(function() {
+                        directory.getFile(file1, {create: true}, copyDir, fail);
+                    });
 
-        // create a new file entry to kick off it
-        this.createFile(file1, entryCallback, this.fail);
-    });
-    module('FileReader model');
-    it("FileReader object should have correct methods", function() {
-        expect(6);
-        var reader = new FileReader();
-        expect(reader !== null, "new FileReader() should not be null.");
-        expect(typeof reader.readAsBinaryString === 'function', "FileReader object should have a readAsBinaryString function.");
-        expect(typeof reader.readAsDataURL === 'function', "FileReader object should have a readAsDataURL function.");
-        expect(typeof reader.readAsText === 'function', "FileReader object should have a readAsText function.");
-        expect(typeof reader.readAsArrayBuffer === 'function', "FileReader object should have a readAsArrayBuffer function.");
-        expect(typeof reader.abort === 'function', "FileReader object should have an abort function.");
-    });
-    module('FileReader read', {
-        setup: function() {
-            this.root = getFileSystemRoot(); 
-            this.fail = function(error) {
-                console.log('file error: ' + error.code);
-            };            
-        }
-    });
-    it("should read file properly, File object", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(1);
-            
-            // path of file
-        var fileName = "reader.txt",
-            filePath = this.root.fullPath + '/' + fileName;
-            // file content
-            rule = "There is an exception to every rule.  Except this one.",
-            // creates a FileWriter object
-            create_writer = function(fileEntry) {
-                fileEntry.createWriter(write_file, this.fail);
-            },
-            // writes file and reads it back in
-            write_file = function(writer) {
-                writer.onwriteend = read_file; 
-                writer.write(rule);
-            },
-            // reads file and compares content to what was written
-            read_file = function(evt) {
-                var reader = new FileReader();
-                reader.onloadend = function(evt) {
-                    console.log("read success");
-                    console.log(evt.target.result);
-                    expect(evt.target.result === rule, "reader.result should be expect to the text written.");
-                    QUnit.start();
-                };
-                var myFile = new File();
-                myFile.fullPath = filePath; 
-                reader.readAsText(myFile);
-            };
-        
-        // create a file, write to it, and read it in again
-        this.root.getFile(fileName, {create: true}, create_writer, this.fail);
-    });
-    it("should read empty file properly", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(1);
-            
-            // path of file
-        var fileName = "empty.txt",
-            filePath = this.root.fullPath + '/' + fileName;
-            // file content
-            rule = "",
-            // reads file and compares content to what was written
-            read_file = function(evt) {
-                var reader = new FileReader();
-                reader.onloadend = function(evt) {
-                    console.log("read success");
-                    console.log(evt.target.result);
-                    expect(evt.target.result === rule, "reader.result should be expect to the empty string.");
-                    QUnit.start();
-                };
-                var myFile = new File();
-                myFile.fullPath = filePath; 
-                reader.readAsText(myFile);
-            };
-        
-        // create a file, write to it, and read it in again
-        this.root.getFile(fileName, {create: true}, read_file, this.fail);
-    });
-    it("should error out on non-existent file", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(1);
-            
-        var reader = new FileReader();
-		reader.onerror = function(evt) {
-			console.log("Properly got a file error as no file exists.");
-			expect(evt.target.error.code === 1, "Should throw a NOT_FOUND_ERR.");
-			QUnit.start();
-		}
-        var myFile = new File();
-        myFile.fullPath = this.root.fullPath + '/' + "doesnotexist.err"; 
-        reader.readAsText(myFile);
-    });
-    it("should read file properly, Data URL", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(1);
-            
-            // path of file
-        var fileName = "reader.txt",
-            filePath = this.root.fullPath + '/' + fileName;
-            // file content
-            rule = "There is an exception to every rule.  Except this one.",
-            // creates a FileWriter object
-            create_writer = function(fileEntry) {
-                fileEntry.createWriter(write_file, this.fail);
-            },
-            // writes file and reads it back in
-            write_file = function(writer) {
-                writer.onwriteend = read_file; 
-                writer.write(rule);
-            },
-            // reads file and compares content to what was written
-            read_file = function(evt) {
-                var reader = new FileReader();
-                reader.onloadend = function(evt) {
-                    console.log("read success");
-                    console.log(evt.target.result);
-                    expect(evt.target.result.substr(0,23) === "data:text/plain;base64,", "reader.result should be base64 encoded.");
-                    QUnit.start();
-                };
-                var myFile = new File();
-                myFile.fullPath = filePath; 
-                reader.readAsDataURL(myFile);
-            };
-        
-        // create a file, write to it, and read it in again
-        this.root.getFile(fileName, {create: true}, create_writer, this.fail);
-    });
-    module('FileWriter model', {
-        // setup function will run before each it
-        setup: function() {
-            var that = this;
-            this.root = getFileSystemRoot(); 
-            this.fail = function(error) {
-                console.log('file error: ' + error.code);
-            };
-            // deletes file, if it exists, then invexpectes callback
-            this.deleteFile = function(fileName, callback) {
-                that.root.getFile(fileName, null, 
-                        // remove file system entry
-                        function(entry) {
-                            entry.remove(callback, that.fail); 
-                        },
-                        // doesn't exist
-                        callback);
-            };
-            // deletes and re-creates the specified file, then invexpectes callback
-            this.createFile = function(fileName, callback) {
-                // creates file
-                var create_file = function() {
-                    that.root.getFile(fileName, {create: true}, callback, that.fail);                
-                };
-                
-                // deletes file, then re-creates it
-                that.deleteFile(fileName, create_file);
-            };
-        }
-    });    
-    it("FileWriter object should have correct methods", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(5);
-        
-        // retrieve a FileWriter object
-        var fileName = "writer.methods",
-            that = this,
-            it_writer = function(fileEntry) {
-                fileEntry.createWriter(function(writer) {
-                    expect(typeof writer !== 'undefined' && writer !== null, "FileEntry.createWriter should return a FileWriter object.");
-                    expect(typeof writer.write === 'function', "FileWriter object should have a write function.");
-                    expect(typeof writer.seek === 'function', "FileWriter object should have a seek function.");
-                    expect(typeof writer.truncate === 'function', "FileWriter object should have a truncate function.");
-                    expect(typeof writer.abort === 'function', "FileWriter object should have an abort function.");
+                    waitsFor(function() { return copyDir.wasCalled; }, "copyDir never called", Tests.TEST_TIMEOUT);
+                }),
+                itCopy = jasmine.createSpy().andCallFake(function(directory) {
+                    expect(directory).toBeDefined();
+                    expect(directory.isFile).toBe(false);
+                    expect(directory.isDirectory).toBe(true);
+                    expect(directory.fullPath).toBe(dstPath);
+                    expect(directory.name).toBe(dstDir);
+             
+                    runs(function() {
+                        root.getDirectory(dstDir, {create:false}, itDirExists, fail);
+                    });
+
+                    waitsFor(function() { return itDirExists.wasCalled; } , "itDirExists never called", Tests.TEST_TIMEOUT);
+                }),
+                itDirExists = jasmine.createSpy().andCallFake(function(dirEntry) {
+                     expect(dirEntry).toBeDefined();
+                     expect(dirEntry.isFile).toBe(false);
+                     expect(dirEntry.isDirectory).toBe(true);
+                     expect(dirEntry.fullPath).toBe(dstPath);
+                     expect(dirEntry.name).toBe(dstDir);
+                     
+                     runs(function() {
+                         dirEntry.getFile(file1, {create:false}, itFileExists, fail);
+                     });
+
+                     waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists never called", Tests.TEST_TIMEOUT);
+
+                     runs(function() {
+                        expect(itFileExists).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                     });
+                }),
+                itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expects(fileEntry.isFile).toBe(true);
+                    expects(fileEntry.isDirectory).toBe(false);
+                    expects(fileEntry.fullPath).toBe(filePath);
+                    expects(fileEntry.name).toBe(file1);
 
                     // cleanup
-                    that.deleteFile(fileName);
-                    QUnit.start();
-                }, this.fail);
-            };
+                    deleteEntry(srcDir);
+                    deleteEntry(dstDir);
+                });
 
-        // it FileWriter
-        this.root.getFile(fileName, {create: true}, it_writer, this.fail);                        
-    });
-    it("should be able to write and append to file, createWriter", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(4);
+            // create a new directory entry to kick off it
+            runs(function() {
+                createDirectory(srcDir, entryCallback, fail);
+            });
 
-        var that = this,
-            fileName = "writer.append",
-            filePath = this.root.fullPath + '/' + fileName,
-            // file content
-            rule = "There is an exception to every rule.",
-            // for iting file length
-            length = rule.length,
-            // writes initial file content
-            write_file = function(fileEntry) {
-                fileEntry.createWriter(function(writer) {
-                    writer.onwriteend = function(evt) {
-                        expect(writer.length === length, "should have written " + length + " bytes");
-                        expect(writer.position === length, "position should be at " + length);
-                        append_file(writer);
-                    };
-                    writer.write(rule); 
-                }, that.fail);
-            }, 
-            // appends to file
-            append_file = function(writer) {
-                var exception = "  Except this one.";            
-                writer.onwriteend = function(evt) {
-                    expect(writer.length === length, "file length should be " + length);
-                    expect(writer.position === length, "position should be at " + length);
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.copyTo: directory onto itself", function() {
+            var file1 = "file1",
+                srcDir = "entry.copy.dos.srcDir",
+                srcPath = root.fullPath + '/' + srcDir,
+                filePath = srcPath + '/' + file1,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(directory) {
+                    var copyDir = jasmine.createSpy().andCallFake(function(fileEntry) {
+                        // copy srcDir onto itself
+                        runs(function() {
+                            directory.copyTo(root, null, win, itCopy); 
+                        });
 
-                    // cleanup
-                    that.deleteFile(fileName);
-                    QUnit.start();
-                };
-                length += exception.length;
-                writer.seek(writer.length);
-                writer.write(exception); 
-            };
-        
-        // create file, then write and append to it
-        this.createFile(fileName, write_file);
-    });
-    it("should be able to write and append to file, File object", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(4);
+                        waitsFor(function() { return itCopy.wasCalled; }, "itCopy never called", Tests.TEST_TIMEOUT);
+                    });
+                    // create a file within new directory
+                    runs(function() {
+                        directory.getFile(file1, {create: true}, copyDir, fail);
+                    });
 
-        var that = this,
-            fileName = "writer.append",
-            filePath = this.root.fullPath + '/' + fileName,
-            // file content
-            rule = "There is an exception to every rule.",
-            // for iting file length
-            length = rule.length,
-            // writes initial file content
-            write_file = function(file) {
-                var writer = new FileWriter(file);
-                    writer.onwriteend = function(evt) {
-                        expect(writer.length === length, "should have written " + length + " bytes");
-                        expect(writer.position === length, "position should be at " + length);
-                        append_file(writer);
-                    };
-                    writer.write(rule); 
-            }, 
-            // appends to file
-            append_file = function(writer) {
-                var exception = "  Except this one.";            
-                writer.onwriteend = function(evt) {
-                    expect(writer.length === length, "file length should be " + length);
-                    expect(writer.position === length, "position should be at " + length);
+                    waitsFor(function() { return copyDir.wasCalled; }, "copyDir never called", Tests.TEST_TIMEOUT);
+                }),
+                itCopy = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.INVALID_MODIFICATION_ERR);
+                    
+                    runs(function() { 
+                        root.getDirectory(srcDir, {create:false}, itDirectoryExists, fail);
+                    });
 
-                    // cleanup
-                    that.deleteFile(fileName);
-                    QUnit.start();
-                };
-                length += exception.length;
-                writer.seek(writer.length);
-                writer.write(exception); 
-            };
-        
-        // create file, then write and append to it
-        var file = new File();
-        file.fullPath = filePath;
-        write_file(file);
-    });
-    it("should be able to seek to the middle of the file and write more data than file.length", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(4);
+                    waitsFor(function() { return itDirectoryExists.wasCalled; }, "itDirectoryExists never called", Tests.TEST_TIMEOUT);
+                }),
+                itDirectoryExists = jasmine.createSpy().andCallFake(function(dirEntry) {
+                    // returning confirms existence so just check fullPath entry
+                    expect(dirEntry).toBeDefined();
+                    expect(dirEntry.fullPath).toBe(srcPath);
+                   
+                    runs(function() {
+                        dirEntry.getFile(file1, {create:false}, itFileExists, fail);
+                    });
 
-        var that = this,
-            fileName = "writer.seek.write",
-            filePath = this.root.fullPath + '/' + fileName,
-            // file content
-            rule = "This is our sentence.",
-            // for iting file length
-            length = rule.length,
-            // writes initial file content
-            write_file = function(fileEntry) {
-                fileEntry.createWriter(function(writer) {
-                    writer.onwriteend = function(evt) {
-                        expect(writer.length === length, "should have written " + length + " bytes");
-                        expect(writer.position === length, "position should be at " + length);
-                        append_file(writer);
-                    };
-                    writer.write(rule); 
-                }, that.fail);
-            }, 
-            // appends to file
-            append_file = function(writer) {
-                var exception = "newer sentence.";            
-                writer.onwriteend = function(evt) {
-                    expect(writer.length === length, "file length should be " + length);
-                    expect(writer.position === length, "position should be at " + length);
+                    waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists never called", Tests.TEST_TIMEOUT);
 
-                    // cleanup
-                    that.deleteFile(fileName);
-                    QUnit.start();
-                };
-                length = 12 + exception.length;
-                writer.seek(12);
-                writer.write(exception); 
-            };
-        
-        // create file, then write and append to it
-        this.createFile(fileName, write_file);
-    });
-    it("should be able to seek to the middle of the file and write less data than file.length", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(4);
-
-        var that = this,
-            fileName = "writer.seek.write2",
-            filePath = this.root.fullPath + '/' + fileName,
-            // file content
-            rule = "This is our sentence.",
-            // for iting file length
-            length = rule.length,
-            // writes initial file content
-            write_file = function(fileEntry) {
-                fileEntry.createWriter(function(writer) {
-                    writer.onwriteend = function(evt) {
-                        expect(writer.length === length, "should have written " + length + " bytes");
-                        expect(writer.position === length, "position should be at " + length);
-                        append_file(writer);
-                    };
-                    writer.write(rule); 
-                }, that.fail);
-            }, 
-            // appends to file
-            append_file = function(writer) {
-                var exception = "new.";            
-                writer.onwriteend = function(evt) {
-                    expect(writer.length === length, "file length should be " + length);
-                    expect(writer.position === length, "position should be at " + length);
-
-                    // cleanup
-                    that.deleteFile(fileName);
-                    QUnit.start();
-                };
-                length = 8 + exception.length;
-                writer.seek(8);
-                writer.write(exception); 
-            };
-        
-        // create file, then write and append to it
-        this.createFile(fileName, write_file);
-    });
-    it("should be able to write XML data", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-
-        var that = this,
-            fileName = "writer.xml",
-            filePath = this.root.fullPath + '/' + fileName,
-            // file content
-            rule = '<?xml version="1.0" encoding="UTF-8"?>\n<it prop="ack">\nData\n</it>\n',
-            // for iting file length
-            length = rule.length,
-            // writes file content
-            write_file = function(fileEntry) {
-                fileEntry.createWriter(function(writer) {
-                    writer.onwriteend = function(evt) {
-						expect(writer.length === length, "should have written " + length + " bytes");
-                        expect(writer.position === length, "position should be at " + length);
-
-                        // cleanup
-                        that.deleteFile(fileName);
-                        QUnit.start();
-                    };
-                    writer.write(rule); 
-                }, that.fail);
-            };
-            
-        // creates file, then write XML data
-        this.createFile(fileName, write_file);
-    });
-    it("should be able to write JSON data", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-
-        var that = this,
-            fileName = "writer.json",
-            filePath = this.root.fullPath + '/' + fileName,
-            // file content
-            rule = '{ "name": "Guy Incognito", "email": "here@there.com" }',
-            // for iting file length
-            length = rule.length,
-            // writes file content
-            write_file = function(fileEntry) {
-                fileEntry.createWriter(function(writer) {
-                    writer.onwriteend = function(evt) {
-                        expect(writer.length === length, "should have written " + length + " bytes");
-                        expect(writer.position === length, "position should be at " + length);
-
-                        // cleanup
-                        that.deleteFile(fileName);
-                        QUnit.start();
-                    };
-                    writer.write(rule); 
-                }, that.fail);
-            };
-        
-        // creates file, then write JSON content
-        this.createFile(fileName, write_file);
-    });
-	it("should write and read special characters", function() {
-		 QUnit.stop(its.it_TIMEOUT);
-		 expect(1);
-		 
-		 var that = this,
-			// path of file
-			fileName = "reader.txt",
-			filePath = this.root.fullPath + '/' + fileName,
-			// file content
-			rule = "H\u00EBll\u00F5 Euro \u20AC\u00A1",
-			// creates a FileWriter object
-			create_writer = function(fileEntry) {
-				fileEntry.createWriter(write_file, this.fail);
-			},
-			// writes file and reads it back in
-			write_file = function(writer) {
-				writer.onwriteend = read_file; 
-				writer.write(rule);
-			},
-			// reads file and compares content to what was written
-			read_file = function(evt) {
-				var reader = new FileReader();
-					reader.onloadend = function(evt) {
-					console.log("read success");
-					console.log(evt.target.result);
-					expect(evt.target.result === rule, "reader.result should be expect to the text written.");
-					// cleanup
-					that.deleteFile(fileName);
-					QUnit.start();
-				};
-				var myFile = new File();
-				myFile.fullPath = filePath; 
-				reader.readAsText(myFile);
-			};
-		 
-		 // create a file, write to it, and read it in again
-		 this.createFile(fileName, create_writer, this.fail);
-		 });
-    it("should be able to seek", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(5);
-        
-        var that = this,
-            fileName = "writer.seek",
-            // file content
-            rule = "There is an exception to every rule.  Except this one.",
-            // for iting file length
-            length = rule.length,
-            // writes file content and its writer.seek
-            seek_file = function(fileEntry) {
-                fileEntry.createWriter(function(writer) {
-                    writer.onwriteend = function(evt) {
-                        expect(writer.position == length, "position should be at " + length); 
-                        writer.seek(-5);
-                        expect(writer.position == (length-5), "position should be at " + (length-5)); 
-                        writer.seek(100);
-                        expect(writer.position == length, "position should be at " + length); 
-                        writer.seek(10);
-                        expect(writer.position == 10, "position should be at 10"); 
-
-                        // cleanup
-                        that.deleteFile(fileName);
-                        QUnit.start();
-                    };
-                    writer.seek(-100);
-                    expect(writer.position == 0, "position should be at 0");        
-                    writer.write(rule);
-                }, that.fail);
-            };
-            
-        // creates file, then write JSON content
-        this.createFile(fileName, seek_file);
-    });
-    it("should be able to truncate", function() {
-        QUnit.stop(its.it_TIMEOUT);
-        expect(2);
-        
-        var that = this,
-            fileName = "writer.truncate",
-            rule = "There is an exception to every rule.  Except this one.",
-            // writes file content 
-            write_file = function(fileEntry) {
-                fileEntry.createWriter(function(writer) {
-                    writer.onwriteend = function(evt) {
-                        truncate_file(writer);
-                    }; 
-                    writer.write(rule);
-                }, that.fail);
-            },
-            // and its writer.truncate
-            truncate_file = function(writer) {
-                writer.onwriteend = function(evt) {
-                    expect(writer.length == 36, "file length should be 36");
-                    expect(writer.position == 36, "position should be at 36");  
+                    runs(function() {
+                        expect(win).not.toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                        expect(itFileExists).toHaveBeenCalled();
+                    });
+                }),
+                itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(filePath);
                     
                     // cleanup
-                    that.deleteFile(fileName);
-                    QUnit.start();
-                }; 
-                writer.truncate(36);                
-            };
+                    deleteEntry(srcDir);
+                });
 
-        // creates file, writes to it, then truncates it
-        this.createFile(fileName, write_file);
+            // create a new directory entry to kick off it
+            runs(function() {
+                createDirectory(srcDir, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.copyTo: directory into itself", function() {
+            var srcDir = "entry.copy.dis.srcDir",
+                dstDir = "entry.copy.dis.dstDir",
+                fail = createFail('Entry'),
+                win = createWin('Entry'),
+                srcPath = root.fullPath + '/' + srcDir,
+                entryCallback = jasmine.createSpy().andCallFake(function(directory) {
+                    // copy source directory into itself
+                    runs(function() {
+                        directory.copyTo(directory, dstDir, win, itCopy);
+                    });
+
+                    waitsFor(function() { return itCopy.wasCalled; }, "itCopy never called", Tests.TEST_TIMEOUT);
+                }),
+                itCopy = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.INVALID_MODIFICATION_ERR);
+                    
+                    runs(function() {
+                        root.getDirectory(srcDir, {create:false}, itDirectoryExists, fail);
+                    });
+
+                    waitsFor(function() { return itDirectoryExists.wasCalled; }, "itDirectoryExists never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(itDirectoryExists).toHaveBeenCalled();
+                        expect(win).not.toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                itDirectoryExists = function(dirEntry) {
+                    // returning confirms existence so just check fullPath entry
+                    expect(dirEntry).toBeDefined();
+                    expect(dirEntry.fullPath).toBe(srcPath);
+
+                    // cleanup
+                    deleteEntry(srcDir);
+                };
+
+            // create a new directory entry to kick off it
+            runs(function() {
+                createDirectory(srcDir, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.copyTo: directory that does not exist", function() {
+            var file1 = "entry.copy.dnf.file1", 
+                dstDir = "entry.copy.dnf.dstDir",
+                filePath = root.fullPath + '/' + file1,
+                dstPath = root.fullPath + '/' + dstDir,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    // copy file to target directory that does not exist
+                    runs(function() {
+                        directory = new DirectoryEntry();
+                        directory.fullPath = dstPath;
+                        entry.copyTo(directory, null, win, itCopy);
+                    });
+
+                    waitsFor(function() { return itCopy.wasCalled; }, "itCopy never called", Tests.TEST_TIMEOUT);
+                }),
+                itCopy = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+                    runs(function() {
+                        root.getFile(file1, {create: false}, itFileExists, fail);
+                    });
+
+                    waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(itFileExists).toHaveBeenCalled();
+                        expect(win).not.toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                itFileExists = function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(filePath);
+
+                    // cleanup
+                    deleteEntry(file1);
+                };
+
+            // create a new file entry to kick off it
+            runs(function() {
+                createFile(file1, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.copyTo: invalid target name", function() {
+            var file1 = "entry.copy.itn.file1",
+                file2 = "bad:file:name",
+                filePath = root.fullPath + '/' + file1,
+                fail = createFail('Entry'),
+                win = createWin('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    // copy file1 to file2
+                    runs(function() {
+                        entry.copyTo(that.root, file2, win, itCopy);
+                    });
+
+                    waitsFor(function() { return itCopy.wasCalled; }, "itCopy never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(fail).not.toHaveBeenCalled();
+                        expect(win).not.toHaveBeenCalled();
+                        expect(itCopy).toHaveBeenCalled();
+                    });
+                }),
+                itCopy = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.ENCODING_ERR);
+
+                    // cleanup
+                    deleteEntry(file1);
+                });
+
+            // create a new file entry
+            runs(function() {
+                createFile(file1, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.moveTo: file to same parent", function() {
+            var file1 = "entry.move.fsp.file1",
+                file2 = "entry.move.fsp.file2",
+                srcPath = root.fullPath + '/' + file1,
+                dstPath = root.fullPath + '/' + file2,
+                fail = createFail('Entry'),
+                win = createWin('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    // move file1 to file2
+                    runs(function() {
+                        entry.moveTo(that.root, file2, itMove, fail);
+                    });
+
+                    waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
+                }),
+                itMove = jasmine.createSpy().andCallFake(function(entry) {
+                    expect(entry).toBeDefined();
+                    expect(entry.isFile).toBe(true);
+                    expect(entry.isDirectory).toBe(false);
+                    expect(entry.fullPath).toBe(dstPath);
+                    expect(entry.name).toBe(file2);
+         
+                    runs(function() {
+                        root.getFile(file2, {create:false}, itMovedExists, fail);
+                    });
+
+                    waitsFor(function() { return itMovedExists.wasCalled; }, "itMovedExists never called", Tests.TEST_TIMEOUT);
+                }),
+                itMovedExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(dstPath);
+                           
+                    runs(function() {
+                        root.getFile(file1, {create:false}, win, itOrig);
+                    });
+
+                    waitsFor(function() { return itOrig.wasCalled; }, "itOrig never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).not.toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                        expect(itOrig).toHaveBeenCalled();
+                    });
+                }),
+                itOrig = function(error) {
+                    //expect(navigator.fileMgr.itFileExists(srcPath) === false, "original file should not exist.");
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+         
+                    // cleanup
+                    deleteEntry(file1);
+                    deleteEntry(file2);
+                };
+
+            // create a new file entry to kick off it
+            runs(function() {
+                createFile(file1, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.moveTo: file to new parent", function() {
+            var file1 = "entry.move.fnp.file1",
+                dir = "entry.move.fnp.dir",
+                srcPath = root.fullPath + '/' + file1,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                dstPath = root.fullPath + '/' + dir + '/' + file1,
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    // move file1 to new directory
+                    var moveFile = jasmine.createSpy().andCallFake(function(directory) {
+                        var itMove = jasmine.createSpy().andCallFake(function(entry) {
+                            expect(entry).toBeDefined();
+                            expect(entry.isFile).toBe(true);
+                            expect(entry.isDirectory).toBe(false);
+                            expect(entry.fullPath).toBe(dstPath);
+                            expect(entry.name).toBe(file1);
+                            // it the moved file exists
+                            runs(function() {
+                                directory.getFile(file1, {create:false}, itMovedExists, fail);
+                            });
+
+                            waitsFor(function() { return itMovedExists.wasCalled; }, "itMovedExists never called", Tests.TEST_TIMEOUT);
+                        });
+                        // move the file
+                        runs(function() {
+                            entry.moveTo(directory, null, itMove, fail);
+                        });
+
+                        waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
+                    });
+         
+                    // create a parent directory to move file to
+                    runs(function() {
+                        root.getDirectory(dir, {create: true}, moveFile, fail);
+                    });
+
+                    waitsFor(function() { return moveFile.wasCalled; }, "moveFile never called", Tests.TEST_TIMEOUT);
+                }),
+                itMovedExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(dstPath);
+                 
+                    runs(function() {
+                        root.getFile(file1, {create:false}, win, itOrig);
+                    });
+
+                    waitsFor(function() { return itOrig.wasCalled; }, "itOrig never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).not.toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                        expect(itOrig).toHaveBeenCalled();
+                    });
+                }),
+                itOrig = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+                  
+                    // cleanup
+                    deleteEntry(file1);
+                    deleteEntry(dir);
+                });
+
+            // ensure destination directory is cleaned up first
+            runs(function() {
+                deleteEntry(dir, function() {
+                    // create a new file entry to kick off it
+                    createFile(file1, entryCallback, fail);
+                }, fail);
+            });
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.moveTo: directory to same parent", function() {
+            var file1 = "file1",
+                srcDir = "entry.move.dsp.srcDir",
+                dstDir = "entry.move.dsp.dstDir",
+                srcPath = root.fullPath + '/' + srcDir,
+                dstPath = root.fullPath + '/' + dstDir,
+                filePath = dstPath + '/' + file1,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(directory) {
+                    var moveDir = jasmine.createSpy().andCallFake(function(fileEntry) {
+                        // move srcDir to dstDir
+                        runs(function() {
+                            directory.moveTo(that.root, dstDir, itMove, fail);
+                        });
+
+                        waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
+                    });
+                    // create a file within directory
+                    runs(function() {
+                        directory.getFile(file1, {create: true}, moveDir, fail);
+                    });
+
+                    waitsFor(function() { return moveDir.wasCalled; }, "moveDir never called", Tests.TEST_TIMEOUT);
+                }),
+                itMove = jasmine.createSpy().andCallFake(function(directory) {
+                    expect(directory).toBeDefined();
+                    expect(directory.isFile).toBe(false);
+                    expect(directory.isDirectory).toBe(true);
+                    expect(directory.fullPath).toBe(dstPath);
+                    expect(directory.name).toBe(dstDir);
+                    // it that moved file exists in destination dir
+                    
+                    runs(function() {
+                        directory.getFile(file1, {create:false}, itMovedExists, fail);
+                    });
+
+                    waitsFor(function() { return itMovedExists.wasCalled; }, "itMovedExists never called", Tests.TEST_TIMEOUT);
+                }),
+                itMovedExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(filePath);
+
+                    // check that the moved file no longer exists in original dir
+                    runs(function() {
+                        root.getFile(file1, {create:false}, win, itOrig);
+                    });
+
+                    waitsFor(function() { return itOrig.wasCalled; }, "itOrig never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).not.toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                        expect(itOrig).toHaveBeenCalled();
+                    });
+                }),
+                itOrig = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+             
+                    // cleanup
+                    deleteEntry(srcDir);
+                    deleteEntry(dstDir);
+                });
+
+            // ensure destination directory is cleaned up before it
+            runs(function() {
+                deleteEntry(dstDir, function() {
+                    // create a new directory entry to kick off it
+                    createDirectory(srcDir, entryCallback, fail);
+                }, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCAllback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.moveTo: directory to same parent with same name", function() {
+            var file1 = "file1",
+                srcDir = "entry.move.dsp.srcDir",
+                dstDir = "entry.move.dsp.srcDir-backup",
+                srcPath = root.fullPath + '/' + srcDir,
+                dstPath = root.fullPath + '/' + dstDir,
+                filePath = dstPath + '/' + file1,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(directory) {
+                    var moveDir = jasmine.createSpy().andCallFake(function(fileEntry) {
+                        // move srcDir to dstDir
+                        runs(function() {
+                            directory.moveTo(that.root, dstDir, itMove, fail);
+                        });
+
+                        waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
+                    });
+                    // create a file within directory
+                    runs(function() {
+                        directory.getFile(file1, {create: true}, moveDir, fail);
+                    });
+
+                    waitsFor(function() { return moveDir.wasCalled; }, "moveDir never called", Tests.TEST_TIMEOUT);
+                }),
+                itMove = jasmine.createSpy().andCallFake(function(directory) {
+                    expect(directory).toBeDefined();
+                    expect(directory.isFile).toBe(false);
+                    expect(directory.isDirectory).toBe(true);
+                    expect(directory.fullPath).toBe(dstPath);
+                    expect(directory.name).toBe(dstDir);
+                    // check that moved file exists in destination dir
+                    runs(function() {
+                        directory.getFile(file1, {create:false}, itMovedExists, null);
+                    });
+
+                    waitsFor(function() { return itMovedExists.wasCalled; }, "itMovedExists never called", Tests.TEST_TIMEOUT);
+                }),
+                itMovedExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(filePath);
+                    // check that the moved file no longer exists in original dir
+                    runs(function() {
+                        root.getFile(file1, {create:false}, win, itOrig);
+                    });
+
+                    waitsFor(function() { return itOrig.wasCalled; }, "itOrig never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).not.toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                        expect(itOrig).toHaveBeenCalled();
+                    });
+                }),
+                itOrig = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+             
+                    // cleanup
+                    deleteEntry(srcDir);
+                    deleteEntry(dstDir);
+                });
+
+            // ensure destination directory is cleaned up before it
+            runs(function() {
+                deleteEntry(dstDir, function() {
+                    // create a new directory entry to kick off it
+                    createDirectory(srcDir, entryCallback, fail);
+                }, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.moveTo: directory to new parent", function() {
+            var file1 = "file1",
+                srcDir = "entry.move.dnp.srcDir",
+                dstDir = "entry.move.dnp.dstDir",
+                srcPath = root.fullPath + '/' + srcDir,
+                dstPath = root.fullPath + '/' + dstDir,
+                filePath = dstPath + '/' + file1,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(directory) {
+                    var moveDir = jasmine.createSpy().andCallFake(function(fileEntry) {
+                        // move srcDir to dstDir
+                        runs(function() {
+                            directory.moveTo(root, dstDir, itMove, fail);
+                        });
+
+                        waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
+                    });
+                    // create a file within directory
+                    runs(function() {
+                        directory.getFile(file1, {create: true}, moveDir, fail);
+                    });
+
+                    waitsFor(function() { return moveDir.wasCalled; }, "moveDir never called", Tests.TEST_TIMEOUT);
+                }),
+                itMove = jasmine.createSpy().andCallFake(function(directory) {
+                    expect(directory).toBeDefined();
+                    expect(directory.isFile).toBe(false);
+                    expect(directory.isDirectory).toBe(true);
+                    expect(directory.fullPath).toBe(dstPath);
+                    expect(directory.name).toBe(dstDir);
+                    // it that moved file exists in destination dir
+                    runs(function() {
+                        directory.getFile(file1, {create:false}, itMovedExists, fail);
+                    });
+
+                    waitsFor(function() { return itMovedExists.wasCalled; }, "itMovedExists never called", Tests.TEST_TIMEOUT);
+                }),
+                itMovedExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(filePath);
+                    // it that the moved file no longer exists in original dir
+                    runs(function() {
+                        root.getFile(file1, {create:false}, win, itOrig);
+                    });
+
+                    waitsFor(function() { return itOrig.wasCalled; }, "itOrig never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).not.toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                        expect(itOrig).toHaveBeenCalled();
+                    });
+                }),
+                itOrig = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+                  
+                    // cleanup
+                    deleteEntry(srcDir);
+                    deleteEntry(dstDir);
+                });
+
+            // ensure destination directory is cleaned up before it
+            runs(function() {
+                deleteEntry(dstDir, function() {
+                    // create a new directory entry to kick off it
+                    createDirectory(srcDir, entryCallback, fail);
+                }, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.moveTo: directory onto itself", function() {
+            var file1 = "file1",
+                srcDir = "entry.move.dos.srcDir",
+                srcPath = root.fullPath + '/' + srcDir,
+                filePath = srcPath + '/' + file1,
+                fail = createFail('Entry'),
+                win = createWin('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(directory) {
+                    var moveDir = jasmine.createSpy().andCallFake(function(fileEntry) {
+                        // move srcDir onto itself
+                        runs(function() {
+                            directory.moveTo(root, null, win, itMove);
+                        });
+
+                        waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
+                    });
+                    // create a file within new directory
+                    runs(function() {
+                        directory.getFile(file1, {create: true}, moveDir, fail);
+                    });
+
+                    waitsFor(function() { return moveDir.wasCalled; }, "moveDir never called", Tests.TEST_TIMEOUT);
+                }),
+                itMove = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.INVALID_MODIFICATION_ERR);
+                     
+                    // it that original dir still exists
+                    runs(function() {
+                        root.getDirectory(srcDir, {create:false}, itDirectoryExists, fail);
+                    });
+
+                    waitsFor(function() { return itDirectoryExists.wasCalled; }, "itDirectoryExists never called", Tests.TEST_TIMEOUT);
+                }),
+                itDirectoryExists = jasmine.createSpy().andCallFake(function(dirEntry) {
+                    // returning confirms existence so just check fullPath entry
+                    expect(dirEntry).toBeDefined();
+                    expect(dirEntry.fullPath).toBe(srcPath);
+                 
+                    runs(function() {
+                        dirEntry.getFile(file1, {create:false}, itFileExists, fail);
+                    });
+
+                    waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(itFileExists).toHaveBeenCalled();
+                        expect(win).not.toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(filePath);
+                    
+                    // cleanup
+                    deleteEntry(srcDir);
+                });
+
+            // create a new directory entry to kick off it
+            runs(function() {
+                createDirectory(srcDir, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.moveTo: directory into itself", function() {
+            var srcDir = "entry.move.dis.srcDir",
+                dstDir = "entry.move.dis.dstDir",
+                srcPath = root.fullPath + '/' + srcDir,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(directory) {
+                    // move source directory into itself
+                    runs(function() {
+                        directory.moveTo(directory, dstDir, win, itMove);
+                    });
+
+                    waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
+                }),
+                itMove = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.INVALID_MODIFICATION_ERR);
+                    // make sure original directory still exists
+                    runs(function() {
+                        root.getDirectory(srcDir, {create:false}, itDirectoryExists, fail);
+                    });
+
+                    waitsFor(function() { return itDirectoryExists.wasCalled; }, "itDirectoryExists never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(fail).not.toHaveBeenCalled();
+                        expect(win).not.toHaveBeenCalled();
+                        expect(itDirectoryExists).toHaveBeenCalled();
+                    });
+                }),
+                itDirectoryExists = function(entry) {
+                    expect(entry).toBeDefined();
+                    expects(entry.fullPath).toBe(srcPath);
+                 
+                    // cleanup
+                    deleteEntry(srcDir);
+                };
+
+            // create a new directory entry to kick off it
+            runs(function() {
+                createDirectory(srcDir, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.moveTo: file onto itself", function() {
+            var file1 = "entry.move.fos.file1",
+                filePath = root.fullPath + '/' + file1,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    // move file1 onto itself
+                    runs(function() {
+                        entry.moveTo(that.root, null, win, itMove);
+                    });
+
+                    waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
+                }),
+                itMove = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.INVALID_MODIFICATION_ERR);
+                    
+                    //it that original file still exists
+                    runs(function() {
+                        root.getFile(file1, {create:false}, itFileExists, fail);
+                    });
+
+                    waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(itFileExists).toHaveBeenCalled();
+                        expect(win).not.toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                }),
+                itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(filePath);
+         
+                    // cleanup
+                    deleteEntry(file1);
+                });
+
+            // create a new file entry to kick off it
+            runs(function() {
+                createFile(file1, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, "entryCAllback never called", Tests.TEST_TIMEOUT);
+        });
+        it("Entry.moveTo: file onto existing directory", function() {
+            var file1 = "entry.move.fod.file1",
+                dstDir = "entry.move.fod.dstDir",
+                subDir = "subDir",
+                dirPath = root.fullPath + '/' + dstDir + '/' + subDir,
+                filePath = root.fullPath + '/' + file1,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = function(entry) {
+                    var createSubDirectory = function(directory) {
+                        var moveFile = function(subDirectory) {
+                            var itMove = function(error) {
+                                expect(error).toBeDefined();
+                                expect(error.code).toBe(FileError.INVALID_MODIFICATION_ERR);
+                                // check that original dir still exists
+                                directory.getDirectory(subDir, {create:false}, itDirectoryExists, fail);
+                            };
+                            // move file1 onto sub-directory
+                            entry.moveTo(directory, subDir, win, itMove);
+                        };
+                        // create sub-directory 
+                        directory.getDirectory(subDir, {create: true}, moveFile, fail);
+                    };
+                    // create top level directory 
+                    root.getDirectory(dstDir, {create: true}, createSubDirectory, fail);
+                },
+                itDirectoryExists = function(dirEntry) {
+                    expect(dirEntry).toBeDefined();
+                    expect(dirEntry.fullPath).toBe(dirPath);
+                    // check that original file still exists
+                    root.getFile(file1, {create:false},itFileExists, fail);
+                },
+                itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(filePath);
+
+                    // cleanup
+                    deleteEntry(file1);
+                    deleteEntry(dstDir);
+                });
+
+            // ensure destination directory is cleaned up before it
+            runs(function() {
+                deleteEntry(dstDir, function() {
+                    // create a new file entry to kick off it
+                    createFile(file1, entryCallback, fail);
+                }, fail);
+            });
+
+            waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists never called", Tests.TEST_TIMEOUT);
+            
+            runs(function() {
+                expect(itFileExists).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("Entry.moveTo: directory onto existing file", function() {
+            var file1 = "entry.move.dof.file1",
+                srcDir = "entry.move.dof.srcDir",
+                dirPath = root.fullPath + '/' + srcDir,
+                filePath = root.fullPath + '/' + file1,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = function(entry) {
+                    var moveDir = function(fileEntry) {
+                        // move directory onto file
+                        entry.moveTo(root, file1, win, itMove);
+                    };
+                    // create file
+                    root.getFile(file1, {create: true}, moveDir, fail);
+                },
+                itMove = function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.INVALID_MODIFICATION_ERR);
+                    // it that original directory exists
+                    root.getDirectory(srcDir, {create:false}, itDirectoryExists, fail);
+                },
+                itDirectoryExists = function(dirEntry) {
+                    // returning confirms existence so just check fullPath entry
+                    expect(dirEntry).toBeDefined();
+                    expect(dirEntry.fullPath).toBe(dirPath);
+                    // it that original file exists
+                    root.getFile(file1, {create:false}, itFileExists, fail);
+                },
+                itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(filePath);
+         
+                    // cleanup
+                    deleteEntry(file1);
+                    deleteEntry(srcDir);
+                });
+
+            // create a new directory entry to kick off it
+            runs(function() {
+                createDirectory(srcDir, entryCallback, fail);
+            });
+
+            waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(itFileExists).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("Entry.copyTo: directory onto existing file", function() {
+            var file1 = "entry.copy.dof.file1",
+                srcDir = "entry.copy.dof.srcDir",
+                dirPath = root.fullPath + '/' + srcDir,
+                filePath = root.fullPath + '/' + file1,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = function(entry) {
+                    var copyDir = function(fileEntry) {
+                        // move directory onto file
+                        entry.copyTo(that.root, file1, win, itMove);
+                    };
+                    // create file
+                    root.getFile(file1, {create: true}, copyDir, fail);
+                },
+                itMove = function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.INVALID_MODIFICATION_ERR);
+                    //check that original dir still exists
+                    root.getDirectory(srcDir, {create:false}, itDirectoryExists, fail);
+                },
+                itDirectoryExists = function(dirEntry) {
+                    // returning confirms existence so just check fullPath entry
+                    expect(dirEntry).toBeDefined();
+                    expect(dirEntry.fullPath).toBe(dirPath);
+                    // it that original file still exists
+                    root.getFile(file1, {create:false}, itFileExists, fail);
+                },
+                itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(filePath);
+         
+                    // cleanup
+                    deleteEntry(file1);
+                    deleteEntry(srcDir);
+                });
+
+            // create a new directory entry to kick off it
+            runs(function() {
+                createDirectory(srcDir, entryCallback, fail);
+            });
+
+            waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(itFileExists).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("Entry.moveTo: directory onto directory that is not empty", function() {
+            var srcDir = "entry.move.dod.srcDir",
+                dstDir = "entry.move.dod.dstDir",
+                subDir = "subDir",
+                srcPath = this.root.fullPath + '/' + srcDir,
+                dstPath = this.root.fullPath + '/' + dstDir + '/' + subDir,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = function(entry) {
+                    var createSubDirectory = function(directory) {
+                        var moveDir = function(subDirectory) {
+                            // move srcDir onto dstDir (not empty)
+                            entry.moveTo(that.root, dstDir, win, itMove);
+                        };
+                        var itMove = function(error) {
+                            expect(error).toBeDefined();
+                            expect(error.code).toBe(FileError.INVALID_MODIFICATION_ERR);
+                     
+                            // it that destination directory still exists
+                            directory.getDirectory(subDir, {create:false}, itDirectoryExists, fail);
+                        };
+                        // create sub-directory 
+                        directory.getDirectory(subDir, {create: true}, moveDir, fail);
+                    };
+                    // create top level directory 
+                    root.getDirectory(dstDir, {create: true}, createSubDirectory, fail);
+                },
+                itDirectoryExists = function(dirEntry) {
+                    // returning confirms existence so just check fullPath entry
+                    expect(dirEntry).toBeDefined();
+                    expect(dirEntry.fullPath).toBe(dstPath);
+                    // it that source directory exists
+                    root.getDirectory(srcDir,{create:false}, itSrcDirectoryExists, fail);
+                },
+                itSrcDirectoryExists = jasmine.createSpy().andCallFake(function(srcEntry){
+                    expect(srcEntry).toBeDefined();
+                    expect(srcEntry.fullPath).toBe(srcPath);
+                    // cleanup
+                    deleteEntry(srcDir);
+                    deleteEntry(dstDir);
+                });
+
+            // ensure destination directory is cleaned up before it
+            runs(function() {
+                deleteEntry(dstDir, function() {
+                    // create a new file entry to kick off it
+                    createDirectory(srcDir, entryCallback, fail);
+                }, fail);
+            });
+
+            waitsFor(function() { return itSrcDirectoryExists.wasCalled; }, "itSrcDirectoryExists never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(itSrcDirectoryExists).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("Entry.moveTo: file replace existing file", function() {
+            var file1 = "entry.move.frf.file1",
+                file2 = "entry.move.frf.file2",
+                file1Path = root.fullPath + '/' + file1,
+                file2Path = root.fullPath + '/' + file2,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = function(entry) {
+                    var moveFile = function(fileEntry) {
+                        // replace file2 with file1
+                        entry.moveTo(root, file2, itMove, fail);
+                    };
+                    // create file
+                    root.getFile(file2, {create: true}, moveFile,fail);
+                },
+                itMove = function(entry) {
+                    expect(entry).toBeDefined();
+                    expect(entry.isFile).toBe(true);
+                    expect(entry.isDirectory).toBe(false);
+                    expect(entry.fullPath).toBe(file2Path);
+                    expect(entry.name).toBe(file2);
+                    
+                    // it that old file does not exists
+                    root.getFile(file1, {create:false}, win, itFileMoved);
+                },
+                itFileMoved = function(error){
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+                    // it that new file exists
+                    root.getFile(file2, {create:false}, itFileExists, fail);
+                },
+                itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(file2Path);
+         
+                    // cleanup
+                    deleteEntry(file1);
+                    deleteEntry(file2);
+                });
+
+            // create a new directory entry to kick off it
+            runs(function() {
+                createFile(file1, entryCallback, fail);
+            });
+
+            waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(itFileExists).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("Entry.moveTo: directory replace empty directory", function() {
+            var file1 = "file1",
+                srcDir = "entry.move.drd.srcDir",
+                dstDir = "entry.move.drd.dstDir",
+                srcPath = root.fullPath + '/' + srcDir,
+                dstPath = root.fullPath + '/' + dstDir,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                filePath = dstPath + '/' + file1,
+                entryCallback = function(directory) {
+                    var mkdir = function(fileEntry) {
+                        // create destination directory
+                        root.getDirectory(dstDir, {create: true}, moveDir, fail);
+                    };
+                    var moveDir = function(fileEntry) {
+                        // move srcDir to dstDir
+                        directory.moveTo(that.root, dstDir, itMove, fail);
+                    };
+                    // create a file within source directory
+                    directory.getFile(file1, {create: true}, mkdir, fail);
+                },
+                itMove = function(directory) {
+                    expect(directory).toBeDefined();
+                    expect(directory.isFile).toBe(false);
+                    expect(directory.isDirectory).toBe(true);
+                    expect(directory.fullPath).toBe(dstPath);
+                    expect(directory.name).toBe(dstDir);
+                    // check that old directory contents have been moved
+                    directory.getFile(file1, {create:false}, itFileExists, fail);
+                },
+                itFileExists = function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.fullPath).toBe(filePath);
+                 
+                    // check that old directory no longer exists
+                    root.getDirectory(srcDir, {create:false}, win, itRemoved);
+                },
+                itRemoved = jasmine.createSpy().andCallFake(function(error){
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+                    
+                    // cleanup
+                    deleteEntry(srcDir);
+                    deleteEntry(dstDir);
+                });
+
+            // ensure destination directory is cleaned up before it
+            runs(function() {
+                deleteEntry(dstDir, function() {
+                    // create a new directory entry to kick off it
+                    createDirectory(srcDir, entryCallback, fail);
+                }, fail);
+            });
+
+            waitsFor(function() { return itRemoved.wasCalled; }, "itRemoved never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(itRemoved).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("Entry.moveTo: directory that does not exist", function() {
+            var file1 = "entry.move.dnf.file1", 
+                dstDir = "entry.move.dnf.dstDir",
+                filePath = root.fullPath + '/' + file1,
+                dstPath = root.fullPath + '/' + dstDir,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = function(entry) {
+                    // move file to directory that does not exist
+                    directory = new DirectoryEntry();
+                    directory.fullPath = dstPath;
+                    entry.moveTo(directory, null, win, itMove);
+                },
+                itMove = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.NOT_FOUND_ERR);
+            
+                    // cleanup
+                    deleteEntry(file1);
+                });
+
+            // create a new file entry to kick off it
+            runs(function() {
+                createFile(file1, entryCallback, fail);
+            });
+
+            waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(itMove).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("Entry.moveTo: invalid target name", function() {
+            var file1 = "entry.move.itn.file1",
+                file2 = "bad:file:name",
+                filePath = root.fullPath + '/' + file1,
+                win = createWin('Entry'),
+                fail = createFail('Entry'),
+                entryCallback = function(entry) {
+                    // move file1 to file2
+                    entry.moveTo(root, file2, win, itMove);
+                },
+                itMove = function(error) {
+                    expect(error).toBeDefined();
+                    expect(error.code).toBe(FileError.ENCODING_ERR);
+
+                    // cleanup
+                    deleteEntry(file1);
+                };
+
+            // create a new file entry to kick off it
+            runs(function() {
+                createFile(file1,entryCallback, fail);
+            });
+
+            waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(itMove).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('FileReader model', function() {
+        it("should have correct methods", function() {
+            var reader = new FileReader();
+            expect(reader).toBeDefined();
+            expect(reader.readAsBinaryString).toBe(jasmine.any(Function));
+            expect(reader.readAsDataURL).toBe(jasmine.any(Function));
+            expect(reader.readAsText).toBe(jasmine.any(Function));
+            expect(reader.readAsArrayBuffer).toBe(jasmine.any(Function));
+            expect(reader.abort).toBe(jasmine.any(Function));
+        });
+    });
+
+    describe('FileReader read', function(){
+        it("should read file properly, File object", function() {
+            // path of file
+            var fileName = "reader.txt",
+                // file content
+                rule = "There is an exception to every rule.  Except this one.",
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(evt).toBeDefined();
+                    expect(evt.target.result).toBe(rule);
+                }),
+                fail = createFail('FileReader'),
+                filePath = root.fullPath + '/' + fileName;
+                // creates a FileWriter object
+                create_writer = function(fileEntry) {
+                    fileEntry.createWriter(write_file, fail);
+                },
+                // writes file and reads it back in
+                write_file = function(writer) {
+                    writer.onwriteend = read_file;
+                    writer.write(rule);
+                },
+                // reads file and compares content to what was written
+                read_file = function(evt) {
+                    var reader = new FileReader();
+                    reader.onloadend = verifier;
+                    var myFile = new File();
+
+                    myFile.fullPath = filePath; 
+                    reader.readAsText(myFile);
+                };
+            
+            // create a file, write to it, and read it in again
+            runs(function() {
+                root.getFile(fileName, {create: true}, create_writer, fail);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).not.toHaveBeenCalled();
+                expect(verifier).toHaveBeenCalled();
+            });
+        });
+        it("should read empty file properly", function() {
+            // path of file
+            var fileName = "empty.txt",
+                filePath = root.fullPath + '/' + fileName;
+                // file content
+                rule = "",
+                fail = createFail('FileReader'),
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(evt).toBeDefined();
+                    expect(evt.target.result).toBe(rule);
+                }),
+                // reads file and compares content to what was written
+                read_file = function(evt) {
+                    var reader = new FileReader();
+                    reader.onloadend = verifier;
+                    var myFile = new File();
+                    myFile.fullPath = filePath; 
+                    reader.readAsText(myFile);
+                };
+            
+            // create a file, write to it, and read it in again
+            runs(function() {
+                root.getFile(fileName, {create: true}, read_file, fail);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).not.toHaveBeenCalled();
+                expect(verifier).toHaveBeenCalled();
+            });
+        });
+        it("should error out on non-existent file", function() {
+            var reader = new FileReader();
+            var verifier = jasmine.createSpy().andCallFake(function(evt) {
+                expect(evt).toBeDefined();
+                expect(evt.target.error.code).toBe(FileError.NOT_FOUND_ERR);
+            });
+            reader.onerror = verifier;
+            var myFile = new File();
+            myFile.fullPath = root.fullPath + '/' + "doesnotexist.err"; 
+
+            runs(function() {
+                reader.readAsText(myFile);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+            });
+        });
+        it("should read file properly, Data URL", function() {
+            // path of file
+            var fileName = "reader.txt",
+                filePath = root.fullPath + '/' + fileName,
+                fail = createFail('FileReader'),
+                // file content
+                rule = "There is an exception to every rule.  Except this one.",
+                // creates a FileWriter object
+                create_writer = function(fileEntry) {
+                    fileEntry.createWriter(write_file, fail);
+                },
+                // writes file and reads it back in
+                write_file = function(writer) {
+                    writer.onwriteend = read_file; 
+                    writer.write(rule);
+                },
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(evt).toBeDefined();
+                    expect(evt.target.result.substr(0,23)).toBe("data:text/plain;base64,");
+                }),
+                // reads file and compares content to what was written
+                read_file = function(evt) {
+                    var reader = new FileReader();
+                    reader.onloadend = verifier;
+                    var myFile = new File();
+                    myFile.fullPath = filePath; 
+                    reader.readAsDataURL(myFile);
+                };
+            
+            // create a file, write to it, and read it in again
+            runs(function() {
+                root.getFile(fileName, {create: true}, create_writer, fail);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).not.toHaveBeenCalled();
+                expect(verifier).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('FileWriter model', function(){
+        it("should have correct methods", function() {
+            // retrieve a FileWriter object
+            var fileName = "writer.methods",
+                fail = createFail('FileWriter'),
+                verifier = jasmine.createSpy().andCallFake(function(writer) {
+                    expect(writer).toBeDefined();
+                    expect(writer.write).toBe(jasmine.any(Function));
+                    expect(writer.seek).toBe(jasmine.any(Function));
+                    expect(writer.truncate).toBe(jasmine.any(Function));
+                    expect(writer.abort).toBe(jasmine.any(Function));
+
+                    // cleanup
+                    deleteFile(fileName);
+                }),
+                it_writer = function(fileEntry) {
+                    fileEntry.createWriter(verifier, fail);
+                };
+
+            // it FileWriter
+            runs(function() {
+                root.getFile(fileName, {create: true}, it_writer, fail);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).not.toHaveBeenCalled();
+                expect(verifier).toHaveBeenCalled();
+            });
+        });
+        it("should be able to write and append to file, createWriter", function() {
+            var fileName = "writer.append",
+                filePath = root.fullPath + '/' + fileName,
+                // file content
+                rule = "There is an exception to every rule.",
+                // for checkin file length
+                length = rule.length,
+                fail = createFail('FileWriter'),
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(writer.length).toBe(length);
+                    expect(writer.position).toBe(length);
+                    append_file(writer);
+                }),
+                anotherVerifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(writer.length).toBe(length);
+                    expect(writer.position).toBe(length);
+
+                    // cleanup
+                    deleteFile(fileName);
+                }),
+                // writes initial file content
+                write_file = function(fileEntry) {
+                    fileEntry.createWriter(function(writer) {
+                        writer.onwriteend = verifier;
+                        writer.write(rule); 
+                    }, fail);
+                }, 
+                // appends to file
+                append_file = function(writer) {
+                    var exception = "  Except this one.";
+                    writer.onwriteend = anotherVerifier;
+                    length += exception.length;
+                    writer.seek(writer.length);
+                    writer.write(exception);
+                };
+            
+            // create file, then write and append to it
+            runs(function() {
+                createFile(fileName, write_file);
+            });
+
+            waitsFor(function() { return anotherVerifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).not.toHaveBeenCalled();
+                expect(verifier).toHaveBeenCalled();
+                expect(anotherVerifier).toHaveBeenCalled();
+            });
+        });
+        it("should be able to write and append to file, File object", function() {
+            var fileName = "writer.append",
+                filePath = root.fullPath + '/' + fileName,
+                // file content
+                rule = "There is an exception to every rule.",
+                // for checking file length
+                length = rule.length,
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(writer.length).toBe(length);
+                    expect(writer.position).toBe(length);
+                    append_file(writer);
+                }),
+                anotherVerifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(writer.length).toBe(length);
+                    expect(writer.position).toBe(length);
+
+                    // cleanup
+                    deleteFile(fileName);
+                }),
+                // writes initial file content
+                write_file = function(file) {
+                    var writer = new FileWriter(file);
+                    writer.onwriteend = verifier;
+                    writer.write(rule);
+                },
+                // appends to file
+                append_file = function(writer) {
+                    var exception = "  Except this one.";
+                    writer.onwriteend = anotherVerifier;
+                    length += exception.length;
+                    writer.seek(writer.length);
+                    writer.write(exception); 
+                };
+            
+            // create file, then write and append to it
+            runs(function() {
+                var file = new File();
+                file.fullPath = filePath;
+                write_file(file);
+            });
+
+            waitsFor(function() { return anotherVerifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+                expect(anotherVerifier).toHaveBeenCalled();
+            });
+        });
+        it("should be able to seek to the middle of the file and write more data than file.length", function() {
+            var fileName = "writer.seek.write",
+                filePath = root.fullPath + '/' + fileName,
+                // file content
+                rule = "This is our sentence.",
+                // for iting file length
+                length = rule.length,
+                fail = createFail('FileWriter'),
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(writer.length).toBe(length);
+                    expect(writer.position).toBe(length);
+                    append_file(writer);
+                }),
+                anotherVerifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(writer.length).toBe(length);
+                    expect(writer.position).toBe(length);
+
+                    // cleanup
+                    deleteFile(fileName);
+                }),
+                // writes initial file content
+                write_file = function(fileEntry) {
+                    fileEntry.createWriter(function(writer) {
+                        writer.onwriteend = verifier;
+                        writer.write(rule);
+                    }, fail);
+                }, 
+                // appends to file
+                append_file = function(writer) {
+                    var exception = "newer sentence.";
+                    writer.onwriteend = anotherVerifier;
+                    length = 12 + exception.length;
+                    writer.seek(12);
+                    writer.write(exception); 
+                };
+            
+            // create file, then write and append to it
+            runs(function() {
+                createFile(fileName, write_file);
+            });
+
+            waitsFor(function() { return anotherVerifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+                expect(anotherVerifier).toHaveBeenCalled();
+            });
+        });
+        it("should be able to seek to the middle of the file and write less data than file.length", function() {
+            var fileName = "writer.seek.write2",
+                filePath = root.fullPath + '/' + fileName,
+                // file content
+                rule = "This is our sentence.",
+                fail = createFail('FileWriter'),
+                // for iting file length
+                length = rule.length,
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(writer.length).toBe(length);
+                    expect(writer.position).toBe(length);
+                    append_file(writer);
+                }),
+                anotherVerifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(writer.length).toBe(length);
+                    expect(writer.position).toBe(length);
+
+                    // cleanup
+                    deleteFile(fileName);
+                }),
+                // writes initial file content
+                write_file = function(fileEntry) {
+                    fileEntry.createWriter(function(writer) {
+                        writer.onwriteend = verifier;
+                        writer.write(rule);
+                    }, fail);
+                }, 
+                // appends to file
+                append_file = function(writer) {
+                    var exception = "new.";
+                    writer.onwriteend = anotherVerifier;
+                    length = 8 + exception.length;
+                    writer.seek(8);
+                    writer.write(exception); 
+                };
+            
+            // create file, then write and append to it
+            runs(function() {
+                createFile(fileName, write_file);
+            });
+
+            waitsFor(function() { return anotherVerifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+                expect(anotherVerifier).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("should be able to write XML data", function() {
+            var fileName = "writer.xml",
+                filePath = root.fullPath + '/' + fileName,
+                fail = createFail('FileWriter'),
+                // file content
+                rule = '<?xml version="1.0" encoding="UTF-8"?>\n<it prop="ack">\nData\n</it>\n',
+                // for iting file length
+                length = rule.length,
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(writer.length).toBe(length);
+                    expect(writer.position).toBe(length);
+
+                    // cleanup
+                    deleteFile(fileName);
+                }),
+                // writes file content
+                write_file = function(fileEntry) {
+                    fileEntry.createWriter(function(writer) {
+                        writer.onwriteend = verifier;
+                        writer.write(rule);
+                    }, fail);
+                };
+                
+            // creates file, then write XML data
+            runs(function() {
+                createFile(fileName, write_file);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("should be able to write JSON data", function() {
+            var fileName = "writer.json",
+                filePath = root.fullPath + '/' + fileName,
+                // file content
+                rule = '{ "name": "Guy Incognito", "email": "here@there.com" }',
+                fail = createFail('FileWriter'),
+                // for iting file length
+                length = rule.length,
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(writer.length).toBe(length);
+                    expect(writer.position).toBe(length);
+
+                    // cleanup
+                    deleteFile(fileName);
+                }),
+                // writes file content
+                write_file = function(fileEntry) {
+                    fileEntry.createWriter(function(writer) {
+                        writer.onwriteend = verifier;
+                        writer.write(rule); 
+                    }, fail);
+                };
+            
+            // creates file, then write JSON content
+            runs(function() {
+                createFile(fileName, write_file);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("should write and read special characters", function() {
+            var fileName = "reader.txt",
+                filePath = root.fullPath + '/' + fileName,
+                // file content
+                rule = "H\u00EBll\u00F5 Euro \u20AC\u00A1",
+                fail = createFail('FileWriter'),
+                // creates a FileWriter object
+                create_writer = function(fileEntry) {
+                    fileEntry.createWriter(write_file, fail);
+                },
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(evt).toBeDefined();
+                    expect(evt.target.result).toBe(rule);
+                    // cleanup
+                    deleteFile(fileName);
+                }),
+                // writes file and reads it back in
+                write_file = function(writer) {
+                    writer.onwriteend = read_file; 
+                    writer.write(rule);
+                },
+                // reads file and compares content to what was written
+                read_file = function(evt) {
+                    var reader = new FileReader();
+                    reader.onloadend = verifier;
+                    var myFile = new File();
+                    myFile.fullPath = filePath;
+                    reader.readAsText(myFile);
+                };
+
+            // create a file, write to it, and read it in again
+            runs(function() {
+                createFile(fileName, create_writer, fail);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("should be able to seek", function() {
+            var fileName = "writer.seek",
+                // file content
+                rule = "There is an exception to every rule.  Except this one.",
+                // for iting file length
+                length = rule.length,
+                fail = createFail('FileWriter'),
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(writer.position).toBe(length);
+                    writer.seek(-5);
+                    expect(writer.position).toBe(length-5);
+                    writer.seek(length + 100);
+                    expect(writer.position).toBe(length);
+                    writer.seek(10);
+                    expect(writer.position).toBe(10);
+
+                    // cleanup
+                    deleteFile(fileName);
+                }),
+                // writes file content and its writer.seek
+                seek_file = function(fileEntry) {
+                    fileEntry.createWriter(function(writer) {
+                        writer.onwriteend = verifier;
+                        writer.seek(-100);
+                        expect(writer.position).toBe(0);
+                        writer.write(rule);
+                    }, fail);
+                };
+                
+            // creates file, then write JSON content
+            runs(function() {
+                createFile(fileName, seek_file);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("should be able to truncate", function() {
+            var fileName = "writer.truncate",
+                rule = "There is an exception to every rule.  Except this one.",
+                fail = createFail('FileWRiter'),
+                // writes file content 
+                write_file = function(fileEntry) {
+                    fileEntry.createWriter(function(writer) {
+                        writer.onwriteend = function(evt) {
+                            truncate_file(writer);
+                        }; 
+                        writer.write(rule);
+                    }, fail);
+                },
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(writer.length).toBe(36);
+                    expect(writer.position).toBe(36);
+                    
+                    // cleanup
+                    deleteFile(fileName);
+                }),
+                // and its writer.truncate
+                truncate_file = function(writer) {
+                    writer.onwriteend = verifier;
+                    writer.truncate(36);
+                };
+
+            // creates file, writes to it, then truncates it
+            runs(function() {
+                createFile(fileName, write_file);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
     });
 });
