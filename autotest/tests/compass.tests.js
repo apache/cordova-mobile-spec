@@ -1,10 +1,11 @@
 describe('Compass (navigator.compass)', function () {
-	it("should exist", function() {
-      expect(navigator.compass).toBeDefined();
-	});
+    it("should exist", function() {
+        expect(navigator.compass).toBeDefined();
+    });
 
-	it("should contain a getCurrentHeading function", function() {
+    it("should contain a getCurrentHeading function", function() {
         expect(navigator.compass.getCurrentHeading).toBeDefined();
+<<<<<<< HEAD
 		expect(typeof navigator.compass.getCurrentHeading == 'function').toBe(true);
 	});
 <<<<<<< HEAD
@@ -34,9 +35,13 @@ describe('Compass (navigator.compass)', function () {
 =======
 >>>>>>> converted some more tests to jasmine
 >>>>>>> converted some more tests to jasmine
+=======
+        expect(typeof navigator.compass.getCurrentHeading == 'function').toBe(true);
+    });
+>>>>>>> bmping timeout to 5 secs and fixing compass tests
 
-	it("getCurrentHeading success callback should be called with a Heading object", function() {
-		var win = jasmine.createSpy().andCallFake(function(a) {
+    it("getCurrentHeading success callback should be called with a Heading object", function() {
+        var win = jasmine.createSpy().andCallFake(function(a) {
                 expect(a instanceof CompassHeading).toBe(true);
                 expect(a.magneticHeading).toBeDefined();
                 expect(typeof a.magneticHeading == 'number').toBe(true);
@@ -44,12 +49,12 @@ describe('Compass (navigator.compass)', function () {
                 expect(typeof a.trueHeading == 'number' || a.trueHeading === null).toBe(true);
                 expect(a.headingAccuracy).not.toBe(undefined);
                 expect(typeof a.headingAccuracy == 'number' || a.headingAccuracy === null).toBe(true);
-                expect(a.timestamp instanceof Date).toBe(true);
+                expect(typeof a.timestamp == 'number').toBe(true);
             }),
             fail = jasmine.createSpy();
 
         runs(function () {
-		    navigator.compass.getCurrentHeading(win, fail);
+            navigator.compass.getCurrentHeading(win, fail);
         });
 
         waitsFor(function () { return win.wasCalled; }, "success callback never called", Tests.TEST_TIMEOUT);
@@ -60,10 +65,13 @@ describe('Compass (navigator.compass)', function () {
         });
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> converted some more tests to jasmine
 =======
 =======
 >>>>>>> converted some more tests to jasmine
+=======
+>>>>>>> bmping timeout to 5 secs and fixing compass tests
 =======
 	test("getCurrentHeading success callback should be called with a Heading object", function() {
 		expect(9);
@@ -90,19 +98,22 @@ describe('Compass (navigator.compass)', function () {
 >>>>>>> converted some more tests to jasmine
 >>>>>>> converted some more tests to jasmine
 	});
+=======
+    });
+>>>>>>> bmping timeout to 5 secs and fixing compass tests
 
-	it("should contain a watchHeading function", function() {
+    it("should contain a watchHeading function", function() {
         expect(navigator.compass.watchHeading).toBeDefined();
-		expect(typeof navigator.compass.watchHeading == 'function').toBe(true);
-	});
+        expect(typeof navigator.compass.watchHeading == 'function').toBe(true);
+    });
 
-	it("should contain a clearWatch function", function() {
+    it("should contain a clearWatch function", function() {
         expect(navigator.compass.clearWatch).toBeDefined();
-		expect(typeof navigator.compass.clearWatch == 'function').toBe(true);
-	});
+        expect(typeof navigator.compass.clearWatch == 'function').toBe(true);
+    });
 
     describe('Compass Constants (window.CompassError)', function () {
-        it("CompassError globals should exist", function() {
+        it("should exist", function() {
             expect(window.CompassError).toBeDefined();
             expect(window.CompassError.COMPASS_INTERNAL_ERR).toBe(0);
             expect(window.CompassError.COMPASS_NOT_SUPPORTED).toBe(20);
@@ -110,18 +121,19 @@ describe('Compass (navigator.compass)', function () {
     });
 
     describe('Compass Heading model (CompassHeading)', function () {
-        it("CompassHeading function should exist", function() {
+        it("should exist", function() {
             expect(CompassHeading).toBeDefined();
         });
 
-        it("Creating a new CompassHeading instance with no parameters", function() {
+        it("should be able to create a new CompassHeading instance with no parameters", function() {
             var h = new CompassHeading();
             expect(h.magneticHeading).toBeDefined();
             expect(h.trueHeading).toBeDefined();
             expect(h.headingAccuracy).toBeDefined();
-            expect(h.timestamp instanceof Date).toBe(true);
+            expect(typeof h.timestamp == 'number').toBe(true);
         });
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -154,15 +166,20 @@ describe('Compass (navigator.compass)', function () {
 >>>>>>> Fixes CB-439 Compass timestamp specified in milliseconds
 =======
 =======
+>>>>>>> bmping timeout to 5 secs and fixing compass tests
+=======
 >>>>>>> converted some more tests to jasmine
 >>>>>>> converted some more tests to jasmine
         it("Creating a new CompassHeading instance with parameters", function() {
+=======
+        it("should be able to creat a new CompassHeading instance with parameters", function() {
+>>>>>>> bmping timeout to 5 secs and fixing compass tests
             var h = new CompassHeading(1,2,3,4);
             expect(h.magneticHeading).toBe(1);
             expect(h.trueHeading).toBe(2);
             expect(h.headingAccuracy).toBe(3);
             expect(h.timestamp.valueOf()).toBe(4);
-            expect(h.timestamp instanceof Date).toBe(true);
+            expect(typeof h.timestamp == 'number').toBe(true);
         });
     });
 });

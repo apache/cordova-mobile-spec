@@ -28,4 +28,4 @@ if (window.sessionStorage != null) {
 // time to query the response. This is important for some
 // Android devices.
 var Tests = function() {};
-Tests.TEST_TIMEOUT = 2000;
+Tests.TEST_TIMEOUT = 5000;
