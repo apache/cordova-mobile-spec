@@ -164,7 +164,19 @@ Tests.prototype.StorageTests = function()
     ok(typeof(window.openDatabase) == "function", "Database is defined");
   });
   test("Should open a database", function() {
+    expect(1);
     var db = openDatabase("Database", "1.0", "HTML5 Database API example", 200000);
     ok(db != null, "Database should be opened");
+  });
+  test("Should not gobble INVALID_STATE_ERR exceptions", function() {
+    expect(2);
+    var db = openDatabase("Database", "1.0", "HTML5 Database API example", 200000);
+    ok(db != null, "Database should be opened");
+    try {
+        console.log("Trying to open db with version 5.0");
+        db = openDatabase("Database", "5.0", "HTML5 Database API example", 200000);
+    } catch (e) {
+        ok(e.code === 11, "INVALID_STATE_ERR should be thrown");
+    }
   });
 }
