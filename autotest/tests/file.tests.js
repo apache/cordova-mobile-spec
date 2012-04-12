@@ -81,7 +81,7 @@ describe('File API', function() {
         it("should define FileError constants", function() {
             expect(FileError.NOT_FOUND_ERR).toBe(1);
             expect(FileError.SECURITY_ERR).toBe(2);
-            expect(FileError.ABORT_ERR).tobe(3);
+            expect(FileError.ABORT_ERR).toBe(3);
             expect(FileError.NOT_READABLE_ERR).toBe(4);
             expect(FileError.ENCODING_ERR).toBe(5);
             expect(FileError.NO_MODIFICATION_ALLOWED_ERR).toBe(6);
@@ -452,7 +452,7 @@ describe('File API', function() {
             // create file to kick off it
             runs(function() {
                 root.getFile(fileName, {create:true}, getFile, fail);
-            }):
+            });
 
             waitsFor(function() { return getFile.wasCalled; }, "getFile was never called", Tests.TEST_TIMEOUT);
         });
@@ -1661,7 +1661,7 @@ describe('File API', function() {
                         directory.getFile(file1, {create: true}, copyDir, fail);
                     });
 
-                    waitsFor(function() { retun copyDir.wasCalled; }, "copyDir never called", Tests.TEST_TIMEOUT);
+                    waitsFor(function() { return copyDir.wasCalled; }, "copyDir never called", Tests.TEST_TIMEOUT);
                 }),
                 itCopy = jasmine.createSpy().andCallFake(function(directory) {
                     expect(directory).toBeDefined();
