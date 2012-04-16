@@ -1,76 +1,5 @@
 <!DOCTYPE html>
 <html>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, height=device-height, user-scalable=yes, initial-scale=1.0;" />
-
-    <title>Cordova: All API Specs</title>
-
-    <!-- Load QUnit -->
-    <link rel="stylesheet" type="text/css" href="../qunit.css" />
-    <script type="text/javascript" src="../qunit.js"></script>
-
-    <!-- Source -->
-    <script type="text/javascript" src="../../phonegap.js"></script>
-
-    <!-- Load Test Runner -->
-    <script type="text/javascript" src="../test-runner.js"></script>
-
-    <!-- Tests -->
-    <script type="text/javascript" src="../tests/accelerometer.tests.js"></script>
-    <script type="text/javascript" src="../tests/battery.tests.js"></script>
-    <script type="text/javascript" src="../tests/capture.tests.js"></script>
-    <script type="text/javascript" src="../tests/compass.tests.js"></script>
-    <script type="text/javascript" src="../tests/contacts.tests.js"></script>
-    <script type="text/javascript" src="../tests/camera.tests.js"></script>
-    <script type="text/javascript" src="../tests/device.tests.js"></script>
-    <script type="text/javascript" src="../tests/file.tests.js"></script>
-    <script type="text/javascript" src="../tests/geolocation.tests.js"></script>
-    <script type="text/javascript" src="../tests/media.tests.js"></script>
-    <script type="text/javascript" src="../tests/network.tests.js"></script>
-    <script type="text/javascript" src="../tests/notification.tests.js"></script>
-    <script type="text/javascript" src="../tests/platform.tests.js"></script>
-    <script type="text/javascript" src="../tests/storage.tests.js"></script>
-    <script type="text/javascript">
-      document.addEventListener('deviceready', function() {
-          console.log('running tests');
-          var tests = new Tests();
-
-          // Each group of tests are declared as a function in the object `Tests`.
-          // A group of tests are identified by a name that contains the word 'Tests'.
-          //
-          // Load each group of tests into QUnit
-          for (var t in tests) {
-              if (t.indexOf('Tests') > -1) {
-                  tests[t]();
-              }
-          }
-
-          // Start the QUnit test suite
-          QUnit.start();
-      }, false);
-    </script>
-  </head>
-    <body>
-        <div class="backBtn" onclick="backHome();">Back</div>
-        <h1 id="qunit-header">Cordova: All API Specs</h1>
-        <h2 id="qunit-banner"></h2>
-        <h2 id="qunit-userAgent"></h2>
-        <ol id="qunit-tests"></ol>
-        <div id="qunit-fixture">
-            <!-- Populated by tests -->
-        </div>
-    </body>
-=======
-=======
->>>>>>> fixed html errors, and various html tweaks, doctype, &nbsp; javascript:
-=======
-=======
->>>>>>> updating all.html to use jasmine and fixing syntax errors in file tests
->>>>>>> updating all.html to use jasmine and fixing syntax errors in file tests
 <head>
   <title>Cordova: API Specs</title>
 
@@ -98,11 +27,7 @@
   <script type="text/javascript" src="../tests/contacts.tests.js"></script>
   <script type="text/javascript" src="../tests/camera.tests.js"></script>
   <script type="text/javascript" src="../tests/device.tests.js"></script>
-<<<<<<< HEAD
-  <!-- <script type="text/javascript" src="../tests/file.tests.js"></script> -->
-=======
   <script type="text/javascript" src="../tests/file.tests.js"></script>
->>>>>>> updating all.html to use jasmine and fixing syntax errors in file tests
   <script type="text/javascript" src="../tests/geolocation.tests.js"></script>
   <script type="text/javascript" src="../tests/media.tests.js"></script>
   <script type="text/javascript" src="../tests/network.tests.js"></script>
@@ -131,79 +56,4 @@
 <body>
   <a href="javascript:" class="backBtn" onclick="backHome();">Back</a>
 </body>
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> converted all (commented out file for now)
-=======
-=======
->>>>>>> updating all.html to use jasmine and fixing syntax errors in file tests
-=======
-  <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, height=device-height, user-scalable=yes, initial-scale=1.0;" />
-
-    <title>Cordova: All API Specs</title>
-
-    <!-- Load QUnit -->
-    <link rel="stylesheet" type="text/css" href="../qunit.css" />
-    <script type="text/javascript" src="../qunit.js"></script>
-
-    <!-- Source -->
-    <script type="text/javascript" src="../../phonegap.js"></script>
-
-    <!-- Load Test Runner -->
-    <script type="text/javascript" src="../test-runner.js"></script>
-
-    <!-- Tests -->
-    <script type="text/javascript" src="../tests/accelerometer.tests.js"></script>
-    <script type="text/javascript" src="../tests/battery.tests.js"></script>
-    <script type="text/javascript" src="../tests/capture.tests.js"></script>
-    <script type="text/javascript" src="../tests/compass.tests.js"></script>
-    <script type="text/javascript" src="../tests/contacts.tests.js"></script>
-    <script type="text/javascript" src="../tests/camera.tests.js"></script>
-    <script type="text/javascript" src="../tests/device.tests.js"></script>
-    <script type="text/javascript" src="../tests/file.tests.js"></script>
-    <script type="text/javascript" src="../tests/geolocation.tests.js"></script>
-    <script type="text/javascript" src="../tests/media.tests.js"></script>
-    <script type="text/javascript" src="../tests/network.tests.js"></script>
-    <script type="text/javascript" src="../tests/notification.tests.js"></script>
-    <script type="text/javascript" src="../tests/platform.tests.js"></script>
-    <script type="text/javascript" src="../tests/storage.tests.js"></script>
-    <script type="text/javascript">
-      document.addEventListener('deviceready', function() {
-          console.log('running tests');
-          var tests = new Tests();
-
-          // Each group of tests are declared as a function in the object `Tests`.
-          // A group of tests are identified by a name that contains the word 'Tests'.
-          //
-          // Load each group of tests into QUnit
-          for (var t in tests) {
-              if (t.indexOf('Tests') > -1) {
-                  tests[t]();
-              }
-          }
-
-          // Start the QUnit test suite
-          QUnit.start();
-      }, false);
-    </script>
-  </head>
-    <body>
-        <div class="backBtn" onclick="backHome();">Back</div>
-        <h1 id="qunit-header">Cordova: All API Specs</h1>
-        <h2 id="qunit-banner"></h2>
-        <h2 id="qunit-userAgent"></h2>
-        <ol id="qunit-tests"></ol>
-        <div id="qunit-fixture">
-            <!-- Populated by tests -->
-        </div>
-    </body>
->>>>>>> fixed html errors, and various html tweaks, doctype, &nbsp; javascript:
-<<<<<<< HEAD
->>>>>>> fixed html errors, and various html tweaks, doctype, &nbsp; javascript:
-=======
-=======
->>>>>>> updating all.html to use jasmine and fixing syntax errors in file tests
->>>>>>> updating all.html to use jasmine and fixing syntax errors in file tests
 </html>

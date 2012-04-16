@@ -1,74 +1,7 @@
 <!DOCTYPE html>
 <html>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, height=device-height, user-scalable=yes, initial-scale=1.0;" />
-
-    <title>Cordova: Battery API Specs</title>
-
-    <!-- Load QUnit -->
-    <link rel="stylesheet" type="text/css" href="../qunit.css" />
-    <script type="text/javascript" src="../qunit.js"></script>
-
-    <!-- Source -->
-    <script type="text/javascript" src="../../phonegap.js"></script>
-
-    <!-- Load Test Runner -->
-    <script type="text/javascript" src="../test-runner.js"></script>
-
-    <!-- Tests -->
-    <script type="text/javascript" src="../tests/battery.tests.js"></script>
-    <script type="text/javascript">
-      document.addEventListener('deviceready', function() {
-          console.log('running tests');
-          var tests = new Tests();
-
-          // Each group of tests are declared as a function in the object `Tests`.
-          // A group of tests are identified by a name that contains the word 'Tests'.
-          //
-          // Load each group of tests into QUnit
-          for (var t in tests) {
-              if (t.indexOf('Tests') > -1) {
-                  tests[t]();
-              }
-          }
-
-          // Start the QUnit test suite
-          QUnit.start();
-      }, false);
-    </script>
-  </head>
-    <body>
-        <div class="backBtn" onclick="backHome();">Back</div>
-        <h1 id="qunit-header">Cordova: Battery API Specs</h1>
-        <h2 id="qunit-banner"></h2>
-        <h2 id="qunit-userAgent"></h2>
-        <ol id="qunit-tests"></ol>
-        <div id="qunit-fixture">
-            <!-- Populated by tests -->
-        </div>
-    </body>
-=======
-=======
->>>>>>> fixed html errors, and various html tweaks, doctype, &nbsp; javascript:
-=======
->>>>>>> added jasmine runner and ported battery tests
 <head>
   <title>Cordova: Battery API Specs</title>
-
-  <!-- Load jasmine -->
-=======
-<head>
-  <title>Cordova: Battery API Specs</title>
-
-<<<<<<< HEAD
->>>>>>> added jasmine runner and ported battery tests
-=======
-  <!-- Load jasmine -->
->>>>>>> updated test-runner and changed title of battery tests
   <link href="../jasmine.css" rel="stylesheet"/>
   <script type="text/javascript" src="../jasmine.js"></script>
   <script type="text/javascript" src="../html/HtmlReporterHelpers.js"></script>
@@ -77,10 +10,6 @@
   <script type="text/javascript" src="../html/SpecView.js"></script>
   <script type="text/javascript" src="../html/SuiteView.js"></script>
   <script type="text/javascript" src="../html/TrivialReporter.js"></script>
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-  <!-- Source -->
   <script type="text/javascript" src="../../phonegap.js"></script>
 
   <!-- Load Test Runner -->
@@ -88,22 +17,6 @@
 
   <!-- Tests -->
   <script type="text/javascript" src="../tests/battery.tests.js"></script>
-=======
-  <!-- include source files here... -->
-=======
-  <!-- Source -->
->>>>>>> updated test-runner and changed title of battery tests
-  <script type="text/javascript" src="../../phonegap.js"></script>
-
-  <!-- Load Test Runner -->
-  <script type="text/javascript" src="../test-runner.js"></script>
-
-<<<<<<< HEAD
->>>>>>> added jasmine runner and ported battery tests
-=======
-  <!-- Tests -->
-  <script type="text/javascript" src="../tests/battery.tests.js"></script>
->>>>>>> updated test-runner and changed title of battery tests
   <script type="text/javascript">
     document.addEventListener('deviceready', function () {
       var jasmineEnv = jasmine.getEnv();
@@ -125,69 +38,4 @@
 <body>
   <a href="javascript:" class="backBtn" onclick="backHome();">Back</a>
 </body>
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> added jasmine runner and ported battery tests
-=======
-=======
->>>>>>> added jasmine runner and ported battery tests
-=======
-  <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, height=device-height, user-scalable=yes, initial-scale=1.0;" />
-
-    <title>Cordova: Battery API Specs</title>
-
-    <!-- Load QUnit -->
-    <link rel="stylesheet" type="text/css" href="../qunit.css" />
-    <script type="text/javascript" src="../qunit.js"></script>
-
-    <!-- Source -->
-    <script type="text/javascript" src="../../phonegap.js"></script>
-
-    <!-- Load Test Runner -->
-    <script type="text/javascript" src="../test-runner.js"></script>
-
-    <!-- Tests -->
-    <script type="text/javascript" src="../tests/battery.tests.js"></script>
-    <script type="text/javascript">
-      document.addEventListener('deviceready', function() {
-          console.log('running tests');
-          var tests = new Tests();
-
-          // Each group of tests are declared as a function in the object `Tests`.
-          // A group of tests are identified by a name that contains the word 'Tests'.
-          //
-          // Load each group of tests into QUnit
-          for (var t in tests) {
-              if (t.indexOf('Tests') > -1) {
-                  tests[t]();
-              }
-          }
-
-          // Start the QUnit test suite
-          QUnit.start();
-      }, false);
-    </script>
-  </head>
-    <body>
-        <div class="backBtn" onclick="backHome();">Back</div>
-        <h1 id="qunit-header">Cordova: Battery API Specs</h1>
-        <h2 id="qunit-banner"></h2>
-        <h2 id="qunit-userAgent"></h2>
-        <ol id="qunit-tests"></ol>
-        <div id="qunit-fixture">
-            <!-- Populated by tests -->
-        </div>
-    </body>
->>>>>>> fixed html errors, and various html tweaks, doctype, &nbsp; javascript:
-<<<<<<< HEAD
->>>>>>> fixed html errors, and various html tweaks, doctype, &nbsp; javascript:
-=======
-=======
->>>>>>> added jasmine runner and ported battery tests
->>>>>>> added jasmine runner and ported battery tests
 </html>
-
-
-
