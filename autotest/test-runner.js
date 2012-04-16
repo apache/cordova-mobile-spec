@@ -1,4 +1,3 @@
-QUnit.config.autostart = false;
 if (window.sessionStorage != null) {
     window.sessionStorage.clear();
 }
