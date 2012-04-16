@@ -19,7 +19,7 @@ describe("Contacts (navigator.contacts)", function () {
 
     it("should contain a find function", function() {
         expect(navigator.contacts.find).toBeDefined();
-        expect(typeof navigator.contacts.find == 'function').toBe(true);
+        expect(typeof navigator.contacts.find).toBe('function');
     });
 
     it("contacts.find success callback should be called with an array", function() {
@@ -43,7 +43,7 @@ describe("Contacts (navigator.contacts)", function () {
         });
     }); 
 
-    it("contacts.find success callback should not be null", function() {
+    it("find success callback should not be null", function() {
         var fail = function() {};
         var obj = new ContactFindOptions();
         var ex;
@@ -55,7 +55,7 @@ describe("Contacts (navigator.contacts)", function () {
         }).toThrow();
     }); 
 
-    it("contacts.find error callback should be called when no fields are specified", function() {
+    it("find error callback should be called when no fields are specified", function() {
         var win = jasmine.createSpy(),
             fail = jasmine.createSpy(function(result) { 
                 expect(typeof result).toBe('object');
@@ -69,10 +69,11 @@ describe("Contacts (navigator.contacts)", function () {
             navigator.contacts.find([], win, fail, obj);
         });
 
-        waitsFor(function () { return win.wasCalled; }, Tests.TEST_TIMEOUT);
+        waitsFor(function () { return fail.wasCalled; }, Tests.TEST_TIMEOUT);
 
         runs(function () { 
             expect(win).not.toHaveBeenCalled();
+            expect(fail).toHaveBeenCalled();
         });
     });
 
