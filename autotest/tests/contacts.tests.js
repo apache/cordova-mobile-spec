@@ -22,133 +22,132 @@ describe("Contacts (navigator.contacts)", function () {
         expect(typeof navigator.contacts.find).toBe('function');
     });
 
-    it("contacts.find success callback should be called with an array", function() {
-        var win = jasmine.createSpy().andCallFake(function(result) {
-                expect(result).toBe(defined);
-                expect(typeof result.length == 'number').toBe(true);
-            }),
-            fail = jasmine.createSpy(),
-            obj = new ContactFindOptions();
-
-        runs(function () {
-            obj.filter="";
-            obj.multiple=true;
-            navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], win, fail, obj);
-        });
-
-        waitsFor(function () { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
-
-        runs(function () {
-            expect(fail).not.toHaveBeenCalled();
-        });
-    }); 
-
-    it("find success callback should not be null", function() {
-        var fail = function() {};
-        var obj = new ContactFindOptions();
-        var ex;
-        obj.filter="";
-        obj.multiple=true;
-
-        expect(function () {
-            navigator.contacts.find(["displayName", "name", "emails", "phoneNumbers"], null, fail, obj);
-        }).toThrow();
-    }); 
-
-    it("find error callback should be called when no fields are specified", function() {
-        var win = jasmine.createSpy(),
-            fail = jasmine.createSpy(function(result) { 
-                expect(typeof result).toBe('object');
-                expect(result.code).toBe(ContactError.INVALID_ARGUMENT_ERROR);
-            }),
-            obj = new ContactFindOptions();
-
-        runs(function () {
-            obj.filter="";
-            obj.multiple=true;
-            navigator.contacts.find([], win, fail, obj);
-        });
-
-        waitsFor(function () { return fail.wasCalled; }, Tests.TEST_TIMEOUT);
-
-        runs(function () { 
-            expect(win).not.toHaveBeenCalled();
-            expect(fail).toHaveBeenCalled();
-        });
-    });
-
-    describe("contacts.find with newly-created contact", function () {
-
-        afterEach(removeContact);
-
-        it("find a contact by name", function() {
-            var test = function (savedContact) {
-                // update so contact will get removed
-                gContactObj = savedContact;
-                // ----
-                // Find asserts
-                // ---
-                var findWin = jasmine.createSpy().andCallFake(function(object) {
-                        var foundName = function(result) {
-                            var bFound = false;
-                            try {
-                                for (var i=0; i < result.length; i++) {
-                                    if (result[i].name.familyName == "Delete") {
-                                        bFound = true;
-                                        break;
-                                    }
-                                }
-                            } catch(e) {
-                                return false;
-                            } 
-                            return bFound;
-                        };         
-                        expect(object instanceof Array).toBe(true);
-                        expect(object.length >= 1).toBe(true);
-                        expect(foundName(object)).toBe(true);
-                        done = true;
-                    }),
-                    findFail = jasmine.createSpy(),
-                    obj = new ContactFindOptions();
-
-                obj.filter="Delete";
-                obj.multiple=true;
-
-                runs(function () {
-                    navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], findWin, findFail, obj);
-                });
-
-                waitsFor(function () { return foundName.wasCalled; }, "test not done", Tests.TEST_TIMEOUT);
-
-                runs(function () {
-                    expect(findFail).not.toHaveBeenCalled();
-                });
-            },
-            done = false,
-            fail = jasmine.createSpy();
+    describe("find method", function() {
+        it("success callback should be called with an array", function() {
+            var win = jasmine.createSpy().andCallFake(function(result) {
+                    expect(result).toBeDefined();
+                    expect(result instanceof Array).toBe(true);
+                }),
+                fail = jasmine.createSpy(),
+                obj = new ContactFindOptions();
 
             runs(function () {
-                gContactObj = new Contact();
-                gContactObj.name = new ContactName();
-                gContactObj.name.familyName = "Delete";
-                gContactObj.save(test, fail);
+                obj.filter="";
+                obj.multiple=true;
+                navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], win, fail, obj);
             });
 
-            waitsFor(function () { return done; }, "test not done", Tests.TEST_TIMEOUT);
+            waitsFor(function () { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
 
             runs(function () {
                 expect(fail).not.toHaveBeenCalled();
             });
+        }); 
+
+        it("should throw an exception if success callback is empty", function() {
+            var fail = function() {};
+            var obj = new ContactFindOptions();
+            obj.filter="";
+            obj.multiple=true;
+
+            expect(function () {
+                navigator.contacts.find(["displayName", "name", "emails", "phoneNumbers"], null, fail, obj);
+            }).toThrow();
+        }); 
+
+        it("error callback should be called when no fields are specified", function() {
+            var win = jasmine.createSpy(),
+                fail = jasmine.createSpy(function(result) { 
+                    expect(result).toBeDefined();
+                    expect(result.code).toBe(ContactError.INVALID_ARGUMENT_ERROR);
+                }),
+                obj = new ContactFindOptions();
+
+            runs(function () {
+                obj.filter="";
+                obj.multiple=true;
+                navigator.contacts.find([], win, fail, obj);
+            });
+
+            waitsFor(function () { return fail.wasCalled; }, Tests.TEST_TIMEOUT);
+
+            runs(function () { 
+                expect(win).not.toHaveBeenCalled();
+                expect(fail).toHaveBeenCalled();
+            });
+        });
+
+        describe("with newly-created contact", function () {
+
+            afterEach(removeContact);
+
+            it("should be able to find a contact by name", function() {
+                var foundName = jasmine.createSpy().andCallFake(function(result) {
+                        var bFound = false;
+                        try {
+                            for (var i=0; i < result.length; i++) {
+                                if (result[i].name.familyName == "Delete") {
+                                    bFound = true;
+                                    break;
+                                }
+                            }
+                        } catch(e) {
+                            return false;
+                        } 
+                        return bFound;
+                    }),
+                    fail = jasmine.createSpy(),
+                    test = jasmine.createSpy().andCallFake(function(savedContact) {
+                        console.log('in test');
+                        // update so contact will get removed
+                        gContactObj = savedContact;
+                        // ----
+                        // Find asserts
+                        // ---
+                        var findWin = jasmine.createSpy().andCallFake(function(object) {
+                                console.log('in findwin');
+                                expect(object instanceof Array).toBe(true);
+                                expect(object.length >= 1).toBe(true);
+                                expect(foundName(object)).toBe(true);
+                            }),
+                            findFail = jasmine.createSpy(),
+                            obj = new ContactFindOptions();
+
+                        obj.filter="Delete";
+                        obj.multiple=true;
+
+                        runs(function () {
+                            navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], findWin, findFail, obj);
+                        });
+
+                        waitsFor(function () { return foundName.wasCalled; }, "foundName not done", Tests.TEST_TIMEOUT);
+
+                        runs(function () {
+                            expect(findFail).not.toHaveBeenCalled();
+                            expect(fail).not.toHaveBeenCalled();
+                        });
+                    });
+
+                runs(function () {
+                    gContactObj = new Contact();
+                    gContactObj.name = new ContactName();
+                    gContactObj.name.familyName = "Delete";
+                    gContactObj.save(test, fail);
+                });
+
+                waitsFor(function () { return test.wasCalled; }, "test not done", Tests.TEST_TIMEOUT);
+            });
         });
     });
 
-    describe("Contacts (navigator.contacts)", function () {
-        it("should contain a create function", function() {
+    describe('create method', function() {
+
+        it("should exist", function() {
             expect(navigator.contacts.create).toBeDefined();
             expect(typeof navigator.contacts.create).toBe('function');
         });
 
-        it("contacts.create should return a Contact object", function() {
+        it("should return a Contact object", function() {
             var bDay = new Date(1976, 7,4);
             var obj = navigator.contacts.create({"displayName": "test name", "gender": "male", "note": "my note", "name": {"formatted": "Mr. Test Name"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], "birthday": bDay});		
 
@@ -164,8 +163,8 @@ describe("Contacts (navigator.contacts)", function () {
         });
     });
 
-    describe("Contact model", function () {
-        it("should be able to define a Contact object", function() {
+    describe("Contact object", function () {
+        it("should be able to create instance", function() {
             var contact = new Contact("a", "b", new ContactName("a", "b", "c", "d", "e", "f"), "c", [], [], [], [], [], "f", "i",  
                 [], [], []);
             expect(contact).toBeDefined();
@@ -233,9 +232,7 @@ describe("Contacts (navigator.contacts)", function () {
             expect(contactFindOptions.filter).toBe("a");
             expect(contactFindOptions.multiple).toBe(true);
         });	
-    });
 
-    describe("Contact Object", function () {
         it("should contain a clone function", function() {
             var contact = new Contact();
             expect(contact.clone).toBeDefined();
@@ -276,7 +273,7 @@ describe("Contacts (navigator.contacts)", function () {
         });
     });
 
-    describe('Contact.save method', function () {
+    describe('save method', function () {
         it("should be able to save a contact", function() {
             var bDay = new Date(1976, 6,4);
             gContactObj = navigator.contacts.create({"gender": "male", "note": "my note", "name": {"familyName": "Delete", "givenName": "Test"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], "birthday": bDay});	

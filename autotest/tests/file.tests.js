@@ -1,44 +1,8 @@
-/**
- * Retrieves root file system entries once, so they don't have to be 
- * repeated for every it (file system shouldn't change during it run). 
- */ 
-var getFileSystemRoot = (function() {
-
-    // private
-    var temp_root, persistent_root;
-
-    var onError = function(error) {
-        console.log('[ERROR getFileSystemRoot] Unable to retrieve file system: ' + error.code);
-    };
-    
-    // one-time retrieval of the root file system entry
-    var init = function() {
-        window.requestFileSystem(LocalFileSystem.PERSISTENT, 0,
-                function(fileSystem) {
-                    console.log('File API test Init: Setting PERSISTENT FS.');
-                    persistent_root = fileSystem.root;
-                }, onError);
-        window.requestFileSystem(LocalFileSystem.TEMPORARY, 0,
-                function(fileSystem) {
-                    console.log('File API test Init: Setting TEMPORARY FS.');
-                    temp_root = fileSystem.root;
-                }, onError);
-    };
-    document.addEventListener("deviceready", init, true);
-
-    // public function returns private root entry
-    return function() {
-        // When testing, it is a good idea to run the test suite once for each
-        // file system type.  Just change the return value from this function.  
-        //return temp_root;
-        return persistent_root;
-    };
-}()); // execute immediately
+// Used by tests, set in file.html
+var root, temp_root, persistent_root;
 
 describe('File API', function() {
     // HELPER FUNCTIONS
-    var that = this;
-    var root = getFileSystemRoot();
 
     // deletes specified file or directory
     var deleteEntry = function(name, success, error) {
@@ -51,6 +15,16 @@ describe('File API', function() {
                     entry.remove(success, error);
                 }
             }, success);
+    };
+    // deletes file, if it exists, then invokes callback
+    var deleteFile = function(fileName, callback) {
+        root.getFile(fileName, null, 
+                // remove file system entry
+                function(entry) {
+                    entry.remove(callback, function() { console.log('[ERROR] deleteFile cleanup method invoked fail callback.'); });
+                },
+                // doesn't exist
+                callback);
     };
     // deletes and re-creates the specified file
     var createFile = function(fileName, success, error) {
@@ -204,7 +178,7 @@ describe('File API', function() {
                 resolveCallback = jasmine.createSpy().andCallFake(function(entry) {
                     // lookup file system entry
                     runs(function() {
-                        window.resolveLocalFileSystemURI(entry.toURI(), win, fail);
+                        window.resolveLocalFileSystemURI(entry.toURL(), win, fail);
                     });
 
                     waitsFor(function() { return win.wasCalled; }, "resolveLocalFileSystemURI callback never called", Tests.TEST_TIMEOUT);
@@ -235,7 +209,7 @@ describe('File API', function() {
                 resolveCallback = jasmine.createSpy().andCallFake(function(entry) {
                     // lookup file system entry
                     runs(function() {
-                        window.resolveLocalFileSystemURI(entry.toURI() + "?1234567890", win, fail);
+                        window.resolveLocalFileSystemURI(entry.toURL() + "?1234567890", win, fail);
                     });
 
                     waitsFor(function() { return win.wasCalled; }, "resolveLocalFileSystemURI callback never called", Tests.TEST_TIMEOUT);
@@ -347,8 +321,8 @@ describe('File API', function() {
         });
     });
 
-    describe('DirectoryEntry interface', function() {
-        it("DirectoryEntry.getFile: get Entry for file that does not exist", function() {
+    describe('DirectoryEntry', function() {
+        it("getFile: get Entry for file that does not exist", function() {
             var fileName = "de.no.file",
                 filePath = root.fullPath + '/' + fileName,
                 fail = jasmine.createSpy().andCallFake(function(error) {
@@ -369,7 +343,7 @@ describe('File API', function() {
                 expect(win).not.toHaveBeenCalled();
             });
         });
-        it("DirectoryEntry.getFile: create new file", function() {
+        it("etFile: create new file", function() {
             var fileName = "de.create.file",
                 filePath = root.fullPath + '/' + fileName,
                 win = jasmine.createSpy().andCallFake(function(entry) {
@@ -395,7 +369,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("DirectoryEntry.getFile: create new file (exclusive)", function() {
+        it("getFile: create new file (exclusive)", function() {
             var fileName = "de.create.exclusive.file",
                 filePath = root.fullPath + '/' + fileName,
                 win = jasmine.createSpy().andCallFake(function(entry) {
@@ -422,7 +396,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("DirectoryEntry.getFile: create file that already exists", function() {
+        it("getFile: create file that already exists", function() {
             var fileName = "de.create.existing.file",
                 filePath = root.fullPath + '/' + fileName,
                 getFile = jasmine.createSpy().andCallFake(function(file) {
@@ -456,7 +430,7 @@ describe('File API', function() {
 
             waitsFor(function() { return getFile.wasCalled; }, "getFile was never called", Tests.TEST_TIMEOUT);
         });
-        it("DirectoryEntry.getFile: create file that already exists (exclusive)", function() {
+        it("getFile: create file that already exists (exclusive)", function() {
             var fileName = "de.create.exclusive.existing.file",
                 filePath = root.fullPath + '/' + fileName,
                 existingFile,
@@ -490,23 +464,10 @@ describe('File API', function() {
 
             waitsFor(function() { return getFile.wasCalled; }, "getFile never called", Tests.TEST_TIMEOUT);
         });
-        it("DirectoryEntry.getFile: get Entry for existing file", function() {
+        it("getFile: get Entry for existing file", function() {
             var fileName = "de.get.file",
                 filePath = root.fullPath + '/' + fileName,
-                getFile = jasmine.createSpy().andCallFake(function(file) {
-                    // create:false, exclusive:false, file exists
-                    runs(function() {
-                        root.getFile(fileName, {create:false}, win, fail);
-                    });
-
-                    waitsFor(function() { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
-
-                    runs(function() {
-                        expect(win).toHaveBeenCalled();
-                        expect(fail).not.toHaveBeenCalled();
-                    });
-                },
-                win = function(entry) {
+                win = jasmine.createSpy().andCallFake(function(entry) {
                     expect(entry).toBeDefined();
                     expect(entry.isFile).toBe(true);
                     expect(entry.isDirectory).toBe(false);
@@ -515,14 +476,27 @@ describe('File API', function() {
             
                     entry.remove(null, fail); //clean up
                 }),
-                fail = createFail('DirectoryEntry');
+                fail = createFail('DirectoryEntry'),
+                getFile = jasmine.createSpy().andCallFake(function(file) {
+                    // create:false, exclusive:false, file exists
+                    runs(function() {
+                        root.getFile(fileName, {create:false}, win, fail);
+                    });
+
+                    waitsFor(function() { return win.wasCalled; }, "getFile success callback", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                });
             
             // create file to kick off it
             runs(function() {
                 root.getFile(fileName, {create:true}, getFile, fail);
             });
 
-            waitsFor(function() { return getFile.wasCalled; }, "getFile never called", Tests.TEST_TIMEOUT);
+            waitsFor(function() { return getFile.wasCalled; }, "file creation", Tests.TEST_TIMEOUT);
         });
         it("DirectoryEntry.getFile: get FileEntry for invalid path", function() {
             var fileName = "de:invalid:path",
@@ -930,13 +904,13 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("DirectoryEntry.createReader: create reader on existing directory", function() {
+        it("createReader: create reader on existing directory", function() {
             // create reader for root directory 
             var reader = root.createReader();
             expect(reader).toBeDefined();
-            expect(reader.readEntries).toBe(jasmine.any(Function));
+            expect(typeof reader.readEntries).toBe('function');
         });
-        it("DirectoryEntry.removeRecursively on root file system", function() {
+        it("removeRecursively on root file system", function() {
             var remove = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
                     expect(error.code).toBe(FileError.NO_MODIFICATION_ALLOWED_ERR);
@@ -952,7 +926,7 @@ describe('File API', function() {
 
             runs(function() {
                 expect(win).not.toHaveBeenCalled();
-                expect(fail).toHaveBeenCalled();
+                expect(remove).toHaveBeenCalled();
             });
         });
     });
@@ -963,7 +937,7 @@ describe('File API', function() {
                 var reader,
                     win = jasmine.createSpy().andCallFake(function(entries) {
                         expect(entries).toBeDefined();
-                        expect(entries.constructor).toBe(jasmine.any(Array));
+                        expect(entries instanceof Array).toBe(true);
                     }),
                     fail = createFail('DirectoryReader');
                 
@@ -1035,9 +1009,10 @@ describe('File API', function() {
         });
     });
 
-    describe('File interface', function() {
+    describe('File', function() {
         it("constructor should be defined", function() {
-            expect(File).toBe(jasmine.any(Function));
+            expect(File).toBeDefined();
+            expect(typeof File).toBe('function');
         });
         it("should be define File attributes", function() {
             var file = new File();
@@ -1049,13 +1024,13 @@ describe('File API', function() {
         });
     });
 
-    describe('FileEntry interface', function() {
+    describe('FileEntry', function() {
         it("should be define FileEntry methods", function() {
             var fileName = "fe.methods",
                 itFileEntry = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.createWriter).toBe(jasmine.any(Function));
-                    expect(fileEntry.file).toBe(jasmine.any(Function));
+                    expect(typeof fileEntry.createWriter).toBe('function');
+                    expect(typeof fileEntry.file).toBe('function');
                     
                     // cleanup 
                     fileEntry.remove(null, fail);
@@ -1074,7 +1049,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("FileEntry.createWriter should return a FileWriter object", function() {
+        it("createWriter should return a FileWriter object", function() {
             var fileName = "fe.createWriter",
                 itFile,
                 entryCallback = jasmine.createSpy().andCallFake(function(fileEntry) {
@@ -1084,7 +1059,7 @@ describe('File API', function() {
                         fileEntry.createWriter(itWriter, fail);
                     });
 
-                    waitsFor(function() { return itWriter.wasCalled; }, "itWriter never called", Tests.TEST_TIMEOUT);
+                    waitsFor(function() { return itWriter.wasCalled; }, "itWriter", Tests.TEST_TIMEOUT);
 
                     runs(function() {
                         expect(itWriter).toHaveBeenCalled();
@@ -1093,7 +1068,7 @@ describe('File API', function() {
                 }),
                 itWriter = jasmine.createSpy().andCallFake(function(writer) {
                     expect(writer).toBeDefined();
-                    expect(writer.constructor).toBe(jasmine.any(FileWriter));
+                    expect(writer instanceof FileWriter).toBe(true);
                     
                     // cleanup 
                     itFile.remove(null, fail);
@@ -1107,7 +1082,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("FileEntry.file should return a File object", function() {
+        it("file should return a File object", function() {
             var fileName = "fe.file",
                 newFile,
                 entryCallback = jasmine.createSpy().andCallFake(function(fileEntry) {
@@ -1126,7 +1101,7 @@ describe('File API', function() {
                 }),
                 itFile = jasmine.createSpy().andCallFake(function(file) {
                     expect(file).toBeDefined();
-                    expect(file.constructor).toBe(jasmine.any(File));
+                    expect(file instanceof File).toBe(true);
                     
                     // cleanup 
                     newFile.remove(null, fail);
@@ -1140,7 +1115,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("FileEntry.file: on File that has been removed", function() {
+        it("file: on File that has been removed", function() {
             var fileName = "fe.no.file",
                 entryCallback = jasmine.createSpy().andCallFake(function(fileEntry) {
                     // create File object
@@ -1178,7 +1153,7 @@ describe('File API', function() {
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
     });
-    describe('Entry interface', function() {
+    describe('Entry', function() {
         it("Entry object", function() {
             var fileName = "entry",
                 fullPath = root.fullPath + '/' + fileName,
@@ -1189,14 +1164,14 @@ describe('File API', function() {
                     expect(entry.isDirectory).toBe(false);
                     expect(entry.name).toBe(fileName);
                     expect(entry.fullPath).toBe(fullPath);
-                    expect(entry.getMetadata).toBe(jasmine.any(Function));
-                    expect(entry.moveTo).toBe(jasmine.any(Function));
-                    expect(entry.copyTo).toBe(jasmine.any(Function));
-                    expect(entry.toURL).toBe(jasmine.any(Function));
-                    expect(entry.remove).toBe(jasmine.any(Function));
-                    expect(entry.getParent).toBe(jasmine.any(Function));
-                    expect(entry.createWriter).toBe(jasmine.any(Function));
-                    expect(entry.file).toBe(jasmine.any(Function));
+                    expect(typeof entry.getMetadata).toBe('function');
+                    expect(typeof entry.moveTo).toBe('function');
+                    expect(typeof entry.copyTo).toBe('function');
+                    expect(typeof entry.toURL).toBe('function');
+                    expect(typeof entry.remove).toBe('function');
+                    expect(typeof entry.getParent).toBe('function');
+                    expect(typeof entry.createWriter).toBe('function');
+                    expect(typeof entry.file).toBe('function');
 
                     // cleanup
                     deleteEntry(fileName);
@@ -1207,7 +1182,7 @@ describe('File API', function() {
                 createFile(fileName, itEntry, fail);
             });
 
-            waitsFor(function() { return itEntry.wasCalled; }, "itEntry never called", Tests.TEST_TIMEOUT);
+            waitsFor(function() { return itEntry.wasCalled; }, "itEntry", Tests.TEST_TIMEOUT);
 
             runs(function() {
                 expect(itEntry).toHaveBeenCalled();
@@ -1231,7 +1206,7 @@ describe('File API', function() {
                 fail = createFail('Entry'),
                 itMetadata = jasmine.createSpy().andCallFake(function(metadata) {
                     expect(metadata).toBeDefined();
-                    expect(metadata.modificationTime).toBe(jasmine.any(Date));
+                    expect(metadata.modificationTime instanceof Date).toBe(true);
 
                     // cleanup
                     deleteEntry(fileName);
@@ -1257,7 +1232,7 @@ describe('File API', function() {
                 fail = createFail('Entry'),
                 itMetadata = jasmine.createSpy().andCallFake(function(metadata) {
                     expect(metadata).toBeDefined();
-                    expect(metadata.modificationTime).toBe(jasmine.any(Date));
+                    expect(metadata.modificationTime instanceof Date).toBe(true);
 
                     // cleanup
                     deleteEntry(dirName);
@@ -1443,7 +1418,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.remove on empty directory", function() {
+        it("remove on empty directory", function() {
             var dirName = "entry.rm.dir",
                 fullPath = root.fullPath + '/' + dirName,
                 entryCallback = jasmine.createSpy().andCallFake(function(entry) {
@@ -1469,12 +1444,12 @@ describe('File API', function() {
 
                     waitsFor(function() { return checkRemove.wasCalled; }, "checkRemove never called", Tests.TEST_TIMEOUT);
                 }),
-                itRemove = function(error) {
+                itRemove = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
                     expect(error.code).toBe(FileError.NOT_FOUND_ERR);
                     // cleanup
                     deleteEntry(dirName);
-                },
+                }),
                 win = createWin('Entry'),
                 fail = createFail('Entry');
 
@@ -1485,7 +1460,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.remove on non-empty directory", function() {
+        it("remove on non-empty directory", function() {
             var dirName = "entry.rm.dir.not.empty",
                 fullPath = root.fullPath + '/' + dirName,
                 fileName = "remove.txt",
@@ -1537,7 +1512,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.remove on root file system", function() {
+        it("remove on root file system", function() {
             var itRemove = jasmine.createSpy().andCallFake(function(error) {
                 expect(error).toBeDefined();
                 expect(error.code).toBe(FileError.NO_MODIFICATION_ALLOWED_ERR);
@@ -1556,7 +1531,7 @@ describe('File API', function() {
                 expect(itRemove).toHaveBeenCalled();
             });
         });
-        it("Entry.copyTo: file", function() {
+        it("copyTo: file", function() {
             var file1 = "entry.copy.file1",
                 file2 = "entry.copy.file2",
                 fullPath = root.fullPath + '/' + file2,
@@ -1564,17 +1539,17 @@ describe('File API', function() {
                 entryCallback = jasmine.createSpy().andCallFake(function(entry) {
                     // copy file1 to file2
                     runs(function() {
-                        entry.copyTo(that.root, file2, itCopy, fail);
+                        entry.copyTo(root, file2, itCopy, fail);
                     });
 
                     waitsFor(function() { return itCopy.wasCalled; }, "itCopy never called", Tests.TEST_TIMEOUT);
                 }),
                 itCopy = jasmine.createSpy().andCallFake(function(entry) {
                     expect(entry).toBeDefined();
-                    expects(entry.isFile).toBe(true);
-                    expects(entry.isDirectory).toBe(false);
-                    expects(entry.fullPath).toBe(fullPath);
-                    expects(entry.name).toBe(file2);
+                    expect(entry.isFile).toBe(true);
+                    expect(entry.isDirectory).toBe(false);
+                    expect(entry.fullPath).toBe(fullPath);
+                    expect(entry.name).toBe(file2);
 
                     runs(function() {
                         root.getFile(file2, {create:false}, itFileExists, fail);
@@ -1607,7 +1582,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.copyTo: file onto itself", function() {
+        it("copyTo: file onto itself", function() {
             var file1 = "entry.copy.fos.file1",
                 entryCallback = jasmine.createSpy().andCallFake(function(entry) {
                     // copy file1 onto itself
@@ -1640,7 +1615,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.copyTo: directory", function() {
+        it("copyTo: directory", function() {
             var file1 = "file1",
                 srcDir = "entry.copy.srcDir",
                 dstDir = "entry.copy.dstDir",
@@ -1714,70 +1689,56 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.copyTo: directory to backup at same root directory", function() {
+        it("copyTo: directory to backup at same root directory", function() {
             var file1 = "file1",
-                srcDir = "entry.copy.srcDir",
-                dstDir = "entry.copy.srcDir-backup",
+                srcDir = "entry.copy.srcDirSame",
+                dstDir = "entry.copy.srcDirSame-backup",
                 dstPath = root.fullPath + '/' + dstDir,
                 filePath = dstPath + '/' + file1,
-                fail = createFail('Entry'),
-                entryCallback = jasmine.createSpy().andCallFake(function(directory) {
-                    var copyDir = jasmine.createSpy().andCallFake(function(fileEntry) {
+                fail = createFail('Entry copyTo: directory to backup at same root'),
+                entryCallback = function(directory) {
+                    var copyDir = function(fileEntry) {
                         // copy srcDir to dstDir
-                        runs(function() {
-                            directory.copyTo(root, dstDir, itCopy, fail);
-                        });
-
-                        waitsFor(function() { return itCopy.wasCalled; } , "itCopy never called", Tests.TEST_TIMEOUT);
-                    });
+                        directory.copyTo(root, dstDir, itCopy, fail);
+                    };
                     // create a file within new directory
-                    runs(function() {
-                        directory.getFile(file1, {create: true}, copyDir, fail);
-                    });
-
-                    waitsFor(function() { return copyDir.wasCalled; }, "copyDir never called", Tests.TEST_TIMEOUT);
-                }),
-                itCopy = jasmine.createSpy().andCallFake(function(directory) {
+                    directory.getFile(file1, {create: true}, copyDir, fail);
+                },
+                itCopy = function(directory) {
                     expect(directory).toBeDefined();
                     expect(directory.isFile).toBe(false);
                     expect(directory.isDirectory).toBe(true);
                     expect(directory.fullPath).toBe(dstPath);
                     expect(directory.name).toBe(dstDir);
              
-                    runs(function() {
-                        root.getDirectory(dstDir, {create:false}, itDirExists, fail);
-                    });
-
-                    waitsFor(function() { return itDirExists.wasCalled; } , "itDirExists never called", Tests.TEST_TIMEOUT);
-                }),
-                itDirExists = jasmine.createSpy().andCallFake(function(dirEntry) {
+                    root.getDirectory(dstDir, {create:false}, itDirExists, fail);
+                },
+                itDirExists = function(dirEntry) {
                      expect(dirEntry).toBeDefined();
                      expect(dirEntry.isFile).toBe(false);
                      expect(dirEntry.isDirectory).toBe(true);
                      expect(dirEntry.fullPath).toBe(dstPath);
                      expect(dirEntry.name).toBe(dstDir);
                      
-                     runs(function() {
-                         dirEntry.getFile(file1, {create:false}, itFileExists, fail);
-                     });
-
-                     waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists never called", Tests.TEST_TIMEOUT);
-
-                     runs(function() {
-                        expect(itFileExists).toHaveBeenCalled();
-                        expect(fail).not.toHaveBeenCalled();
-                     });
-                }),
+                     dirEntry.getFile(file1, {create:false}, itFileExists, fail);
+                },
                 itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
-                    expect(fileEntry).toBeDefined();
-                    expects(fileEntry.isFile).toBe(true);
-                    expects(fileEntry.isDirectory).toBe(false);
-                    expects(fileEntry.fullPath).toBe(filePath);
-                    expects(fileEntry.name).toBe(file1);
+                    var cleanSrc = jasmine.createSpy();
+                    var cleanDst = jasmine.createSpy();
+                    runs(function() {
+                        expect(fileEntry).toBeDefined();
+                        expect(fileEntry.isFile).toBe(true);
+                        expect(fileEntry.isDirectory).toBe(false);
+                        expect(fileEntry.fullPath).toBe(filePath);
+                        expect(fileEntry.name).toBe(file1);
+                        expect(fail).not.toHaveBeenCalled();
 
-                    // cleanup
-                    deleteEntry(srcDir);
-                    deleteEntry(dstDir);
+                        // cleanup
+                        deleteEntry(srcDir, cleanSrc);
+                        deleteEntry(dstDir, cleanDst);
+                    });
+
+                    waitsFor(function() { return cleanSrc.wasCalled && cleanDst.wasCalled; }, "cleanSrc and cleanDst cleanup methods", Tests.TEST_TIMEOUT);
                 });
 
             // create a new directory entry to kick off it
@@ -1785,15 +1746,15 @@ describe('File API', function() {
                 createDirectory(srcDir, entryCallback, fail);
             });
 
-            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+            waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists", 10000);
         });
-        it("Entry.copyTo: directory onto itself", function() {
+        it("copyTo: directory onto itself", function() {
             var file1 = "file1",
                 srcDir = "entry.copy.dos.srcDir",
                 srcPath = root.fullPath + '/' + srcDir,
                 filePath = srcPath + '/' + file1,
                 win = createWin('Entry'),
-                fail = createFail('Entry'),
+                fail = createFail('Entry copyTo: directory onto itself'),
                 entryCallback = jasmine.createSpy().andCallFake(function(directory) {
                     var copyDir = jasmine.createSpy().andCallFake(function(fileEntry) {
                         // copy srcDir onto itself
@@ -1818,7 +1779,7 @@ describe('File API', function() {
                         root.getDirectory(srcDir, {create:false}, itDirectoryExists, fail);
                     });
 
-                    waitsFor(function() { return itDirectoryExists.wasCalled; }, "itDirectoryExists never called", Tests.TEST_TIMEOUT);
+                    waitsFor(function() { return itDirectoryExists.wasCalled; }, "itDirectoryExists", Tests.TEST_TIMEOUT);
                 }),
                 itDirectoryExists = jasmine.createSpy().andCallFake(function(dirEntry) {
                     // returning confirms existence so just check fullPath entry
@@ -1852,7 +1813,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.copyTo: directory into itself", function() {
+        it("copyTo: directory into itself", function() {
             var srcDir = "entry.copy.dis.srcDir",
                 dstDir = "entry.copy.dis.dstDir",
                 fail = createFail('Entry'),
@@ -1864,7 +1825,7 @@ describe('File API', function() {
                         directory.copyTo(directory, dstDir, win, itCopy);
                     });
 
-                    waitsFor(function() { return itCopy.wasCalled; }, "itCopy never called", Tests.TEST_TIMEOUT);
+                    waitsFor(function() { return itCopy.wasCalled; }, "itCopy", Tests.TEST_TIMEOUT);
                 }),
                 itCopy = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
@@ -1882,14 +1843,14 @@ describe('File API', function() {
                         expect(fail).not.toHaveBeenCalled();
                     });
                 }),
-                itDirectoryExists = function(dirEntry) {
+                itDirectoryExists = jasmine.createSpy().andCallFake(function(dirEntry) {
                     // returning confirms existence so just check fullPath entry
                     expect(dirEntry).toBeDefined();
                     expect(dirEntry.fullPath).toBe(srcPath);
 
                     // cleanup
                     deleteEntry(srcDir);
-                };
+                });
 
             // create a new directory entry to kick off it
             runs(function() {
@@ -1898,7 +1859,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.copyTo: directory that does not exist", function() {
+        it("copyTo: directory that does not exist", function() {
             var file1 = "entry.copy.dnf.file1", 
                 dstDir = "entry.copy.dnf.dstDir",
                 filePath = root.fullPath + '/' + file1,
@@ -1930,13 +1891,13 @@ describe('File API', function() {
                         expect(fail).not.toHaveBeenCalled();
                     });
                 }),
-                itFileExists = function(fileEntry) {
+                itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
                     expect(fileEntry.fullPath).toBe(filePath);
 
                     // cleanup
                     deleteEntry(file1);
-                };
+                });
 
             // create a new file entry to kick off it
             runs(function() {
@@ -1945,7 +1906,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.copyTo: invalid target name", function() {
+        it("copyTo: invalid target name", function() {
             var file1 = "entry.copy.itn.file1",
                 file2 = "bad:file:name",
                 filePath = root.fullPath + '/' + file1,
@@ -1954,7 +1915,7 @@ describe('File API', function() {
                 entryCallback = jasmine.createSpy().andCallFake(function(entry) {
                     // copy file1 to file2
                     runs(function() {
-                        entry.copyTo(that.root, file2, win, itCopy);
+                        entry.copyTo(root, file2, win, itCopy);
                     });
 
                     waitsFor(function() { return itCopy.wasCalled; }, "itCopy never called", Tests.TEST_TIMEOUT);
@@ -1980,7 +1941,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.moveTo: file to same parent", function() {
+        it("moveTo: file to same parent", function() {
             var file1 = "entry.move.fsp.file1",
                 file2 = "entry.move.fsp.file2",
                 srcPath = root.fullPath + '/' + file1,
@@ -1990,7 +1951,7 @@ describe('File API', function() {
                 entryCallback = jasmine.createSpy().andCallFake(function(entry) {
                     // move file1 to file2
                     runs(function() {
-                        entry.moveTo(that.root, file2, itMove, fail);
+                        entry.moveTo(root, file2, itMove, fail);
                     });
 
                     waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
@@ -2024,7 +1985,7 @@ describe('File API', function() {
                         expect(itOrig).toHaveBeenCalled();
                     });
                 }),
-                itOrig = function(error) {
+                itOrig = jasmine.createSpy().andCallFake(function(error) {
                     //expect(navigator.fileMgr.itFileExists(srcPath) === false, "original file should not exist.");
                     expect(error).toBeDefined();
                     expect(error.code).toBe(FileError.NOT_FOUND_ERR);
@@ -2032,7 +1993,7 @@ describe('File API', function() {
                     // cleanup
                     deleteEntry(file1);
                     deleteEntry(file2);
-                };
+                });
 
             // create a new file entry to kick off it
             runs(function() {
@@ -2041,7 +2002,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.moveTo: file to new parent", function() {
+        it("moveTo: file to new parent", function() {
             var file1 = "entry.move.fnp.file1",
                 dir = "entry.move.fnp.dir",
                 srcPath = root.fullPath + '/' + file1,
@@ -2113,7 +2074,7 @@ describe('File API', function() {
             });
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.moveTo: directory to same parent", function() {
+        it("moveTo: directory to same parent", function() {
             var file1 = "file1",
                 srcDir = "entry.move.dsp.srcDir",
                 dstDir = "entry.move.dsp.dstDir",
@@ -2126,7 +2087,7 @@ describe('File API', function() {
                     var moveDir = jasmine.createSpy().andCallFake(function(fileEntry) {
                         // move srcDir to dstDir
                         runs(function() {
-                            directory.moveTo(that.root, dstDir, itMove, fail);
+                            directory.moveTo(root, dstDir, itMove, fail);
                         });
 
                         waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
@@ -2188,7 +2149,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCAllback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.moveTo: directory to same parent with same name", function() {
+        it("moveTo: directory to same parent with same name", function() {
             var file1 = "file1",
                 srcDir = "entry.move.dsp.srcDir",
                 dstDir = "entry.move.dsp.srcDir-backup",
@@ -2201,7 +2162,7 @@ describe('File API', function() {
                     var moveDir = jasmine.createSpy().andCallFake(function(fileEntry) {
                         // move srcDir to dstDir
                         runs(function() {
-                            directory.moveTo(that.root, dstDir, itMove, fail);
+                            directory.moveTo(root, dstDir, itMove, fail);
                         });
 
                         waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
@@ -2261,7 +2222,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.moveTo: directory to new parent", function() {
+        it("moveTo: directory to new parent", function() {
             var file1 = "file1",
                 srcDir = "entry.move.dnp.srcDir",
                 dstDir = "entry.move.dnp.dstDir",
@@ -2334,7 +2295,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.moveTo: directory onto itself", function() {
+        it("moveTo: directory onto itself", function() {
             var file1 = "file1",
                 srcDir = "entry.move.dos.srcDir",
                 srcPath = root.fullPath + '/' + srcDir,
@@ -2366,7 +2327,7 @@ describe('File API', function() {
                         root.getDirectory(srcDir, {create:false}, itDirectoryExists, fail);
                     });
 
-                    waitsFor(function() { return itDirectoryExists.wasCalled; }, "itDirectoryExists never called", Tests.TEST_TIMEOUT);
+                    waitsFor(function() { return itDirectoryExists.wasCalled; }, "itDirectoryExists", Tests.TEST_TIMEOUT);
                 }),
                 itDirectoryExists = jasmine.createSpy().andCallFake(function(dirEntry) {
                     // returning confirms existence so just check fullPath entry
@@ -2400,7 +2361,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.moveTo: directory into itself", function() {
+        it("moveTo: directory into itself", function() {
             var srcDir = "entry.move.dis.srcDir",
                 dstDir = "entry.move.dis.dstDir",
                 srcPath = root.fullPath + '/' + srcDir,
@@ -2430,13 +2391,13 @@ describe('File API', function() {
                         expect(itDirectoryExists).toHaveBeenCalled();
                     });
                 }),
-                itDirectoryExists = function(entry) {
+                itDirectoryExists = jasmine.createSpy().andCallFake(function(entry) {
                     expect(entry).toBeDefined();
-                    expects(entry.fullPath).toBe(srcPath);
+                    expect(entry.fullPath).toBe(srcPath);
                  
                     // cleanup
                     deleteEntry(srcDir);
-                };
+                });
 
             // create a new directory entry to kick off it
             runs(function() {
@@ -2445,7 +2406,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.moveTo: file onto itself", function() {
+        it("moveTo: file onto itself", function() {
             var file1 = "entry.move.fos.file1",
                 filePath = root.fullPath + '/' + file1,
                 win = createWin('Entry'),
@@ -2453,7 +2414,7 @@ describe('File API', function() {
                 entryCallback = jasmine.createSpy().andCallFake(function(entry) {
                     // move file1 onto itself
                     runs(function() {
-                        entry.moveTo(that.root, null, win, itMove);
+                        entry.moveTo(root, null, win, itMove);
                     });
 
                     waitsFor(function() { return itMove.wasCalled; }, "itMove never called", Tests.TEST_TIMEOUT);
@@ -2490,7 +2451,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCAllback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.moveTo: file onto existing directory", function() {
+        it("moveTo: file onto existing directory", function() {
             var file1 = "entry.move.fod.file1",
                 dstDir = "entry.move.fod.dstDir",
                 subDir = "subDir",
@@ -2547,7 +2508,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("Entry.moveTo: directory onto existing file", function() {
+        it("moveTo: directory onto existing file", function() {
             var file1 = "entry.move.dof.file1",
                 srcDir = "entry.move.dof.srcDir",
                 dirPath = root.fullPath + '/' + srcDir,
@@ -2597,7 +2558,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("Entry.copyTo: directory onto existing file", function() {
+        it("copyTo: directory onto existing file", function() {
             var file1 = "entry.copy.dof.file1",
                 srcDir = "entry.copy.dof.srcDir",
                 dirPath = root.fullPath + '/' + srcDir,
@@ -2607,7 +2568,7 @@ describe('File API', function() {
                 entryCallback = function(entry) {
                     var copyDir = function(fileEntry) {
                         // move directory onto file
-                        entry.copyTo(that.root, file1, win, itMove);
+                        entry.copyTo(root, file1, win, itMove);
                     };
                     // create file
                     root.getFile(file1, {create: true}, copyDir, fail);
@@ -2647,19 +2608,19 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("Entry.moveTo: directory onto directory that is not empty", function() {
+        it("moveTo: directory onto directory that is not empty", function() {
             var srcDir = "entry.move.dod.srcDir",
                 dstDir = "entry.move.dod.dstDir",
                 subDir = "subDir",
-                srcPath = this.root.fullPath + '/' + srcDir,
-                dstPath = this.root.fullPath + '/' + dstDir + '/' + subDir,
+                srcPath = root.fullPath + '/' + srcDir,
+                dstPath = root.fullPath + '/' + dstDir + '/' + subDir,
                 win = createWin('Entry'),
                 fail = createFail('Entry'),
                 entryCallback = function(entry) {
                     var createSubDirectory = function(directory) {
                         var moveDir = function(subDirectory) {
                             // move srcDir onto dstDir (not empty)
-                            entry.moveTo(that.root, dstDir, win, itMove);
+                            entry.moveTo(root, dstDir, win, itMove);
                         };
                         var itMove = function(error) {
                             expect(error).toBeDefined();
@@ -2705,7 +2666,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("Entry.moveTo: file replace existing file", function() {
+        it("moveTo: file replace existing file", function() {
             var file1 = "entry.move.frf.file1",
                 file2 = "entry.move.frf.file2",
                 file1Path = root.fullPath + '/' + file1,
@@ -2758,7 +2719,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("Entry.moveTo: directory replace empty directory", function() {
+        it("moveTo: directory replace empty directory", function() {
             var file1 = "file1",
                 srcDir = "entry.move.drd.srcDir",
                 dstDir = "entry.move.drd.dstDir",
@@ -2774,7 +2735,7 @@ describe('File API', function() {
                     };
                     var moveDir = function(fileEntry) {
                         // move srcDir to dstDir
-                        directory.moveTo(that.root, dstDir, itMove, fail);
+                        directory.moveTo(root, dstDir, itMove, fail);
                     };
                     // create a file within source directory
                     directory.getFile(file1, {create: true}, mkdir, fail);
@@ -2820,7 +2781,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("Entry.moveTo: directory that does not exist", function() {
+        it("moveTo: directory that does not exist", function() {
             var file1 = "entry.move.dnf.file1", 
                 dstDir = "entry.move.dnf.dstDir",
                 filePath = root.fullPath + '/' + file1,
@@ -2854,7 +2815,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("Entry.moveTo: invalid target name", function() {
+        it("moveTo: invalid target name", function() {
             var file1 = "entry.move.itn.file1",
                 file2 = "bad:file:name",
                 filePath = root.fullPath + '/' + file1,
@@ -2864,13 +2825,13 @@ describe('File API', function() {
                     // move file1 to file2
                     entry.moveTo(root, file2, win, itMove);
                 },
-                itMove = function(error) {
+                itMove = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
                     expect(error.code).toBe(FileError.ENCODING_ERR);
 
                     // cleanup
                     deleteEntry(file1);
-                };
+                });
 
             // create a new file entry to kick off it
             runs(function() {
@@ -2887,19 +2848,19 @@ describe('File API', function() {
         });
     });
 
-    describe('FileReader model', function() {
+    describe('FileReader', function() {
         it("should have correct methods", function() {
             var reader = new FileReader();
             expect(reader).toBeDefined();
-            expect(reader.readAsBinaryString).toBe(jasmine.any(Function));
-            expect(reader.readAsDataURL).toBe(jasmine.any(Function));
-            expect(reader.readAsText).toBe(jasmine.any(Function));
-            expect(reader.readAsArrayBuffer).toBe(jasmine.any(Function));
-            expect(reader.abort).toBe(jasmine.any(Function));
+            expect(typeof reader.readAsBinaryString).toBe('function');
+            expect(typeof reader.readAsDataURL).toBe('function');
+            expect(typeof reader.readAsText).toBe('function');
+            expect(typeof reader.readAsArrayBuffer).toBe('function');
+            expect(typeof reader.abort).toBe('function');
         });
     });
 
-    describe('FileReader read', function(){
+    describe('read method', function(){
         it("should read file properly, File object", function() {
             // path of file
             var fileName = "reader.txt",
@@ -3037,17 +2998,17 @@ describe('File API', function() {
         });
     });
 
-    describe('FileWriter model', function(){
+    describe('FileWriter', function(){
         it("should have correct methods", function() {
             // retrieve a FileWriter object
             var fileName = "writer.methods",
                 fail = createFail('FileWriter'),
                 verifier = jasmine.createSpy().andCallFake(function(writer) {
                     expect(writer).toBeDefined();
-                    expect(writer.write).toBe(jasmine.any(Function));
-                    expect(writer.seek).toBe(jasmine.any(Function));
-                    expect(writer.truncate).toBe(jasmine.any(Function));
-                    expect(writer.abort).toBe(jasmine.any(Function));
+                    expect(typeof writer.write).toBe('function');
+                    expect(typeof writer.seek).toBe('function');
+                    expect(typeof writer.truncate).toBe('function');
+                    expect(typeof writer.abort).toBe('function');
 
                     // cleanup
                     deleteFile(fileName);
@@ -3070,6 +3031,7 @@ describe('File API', function() {
         });
         it("should be able to write and append to file, createWriter", function() {
             var fileName = "writer.append",
+                theWriter,
                 filePath = root.fullPath + '/' + fileName,
                 // file content
                 rule = "There is an exception to every rule.",
@@ -3077,13 +3039,19 @@ describe('File API', function() {
                 length = rule.length,
                 fail = createFail('FileWriter'),
                 verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(writer.length).toBe(length);
-                    expect(writer.position).toBe(length);
-                    append_file(writer);
+                    expect(theWriter.length).toBe(length);
+                    expect(theWriter.position).toBe(length);
+
+                    // append some more stuff
+                    var exception = "  Except this one.";
+                    theWriter.onwriteend = anotherVerifier;
+                    length += exception.length;
+                    theWriter.seek(theWriter.length);
+                    theWriter.write(exception);
                 }),
                 anotherVerifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(writer.length).toBe(length);
-                    expect(writer.position).toBe(length);
+                    expect(theWriter.length).toBe(length);
+                    expect(theWriter.position).toBe(length);
 
                     // cleanup
                     deleteFile(fileName);
@@ -3091,17 +3059,10 @@ describe('File API', function() {
                 // writes initial file content
                 write_file = function(fileEntry) {
                     fileEntry.createWriter(function(writer) {
+                        theWriter = writer;
                         writer.onwriteend = verifier;
-                        writer.write(rule); 
+                        writer.write(rule);
                     }, fail);
-                }, 
-                // appends to file
-                append_file = function(writer) {
-                    var exception = "  Except this one.";
-                    writer.onwriteend = anotherVerifier;
-                    length += exception.length;
-                    writer.seek(writer.length);
-                    writer.write(exception);
                 };
             
             // create file, then write and append to it
@@ -3119,36 +3080,35 @@ describe('File API', function() {
         });
         it("should be able to write and append to file, File object", function() {
             var fileName = "writer.append",
+                theWriter,
                 filePath = root.fullPath + '/' + fileName,
                 // file content
                 rule = "There is an exception to every rule.",
                 // for checking file length
                 length = rule.length,
                 verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(writer.length).toBe(length);
-                    expect(writer.position).toBe(length);
-                    append_file(writer);
+                    expect(theWriter.length).toBe(length);
+                    expect(theWriter.position).toBe(length);
+
+                    // append some more stuff
+                    var exception = "  Except this one.";
+                    theWriter.onwriteend = anotherVerifier;
+                    length += exception.length;
+                    theWriter.seek(theWriter.length);
+                    theWriter.write(exception); 
                 }),
                 anotherVerifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(writer.length).toBe(length);
-                    expect(writer.position).toBe(length);
+                    expect(theWriter.length).toBe(length);
+                    expect(theWriter.position).toBe(length);
 
                     // cleanup
                     deleteFile(fileName);
                 }),
                 // writes initial file content
                 write_file = function(file) {
-                    var writer = new FileWriter(file);
-                    writer.onwriteend = verifier;
-                    writer.write(rule);
-                },
-                // appends to file
-                append_file = function(writer) {
-                    var exception = "  Except this one.";
-                    writer.onwriteend = anotherVerifier;
-                    length += exception.length;
-                    writer.seek(writer.length);
-                    writer.write(exception); 
+                    theWriter = new FileWriter(file);
+                    theWriter.onwriteend = verifier;
+                    theWriter.write(rule);
                 };
             
             // create file, then write and append to it
@@ -3158,7 +3118,7 @@ describe('File API', function() {
                 write_file(file);
             });
 
-            waitsFor(function() { return anotherVerifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+            waitsFor(function() { return anotherVerifier.wasCalled; }, "verifier", Tests.TEST_TIMEOUT);
 
             runs(function() {
                 expect(verifier).toHaveBeenCalled();
@@ -3168,19 +3128,26 @@ describe('File API', function() {
         it("should be able to seek to the middle of the file and write more data than file.length", function() {
             var fileName = "writer.seek.write",
                 filePath = root.fullPath + '/' + fileName,
+                theWriter,
                 // file content
                 rule = "This is our sentence.",
                 // for iting file length
                 length = rule.length,
                 fail = createFail('FileWriter'),
                 verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(writer.length).toBe(length);
-                    expect(writer.position).toBe(length);
-                    append_file(writer);
+                    expect(theWriter.length).toBe(length);
+                    expect(theWriter.position).toBe(length);
+
+                    // append some more stuff
+                    var exception = "newer sentence.";
+                    theWriter.onwriteend = anotherVerifier;
+                    length = 12 + exception.length;
+                    theWriter.seek(12);
+                    theWriter.write(exception); 
                 }),
                 anotherVerifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(writer.length).toBe(length);
-                    expect(writer.position).toBe(length);
+                    expect(theWriter.length).toBe(length);
+                    expect(theWriter.position).toBe(length);
 
                     // cleanup
                     deleteFile(fileName);
@@ -3188,17 +3155,10 @@ describe('File API', function() {
                 // writes initial file content
                 write_file = function(fileEntry) {
                     fileEntry.createWriter(function(writer) {
-                        writer.onwriteend = verifier;
-                        writer.write(rule);
+                        theWriter = writer;
+                        theWriter.onwriteend = verifier;
+                        theWriter.write(rule);
                     }, fail);
-                }, 
-                // appends to file
-                append_file = function(writer) {
-                    var exception = "newer sentence.";
-                    writer.onwriteend = anotherVerifier;
-                    length = 12 + exception.length;
-                    writer.seek(12);
-                    writer.write(exception); 
                 };
             
             // create file, then write and append to it
@@ -3218,17 +3178,24 @@ describe('File API', function() {
                 filePath = root.fullPath + '/' + fileName,
                 // file content
                 rule = "This is our sentence.",
+                theWriter,
                 fail = createFail('FileWriter'),
                 // for iting file length
                 length = rule.length,
                 verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(writer.length).toBe(length);
-                    expect(writer.position).toBe(length);
-                    append_file(writer);
+                    expect(theWriter.length).toBe(length);
+                    expect(theWriter.position).toBe(length);
+
+                    // append some more stuff
+                    var exception = "new.";
+                    theWriter.onwriteend = anotherVerifier;
+                    length = 8 + exception.length;
+                    theWriter.seek(8);
+                    theWriter.write(exception); 
                 }),
                 anotherVerifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(writer.length).toBe(length);
-                    expect(writer.position).toBe(length);
+                    expect(theWriter.length).toBe(length);
+                    expect(theWriter.position).toBe(length);
 
                     // cleanup
                     deleteFile(fileName);
@@ -3236,17 +3203,10 @@ describe('File API', function() {
                 // writes initial file content
                 write_file = function(fileEntry) {
                     fileEntry.createWriter(function(writer) {
-                        writer.onwriteend = verifier;
-                        writer.write(rule);
+                        theWriter = writer;
+                        theWriter.onwriteend = verifier;
+                        theWriter.write(rule);
                     }, fail);
-                }, 
-                // appends to file
-                append_file = function(writer) {
-                    var exception = "new.";
-                    writer.onwriteend = anotherVerifier;
-                    length = 8 + exception.length;
-                    writer.seek(8);
-                    writer.write(exception); 
                 };
             
             // create file, then write and append to it
@@ -3266,13 +3226,14 @@ describe('File API', function() {
             var fileName = "writer.xml",
                 filePath = root.fullPath + '/' + fileName,
                 fail = createFail('FileWriter'),
+                theWriter,
                 // file content
                 rule = '<?xml version="1.0" encoding="UTF-8"?>\n<it prop="ack">\nData\n</it>\n',
                 // for iting file length
                 length = rule.length,
                 verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(writer.length).toBe(length);
-                    expect(writer.position).toBe(length);
+                    expect(theWriter.length).toBe(length);
+                    expect(theWriter.position).toBe(length);
 
                     // cleanup
                     deleteFile(fileName);
@@ -3280,8 +3241,9 @@ describe('File API', function() {
                 // writes file content
                 write_file = function(fileEntry) {
                     fileEntry.createWriter(function(writer) {
-                        writer.onwriteend = verifier;
-                        writer.write(rule);
+                        theWriter = writer;
+                        theWriter.onwriteend = verifier;
+                        theWriter.write(rule);
                     }, fail);
                 };
                 
@@ -3290,7 +3252,7 @@ describe('File API', function() {
                 createFile(fileName, write_file);
             });
 
-            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+            waitsFor(function() { return verifier.wasCalled; }, "verifier", Tests.TEST_TIMEOUT);
 
             runs(function() {
                 expect(verifier).toHaveBeenCalled();
@@ -3300,14 +3262,15 @@ describe('File API', function() {
         it("should be able to write JSON data", function() {
             var fileName = "writer.json",
                 filePath = root.fullPath + '/' + fileName,
+                theWriter,
                 // file content
                 rule = '{ "name": "Guy Incognito", "email": "here@there.com" }',
                 fail = createFail('FileWriter'),
                 // for iting file length
                 length = rule.length,
                 verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(writer.length).toBe(length);
-                    expect(writer.position).toBe(length);
+                    expect(theWriter.length).toBe(length);
+                    expect(theWriter.position).toBe(length);
 
                     // cleanup
                     deleteFile(fileName);
@@ -3315,8 +3278,9 @@ describe('File API', function() {
                 // writes file content
                 write_file = function(fileEntry) {
                     fileEntry.createWriter(function(writer) {
-                        writer.onwriteend = verifier;
-                        writer.write(rule); 
+                        theWriter = writer;
+                        theWriter.onwriteend = verifier;
+                        theWriter.write(rule); 
                     }, fail);
                 };
             
@@ -3325,7 +3289,7 @@ describe('File API', function() {
                 createFile(fileName, write_file);
             });
 
-            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+            waitsFor(function() { return verifier.wasCalled; }, "verifier", Tests.TEST_TIMEOUT);
 
             runs(function() {
                 expect(verifier).toHaveBeenCalled();
@@ -3335,6 +3299,7 @@ describe('File API', function() {
         it("should write and read special characters", function() {
             var fileName = "reader.txt",
                 filePath = root.fullPath + '/' + fileName,
+                theWriter,
                 // file content
                 rule = "H\u00EBll\u00F5 Euro \u20AC\u00A1",
                 fail = createFail('FileWriter'),
@@ -3350,8 +3315,9 @@ describe('File API', function() {
                 }),
                 // writes file and reads it back in
                 write_file = function(writer) {
-                    writer.onwriteend = read_file; 
-                    writer.write(rule);
+                    theWriter = writer;
+                    theWriter.onwriteend = read_file; 
+                    theWriter.write(rule);
                 },
                 // reads file and compares content to what was written
                 read_file = function(evt) {
@@ -3378,17 +3344,18 @@ describe('File API', function() {
             var fileName = "writer.seek",
                 // file content
                 rule = "There is an exception to every rule.  Except this one.",
+                theWriter,
                 // for iting file length
                 length = rule.length,
                 fail = createFail('FileWriter'),
                 verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(writer.position).toBe(length);
-                    writer.seek(-5);
-                    expect(writer.position).toBe(length-5);
-                    writer.seek(length + 100);
-                    expect(writer.position).toBe(length);
-                    writer.seek(10);
-                    expect(writer.position).toBe(10);
+                    expect(theWriter.position).toBe(length);
+                    theWriter.seek(-5);
+                    expect(theWriter.position).toBe(length-5);
+                    theWriter.seek(length + 100);
+                    expect(theWriter.position).toBe(length);
+                    theWriter.seek(10);
+                    expect(theWriter.position).toBe(10);
 
                     // cleanup
                     deleteFile(fileName);
@@ -3396,10 +3363,11 @@ describe('File API', function() {
                 // writes file content and its writer.seek
                 seek_file = function(fileEntry) {
                     fileEntry.createWriter(function(writer) {
-                        writer.onwriteend = verifier;
-                        writer.seek(-100);
-                        expect(writer.position).toBe(0);
-                        writer.write(rule);
+                        theWriter = writer;
+                        theWriter.onwriteend = verifier;
+                        theWriter.seek(-100);
+                        expect(theWriter.position).toBe(0);
+                        theWriter.write(rule);
                     }, fail);
                 };
                 
@@ -3419,18 +3387,20 @@ describe('File API', function() {
             var fileName = "writer.truncate",
                 rule = "There is an exception to every rule.  Except this one.",
                 fail = createFail('FileWRiter'),
+                theWriter,
                 // writes file content 
                 write_file = function(fileEntry) {
                     fileEntry.createWriter(function(writer) {
-                        writer.onwriteend = function(evt) {
-                            truncate_file(writer);
+                        theWriter = writer;
+                        theWriter.onwriteend = function(evt) {
+                            truncate_file(theWriter);
                         }; 
-                        writer.write(rule);
+                        theWriter.write(rule);
                     }, fail);
                 },
                 verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(writer.length).toBe(36);
-                    expect(writer.position).toBe(36);
+                    expect(theWriter.length).toBe(36);
+                    expect(theWriter.position).toBe(36);
                     
                     // cleanup
                     deleteFile(fileName);
