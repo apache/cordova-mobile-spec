@@ -23,6 +23,8 @@
   <script type="text/javascript" src="../tests/file.tests.js"></script>
 
   <script type="text/javascript">
+      var root, temp_root, persistent_root;
+
       document.addEventListener('deviceready', function () {
           // one-time retrieval of the root file system entry
           var onError = function(e) {
