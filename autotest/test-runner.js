@@ -1,5 +1,3 @@
-// Prevent QUnit from running when the DOM load event fires
-QUnit.config.autostart = false;
 if (window.sessionStorage != null) {
     window.sessionStorage.clear();
 }
@@ -8,4 +6,4 @@ if (window.sessionStorage != null) {
 // time to query the response. This is important for some
 // Android devices.
 var Tests = function() {};
-Tests.TEST_TIMEOUT = 2000;
+Tests.TEST_TIMEOUT = 7500;
