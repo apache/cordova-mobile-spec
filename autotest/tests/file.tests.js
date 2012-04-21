@@ -1,6 +1,3 @@
-// Used by tests, set in file.html
-var root, temp_root, persistent_root;
-
 describe('File API', function() {
     // HELPER FUNCTIONS
 
