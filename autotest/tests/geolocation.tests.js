@@ -1,82 +1,119 @@
 describe('Geolocation (navigator.geolocation)', function () {
-	it("should exist", function() {
+    it("should exist", function() {
         expect(navigator.geolocation).toBeDefined();
-	});
+    });
 
-	it("should contain a getCurrentPosition function", function() {
-		expect(typeof navigator.geolocation.getCurrentPosition).toBeDefined();
-		expect(typeof navigator.geolocation.getCurrentPosition == 'function').toBe(true);
-	});
+    it("should contain a getCurrentPosition function", function() {
+        expect(typeof navigator.geolocation.getCurrentPosition).toBeDefined();
+        expect(typeof navigator.geolocation.getCurrentPosition == 'function').toBe(true);
+    });
 
-	it("should contain a watchPosition function", function() {
-		expect(typeof navigator.geolocation.watchPosition).toBeDefined();
-		expect(typeof navigator.geolocation.watchPosition == 'function').toBe(true);
-	});
+    it("should contain a watchPosition function", function() {
+        expect(typeof navigator.geolocation.watchPosition).toBeDefined();
+        expect(typeof navigator.geolocation.watchPosition == 'function').toBe(true);
+    });
 
-	it("should contain a clearWatch function", function() {
-		expect(typeof navigator.geolocation.clearWatch).toBeDefined();
-		expect(typeof navigator.geolocation.clearWatch == 'function').toBe(true);
-	});
+    it("should contain a clearWatch function", function() {
+        expect(typeof navigator.geolocation.clearWatch).toBeDefined();
+        expect(typeof navigator.geolocation.clearWatch == 'function').toBe(true);
+    });
 
-	it("getCurrentPosition success callback should be called with a Position object", function() {
-		var win = jasmine.createSpy().andCallFake(function(p) {
-                expect(p.coords).toBeDefined();
-                expect(p.timestamp).toBeDefined();
-            }),
-            fail = jasmine.createSpy();
+    describe('getCurrentPosition method', function() {
+        describe('error callback', function() {
+            it("should be called if we set timeout to 0 and maximumAge to a very small number", function() {
+                var win = jasmine.createSpy(),
+                    fail = jasmine.createSpy();
 
-        runs(function () {
-            navigator.geolocation.getCurrentPosition(win, fail, {
-                maximumAge:300000 // 5 minutes maximum age of cached position
+                runs(function () {
+                    navigator.geolocation.getCurrentPosition(win, fail, {
+                        maximumAge: 0,
+                        timeout: 0
+                    });
+                });
+
+                waitsFor(function () { return fail.wasCalled; }, "fail never called", 250); //small timeout as this should fire very fast
+
+                runs(function () {
+                    expect(win).not.toHaveBeenCalled();
+                });
             });
         });
 
-        waitsFor(function () { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
+        describe('success callback', function() {
+            it("should be called with a Position object", function() {
+                var win = jasmine.createSpy().andCallFake(function(p) {
+                          expect(p.coords).toBeDefined();
+                          expect(p.timestamp).toBeDefined();
+                          expect(typeof p.timestamp).toBe('number');
+                      }),
+                      fail = jasmine.createSpy();
 
-        runs(function () {
-            expect(fail).not.toHaveBeenCalled();
-        });
-	});
+                runs(function () {
+                    navigator.geolocation.getCurrentPosition(win, fail, {
+                        maximumAge:300000 // 5 minutes maximum age of cached position
+                    });
+                });
 
-	it("getCurrentPosition success callback should be called with a cached Position", function() {
-		var win = jasmine.createSpy().andCallFake(function(p) {
-                expect(p.coords instanceof Position).toBe(true);
-            }),
-            fail = jasmine.createSpy();
+                waitsFor(function () { return win.wasCalled; }, "win never called", 20000);
 
-        runs(function () {
-            navigator.geolocation.getCurrentPosition(win, fail, {
-                maximumAge:300000 // 5 minutes 
+                runs(function () {
+                    expect(fail).not.toHaveBeenCalled();
+                });
             });
-        });
-
-        waitsFor(function () { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
-
-        runs(function () {
-            expect(fail).not.toHaveBeenCalled();
-        });
-	});
-
-    it("getCurrentPosition error callback should be called if we set timeout to 0 and maximumAge to a very small number", function() {
-        var win = jasmine.createSpy(),
-            fail = jasmine.createSpy();
-
-        runs(function () {
-            navigator.geolocation.getCurrentPosition(win, fail, {
-                maximumAge: 0,
-                timeout: 0
-            });
-        });
-
-        waitsFor(function () { return fail.wasCalled; }, "fail never called", Tests.TEST_TIMEOUT);
-
-        runs(function () {
-            expect(win).not.toHaveBeenCalled();
         });
     });
 
-	// TODO: Need to test error callback... how?
-	// TODO: Need to test watchPosition success callback, test that makes sure clearPosition works (how to test that a timer is getting cleared?)
+    describe('watchPosition method', function() {
+        var watch = null;
+        
+        afterEach(function() {
+            navigator.geolocation.clearWatch(watch);
+        });
+
+        describe('error callback', function() {
+            it("should be called if we set timeout to 0 and maximumAge to a very small number", function() {
+                var win = jasmine.createSpy(),
+                    fail = jasmine.createSpy();
+
+                runs(function () {
+                    watch = navigator.geolocation.watchPosition(win, fail, {
+                        maximumAge: 0,
+                        timeout: 0
+                    });
+                });
+
+                waitsFor(function () { return fail.wasCalled; }, "fail never called", 250); // small timeout as this hsould fire very quickly
+
+                runs(function () {
+                    expect(win).not.toHaveBeenCalled();
+                });
+            });
+        });
+
+        describe('success callback', function() {
+            it("should be called with a Position object", function() {
+                var win = jasmine.createSpy().andCallFake(function(p) {
+                          expect(p.coords).toBeDefined();
+                          expect(p.timestamp).toBeDefined();
+                          expect(typeof p.timestamp).toBe('number');
+                      }),
+                      fail = jasmine.createSpy();
+
+                runs(function () {
+                    watch = navigator.geolocation.watchPosition(win, fail, {
+                        maximumAge:300000 // 5 minutes maximum age of cached position
+                    });
+                });
+
+                waitsFor(function () { return win.wasCalled; }, "win never called", 20000);
+
+                runs(function () {
+                    expect(fail).not.toHaveBeenCalled();
+                });
+            });
+        });
+    });
+
     describe("Geolocation model", function () {
         it("should be able to define a Position object with coords and timestamp properties", function() {
             var pos = new Position({}, new Date());
