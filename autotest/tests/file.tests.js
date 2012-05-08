@@ -1162,6 +1162,7 @@ describe('File API', function() {
                     expect(entry.name).toBe(fileName);
                     expect(entry.fullPath).toBe(fullPath);
                     expect(typeof entry.getMetadata).toBe('function');
+                    expect(typeof entry.setMetadata).toBe('function');
                     expect(typeof entry.moveTo).toBe('function');
                     expect(typeof entry.copyTo).toBe('function');
                     expect(typeof entry.toURL).toBe('function');
