@@ -19,9 +19,9 @@ describe('Geolocation (navigator.geolocation)', function () {
 	});
 
 	it("getCurrentPosition success callback should be called with a Position object", function() {
-		var win = jasmine.createSpy().andCallFake(function(a) {
-                expect(p.coords).not.toBe(null);
-                expect(p.timestamp).not.toBe(null);
+		var win = jasmine.createSpy().andCallFake(function(p) {
+                expect(p.coords).toBeDefined();
+                expect(p.timestamp).toBeDefined();
             }),
             fail = jasmine.createSpy();
 
@@ -39,7 +39,7 @@ describe('Geolocation (navigator.geolocation)', function () {
 	});
 
 	it("getCurrentPosition success callback should be called with a cached Position", function() {
-		var win = jasmine.createSpy().andCallFake(function(a) {
+		var win = jasmine.createSpy().andCallFake(function(p) {
                 expect(p.coords instanceof Position).toBe(true);
             }),
             fail = jasmine.createSpy();
