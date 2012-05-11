@@ -31,7 +31,7 @@ describe('File API', function() {
     // deletes specified file or directory
     var deleteEntry = function(name, success, error) {
         // deletes entry, if it exists
-        window.resolveLocalFileSystemURI(root.toURL() + '/' + name,
+        window.resolveLocalFileSystemURI(root.toURI() + '/' + name,
             function(entry) {
                 if (entry.isDirectory === true) {
                     entry.removeRecursively(success, error);
@@ -202,7 +202,7 @@ describe('File API', function() {
                 resolveCallback = jasmine.createSpy().andCallFake(function(entry) {
                     // lookup file system entry
                     runs(function() {
-                        window.resolveLocalFileSystemURI(entry.toURL(), win, fail);
+                        window.resolveLocalFileSystemURI(entry.toURI(), win, fail);
                     });
 
                     waitsFor(function() { return win.wasCalled; }, "resolveLocalFileSystemURI callback never called", Tests.TEST_TIMEOUT);
@@ -233,7 +233,7 @@ describe('File API', function() {
                 resolveCallback = jasmine.createSpy().andCallFake(function(entry) {
                     // lookup file system entry
                     runs(function() {
-                        window.resolveLocalFileSystemURI(entry.toURL() + "?1234567890", win, fail);
+                        window.resolveLocalFileSystemURI(entry.toURI() + "?1234567890", win, fail);
                     });
 
                     waitsFor(function() { return win.wasCalled; }, "resolveLocalFileSystemURI callback never called", Tests.TEST_TIMEOUT);
@@ -270,7 +270,7 @@ describe('File API', function() {
                     expect(win).not.toHaveBeenCalled();
                 });
             });
-            it("should error (NOT_FOUND_ERR) when resolving (non-existent) invalid URL", function() {
+            it("should error (NOT_FOUND_ERR) when resolving (non-existent) invalid URI", function() {
                 var fail = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
                     expect(error).toBeFileError(FileError.NOT_FOUND_ERR);
@@ -322,7 +322,7 @@ describe('File API', function() {
                 expect(entry.getMetadata).toBeDefined();
                 expect(entry.moveTo).toBeDefined();
                 expect(entry.copyTo).toBeDefined();
-                expect(entry.toURL).toBeDefined();
+                expect(entry.toURI).toBeDefined();
                 expect(entry.remove).toBeDefined();
                 expect(entry.getParent).toBeDefined();
                 expect(entry.createReader).toBeDefined();
@@ -333,7 +333,7 @@ describe('File API', function() {
             fail = createFail('FileSystem');
 
             runs(function() {
-                window.resolveLocalFileSystemURI(root.toURL(), win, fail);
+                window.resolveLocalFileSystemURI(root.toURI(), win, fail);
             });
 
             waitsFor(function() { return win.wasCalled; }, "success callback never called", Tests.TEST_TIMEOUT);
@@ -564,14 +564,14 @@ describe('File API', function() {
                 expect(win).not.toHaveBeenCalled();
             });
         });
-        it("DirectoryEntry.getDirectory: create new dir with space then resolveFileSystemURL", function() {
+        it("DirectoryEntry.getDirectory: create new dir with space then resolveFileSystemURI", function() {
             var dirName = "de create dir",
                 dirPath = root.fullPath + '/' + dirName,
                 getDir = jasmine.createSpy().andCallFake(function(dirEntry) {
-                    var dirURL = dirEntry.toURL();
-                    // now encode URL and try to resolve
+                    var dirURI = dirEntry.toURI();
+                    // now encode URI and try to resolve
                     runs(function() {
-                        window.resolveLocalFileSystemURI(dirURL, win, fail);
+                        window.resolveLocalFileSystemURI(dirURI, win, fail);
                     });
 
                     waitsFor(function() { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
@@ -600,14 +600,14 @@ describe('File API', function() {
 
             waitsFor(function() { return getDir.wasCalled; }, "getDir never called", Tests.TEST_TIMEOUT);
         });
-        it("DirectoryEntry.getDirectory: create new dir with space resolveFileSystemURL with encoded URL", function() {
+        it("DirectoryEntry.getDirectory: create new dir with space resolveFileSystemURI with encoded URI", function() {
             var dirName = "de create dir",
                 dirPath = root.fullPath + '/' + dirName,
                 getDir = jasmine.createSpy().andCallFake(function(dirEntry) {
-                    var dirURL = dirEntry.toURL();
-                    // now encode URL and try to resolve
+                    var dirURI = dirEntry.toURI();
+                    // now encode URI and try to resolve
                     runs(function() {
-                        window.resolveLocalFileSystemURI(encodeURI(dirURL), win, fail);
+                        window.resolveLocalFileSystemURI(encodeURI(dirURI), win, fail);
                     });
 
                     waitsFor(function() { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
@@ -1192,7 +1192,7 @@ describe('File API', function() {
                     expect(typeof entry.setMetadata).toBe('function');
                     expect(typeof entry.moveTo).toBe('function');
                     expect(typeof entry.copyTo).toBe('function');
-                    expect(typeof entry.toURL).toBe('function');
+                    expect(typeof entry.toURI).toBe('function');
                     expect(typeof entry.remove).toBe('function');
                     expect(typeof entry.getParent).toBe('function');
                     expect(typeof entry.createWriter).toBe('function');
@@ -1352,11 +1352,11 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("Entry.toURL on file", function() {
+        it("Entry.toURI on file", function() {
             var fileName = "entry.uri.file",
                 rootPath = root.fullPath,
-                itURL = jasmine.createSpy().andCallFake(function(entry) {
-                    var uri = entry.toURL();
+                itURI = jasmine.createSpy().andCallFake(function(entry) {
+                    var uri = entry.toURI();
                     expect(uri).toBeDefined();
                     expect(uri.indexOf(rootPath)).not.toBe(-1);
 
@@ -1367,21 +1367,21 @@ describe('File API', function() {
 
             // create a new file entry
             runs(function() {
-                createFile(fileName, itURL, fail);
+                createFile(fileName, itURI, fail);
             });
 
-            waitsFor(function() { return itURL.wasCalled; }, "itURL never called", Tests.TEST_TIMEOUT);
+            waitsFor(function() { return itURI.wasCalled; }, "itURI never called", Tests.TEST_TIMEOUT);
 
             runs(function() {
-                expect(itURL).toHaveBeenCalled();
+                expect(itURI).toHaveBeenCalled();
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("Entry.toURL on directory", function() {
+        it("Entry.toURI on directory", function() {
             var dirName = "entry.uri.dir",
                 rootPath = root.fullPath,
-                itURL = jasmine.createSpy().andCallFake(function(entry) {
-                    var uri = entry.toURL();
+                itURI = jasmine.createSpy().andCallFake(function(entry) {
+                    var uri = entry.toURI();
                     expect(uri).toBeDefined();
                     expect(uri.indexOf(rootPath)).not.toBe(-1);
 
@@ -1392,13 +1392,13 @@ describe('File API', function() {
 
             // create a new directory entry
             runs(function() {
-                createDirectory(dirName, itURL, fail);
+                createDirectory(dirName, itURI, fail);
             });
 
-            waitsFor(function() { return itURL.wasCalled; }, "itURL never called", Tests.TEST_TIMEOUT);
+            waitsFor(function() { return itURI.wasCalled; }, "itURI never called", Tests.TEST_TIMEOUT);
 
             runs(function() {
-                expect(itURL).toHaveBeenCalled();
+                expect(itURI).toHaveBeenCalled();
                 expect(fail).not.toHaveBeenCalled();
             });
         });
@@ -2878,7 +2878,7 @@ describe('File API', function() {
             var reader = new FileReader();
             expect(reader).toBeDefined();
             expect(typeof reader.readAsBinaryString).toBe('function');
-            expect(typeof reader.readAsDataURL).toBe('function');
+            expect(typeof reader.readAsDataURI).toBe('function');
             expect(typeof reader.readAsText).toBe('function');
             expect(typeof reader.readAsArrayBuffer).toBe('function');
             expect(typeof reader.abort).toBe('function');
@@ -2980,7 +2980,7 @@ describe('File API', function() {
                 expect(verifier).toHaveBeenCalled();
             });
         });
-        it("should read file properly, Data URL", function() {
+        it("should read file properly, Data URI", function() {
             // path of file
             var fileName = "reader.txt",
                 filePath = root.fullPath + '/' + fileName,
@@ -3006,7 +3006,7 @@ describe('File API', function() {
                     reader.onloadend = verifier;
                     var myFile = new File();
                     myFile.fullPath = filePath;
-                    reader.readAsDataURL(myFile);
+                    reader.readAsDataURI(myFile);
                 };
 
             // create a file, write to it, and read it in again
