@@ -231,6 +231,22 @@
     }
     
     /**
+     * Function to create a file for BB recording
+     */
+    function getRecordSrcBB() {
+        var fsFail = function(error) {
+            console.log("error creating file for BB recording");
+        };
+        var gotFile = function(file) {
+            recordSrc = file.fullPath;
+        };
+        var gotFS = function(fileSystem) {
+            fileSystem.root.getFile("BBRecording.amr", {create: true}, gotFile, fsFail);
+        };
+        window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, gotFS, fsFail);
+    }
+
+    /**
      * Function called when page has finished loading.
      */
     function init() {
@@ -239,6 +255,8 @@
                 if (device.platform.indexOf("iPhone") !=-1 || device.platform.indexOf("iPad") !=-1)
                 {
                      getRecordSrc();
+                } else if (typeof blackberry !== 'undefined') {
+                    getRecordSrcBB();
                 }
                 console.log("Device="+device.platform+" "+device.version);
             }, false);
