@@ -2878,7 +2878,7 @@ describe('File API', function() {
             var reader = new FileReader();
             expect(reader).toBeDefined();
             expect(typeof reader.readAsBinaryString).toBe('function');
-            expect(typeof reader.readAsDataURI).toBe('function');
+            expect(typeof reader.readAsDataURL).toBe('function');
             expect(typeof reader.readAsText).toBe('function');
             expect(typeof reader.readAsArrayBuffer).toBe('function');
             expect(typeof reader.abort).toBe('function');
@@ -3006,7 +3006,7 @@ describe('File API', function() {
                     reader.onloadend = verifier;
                     var myFile = new File();
                     myFile.fullPath = filePath;
-                    reader.readAsDataURI(myFile);
+                    reader.readAsDataURL(myFile);
                 };
 
             // create a file, write to it, and read it in again
