@@ -365,9 +365,9 @@ describe('FileTransfer', function() {
             });
 
             runs(function() {
-                deleteFile(localFileName, function(fileEntry) {
+                deleteFile(localFileName, function() {
                     var ft = new FileTransfer();
-                    ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail);
+                    ft.upload(root.fullPath + "/" + localFileName, remoteFile, uploadWin, uploadFail);
                 }, fail);
             });
 
