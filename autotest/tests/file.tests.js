@@ -22,6 +22,16 @@ describe('File API', function() {
                     return "Expected FileError with code " + fileErrorMap[error.code] + " (" + error.code + ") to be " + fileErrorMap[code] + "(" + code + ")";
                 };
                 return (error.code == code);
+            },
+            toCanonicallyMatch:function(path){
+                this.message = function(){
+                    return "Expected paths to match : " + path + " should be " + this.actual;
+                };
+
+                var a = path.split("/").join("").split("\\").join("");
+                var b = this.actual.split("/").join("").split("\\").join("");
+
+                return a == b;
             }
         });
     });
@@ -193,7 +203,7 @@ describe('File API', function() {
                 var fileName = "resolve.file.uri",
                 win = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.name).toBe(fileName);
+                    expect(fileEntry.name).toCanonicallyMatch(fileName);
 
                     // cleanup
                     deleteEntry(fileName);
@@ -270,10 +280,10 @@ describe('File API', function() {
                     expect(win).not.toHaveBeenCalled();
                 });
             });
-            it("should error (NOT_FOUND_ERR) when resolving (non-existent) invalid URI", function() {
+            it("should error (ENCODING_ERR) when resolving invalid URI with leading /", function() {
                 var fail = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
-                    expect(error).toBeFileError(FileError.NOT_FOUND_ERR);
+                    expect(error).toBeFileError(FileError.ENCODING_ERR);
                 }),
                 win = createWin('window.resolveLocalFileSystemURI');
 
@@ -374,7 +384,7 @@ describe('File API', function() {
                     expect(entry).toBeDefined();
                     expect(entry.isFile).toBe(true);
                     expect(entry.isDirectory).toBe(false);
-                    expect(entry.name).toBe(fileName);
+                    expect(entry.name).toCanonicallyMatch(fileName);
                     expect(entry.fullPath).toBe(filePath);
                     // cleanup
                     entry.remove(null, null);
@@ -441,7 +451,7 @@ describe('File API', function() {
                     expect(entry).toBeDefined();
                     expect(entry.isFile).toBe(true);
                     expect(entry.isDirectory).toBe(false);
-                    expect(entry.name).toBe(fileName);
+                    expect(entry.name).toCanonicallyMatch(fileName);
                     expect(entry.fullPath).toBe(filePath);
 
                     // cleanup
@@ -495,8 +505,8 @@ describe('File API', function() {
                     expect(entry).toBeDefined();
                     expect(entry.isFile).toBe(true);
                     expect(entry.isDirectory).toBe(false);
-                    expect(entry.name).toBe(fileName);
-                    expect(entry.fullPath).toBe(filePath);
+                    expect(entry.name).toCanonicallyMatch(fileName);
+                    expect(entry.fullPath).toCanonicallyMatch(filePath);
 
                     entry.remove(null, fail); //clean up
                 }),
@@ -585,8 +595,8 @@ describe('File API', function() {
                     expect(directory).toBeDefined();
                     expect(directory.isFile).toBe(false);
                     expect(directory.isDirectory).toBe(true);
-                    expect(directory.name).toBe(dirName);
-                    expect(directory.fullPath).toBe(dirPath);
+                    expect(directory.name).toCanonicallyMatch(dirName);
+                    expect(directory.fullPath).toCanonicallyMatch(dirPath);
 
                     // cleanup
                     directory.remove(null, fail);
@@ -621,8 +631,8 @@ describe('File API', function() {
                     expect(directory).toBeDefined();
                     expect(directory.isFile).toBe(false);
                     expect(directory.isDirectory).toBe(true);
-                    expect(directory.name).toBe(dirName);
-                    expect(directory.fullPath).toBe(dirPath);
+                    expect(directory.name).toCanonicallyMatch(dirName);
+                    expect(directory.fullPath).toCanonicallyMatch(dirPath);
                     // cleanup
                     directory.remove(null, fail);
                 }),
@@ -643,8 +653,8 @@ describe('File API', function() {
                     expect(directory).toBeDefined();
                     expect(directory.isFile).toBe(false);
                     expect(directory.isDirectory).toBe(true);
-                    expect(directory.name).toBe(dirName);
-                    expect(directory.fullPath).toBe(dirPath);
+                    expect(directory.name).toCanonicallyMatch(dirName);
+                    expect(directory.fullPath).toCanonicallyMatch(dirPath);
 
                     // cleanup
                     directory.remove(null, fail);
@@ -671,8 +681,8 @@ describe('File API', function() {
                     expect(directory).toBeDefined();
                     expect(directory.isFile).toBe(false);
                     expect(directory.isDirectory).toBe(true);
-                    expect(directory.name).toBe(dirName);
-                    expect(directory.fullPath).toBe(dirPath);
+                    expect(directory.name).toCanonicallyMatch(dirName);
+                    expect(directory.fullPath).toCanonicallyMatch(dirPath);
 
                     // cleanup
                     directory.remove(null, fail);
@@ -710,8 +720,8 @@ describe('File API', function() {
                     expect(directory).toBeDefined();
                     expect(directory.isFile).toBe(false);
                     expect(directory.isDirectory).toBe(true);
-                    expect(directory.name).toBe(dirName);
-                    expect(directory.fullPath).toBe(dirPath);
+                    expect(directory.name).toCanonicallyMatch(dirName);
+                    expect(directory.fullPath).toCanonicallyMatch(dirPath);
 
                     // cleanup
                     directory.remove(null, fail);
@@ -779,9 +789,9 @@ describe('File API', function() {
                     expect(directory).toBeDefined();
                     expect(directory.isFile).toBe(false);
                     expect(directory.isDirectory).toBe(true);
-                    expect(directory.name).toBe(dirName);
+                    expect(directory.name).toCanonicallyMatch(dirName);
 
-                    expect(directory.fullPath).toBe(dirPath);
+                    expect(directory.fullPath).toCanonicallyMatch(dirPath);
 
                     // cleanup
                     directory.remove(null, fail);
@@ -1186,8 +1196,8 @@ describe('File API', function() {
                     expect(entry).toBeDefined();
                     expect(entry.isFile).toBe(true);
                     expect(entry.isDirectory).toBe(false);
-                    expect(entry.name).toBe(fileName);
-                    expect(entry.fullPath).toBe(fullPath);
+                    expect(entry.name).toCanonicallyMatch(fileName);
+                    expect(entry.fullPath).toCanonicallyMatch(fullPath);
                     expect(typeof entry.getMetadata).toBe('function');
                     expect(typeof entry.setMetadata).toBe('function');
                     expect(typeof entry.moveTo).toBe('function');
@@ -1288,7 +1298,7 @@ describe('File API', function() {
                 }),
                 itParent = jasmine.createSpy().andCallFake(function(parent) {
                     expect(parent).toBeDefined();
-                    expect(parent.fullPath).toBe(rootPath);
+                    expect(parent.fullPath).toCanonicallyMatch(rootPath);
 
                     // cleanup
                     deleteEntry(fileName);
@@ -1319,7 +1329,7 @@ describe('File API', function() {
                 }),
                 itParent = jasmine.createSpy().andCallFake(function(parent) {
                     expect(parent).toBeDefined();
-                    expect(parent.fullPath).toBe(rootPath);
+                    expect(parent.fullPath).toCanonicallyMatch(rootPath);
 
                     // cleanup
                     deleteEntry(dirName);
@@ -1336,7 +1346,7 @@ describe('File API', function() {
             var rootPath = root.fullPath,
                 itParent = jasmine.createSpy().andCallFake(function(parent) {
                     expect(parent).toBeDefined();
-                    expect(parent.fullPath).toBe(rootPath);
+                    expect(parent.fullPath).toCanonicallyMatch(rootPath);
                 }),
                 fail = createFail('Entry');
 
@@ -1523,7 +1533,7 @@ describe('File API', function() {
                 }),
                 itRemove = jasmine.createSpy().andCallFake(function(entry) {
                     expect(entry).toBeDefined();
-                    expect(entry.fullPath).toBe(fullPath);
+                    expect(entry.fullPath).toCanonicallyMatch(fullPath);
                     // cleanup
                     deleteEntry(dirName);
                 }),
@@ -1573,8 +1583,8 @@ describe('File API', function() {
                     expect(entry).toBeDefined();
                     expect(entry.isFile).toBe(true);
                     expect(entry.isDirectory).toBe(false);
-                    expect(entry.fullPath).toBe(fullPath);
-                    expect(entry.name).toBe(file2);
+                    expect(entry.fullPath).toCanonicallyMatch(fullPath);
+                    expect(entry.name).toCanonicallyMatch(file2);
 
                     runs(function() {
                         root.getFile(file2, {create:false}, itFileExists, fail);
@@ -1592,8 +1602,8 @@ describe('File API', function() {
                     expect(entry2).toBeDefined();
                     expect(entry2.isFile).toBe(true);
                     expect(entry2.isDirectory).toBe(false);
-                    expect(entry2.fullPath).toBe(fullPath);
-                    expect(entry2.name).toBe(file2);
+                    expect(entry2.fullPath).toCanonicallyMatch(fullPath);
+                    expect(entry2.name).toCanonicallyMatch(file2);
 
                     // cleanup
                     deleteEntry(file1);
@@ -1667,8 +1677,8 @@ describe('File API', function() {
                     expect(directory).toBeDefined();
                     expect(directory.isFile).toBe(false);
                     expect(directory.isDirectory).toBe(true);
-                    expect(directory.fullPath).toBe(dstPath);
-                    expect(directory.name).toBe(dstDir);
+                    expect(directory.fullPath).toCanonicallyMatch(dstPath);
+                    expect(directory.name).toCanonicallyMatch(dstDir);
 
                     runs(function() {
                         root.getDirectory(dstDir, {create:false}, itDirExists, fail);
@@ -1680,8 +1690,8 @@ describe('File API', function() {
                      expect(dirEntry).toBeDefined();
                      expect(dirEntry.isFile).toBe(false);
                      expect(dirEntry.isDirectory).toBe(true);
-                     expect(dirEntry.fullPath).toBe(dstPath);
-                     expect(dirEntry.name).toBe(dstDir);
+                     expect(dirEntry.fullPath).toCanonicallyMatch(dstPath);
+                     expect(dirEntry.name).toCanonicallyMatch(dstDir);
 
                      runs(function() {
                          dirEntry.getFile(file1, {create:false}, itFileExists, fail);
@@ -1698,8 +1708,8 @@ describe('File API', function() {
                     expect(fileEntry).toBeDefined();
                     expect(fileEntry.isFile).toBe(true);
                     expect(fileEntry.isDirectory).toBe(false);
-                    expect(fileEntry.fullPath).toBe(filePath);
-                    expect(fileEntry.name).toBe(file1);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
+                    expect(fileEntry.name).toCanonicallyMatch(file1);
 
                     // cleanup
                     deleteEntry(srcDir);
@@ -1733,8 +1743,8 @@ describe('File API', function() {
                     expect(directory).toBeDefined();
                     expect(directory.isFile).toBe(false);
                     expect(directory.isDirectory).toBe(true);
-                    expect(directory.fullPath).toBe(dstPath);
-                    expect(directory.name).toBe(dstDir);
+                    expect(directory.fullPath).toCanonicallyMatch(dstPath);
+                    expect(directory.name).toCanonicallyMatch(dstDir);
 
                     root.getDirectory(dstDir, {create:false}, itDirExists, fail);
                 },
@@ -1742,8 +1752,8 @@ describe('File API', function() {
                      expect(dirEntry).toBeDefined();
                      expect(dirEntry.isFile).toBe(false);
                      expect(dirEntry.isDirectory).toBe(true);
-                     expect(dirEntry.fullPath).toBe(dstPath);
-                     expect(dirEntry.name).toBe(dstDir);
+                     expect(dirEntry.fullPath).toCanonicallyMatch(dstPath);
+                     expect(dirEntry.name).toCanonicallyMatch(dstDir);
 
                      dirEntry.getFile(file1, {create:false}, itFileExists, fail);
                 },
@@ -1754,8 +1764,8 @@ describe('File API', function() {
                         expect(fileEntry).toBeDefined();
                         expect(fileEntry.isFile).toBe(true);
                         expect(fileEntry.isDirectory).toBe(false);
-                        expect(fileEntry.fullPath).toBe(filePath);
-                        expect(fileEntry.name).toBe(file1);
+                        expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
+                        expect(fileEntry.name).toCanonicallyMatch(file1);
                         expect(fail).not.toHaveBeenCalled();
 
                         // cleanup
@@ -1809,7 +1819,7 @@ describe('File API', function() {
                 itDirectoryExists = jasmine.createSpy().andCallFake(function(dirEntry) {
                     // returning confirms existence so just check fullPath entry
                     expect(dirEntry).toBeDefined();
-                    expect(dirEntry.fullPath).toBe(srcPath);
+                    expect(dirEntry.fullPath).toCanonicallyMatch(srcPath);
 
                     runs(function() {
                         dirEntry.getFile(file1, {create:false}, itFileExists, fail);
@@ -1825,7 +1835,7 @@ describe('File API', function() {
                 }),
                 itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(filePath);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
 
                     // cleanup
                     deleteEntry(srcDir);
@@ -1871,7 +1881,7 @@ describe('File API', function() {
                 itDirectoryExists = jasmine.createSpy().andCallFake(function(dirEntry) {
                     // returning confirms existence so just check fullPath entry
                     expect(dirEntry).toBeDefined();
-                    expect(dirEntry.fullPath).toBe(srcPath);
+                    expect(dirEntry.fullPath).toCanonicallyMatch(srcPath);
 
                     // cleanup
                     deleteEntry(srcDir);
@@ -1918,7 +1928,7 @@ describe('File API', function() {
                 }),
                 itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(filePath);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
 
                     // cleanup
                     deleteEntry(file1);
@@ -1985,8 +1995,8 @@ describe('File API', function() {
                     expect(entry).toBeDefined();
                     expect(entry.isFile).toBe(true);
                     expect(entry.isDirectory).toBe(false);
-                    expect(entry.fullPath).toBe(dstPath);
-                    expect(entry.name).toBe(file2);
+                    expect(entry.fullPath).toCanonicallyMatch(dstPath);
+                    expect(entry.name).toCanonicallyMatch(file2);
 
                     runs(function() {
                         root.getFile(file2, {create:false}, itMovedExists, fail);
@@ -1996,7 +2006,7 @@ describe('File API', function() {
                 }),
                 itMovedExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(dstPath);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(dstPath);
 
                     runs(function() {
                         root.getFile(file1, {create:false}, win, itOrig);
@@ -2041,8 +2051,8 @@ describe('File API', function() {
                             expect(entry).toBeDefined();
                             expect(entry.isFile).toBe(true);
                             expect(entry.isDirectory).toBe(false);
-                            expect(entry.fullPath).toBe(dstPath);
-                            expect(entry.name).toBe(file1);
+                            expect(entry.fullPath).toCanonicallyMatch(dstPath);
+                            expect(entry.name).toCanonicallyMatch(file1);
                             // it the moved file exists
                             runs(function() {
                                 directory.getFile(file1, {create:false}, itMovedExists, fail);
@@ -2067,7 +2077,7 @@ describe('File API', function() {
                 }),
                 itMovedExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(dstPath);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(dstPath);
 
                     runs(function() {
                         root.getFile(file1, {create:false}, win, itOrig);
@@ -2128,8 +2138,8 @@ describe('File API', function() {
                     expect(directory).toBeDefined();
                     expect(directory.isFile).toBe(false);
                     expect(directory.isDirectory).toBe(true);
-                    expect(directory.fullPath).toBe(dstPath);
-                    expect(directory.name).toBe(dstDir);
+                    expect(directory.fullPath).toCanonicallyMatch(dstPath);
+                    expect(directory.name).toCanonicallyMatch(dstDir);
                     // it that moved file exists in destination dir
 
                     runs(function() {
@@ -2140,7 +2150,7 @@ describe('File API', function() {
                 }),
                 itMovedExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(filePath);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
 
                     // check that the moved file no longer exists in original dir
                     runs(function() {
@@ -2203,8 +2213,8 @@ describe('File API', function() {
                     expect(directory).toBeDefined();
                     expect(directory.isFile).toBe(false);
                     expect(directory.isDirectory).toBe(true);
-                    expect(directory.fullPath).toBe(dstPath);
-                    expect(directory.name).toBe(dstDir);
+                    expect(directory.fullPath).toCanonicallyMatch(dstPath);
+                    expect(directory.name).toCanonicallyMatch(dstDir);
                     // check that moved file exists in destination dir
                     runs(function() {
                         directory.getFile(file1, {create:false}, itMovedExists, null);
@@ -2214,7 +2224,7 @@ describe('File API', function() {
                 }),
                 itMovedExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(filePath);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
                     // check that the moved file no longer exists in original dir
                     runs(function() {
                         root.getFile(file1, {create:false}, win, itOrig);
@@ -2276,8 +2286,8 @@ describe('File API', function() {
                     expect(directory).toBeDefined();
                     expect(directory.isFile).toBe(false);
                     expect(directory.isDirectory).toBe(true);
-                    expect(directory.fullPath).toBe(dstPath);
-                    expect(directory.name).toBe(dstDir);
+                    expect(directory.fullPath).toCanonicallyMatch(dstPath);
+                    expect(directory.name).toCanonicallyMatch(dstDir);
                     // it that moved file exists in destination dir
                     runs(function() {
                         directory.getFile(file1, {create:false}, itMovedExists, fail);
@@ -2287,7 +2297,7 @@ describe('File API', function() {
                 }),
                 itMovedExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(filePath);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
                     // it that the moved file no longer exists in original dir
                     runs(function() {
                         root.getFile(file1, {create:false}, win, itOrig);
@@ -2357,7 +2367,7 @@ describe('File API', function() {
                 itDirectoryExists = jasmine.createSpy().andCallFake(function(dirEntry) {
                     // returning confirms existence so just check fullPath entry
                     expect(dirEntry).toBeDefined();
-                    expect(dirEntry.fullPath).toBe(srcPath);
+                    expect(dirEntry.fullPath).toCanonicallyMatch(srcPath);
 
                     runs(function() {
                         dirEntry.getFile(file1, {create:false}, itFileExists, fail);
@@ -2373,7 +2383,7 @@ describe('File API', function() {
                 }),
                 itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(filePath);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
 
                     // cleanup
                     deleteEntry(srcDir);
@@ -2418,7 +2428,7 @@ describe('File API', function() {
                 }),
                 itDirectoryExists = jasmine.createSpy().andCallFake(function(entry) {
                     expect(entry).toBeDefined();
-                    expect(entry.fullPath).toBe(srcPath);
+                    expect(entry.fullPath).toCanonicallyMatch(srcPath);
 
                     // cleanup
                     deleteEntry(srcDir);
@@ -2463,7 +2473,7 @@ describe('File API', function() {
                 }),
                 itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(filePath);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
 
                     // cleanup
                     deleteEntry(file1);
@@ -2504,13 +2514,13 @@ describe('File API', function() {
                 },
                 itDirectoryExists = function(dirEntry) {
                     expect(dirEntry).toBeDefined();
-                    expect(dirEntry.fullPath).toBe(dirPath);
+                    expect(dirEntry.fullPath).toCanonicallyMatch(dirPath);
                     // check that original file still exists
                     root.getFile(file1, {create:false},itFileExists, fail);
                 },
                 itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(filePath);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
 
                     // cleanup
                     deleteEntry(file1);
@@ -2557,13 +2567,13 @@ describe('File API', function() {
                 itDirectoryExists = function(dirEntry) {
                     // returning confirms existence so just check fullPath entry
                     expect(dirEntry).toBeDefined();
-                    expect(dirEntry.fullPath).toBe(dirPath);
+                    expect(dirEntry.fullPath).toCanonicallyMatch(dirPath);
                     // it that original file exists
                     root.getFile(file1, {create:false}, itFileExists, fail);
                 },
                 itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(filePath);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
 
                     // cleanup
                     deleteEntry(file1);
@@ -2607,13 +2617,13 @@ describe('File API', function() {
                 itDirectoryExists = function(dirEntry) {
                     // returning confirms existence so just check fullPath entry
                     expect(dirEntry).toBeDefined();
-                    expect(dirEntry.fullPath).toBe(dirPath);
+                    expect(dirEntry.fullPath).toCanonicallyMatch(dirPath);
                     // it that original file still exists
                     root.getFile(file1, {create:false}, itFileExists, fail);
                 },
                 itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(filePath);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
 
                     // cleanup
                     deleteEntry(file1);
@@ -2663,13 +2673,13 @@ describe('File API', function() {
                 itDirectoryExists = function(dirEntry) {
                     // returning confirms existence so just check fullPath entry
                     expect(dirEntry).toBeDefined();
-                    expect(dirEntry.fullPath).toBe(dstPath);
+                    expect(dirEntry.fullPath).toCanonicallyMatch(dstPath);
                     // it that source directory exists
                     root.getDirectory(srcDir,{create:false}, itSrcDirectoryExists, fail);
                 },
                 itSrcDirectoryExists = jasmine.createSpy().andCallFake(function(srcEntry){
                     expect(srcEntry).toBeDefined();
-                    expect(srcEntry.fullPath).toBe(srcPath);
+                    expect(srcEntry.fullPath).toCanonicallyMatch(srcPath);
                     // cleanup
                     deleteEntry(srcDir);
                     deleteEntry(dstDir);
@@ -2710,8 +2720,8 @@ describe('File API', function() {
                     expect(entry).toBeDefined();
                     expect(entry.isFile).toBe(true);
                     expect(entry.isDirectory).toBe(false);
-                    expect(entry.fullPath).toBe(file2Path);
-                    expect(entry.name).toBe(file2);
+                    expect(entry.fullPath).toCanonicallyMatch(file2Path);
+                    expect(entry.name).toCanonicallyMatch(file2);
 
                     // it that old file does not exists
                     root.getFile(file1, {create:false}, win, itFileMoved);
@@ -2724,7 +2734,7 @@ describe('File API', function() {
                 },
                 itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(file2Path);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(file2Path);
 
                     // cleanup
                     deleteEntry(file1);
@@ -2769,14 +2779,14 @@ describe('File API', function() {
                     expect(directory).toBeDefined();
                     expect(directory.isFile).toBe(false);
                     expect(directory.isDirectory).toBe(true);
-                    expect(directory.fullPath).toBe(dstPath);
-                    expect(directory.name).toBe(dstDir);
+                    expect(directory.fullPath).toCanonicallyMatch(dstPath);
+                    expect(directory.name).toCanonicallyMatch(dstDir);
                     // check that old directory contents have been moved
                     directory.getFile(file1, {create:false}, itFileExists, fail);
                 },
                 itFileExists = function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toBe(filePath);
+                    expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
 
                     // check that old directory no longer exists
                     root.getDirectory(srcDir, {create:false}, win, itRemoved);
