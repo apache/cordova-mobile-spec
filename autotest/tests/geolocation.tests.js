@@ -64,19 +64,18 @@ describe('Geolocation (navigator.geolocation)', function () {
     });
 
     describe('watchPosition method', function() {
-        var watch = null;
-        
-        afterEach(function() {
-            navigator.geolocation.clearWatch(watch);
-        });
-
         describe('error callback', function() {
+            var errorWatch = null;
+            
+            afterEach(function() {
+                navigator.geolocation.clearWatch(errorWatch);
+            });
             it("should be called if we set timeout to 0 and maximumAge to a very small number", function() {
                 var win = jasmine.createSpy(),
                     fail = jasmine.createSpy();
 
                 runs(function () {
-                    watch = navigator.geolocation.watchPosition(win, fail, {
+                    errorWatch = navigator.geolocation.watchPosition(win, fail, {
                         maximumAge: 0,
                         timeout: 0
                     });
@@ -91,6 +90,11 @@ describe('Geolocation (navigator.geolocation)', function () {
         });
 
         describe('success callback', function() {
+            var successWatch = null;
+            
+            afterEach(function() {
+                navigator.geolocation.clearWatch(successWatch);
+            });
             it("should be called with a Position object", function() {
                 var win = jasmine.createSpy().andCallFake(function(p) {
                           expect(p.coords).toBeDefined();
@@ -100,7 +104,7 @@ describe('Geolocation (navigator.geolocation)', function () {
                       fail = jasmine.createSpy();
 
                 runs(function () {
-                    watch = navigator.geolocation.watchPosition(win, fail, {
+                    successWatch = navigator.geolocation.watchPosition(win, fail, {
                         maximumAge:300000 // 5 minutes maximum age of cached position
                     });
                 });
