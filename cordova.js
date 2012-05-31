@@ -1,4 +1,4 @@
-var VERSION='1.7.0';
+var VERSION='1.8.0rc1';
 var scripts = document.getElementsByTagName('script');
 var cordovaPath = scripts[scripts.length - 1].src.replace('cordova.js', 'cordova-'+VERSION+'.js');
 
