@@ -21,6 +21,7 @@ describe('Geolocation (navigator.geolocation)', function () {
     describe('getCurrentPosition method', function() {
         describe('error callback', function() {
             it("should be called if we set timeout to 0 and maximumAge to a very small number", function() {
+                console.log("Here I am");
                 var win = jasmine.createSpy(),
                     fail = jasmine.createSpy();
 
@@ -44,7 +45,7 @@ describe('Geolocation (navigator.geolocation)', function () {
                 var win = jasmine.createSpy().andCallFake(function(p) {
                           expect(p.coords).toBeDefined();
                           expect(p.timestamp).toBeDefined();
-                          expect(typeof p.timestamp).toBe('number');
+                          expect(p.timestamp instanceof Date).toBe(true);
                       }),
                       fail = jasmine.createSpy();
 
@@ -66,7 +67,7 @@ describe('Geolocation (navigator.geolocation)', function () {
     describe('watchPosition method', function() {
         describe('error callback', function() {
             var errorWatch = null;
-            
+
             afterEach(function() {
                 navigator.geolocation.clearWatch(errorWatch);
             });
@@ -91,7 +92,7 @@ describe('Geolocation (navigator.geolocation)', function () {
 
         describe('success callback', function() {
             var successWatch = null;
-            
+
             afterEach(function() {
                 navigator.geolocation.clearWatch(successWatch);
             });
@@ -99,7 +100,7 @@ describe('Geolocation (navigator.geolocation)', function () {
                 var win = jasmine.createSpy().andCallFake(function(p) {
                           expect(p.coords).toBeDefined();
                           expect(p.timestamp).toBeDefined();
-                          expect(typeof p.timestamp).toBe('number');
+                          expect(p.timestamp instanceof Date).toBe(true);
                       }),
                       fail = jasmine.createSpy();
 
