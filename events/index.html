@@ -33,6 +33,12 @@
     function interceptOffline() {
       eventOutput("Offline event intercepted");
     }
+    function interceptVolumeUpbutton() {
+      eventOutput("Volume Up event intercepted");
+    }
+    function interceptVolumeDownbutton() {
+      eventOutput("Volume Down event intercepted");
+    }
     
     var eventOutput = function(s) {
         var el = document.getElementById("results");
@@ -72,6 +78,10 @@
     <div class="btn large" onclick="document.removeEventListener('backbutton', interceptBackbutton, false);">Stop intercept of backbutton</div>
     <div class="btn large" onclick="document.addEventListener('menubutton', interceptMenubutton, false);">Intercept menubutton</div>
     <div class="btn large" onclick="document.removeEventListener('menubutton', interceptMenubutton, false);">Stop intercept of menubutton</div>
+    <div class="btn large" onclick="document.addEventListener('volumeupbutton', interceptVolumeUpbutton, false);">Intercept volumeupbutton</div>
+    <div class="btn large" onclick="document.removeEventListener('volumeupbutton', interceptVolumeUpbutton, false);">Stop intercept of volumeupbutton</div>
+    <div class="btn large" onclick="document.addEventListener('volumedownbutton', interceptVolumeDownbutton, false);">Intercept volumedownbutton</div>
+    <div class="btn large" onclick="document.removeEventListener('volumedownbutton', interceptVolumeDownbutton, false);">Stop intercept of volumedownbutton</div>
     <div class="btn large" onclick="document.addEventListener('searchbutton', interceptSearchbutton, false);">Intercept searchbutton</div>
     <div class="btn large" onclick="document.removeEventListener('searchbutton', interceptSearchbutton, false);">Stop intercept of searchbutton</div>
     <div class="btn large" onclick="document.addEventListener('resume', interceptResume, false);">Intercept resume</div>
