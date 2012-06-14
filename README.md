@@ -15,3 +15,15 @@ This is done so that you don't have to modify every HTML file when you want to t
 The goal is to test mobile device functionality inside a mobile browser.
 Where possible, the Cordova API lines up with HTML 5 spec. Maybe down
 the road we could use this spec for parts of HTML 5, too :)
+
+### Requirements ###
+
+Various parts of this test suite communicate with external servers.
+Therefore, when you wrap up the test suite inside a Cordova application,
+make sure you add the following entries to the whitelist!
+
+- audio.ibeat.org
+- cordova-filetransfer.jitsu.com
+- apache.org (with all subdomains)
+- httpssss://example.com (bad protocol necessary)
+
