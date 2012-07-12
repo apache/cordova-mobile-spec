@@ -402,6 +402,57 @@ describe('FileTransfer', function() {
             });
 
         });
+        it("should be able to set custom headers", function() {
+            var remoteFile = "http://whatheaders.com";
+            var localFileName = "upload.txt";
 
+            var fileFail = function() {};
+            var uploadFail = function() {
+                expect(false).toBe(true, "Ensure " + remoteFile + " is in the white list");
+            };
+
+            var uploadWin = jasmine.createSpy().andCallFake(function(uploadResult) {
+                expect(uploadResult.bytesSent).toBeGreaterThan(0);
+                expect(uploadResult.responseCode).toBe(200);
+                expect(uploadResult.response).toBeDefined();
+                deleteEntry(localFileName);
+                var responseHtml = decodeURIComponent(uploadResult.response);
+                expect(responseHtml).toMatch(/CustomHeader1[\s\S]*CustomValue1/i);
+                expect(responseHtml).toMatch(/CustomHeader2[\s\S]*CustomValue2[\s\S]*CustomValue3/i, "Should allow array values");
+                expect(responseHtml).not.toMatch(/X-Requested-With/i, "Should hot have sent User-Agent header");
+            });
+
+            var fileWin = function(fileEntry) {
+                ft = new FileTransfer();
+
+                var options = new FileUploadOptions();
+                options.fileKey = "file";
+                options.fileName = localFileName;
+                options.mimeType = "text/plain";
+
+                var params = new Object();
+                params.value1 = "test";
+                params.value2 = "param";
+                options.params = params;
+                options.headers = {
+                    "CustomHeader1": "CustomValue1",
+                    "CustomHeader2": ["CustomValue2", "CustomValue3"],
+                    "X-Requested-With": null  // Removes the header.
+                };
+
+                // removing options cause Android to timeout
+                ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
+            };
+
+            runs(function() {
+                writeFile(localFileName, "this file should upload", fileWin, fileFail);
+            });
+
+            waitsFor(function() { return uploadWin.wasCalled; }, "uploadWin", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(uploadWin).toHaveBeenCalled();
+            });
+        });
     });
 });
