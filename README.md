@@ -24,6 +24,7 @@ make sure you add the following entries to the whitelist!
 
 - audio.ibeat.org
 - cordova-filetransfer.jitsu.com
+- whatheaders.com
 - apache.org (with all subdomains)
 - httpssss://example.com (bad protocol necessary)
 
