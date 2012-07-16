@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,height=device-height,user-scalable=no,initial-scale=1.0" />
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"> <!-- ISO-8859-1 -->
     <title>Cordova Audio Tests</title>
-    <link rel="stylesheet" href="../master.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <link rel="stylesheet" href="../master.css" type="text/css" media="screen" title="no title" charset="utf-8"/>
     <script type="text/javascript" charset="utf-8" src="../cordova.js"></script>      
 
       
@@ -27,8 +27,8 @@
         console.log("playAudio()");
         console.log(" -- media="+media1);
 
-        //var src = "http://neuga.s3.amazonaws.com/onclassical/strings-organ.mp3";
-        var src = "http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3";
+        //var src = "http://neuga.s3.amazonaws.com/onclassical/strings-or gan.mp3";
+       var src = "http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3";
         //var src = "/android_asset/www/Jet_Sledding.mp4"; // no work
         //var src = "http://vprbbc.streamguys.net/vprbbc24.mp3"; // mp3 streaming
         
@@ -266,7 +266,82 @@
         	}
         },1000);
     }
+    
+    /**
+     * for forced updates of position after a successful seek
+     */
+    function updatePosition() {
+        media1.getCurrentPosition(
+            function(position) {
+                console.log("Pos="+position);
+                if (position >= 0.0) {
+                    setAudioPosition(position+" sec");
+                }
+            },
+            function(e) {
+                console.log("Error getting pos="+e);
+                setAudioPosition("Error: "+e);
+            });
+    }
 
+    /**
+     *
+     */
+    function seekAudio(mode) {
+        var time = document.getElementById("seekinput").value;
+        if (time == "") {
+            time = 5000;
+        } else {
+            time = time * 1000; //we expect the input to be in seconds
+        }
+        if (media1 == null) {
+            console.log("seekTo requested while media1 is null");
+            if (audioSrc == null) {
+                audioSrc = "http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3";
+            }
+            media1 = new Media(audioSrc,
+                function() {
+                    console.log("seekToAudio():Audio Success");
+                },
+                function(err) {
+                    console.log("seekAudio():Audio Error: "+err.code);
+                    setAudioStatus("Error: " + err.code);
+                },
+                function(status) {
+                    console.log("seekAudio():Audio Status: "+status);
+                    setAudioStatus(Media.MEDIA_MSG[status]);
+
+                    // If stopped, then stop getting current position
+                    if (Media.MEDIA_STOPPED == status) {
+                        clearInterval(media1Timer);
+                        media1Timer = null;
+                        setAudioPosition("0 sec");
+                    }
+                });
+        }
+        
+        media1.getCurrentPosition(
+            function (position) {
+                var deltat = time;
+                if (mode == "by") {
+                    deltat = time + position * 1000;   
+                }
+                media1.seekTo(deltat,
+                    function () {
+                        console.log("seekAudioTo():Audio Success");
+                        //force an update on the position display
+                        updatePosition();
+                    },
+                    function (err) {
+                        console.log("seekAudioTo():Audio Error: " + err.code);
+                    });
+            },
+            function(e) {
+                console.log("Error getting pos="+e);
+                setAudioPosition("Error: "+e);
+            });
+    }
+    
 </script>
 
   </head>
@@ -289,6 +364,16 @@
             <td><div class="btn large" style="width:100%;" onclick="playAudio();">Play</div></td>
             <td><div class="btn large" style="width:100%;" onclick="pauseAudio();">Pause</div></td>
             <td><div class="btn large" style="width:100%;" onclick="stopAudio();">Stop</div></td>
+        </tr>
+        <tr>
+            <td><div class="btn large" style="width:100%;" onclick="seekAudio('by');">Seek By</div></td>
+            <td><div class="btn large" style="width:100%;" onclick="seekAudio('to');">Seek To</div></td>
+            <td>
+                <div style="width:100%;">
+                    <input class="input numeric" type="number" id="seekinput" value="in seconds">
+                </div>
+            </td>
+            <td><h2>s</h2></td>
         </tr>
         <tr>
             <th colspan=3><br><br>Record Audio</th>
