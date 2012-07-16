@@ -220,7 +220,9 @@ describe('FileTransfer', function() {
 
         it("should be able to upload a file", function() {
             var fail = jasmine.createSpy();
-            var uploadFail = jasmine.createSpy();
+            var uploadFail = function() {
+                expect(false).toBe(true, "Ensure " + remoteFile + " is in the white list");
+            };
 
             var remoteFile = server + "/upload";
             var localFileName = "upload.txt";
@@ -257,7 +259,6 @@ describe('FileTransfer', function() {
 
             runs(function() {
                 expect(uploadWin).toHaveBeenCalled();
-                expect(uploadFail).not.toHaveBeenCalled();
                 expect(fail).not.toHaveBeenCalled();
             });
         });
@@ -408,7 +409,7 @@ describe('FileTransfer', function() {
 
             var fileFail = function() {};
             var uploadFail = function() {
-                expect(false).toBe(true, "Ensure " + remoteFile + " is in the white list");
+                expect(false).toBe(true, "Ensure " + remoteFile + " is in the white list and that Content-Length header is being set.");
             };
 
             var uploadWin = jasmine.createSpy().andCallFake(function(uploadResult) {
@@ -419,7 +420,6 @@ describe('FileTransfer', function() {
                 var responseHtml = decodeURIComponent(uploadResult.response);
                 expect(responseHtml).toMatch(/CustomHeader1[\s\S]*CustomValue1/i);
                 expect(responseHtml).toMatch(/CustomHeader2[\s\S]*CustomValue2[\s\S]*CustomValue3/i, "Should allow array values");
-                expect(responseHtml).not.toMatch(/X-Requested-With/i, "Should hot have sent User-Agent header");
             });
 
             var fileWin = function(fileEntry) {
@@ -437,7 +437,6 @@ describe('FileTransfer', function() {
                 options.headers = {
                     "CustomHeader1": "CustomValue1",
                     "CustomHeader2": ["CustomValue2", "CustomValue3"],
-                    "X-Requested-With": null  // Removes the header.
                 };
 
                 // removing options cause Android to timeout
