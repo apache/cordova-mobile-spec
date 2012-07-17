@@ -59,8 +59,12 @@ describe('Accelerometer (navigator.accelerometer)', function () {
 
         it("success callback Acceleration object should return a recent timestamp", function() {
             var veryRecently = (new Date()).getTime();
+            // Need to check that dates returned are not vastly greater than a recent time stamp.
+            // In case the timestamps returned are ridiculously high
+            var reasonableTimeLimit = veryRecently + 5000; // 5 seconds from now
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a.timestamp).toBeGreaterThan(veryRecently);
+                    expect(a.timestamp).toBeLessThan(reasonableTimeLimit);
                 }),
                 fail = jasmine.createSpy();
 
@@ -137,8 +141,12 @@ describe('Accelerometer (navigator.accelerometer)', function () {
 
         it("success callback Acceleration object should return a recent timestamp", function() {
             var veryRecently = (new Date()).getTime();
+            // Need to check that dates returned are not vastly greater than a recent time stamp.
+            // In case the timestamps returned are ridiculously high
+            var reasonableTimeLimit = veryRecently + 5000; // 5 seconds from now
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a.timestamp).toBeGreaterThan(veryRecently);
+                    expect(a.timestamp).toBeLessThan(reasonableTimeLimit);
                 }),
                 fail = jasmine.createSpy();
 
