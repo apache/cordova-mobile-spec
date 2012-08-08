@@ -2906,7 +2906,7 @@ describe('File API', function() {
                     expect(evt.target.result).toBe(rule);
                 }),
                 fail = createFail('FileReader'),
-                filePath = root.fullPath + '/' + fileName;
+                filePath = root.fullPath + '/' + fileName,
                 // creates a FileWriter object
                 create_writer = function(fileEntry) {
                     fileEntry.createWriter(write_file, fail);
@@ -2941,7 +2941,7 @@ describe('File API', function() {
         it("should read empty file properly", function() {
             // path of file
             var fileName = "empty.txt",
-                filePath = root.fullPath + '/' + fileName;
+                filePath = root.fullPath + '/' + fileName,
                 // file content
                 rule = "",
                 fail = createFail('FileReader'),
