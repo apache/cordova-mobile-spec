@@ -20,10 +20,35 @@
 */
 
 describe('FileTransfer', function() {
-
     // https://github.com/don/cordova-filetransfer
     var server = "http://cordova-filetransfer.jitsu.com";
 
+    // Creates a spy that will fail if called.
+    function createDoNotCallSpy(name, opt_extraMessage) {
+        return jasmine.createSpy().andCallFake(function() {
+            var errorMessage = name + ' should not have been called.';
+            if (arguments.length) {
+                errorMessage += ' Got args: ' + JSON.stringify(arguments);
+            }
+            if (opt_extraMessage) {
+                errorMessage += '\n' + opt_extraMessage;
+            }
+            expect(false).toBe(true, errorMessage);
+        });
+    }
+
+    // Waits for any of the given spys to be called.
+    function waitsForAny() {
+        var spys = arguments;
+        waitsFor(function() {
+            for (var i = 0; i < spys.length; ++i) {
+                if (spys[i].wasCalled) {
+                    return true;
+                }
+            }
+            return false;
+        }, "Expecting success or failure callbacks to be called.", Tests.TEST_TIMEOUT);
+    }
     // deletes and re-creates the specified content
     var writeFile = function(fileName, fileContent, success, error) {
         var content = fileContent;
@@ -121,7 +146,7 @@ describe('FileTransfer', function() {
         //     - Item 2 String *.apache.org
 
         it("should be able to download a file", function() {
-            var fail = jasmine.createSpy();
+            var fail = createDoNotCallSpy('downloadFail');
             var remoteFile = server + "/robots.txt"
             var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
             var downloadWin = jasmine.createSpy().andCallFake(function(entry) {
@@ -134,15 +159,10 @@ describe('FileTransfer', function() {
                 ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, fail);
             });
 
-            waitsFor(function() { return downloadWin.wasCalled; }, "downloadWin", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(downloadWin).toHaveBeenCalled();
-                expect(fail).not.toHaveBeenCalled();
-            });
+            waitsForAny(downloadWin, fail);
         });
         it("should get http status on failure", function() {
-            var downloadWin = jasmine.createSpy();
+            var downloadWin = createDoNotCallSpy('downloadWin');
 
             var remoteFile = server + "/404";
             var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
@@ -157,16 +177,10 @@ describe('FileTransfer', function() {
                 ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
             });
 
-            waitsFor(function() { return downloadFail.wasCalled; }, "downloadFail", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(downloadFail).toHaveBeenCalled();
-                expect(downloadWin).not.toHaveBeenCalled();
-            });
+            waitsForAny(downloadWin, downloadFail);
         });
         it("should handle malformed urls", function() {
-
-            var downloadWin = jasmine.createSpy();
+            var downloadWin = createDoNotCallSpy('downloadWin');
 
             var remoteFile = getMalformedUrl();
             var localFileName = "download_malformed_url.txt";
@@ -185,15 +199,10 @@ describe('FileTransfer', function() {
                 ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
             });
 
-            waitsFor(function() { return downloadFail.wasCalled; }, "downloadFail", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(downloadFail).toHaveBeenCalled();
-                expect(downloadWin).not.toHaveBeenCalled();
-            });
+            waitsForAny(downloadWin, downloadFail);
         });
         it("should handle unknown host", function() {
-            var downloadWin = jasmine.createSpy();
+            var downloadWin = createDoNotCallSpy('downloadWin');
 
             var remoteFile = "http://foobar.apache.org/index.html";
             var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
@@ -206,16 +215,10 @@ describe('FileTransfer', function() {
                 ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
             });
 
-            waitsFor(function() { return downloadFail.wasCalled; }, "downloadFail", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(downloadFail).toHaveBeenCalled();
-                expect(downloadWin).not.toHaveBeenCalled();
-            });
+            waitsForAny(downloadWin, downloadFail);
         });
         it("should handle bad file path", function() {
-            var fail = jasmine.createSpy();
-            var downloadWin = jasmine.createSpy();
+            var downloadWin = createDoNotCallSpy('downloadWin');
 
             var remoteFile = server;
             var badFilePath = "c:\\54321";
@@ -228,25 +231,17 @@ describe('FileTransfer', function() {
                 ft.download(remoteFile, badFilePath, downloadWin, downloadFail);
             });
 
-            waitsFor(function() { return downloadFail.wasCalled; }, "downloadFail", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(downloadFail).toHaveBeenCalled();
-                expect(downloadWin).not.toHaveBeenCalled();
-                expect(fail).not.toHaveBeenCalled();
-            });
+            waitsForAny(downloadWin, downloadFail);
         });
     });
     describe('upload method', function() {
 
         it("should be able to upload a file", function() {
-            var fail = jasmine.createSpy();
-            var uploadFail = function() {
-                expect(false).toBe(true, "Ensure " + remoteFile + " is in the white list");
-            };
-
             var remoteFile = server + "/upload";
             var localFileName = "upload.txt";
+
+            var fileFail = createDoNotCallSpy('fileFail');
+            var uploadFail = createDoNotCallSpy('uploadFail', "Ensure " + remoteFile + " is in the white list");
 
             var uploadWin = jasmine.createSpy().andCallFake(function(uploadResult) {
                 expect(uploadResult.bytesSent).toBeGreaterThan(0);
@@ -273,19 +268,14 @@ describe('FileTransfer', function() {
             };
 
             runs(function() {
-                writeFile(localFileName, "this file should upload", fileWin, fail);
+                writeFile(localFileName, "this file should upload", fileWin, fileFail);
             });
 
-            waitsFor(function() { return uploadWin.wasCalled; }, "uploadWin", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(uploadWin).toHaveBeenCalled();
-                expect(fail).not.toHaveBeenCalled();
-            });
+            waitsForAny(uploadWin, uploadFail, fileFail);
         });
         it("should get http status on failure", function() {
-            var fail = jasmine.createSpy();
-            var uploadWin = jasmine.createSpy();
+            var fileFail = createDoNotCallSpy('fileFail');
+            var uploadWin = createDoNotCallSpy('uploadWin');
 
             var remoteFile = server + "/403";
             var localFileName = "upload_expect_fail.txt";
@@ -307,20 +297,14 @@ describe('FileTransfer', function() {
             };
 
             runs(function() {
-                writeFile(localFileName, "this file should fail to upload", fileWin, fail);
+                writeFile(localFileName, "this file should fail to upload", fileWin, fileFail);
             });
 
-            waitsFor(function() { return uploadFail.wasCalled; }, "Expecting file upload to fail", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(uploadFail).toHaveBeenCalled();
-                expect(uploadWin).not.toHaveBeenCalled();
-                expect(fail).not.toHaveBeenCalled();
-            });
+            waitsForAny(uploadWin, uploadFail, fileFail);
         });
         it("should handle malformed urls", function() {
-            var fail = jasmine.createSpy();
-            var uploadWin = jasmine.createSpy();
+            var fileFail = createDoNotCallSpy('fileFail');
+            var uploadWin = createDoNotCallSpy('uploadWin');
 
             var remoteFile = getMalformedUrl();
             var localFileName = "malformed_url.txt";
@@ -335,20 +319,14 @@ describe('FileTransfer', function() {
             };
 
             runs(function() {
-                writeFile(localFileName, "Some content", fileWin, fail);
+                writeFile(localFileName, "Some content", fileWin, fileFail);
             });
 
-            waitsFor(function() { return uploadFail.wasCalled; }, "uploadFail", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(uploadFail).toHaveBeenCalled();
-                expect(uploadWin).not.toHaveBeenCalled();
-                expect(fail).not.toHaveBeenCalled();
-            });
+            waitsForAny(uploadWin, uploadFail, fileFail);
         });
         it("should handle unknown host", function() {
-            var fail = jasmine.createSpy();
-            var uploadWin = jasmine.createSpy();
+            var fileFail = createDoNotCallSpy('fileFail');
+            var uploadWin = createDoNotCallSpy('uploadWin');
 
             var remoteFile = "http://foobar.apache.org/robots.txt";
             var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
@@ -363,20 +341,14 @@ describe('FileTransfer', function() {
             };
 
             runs(function() {
-                writeFile(localFileName, "# allow all", fileWin, fail);
+                writeFile(localFileName, "# allow all", fileWin, fileFail);
             });
 
-            waitsFor(function() { return uploadFail.wasCalled; }, "uploadFail", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(uploadFail).toHaveBeenCalled();
-                expect(uploadWin).not.toHaveBeenCalled();
-                expect(fail).not.toHaveBeenCalled();
-            });
+            waitsForAny(uploadWin, uploadFail, fileFail);
         });
         it("should handle missing file", function() {
-            var fail = jasmine.createSpy();
-            var uploadWin = jasmine.createSpy();
+            var fileFail = createDoNotCallSpy('fileFail');
+            var uploadWin = createDoNotCallSpy('uploadWin');
 
             var remoteFile = server + "/upload";
             var localFileName = "does_not_exist.txt";
@@ -390,19 +362,13 @@ describe('FileTransfer', function() {
                 deleteFile(localFileName, function() {
                     var ft = new FileTransfer();
                     ft.upload(root.fullPath + "/" + localFileName, remoteFile, uploadWin, uploadFail);
-                }, fail);
+                }, fileFail);
             });
 
-            waitsFor(function() { return uploadFail.wasCalled; }, "uploadFail", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(uploadFail).toHaveBeenCalled();
-                expect(uploadWin).not.toHaveBeenCalled();
-                expect(fail).not.toHaveBeenCalled();
-            });
+            waitsForAny(uploadWin, uploadFail, fileFail);
         });
         it("should handle bad file path", function() {
-            var uploadWin = jasmine.createSpy();
+            var uploadWin = createDoNotCallSpy('uploadWin');
 
             var remoteFile = server + "/upload";
 
@@ -416,22 +382,14 @@ describe('FileTransfer', function() {
                 ft.upload("/usr/local/bad/file/path.txt", remoteFile, uploadWin, uploadFail);
             });
 
-            waitsFor(function() { return uploadFail.wasCalled; }, "uploadFail", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(uploadFail).toHaveBeenCalled();
-                expect(uploadWin).not.toHaveBeenCalled();
-            });
-
+            waitsForAny(uploadWin, uploadFail);
         });
         it("should be able to set custom headers", function() {
             var remoteFile = "http://whatheaders.com";
             var localFileName = "upload.txt";
 
             var fileFail = function() {};
-            var uploadFail = function() {
-                expect(false).toBe(true, "Ensure " + remoteFile + " is in the white list and that Content-Length header is being set.");
-            };
+            var uploadFail = createDoNotCallSpy('uploadFail', "Ensure " + remoteFile + " is in the white list and that Content-Length header is being set.");
 
             var uploadWin = jasmine.createSpy().andCallFake(function(uploadResult) {
                 expect(uploadResult.bytesSent).toBeGreaterThan(0);
@@ -468,11 +426,7 @@ describe('FileTransfer', function() {
                 writeFile(localFileName, "this file should upload", fileWin, fileFail);
             });
 
-            waitsFor(function() { return uploadWin.wasCalled; }, "uploadWin", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(uploadWin).toHaveBeenCalled();
-            });
+            waitsForAny(uploadWin, uploadFail);
         });
     });
 });
