@@ -17,7 +17,7 @@
     //-------------------------------------------------------------------------
     var db;
     var callDatabase = function() {
-        db = openDatabase("mydb", "1.0", "PhoneGap Demo", 20000);
+        db = openDatabase("mydb", "1.0", "Apache Cordova Demo", 20000);
         if (db === null) {
             databaseOutput("Database could not be opened.");
             return;
@@ -72,7 +72,7 @@
 
     var readDatabase = function() {
     	if (!db) {
-    	    db = openDatabase("mydb", "1.0", "PhoneGap Demo", 20000);
+    	    db = openDatabase("mydb", "1.0", "Apache Cordova Demo", 20000);
     	    if (db === null) {
                 databaseOutput("Database could not be opened.");
                 return;
@@ -109,7 +109,7 @@
             }, false);
         window.setTimeout(function() {
         	if (!deviceReady) {
-        		alert("Error: PhoneGap did not initialize.  Demo will not run correctly.");
+        		alert("Error: Apache Cordova did not initialize.  Demo will not run correctly.");
         	}
         },1000);
     }

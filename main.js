@@ -90,7 +90,7 @@ function close() {
 
 // This is just to do this.
 function readFile() {
-    navigator.file.read('/sdcard/phonegap.txt', fail, fail);
+    navigator.file.read('/sdcard/cordova.txt', fail, fail);
 }
 
 function writeFile() {
