@@ -74,6 +74,17 @@ describe('FileTransfer', function() {
         }, error);
     };
 
+    var readFileEntry = function(entry, success, error) {
+        entry.file(function(file) {
+            var reader = new FileReader();
+            reader.onerror = error;
+            reader.onload = function(e) {
+                success(reader.result);
+            };
+            reader.readAsText(file);
+        }, error);
+    };
+
     var getMalformedUrl = function() {
         if (device.platform.match(/Android/i)) {
             // bad protocol causes a MalformedUrlException on Android
@@ -145,7 +156,7 @@ describe('FileTransfer', function() {
         //     - Item 1 String cordova-filetransfer.jitsu.com
         //     - Item 2 String *.apache.org
 
-        it("should be able to download a file", function() {
+        it("should be able to download a file using http", function() {
             var fail = createDoNotCallSpy('downloadFail');
             var remoteFile = server + "/robots.txt"
             var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
@@ -160,6 +171,26 @@ describe('FileTransfer', function() {
             });
 
             waitsForAny(downloadWin, fail);
+        });
+        it("should be able to download a file using https", function() {
+            var remoteFile = "https://www.apache.org/licenses/";
+            var localFileName = 'httpstest.html';
+            var downloadFail = createDoNotCallSpy('downloadFail', 'Ensure ' + remoteFile + ' is in the white-list');
+            var fileFail = createDoNotCallSpy('fileFail');
+            var downloadWin = function(entry) {
+                readFileEntry(entry, fileWin, fileFail);
+            };
+            var fileWin = jasmine.createSpy().andCallFake(function(content) {
+               expect(content).toMatch(/The Apache Software Foundation/); 
+               deleteFile(localFileName);
+            });
+
+            runs(function() {
+                var ft = new FileTransfer();
+                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+            });
+
+            waitsForAny(fileWin, downloadFail, fileFail);
         });
         it("should get http status on failure", function() {
             var downloadWin = createDoNotCallSpy('downloadWin');
