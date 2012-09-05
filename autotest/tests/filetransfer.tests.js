@@ -51,8 +51,7 @@ describe('FileTransfer', function() {
     }
     // deletes and re-creates the specified content
     var writeFile = function(fileName, fileContent, success, error) {
-        var content = fileContent;
-        deleteEntry(fileName, function() {
+        deleteFile(fileName, function() {
             root.getFile(fileName, {create: true}, function(fileEntry) {
                 fileEntry.createWriter(function (writer) {
 
@@ -68,10 +67,10 @@ describe('FileTransfer', function() {
                         error(evt);
                     };
 
-                    writer.write(content + "\n");
+                    writer.write(fileContent + "\n");
                 }, error);
             }, error);
-        }, error);
+        });
     };
 
     var readFileEntry = function(entry, success, error) {
@@ -96,24 +95,6 @@ describe('FileTransfer', function() {
     };
 
     // NOTE: copied from file.tests.js
-    // deletes specified file or directory
-    var deleteEntry = function(name, success, error) {
-        // deletes entry, if it exists
-        window.resolveLocalFileSystemURI(root.toURL() + '/' + name,
-            function(entry) {
-                if (entry.isDirectory === true) {
-                    entry.removeRecursively(success, error);
-                } else {
-                    entry.remove(success, error);
-                }
-            }, success);
-    };
-    // deletes and re-creates the specified file
-    var createFile = function(fileName, success, error) {
-        deleteEntry(fileName, function() {
-            root.getFile(fileName, {create: true}, success, error);
-        }, error);
-    };
     // deletes file, if it exists, then invokes callback
     var deleteFile = function(fileName, callback) {
         root.getFile(fileName, null,
@@ -162,9 +143,11 @@ describe('FileTransfer', function() {
             var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
             var downloadWin = jasmine.createSpy().andCallFake(function(entry) {
                 expect(entry.name).toBe(localFileName);
-                deleteFile(localFileName);
             });
 
+            this.after(function() {
+                deleteFile(localFileName);
+            });
             runs(function() {
                 var ft = new FileTransfer();
                 ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, fail);
@@ -181,10 +164,12 @@ describe('FileTransfer', function() {
                 readFileEntry(entry, fileWin, fileFail);
             };
             var fileWin = jasmine.createSpy().andCallFake(function(content) {
-               expect(content).toMatch(/The Apache Software Foundation/); 
-               deleteFile(localFileName);
+                expect(content).toMatch(/The Apache Software Foundation/); 
             });
 
+            this.after(function() {
+                deleteFile(localFileName);
+            });
             runs(function() {
                 var ft = new FileTransfer();
                 ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
@@ -200,9 +185,11 @@ describe('FileTransfer', function() {
             var downloadFail = jasmine.createSpy().andCallFake(function(error) {
                 expect(error.http_status).toBe(404);
                 expect(error.http_status).not.toBe(401, "Ensure " + remoteFile + " is in the white list");
-                deleteFile(localFileName);
             });
 
+            this.after(function() {
+                deleteFile(localFileName);
+            });
             runs(function() {
                 var ft = new FileTransfer();
                 ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
@@ -216,15 +203,16 @@ describe('FileTransfer', function() {
             var remoteFile = getMalformedUrl();
             var localFileName = "download_malformed_url.txt";
             var downloadFail = jasmine.createSpy().andCallFake(function(error) {
-
                 // Note: Android needs the bad protocol to be added to the access list
                 // <access origin=".*"/> won't match because ^https?:// is prepended to the regex
                 // The bad protocol must begin with http to avoid automatic prefix
                 expect(error.http_status).not.toBe(401, "Ensure " + remoteFile + " is in the white list");
                 expect(error.code).toBe(FileTransferError.INVALID_URL_ERR);
-                deleteFile(localFileName);
             });
 
+            this.after(function() {
+                deleteFile(localFileName);
+            });
             runs(function() {
                 var ft = new FileTransfer();
                 ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
@@ -278,7 +266,6 @@ describe('FileTransfer', function() {
                 expect(uploadResult.bytesSent).toBeGreaterThan(0);
                 expect(uploadResult.responseCode).toBe(200);
                 expect(uploadResult.response).toBeDefined();
-                deleteEntry(localFileName);
             });
 
             var fileWin = function(fileEntry) {
@@ -298,6 +285,9 @@ describe('FileTransfer', function() {
                 ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
             };
 
+            this.after(function() {
+                deleteFile(localFileName);
+            });
             runs(function() {
                 writeFile(localFileName, "this file should upload", fileWin, fileFail);
             });
@@ -313,7 +303,6 @@ describe('FileTransfer', function() {
             var uploadFail = jasmine.createSpy().andCallFake(function(error) {
                 expect(error.http_status).toBe(403);
                 expect(error.http_status).not.toBe(401, "Ensure " + remoteFile + " is in the white list");
-                deleteEntry(localFileName);
             });
 
             var fileWin = function(fileEntry) {
@@ -327,6 +316,9 @@ describe('FileTransfer', function() {
                 ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
             };
 
+            this.after(function() {
+                deleteFile(localFileName);
+            });
             runs(function() {
                 writeFile(localFileName, "this file should fail to upload", fileWin, fileFail);
             });
@@ -342,13 +334,15 @@ describe('FileTransfer', function() {
             var uploadFail = jasmine.createSpy().andCallFake(function(error) {
                 expect(error.code).toBe(FileTransferError.INVALID_URL_ERR);
                 expect(error.http_status).not.toBe(401, "Ensure " + remoteFile + " is in the white list");
-                deleteFile(localFileName);
             });
             var fileWin = function(fileEntry) {
                 var ft = new FileTransfer();
                 ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, {});
             };
 
+            this.after(function() {
+                deleteFile(localFileName);
+            });
             runs(function() {
                 writeFile(localFileName, "Some content", fileWin, fileFail);
             });
@@ -364,13 +358,15 @@ describe('FileTransfer', function() {
             var uploadFail = jasmine.createSpy().andCallFake(function(error) {
                 expect(error.code).toBe(FileTransferError.CONNECTION_ERR);
                 expect(error.http_status).not.toBe(401, "Ensure " + remoteFile + " is in the white list");
-                deleteFile(localFileName);
             });
             var fileWin = function(fileEntry) {
                 var ft = new FileTransfer();
                 ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, {});
             };
 
+            this.after(function() {
+                deleteFile(localFileName);
+            });
             runs(function() {
                 writeFile(localFileName, "# allow all", fileWin, fileFail);
             });
@@ -378,7 +374,6 @@ describe('FileTransfer', function() {
             waitsForAny(uploadWin, uploadFail, fileFail);
         });
         it("should handle missing file", function() {
-            var fileFail = createDoNotCallSpy('fileFail');
             var uploadWin = createDoNotCallSpy('uploadWin');
 
             var remoteFile = server + "/upload";
@@ -390,13 +385,11 @@ describe('FileTransfer', function() {
             });
 
             runs(function() {
-                deleteFile(localFileName, function() {
-                    var ft = new FileTransfer();
-                    ft.upload(root.fullPath + "/" + localFileName, remoteFile, uploadWin, uploadFail);
-                }, fileFail);
+                var ft = new FileTransfer();
+                ft.upload(root.fullPath + "/" + localFileName, remoteFile, uploadWin, uploadFail);
             });
 
-            waitsForAny(uploadWin, uploadFail, fileFail);
+            waitsForAny(uploadWin, uploadFail);
         });
         it("should handle bad file path", function() {
             var uploadWin = createDoNotCallSpy('uploadWin');
@@ -426,7 +419,6 @@ describe('FileTransfer', function() {
                 expect(uploadResult.bytesSent).toBeGreaterThan(0);
                 expect(uploadResult.responseCode).toBe(200);
                 expect(uploadResult.response).toBeDefined();
-                deleteEntry(localFileName);
                 var responseHtml = decodeURIComponent(uploadResult.response);
                 expect(responseHtml).toMatch(/CustomHeader1[\s\S]*CustomValue1/i);
                 expect(responseHtml).toMatch(/CustomHeader2[\s\S]*CustomValue2[\s\S]*CustomValue3/i, "Should allow array values");
@@ -453,6 +445,9 @@ describe('FileTransfer', function() {
                 ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
             };
 
+            this.after(function() {
+                deleteFile(localFileName);
+            });
             runs(function() {
                 writeFile(localFileName, "this file should upload", fileWin, fileFail);
             });
