@@ -85,7 +85,7 @@ describe('Compass (navigator.compass)', function () {
             expect(typeof h.timestamp == 'number').toBe(true);
         });
 
-        it("should be able to creat a new CompassHeading instance with parameters", function() {
+        it("should be able to create a new CompassHeading instance with parameters", function() {
             var h = new CompassHeading(1,2,3,4);
             expect(h.magneticHeading).toBe(1);
             expect(h.trueHeading).toBe(2);
