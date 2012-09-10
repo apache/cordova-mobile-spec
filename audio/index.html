@@ -10,6 +10,12 @@
       
 <script type="text/javascript" charset="utf-8">
 
+	//var defaultaudio = "/android_asset/one.mp3"; //local file
+	 var defaultaudio = "http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3";
+       //var src = "http://neuga.s3.amazonaws.com/onclassical/strings-or gan.mp3";
+ //      var src = "http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3";
+        //var src = "/android_asset/www/Jet_Sledding.mp4"; // no work
+        //var src = "http://vprbbc.streamguys.net/vprbbc24.mp3"; // mp3 streaming
     var deviceReady = false;
 
     //-------------------------------------------------------------------------
@@ -27,10 +33,7 @@
         console.log("playAudio()");
         console.log(" -- media="+media1);
 
-        //var src = "http://neuga.s3.amazonaws.com/onclassical/strings-or gan.mp3";
-       var src = "http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3";
-        //var src = "/android_asset/www/Jet_Sledding.mp4"; // no work
-        //var src = "http://vprbbc.streamguys.net/vprbbc24.mp3"; // mp3 streaming
+	    var src = defaultaudio;
         
         if (url) {
             src = url;
@@ -133,12 +136,22 @@
         console.log("stopAudio()");
         if (media1) {
             media1.stop();
-            media1.release();
         }
         clearInterval(media1Timer);
         media1Timer = null;
     }
-
+    
+    /**
+     * Release audio
+     */
+	function releaseAudio() {
+	    console.log("releaseAudio()");
+	    if (media1) {
+	    	media1.stop(); //imlied stop of playback, resets timer
+	    	media1.release();
+	    }
+	}
+	
     /**
      * Set audio status
      */
@@ -297,7 +310,7 @@
         if (media1 == null) {
             console.log("seekTo requested while media1 is null");
             if (audioSrc == null) {
-                audioSrc = "http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3";
+                audioSrc = defaultaudio;
             }
             media1 = new Media(audioSrc,
                 function() {
@@ -356,35 +369,43 @@
         </table>
     </div>
     <h2>Action</h2>
-    <table>
+    <table style="width:80%;">
         <tr>
             <th colspan=3>Play Sample Audio</th>
         </tr>
         <tr>
-            <td><div class="btn large" style="width:100%;" onclick="playAudio();">Play</div></td>
-            <td><div class="btn large" style="width:100%;" onclick="pauseAudio();">Pause</div></td>
-            <td><div class="btn large" style="width:100%;" onclick="stopAudio();">Stop</div></td>
+            <td><div class="btn wide" onclick="playAudio();">Play</div></td>
+            <td><div class="btn wide" onclick="pauseAudio();">Pause</div></td>
         </tr>
         <tr>
-            <td><div class="btn large" style="width:100%;" onclick="seekAudio('by');">Seek By</div></td>
-            <td><div class="btn large" style="width:100%;" onclick="seekAudio('to');">Seek To</div></td>
+            <td><div class="btn wide" onclick="stopAudio();">Stop</div></td>
+            <td><div class="btn wide" onclick="releaseAudio();">Release</div></td>
+        </tr>
+    </table>
+    
+    <table style="width:80%;">
+        <tr>
+            <td><div class="btn wide" onclick="seekAudio('by');">Seek By</div></td>
+            <td><div class="btn wide" onclick="seekAudio('to');">Seek To</div></td>
             <td>
-                <div style="width:100%;">
+                <div>
                     <input class="input numeric" type="number" id="seekinput" value="in seconds">
                 </div>
             </td>
-            <td><h2>s</h2></td>
         </tr>
+    </table>
+    
+    <table style="width:80%;">
         <tr>
             <th colspan=3><br><br>Record Audio</th>
         </tr>
         <tr>
-            <td colspan=3><div class="btn large" onclick="recordAudio();">Record Audio for 10 sec</a></td>
+            <td colspan=3><div class="btn wide" onclick="recordAudio();">Record Audio for 10 sec</a></td>
         </tr>
         <tr>
-            <td><div class="btn large" style="width:100%;" onclick="playRecording();">Play</div></td>
-            <td><div class="btn large" style="width:100%;" onclick="pauseAudio();">Pause</div></td>
-            <td><div class="btn large" style="width:100%;" onclick="stopAudio();">Stop</div></td>
+            <td><div class="btn wide" onclick="playRecording();">Play</div></td>
+            <td><div class="btn wide" onclick="pauseAudio();">Pause</div></td>
+            <td><div class="btn wide" onclick="stopAudio();">Stop</div></td>
         </tr>
     </table>
     
