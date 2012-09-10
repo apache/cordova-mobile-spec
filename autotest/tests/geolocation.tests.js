@@ -102,7 +102,7 @@ describe('Geolocation (navigator.geolocation)', function () {
                     });
                 });
 
-                waitsFor(function () { return fail.wasCalled; }, "fail never called", 250); // small timeout as this hsould fire very quickly
+                waitsFor(function () { return fail.wasCalled; }, "fail never called", 250); // small timeout as this should fire very quickly
 
                 runs(function () {
                     expect(win).not.toHaveBeenCalled();
