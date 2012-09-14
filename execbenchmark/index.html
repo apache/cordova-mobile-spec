@@ -140,6 +140,11 @@
   </head>
   <body id="stage" class="theme">
     <h1>exec() Benchmark</h1>
+    Before running on Android, set the following constants in NativeToJsMessagingBridge:
+    <ul>
+      <li>ENABLE_LOCATION_CHANGE_EXEC_MODE = true
+      <li>DISABLE_EXEC_CHAINING = true
+    </ul>
     <fieldset>
         <legend>Settings</legend>
         <label>Test Duration: <select id="test-duration"><option>1 Second</option><option>5 Seconds</option></select><br></label>
