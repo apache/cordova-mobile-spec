@@ -27,50 +27,41 @@
 */
 var FENCEPOST = 9000;
 
-var exec = cordova.require('cordova/exec');
-
-var echo = cordova.require('cordova/plugin/echo'),
-            startTime = +new Date,
-            callCount = 0,
-            durationMs = 1000,
-            asyncEcho = true,
-            useSetTimeout = true,
-            payloadSize = 5,
-            callsPerSecond = 0,
-            completeSpy = null, 
-            payload = new Array(payloadSize * 10 + 1).join('012\n\n 6789');
+var exec = cordova.require('cordova/exec'),
+    echo = cordova.require('cordova/plugin/echo'),
+    startTime,
+    endTime,
+    callCount,
+    durationMs = 1000,
+    asyncEcho,
+    useSetTimeout,
+    payloadSize,
+    payload;
 
 var vanillaWin = function(result) {
-            callCount++;
-            if (result != payload) {
-                console.log('Wrong echo data!');
-            }
-            var elapsedMs = new Date - startTime;
-            if (elapsedMs < durationMs) {
-                if (useSetTimeout) {
-                    setTimeout(echoMessage, 0);
-                } else {
-                    echoMessage();
-                }
-            } else {
-               callsPerSecond = callCount * 1000 / elapsedMs;
-               console.log('Calls per second: ' + callsPerSecond);
-               if(completeSpy != null)
-                completeSpy();
-            }
+    callCount++;
+    if (result != payload) {
+        console.log('Wrong echo data!');
+    }
+    var elapsedMs = new Date - startTime;
+    if (elapsedMs < durationMs) {
+        if (useSetTimeout) {
+            setTimeout(echoMessage, 0);
+        } else {
+            echoMessage();
         }
+    } else {
+        endTime = +new Date;
+    }
+}
 
 var reset = function()
 {
-            startTime = +new Date,
-            callCount = 0,
-            durationMs = 1000,
-            asyncEcho = true,
-            useSetTimeout = true,
-            payloadSize = 5,
-            callsPerSecond = 0,
-            completeSpy = null,
-            payload = new Array(payloadSize * 10 + 1).join('012\n\n 6789');
+    endTime = null;
+    callCount = 0;
+    useSetTimeout = false;
+    payloadSize = 5;
+    callsPerSecond = 0;
 }
 
 var echoMessage = function()
@@ -78,120 +69,60 @@ var echoMessage = function()
     echo(vanillaWin, fail, payload, asyncEcho);
 }
 
-var fail = jasmine.createSpy();
+var fail = function() {
+    expect(false).toBe(true);
+};
 
-describe('The JS to Native Bridge', function() {
-
-    //Run the reset
-    beforeEach(function() {
+function createTestCase(jsToNativeModeName, nativeToJsModeName, testAsyncEcho) {
+    it(jsToNativeModeName + '+' + nativeToJsModeName, function() {
+        expect(exec.jsToNativeModes[jsToNativeModeName]).toBeDefined();
+        expect(exec.nativeToJsModes[nativeToJsModeName]).toBeDefined();
         reset();
-    });
+        payload = new Array(payloadSize * 10 + 1).join('012\n\n 6789');
+        asyncEcho = testAsyncEcho;
+        exec.setJsToNativeBridgeMode(exec.jsToNativeModes[jsToNativeModeName]);
+        exec.setNativeToJsBridgeMode(exec.nativeToJsModes[nativeToJsModeName]);
 
-    it('should work with prompt', function() {
-        exec.setJsToNativeBridgeMode(0);
-        var win = jasmine.createSpy().andCallFake(function(r) {
-            vanillaWin(r);
+        waits(300);
+        runs(function() {
+            startTime = +new Date,
+            echoMessage();
         });
-        completeSpy = jasmine.createSpy();
-        runs(function() { 
-            echo(win, fail, payload, asyncEcho);
-        });
-        waitsFor(function() { return completeSpy.wasCalled; }, "never completed", durationMs * 2);
-        runs(function() { 
+        waitsFor(function() { return endTime; }, "never completed", durationMs * 2);
+        runs(function() {
+            var elapsedMs = endTime - startTime,
+                callsPerSecond = callCount * 1000 / elapsedMs;
             expect(callsPerSecond).toBeGreaterThan(FENCEPOST);
         });
     });
-    it("should work with jsObject", function() {
-        exec.setJsToNativeBridgeMode(1);
-        var win = jasmine.createSpy().andCallFake(function(r) {
-            vanillaWin(r);
-        });
-        completeSpy = jasmine.createSpy();
-        runs(function() { 
-            echo(win, fail, payload, asyncEcho);
-        });
-        waitsFor(function() { return completeSpy.wasCalled; }, "never completed", durationMs * 2);
-        runs(function() { 
-            expect(callsPerSecond).toBeGreaterThan(FENCEPOST);
-        });
+};
+
+// Wait so that the first benchmark doesn't have contention.
+describe('Wait for page to load.', function() {
+    it('waiting...', function() {
+        waits(1000);
     });
 });
 
-describe("The Native to JS Bridge", function() {
+// Before running on Android, set the following constants in NativeToJsMessagingBridge:
+// - ENABLE_LOCATION_CHANGE_EXEC_MODE = true
+// - DISABLE_EXEC_CHAINING = true
+describe('Android bridge with', function() {
+    var testAsyncEcho = false;
+    createTestCase('PROMPT', 'POLLING', testAsyncEcho);
+    createTestCase('JS_OBJECT', 'POLLING', testAsyncEcho);
+    createTestCase('LOCATION_CHANGE', 'ONLINE_EVENT', testAsyncEcho);
 
-    //Run the reset
-    beforeEach(function() {
-        reset();
-    });
+    testAsyncEcho = true;
+    createTestCase('PROMPT', 'POLLING', testAsyncEcho);
+    createTestCase('PROMPT', 'HANGING_GET', testAsyncEcho);
+    createTestCase('PROMPT', 'LOAD_URL', testAsyncEcho);
+    createTestCase('PROMPT', 'ONLINE_EVENT', testAsyncEcho);
+    createTestCase('PROMPT', 'PRIVATE_API', testAsyncEcho);
 
-    it("should work with polling", function() {
-       exec.setNativeToJsBridgeMode(0);
-        var win = jasmine.createSpy().andCallFake(function(r) {
-            vanillaWin(r);
-        });
-        completeSpy = jasmine.createSpy();
-        runs(function() { 
-            echo(win, fail, payload, asyncEcho);
-        });
-        waitsFor(function() { return completeSpy.wasCalled; }, "never completed", durationMs * 2);
-        runs(function() { 
-            expect(callsPerSecond).toBeGreaterThan(FENCEPOST);
-        });
-    });
-    it("should work with hanging get", function() {
-        exec.setNativeToJsBridgeMode(1);
-        var win = jasmine.createSpy().andCallFake(function(r) {
-            vanillaWin(r);
-        });
-        completeSpy = jasmine.createSpy();
-        runs(function() { 
-            echo(win, fail, payload, asyncEcho);
-        });
-        waitsFor(function() { return completeSpy.wasCalled; }, "never completed", durationMs * 2);
-        runs(function() { 
-            expect(callsPerSecond).toBeGreaterThan(FENCEPOST);
-        });
-    });
-    it("should work with load_url (not on emulator)", function() {
-       exec.setNativeToJsBridgeMode(2);
-        var win = jasmine.createSpy().andCallFake(function(r) {
-            vanillaWin(r);
-        });
-        completeSpy = jasmine.createSpy();
-        runs(function() { 
-            echo(win, fail, payload, asyncEcho);
-        });
-        waitsFor(function() { return completeSpy.wasCalled; }, "never completed", durationMs * 2);
-        runs(function() { 
-            expect(callsPerSecond).toBeGreaterThan(FENCEPOST);
-        });
-    });
-    it("should work with online event", function() {
-        exec.setNativeToJsBridgeMode(3);
-        var win = jasmine.createSpy().andCallFake(function(r) {
-            vanillaWin(r);
-        });
-        completeSpy = jasmine.createSpy();
-        runs(function() { 
-            echo(win, fail, payload, asyncEcho);
-        });
-        waitsFor(function() { return completeSpy.wasCalled; }, "never completed", durationMs * 2);
-        runs(function() { 
-            expect(callsPerSecond).toBeGreaterThan(FENCEPOST);
-        });
-    });
-    it("should work with the private api", function() {
-        exec.setNativeToJsBridgeMode(4);
-        var win = jasmine.createSpy().andCallFake(function(r) {
-            vanillaWin(r);
-        });
-        completeSpy = jasmine.createSpy();
-        runs(function() { 
-            echo(win, fail, payload, asyncEcho);
-        });
-        waitsFor(function() { return completeSpy.wasCalled; }, "never completed", durationMs * 2);
-        runs(function() { 
-            expect(callsPerSecond).toBeGreaterThan(FENCEPOST);
-        });
-    });
+    createTestCase('JS_OBJECT', 'POLLING', testAsyncEcho);
+    createTestCase('JS_OBJECT', 'HANGING_GET', testAsyncEcho);
+    createTestCase('JS_OBJECT', 'LOAD_URL', testAsyncEcho);
+    createTestCase('JS_OBJECT', 'ONLINE_EVENT', testAsyncEcho);
+    createTestCase('JS_OBJECT', 'PRIVATE_API', testAsyncEcho);
 });
