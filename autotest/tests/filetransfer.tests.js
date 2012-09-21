@@ -94,18 +94,18 @@ describe('FileTransfer', function() {
         }
     };
 
-    // NOTE: copied from file.tests.js
     // deletes file, if it exists, then invokes callback
     var deleteFile = function(fileName, callback) {
+        var spy = jasmine.createSpy().andCallFake(callback);
         root.getFile(fileName, null,
             // remove file system entry
             function(entry) {
-                entry.remove(callback, function() { expect(true).toBe(false, 'deleteFile cleanup method invoked fail callback. File: ' + fileName); });
+                entry.remove(spy, spy);
             },
             // doesn't exist
-            callback);
+            spy);
+        waitsFor(function() { return spy.wasCalled; }, Tests.TEST_TIMEOUT);
     };
-    // end copied from file.tests.js
 
     it("should exist and be constructable", function() {
         var ft = new FileTransfer();
@@ -326,7 +326,7 @@ describe('FileTransfer', function() {
         });
         it("should be stopped by abort() right away.", function() {
             var remoteFile = server + "/upload";
-            var localFileName = "upload2.txt";
+            var localFileName = "upload.txt";
 
             var fileFail = createDoNotCallSpy('fileFail');
             var uploadWin = createDoNotCallSpy('uploadWin', 'Should have been aborted');
