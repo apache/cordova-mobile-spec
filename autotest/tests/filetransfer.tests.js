@@ -96,6 +96,7 @@ describe('FileTransfer', function() {
 
     // deletes file, if it exists, then invokes callback
     var deleteFile = function(fileName, callback) {
+        callback = callback || function() {};
         var spy = jasmine.createSpy().andCallFake(callback);
         root.getFile(fileName, null,
             // remove file system entry
