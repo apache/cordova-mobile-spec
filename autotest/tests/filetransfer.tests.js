@@ -288,9 +288,11 @@ describe('FileTransfer', function() {
         it("should be able to upload a file", function() {
             var remoteFile = server + "/upload";
             var localFileName = "upload.txt";
+            var fileContents = 'This file should upload';
 
             var fileFail = createDoNotCallSpy('fileFail');
             var uploadFail = createDoNotCallSpy('uploadFail', "Ensure " + remoteFile + " is in the white list");
+            var lastProgressEvent = null;
 
             var uploadWin = jasmine.createSpy().andCallFake(function(uploadResult) {
                 expect(uploadResult.bytesSent).toBeGreaterThan(0);
@@ -311,6 +313,13 @@ describe('FileTransfer', function() {
                 params.value2 = "param";
                 options.params = params;
 
+                ft.onprogress = function(e) {
+                    expect(e.lengthComputable).toBe(true);
+                    expect(e.total).toBeGreaterThan(0);
+                    expect(e.loaded).toBeGreaterThan(0);
+                    lastProgressEvent = e;
+                };
+
                 // removing options cause Android to timeout
                 ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
             };
@@ -319,10 +328,13 @@ describe('FileTransfer', function() {
                 deleteFile(localFileName);
             });
             runs(function() {
-                writeFile(localFileName, "this file should upload", fileWin, fileFail);
+                writeFile(localFileName, fileContents, fileWin, fileFail);
             });
 
             waitsForAny(uploadWin, uploadFail, fileFail);
+            runs(function() {
+                expect(lastProgressEvent).not.toBeNull('expected progress events');
+            });
         });
         it("should be stopped by abort() right away.", function() {
             var remoteFile = server + "/upload";
