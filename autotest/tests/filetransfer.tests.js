@@ -23,32 +23,6 @@ describe('FileTransfer', function() {
     // https://github.com/don/cordova-filetransfer
     var server = "http://cordova-filetransfer.jitsu.com";
 
-    // Creates a spy that will fail if called.
-    function createDoNotCallSpy(name, opt_extraMessage) {
-        return jasmine.createSpy().andCallFake(function() {
-            var errorMessage = name + ' should not have been called.';
-            if (arguments.length) {
-                errorMessage += ' Got args: ' + JSON.stringify(arguments);
-            }
-            if (opt_extraMessage) {
-                errorMessage += '\n' + opt_extraMessage;
-            }
-            expect(false).toBe(true, errorMessage);
-        });
-    }
-
-    // Waits for any of the given spys to be called.
-    function waitsForAny() {
-        var spys = arguments;
-        waitsFor(function() {
-            for (var i = 0; i < spys.length; ++i) {
-                if (spys[i].wasCalled) {
-                    return true;
-                }
-            }
-            return false;
-        }, "Expecting success or failure callbacks to be called.", Tests.TEST_TIMEOUT);
-    }
     // deletes and re-creates the specified content
     var writeFile = function(fileName, fileContent, success, error) {
         deleteFile(fileName, function() {
@@ -94,18 +68,19 @@ describe('FileTransfer', function() {
         }
     };
 
-    // NOTE: copied from file.tests.js
     // deletes file, if it exists, then invokes callback
     var deleteFile = function(fileName, callback) {
+        callback = callback || function() {};
+        var spy = jasmine.createSpy().andCallFake(callback);
         root.getFile(fileName, null,
             // remove file system entry
             function(entry) {
-                entry.remove(callback, function() { console.log('[ERROR] deleteFile cleanup method invoked fail callback.'); });
+                entry.remove(spy, spy);
             },
             // doesn't exist
-            callback);
+            spy);
+        waitsFor(function() { return spy.wasCalled; }, Tests.TEST_TIMEOUT);
     };
-    // end copied from file.tests.js
 
     it("should exist and be constructable", function() {
         var ft = new FileTransfer();
@@ -141,8 +116,11 @@ describe('FileTransfer', function() {
             var fail = createDoNotCallSpy('downloadFail');
             var remoteFile = server + "/robots.txt"
             var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
+            var lastProgressEvent = null;
+
             var downloadWin = jasmine.createSpy().andCallFake(function(entry) {
                 expect(entry.name).toBe(localFileName);
+                expect(lastProgressEvent.loaded).toBeGreaterThan(1);
             });
 
             this.after(function() {
@@ -150,6 +128,9 @@ describe('FileTransfer', function() {
             });
             runs(function() {
                 var ft = new FileTransfer();
+                ft.onprogress = function(e) {
+                    lastProgressEvent = e;
+                };
                 ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, fail);
             });
 
@@ -176,6 +157,30 @@ describe('FileTransfer', function() {
             });
 
             waitsForAny(fileWin, downloadFail, fileFail);
+        });
+        it("should be stopped by abort() right away", function() {
+            var downloadWin = createDoNotCallSpy('downloadWin');
+            var remoteFile = 'http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3';
+            var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
+            var startTime = +new Date();
+
+            var downloadFail = jasmine.createSpy().andCallFake(function(e) {
+                expect(e.code).toBe(FileTransferError.ABORT_ERR);
+                expect(new Date() - startTime).toBeLessThan(150);
+            });
+
+            this.after(function() {
+                deleteFile(localFileName);
+            });
+            runs(function() {
+                var ft = new FileTransfer();
+                ft.abort(); // should be a no-op.
+                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+                ft.abort();
+                ft.abort(); // should be a no-op.
+            });
+
+            waitsForAny(downloadWin, downloadFail);
         });
         it("should get http status on failure", function() {
             var downloadWin = createDoNotCallSpy('downloadWin');
@@ -258,9 +263,11 @@ describe('FileTransfer', function() {
         it("should be able to upload a file", function() {
             var remoteFile = server + "/upload";
             var localFileName = "upload.txt";
+            var fileContents = 'This file should upload';
 
             var fileFail = createDoNotCallSpy('fileFail');
             var uploadFail = createDoNotCallSpy('uploadFail', "Ensure " + remoteFile + " is in the white list");
+            var lastProgressEvent = null;
 
             var uploadWin = jasmine.createSpy().andCallFake(function(uploadResult) {
                 expect(uploadResult.bytesSent).toBeGreaterThan(0);
@@ -281,6 +288,13 @@ describe('FileTransfer', function() {
                 params.value2 = "param";
                 options.params = params;
 
+                ft.onprogress = function(e) {
+                    expect(e.lengthComputable).toBe(true);
+                    expect(e.total).toBeGreaterThan(0);
+                    expect(e.loaded).toBeGreaterThan(0);
+                    lastProgressEvent = e;
+                };
+
                 // removing options cause Android to timeout
                 ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
             };
@@ -289,7 +303,47 @@ describe('FileTransfer', function() {
                 deleteFile(localFileName);
             });
             runs(function() {
-                writeFile(localFileName, "this file should upload", fileWin, fileFail);
+                writeFile(localFileName, fileContents, fileWin, fileFail);
+            });
+
+            waitsForAny(uploadWin, uploadFail, fileFail);
+            runs(function() {
+                expect(lastProgressEvent).not.toBeNull('expected progress events');
+            });
+        });
+        it("should be stopped by abort() right away.", function() {
+            var remoteFile = server + "/upload";
+            var localFileName = "upload.txt";
+
+            var fileFail = createDoNotCallSpy('fileFail');
+            var uploadWin = createDoNotCallSpy('uploadWin', 'Should have been aborted');
+            var startTime = +new Date();
+
+            var uploadFail = jasmine.createSpy().andCallFake(function(e) {
+                expect(e.code).toBe(FileTransferError.ABORT_ERR);
+                expect(new Date() - startTime).toBeLessThan(150);
+            });
+
+            var fileWin = function(fileEntry) {
+                ft = new FileTransfer();
+
+                var options = new FileUploadOptions();
+                options.fileKey = "file";
+                options.fileName = localFileName;
+                options.mimeType = "text/plain";
+
+                // removing options cause Android to timeout
+                ft.abort(); // should be a no-op.
+                ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
+                ft.abort();
+                ft.abort(); // should be a no-op.
+            };
+
+            this.after(function() {
+                deleteFile(localFileName);
+            });
+            runs(function() {
+                writeFile(localFileName, new Array(10000).join('aborttest!'), fileWin, fileFail);
             });
 
             waitsForAny(uploadWin, uploadFail, fileFail);
