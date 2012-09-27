@@ -23,32 +23,6 @@ describe('FileTransfer', function() {
     // https://github.com/don/cordova-filetransfer
     var server = "http://cordova-filetransfer.jitsu.com";
 
-    // Creates a spy that will fail if called.
-    function createDoNotCallSpy(name, opt_extraMessage) {
-        return jasmine.createSpy().andCallFake(function() {
-            var errorMessage = name + ' should not have been called.';
-            if (arguments.length) {
-                errorMessage += ' Got args: ' + JSON.stringify(arguments);
-            }
-            if (opt_extraMessage) {
-                errorMessage += '\n' + opt_extraMessage;
-            }
-            expect(false).toBe(true, errorMessage);
-        });
-    }
-
-    // Waits for any of the given spys to be called.
-    function waitsForAny() {
-        var spys = arguments;
-        waitsFor(function() {
-            for (var i = 0; i < spys.length; ++i) {
-                if (spys[i].wasCalled) {
-                    return true;
-                }
-            }
-            return false;
-        }, "Expecting success or failure callbacks to be called.", Tests.TEST_TIMEOUT);
-    }
     // deletes and re-creates the specified content
     var writeFile = function(fileName, fileContent, success, error) {
         deleteFile(fileName, function() {
