@@ -284,6 +284,29 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
+        it("stringToDate using invalid date, error callback should be called with a GlobalizationError object", function() {
+            var win = jasmine.createSpy(),
+                fail = jasmine.createSpy().andCallFake(function(a) {
+                    expect(a).toBeDefined();
+                    expect(typeof a).toBe('object');
+                    expect(a.code).toBeDefined();
+                    expect(typeof a.code).toBe('number');
+                    expect(a.code === GlobalizationError.PARSING_ERROR).toBe(true);
+                    expect(a.message).toBeDefined();
+                    expect(typeof a.message).toBe('string');
+                    expect(a.message !== "").toBe(true);
+                });
+
+            runs(function () {
+                navigator.globalization.stringToDate('notADate', win, fail, {selector:'foobar'});
+            });
+
+            waitsFor(function () { return fail.wasCalled; }, "fail never called", Tests.TEST_TIMEOUT);
+
+            runs(function () {
+                expect(win).not.toHaveBeenCalled();
+            });
+        });
     });
 
     describe("getDatePattern", function() {
