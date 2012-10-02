@@ -317,7 +317,7 @@ describe('FileTransfer', function() {
 
             var fileFail = createDoNotCallSpy('fileFail');
             var uploadWin = createDoNotCallSpy('uploadWin', 'Should have been aborted');
-            var startTime = +new Date();
+            var startTime;
 
             var uploadFail = jasmine.createSpy().andCallFake(function(e) {
                 expect(e.code).toBe(FileTransferError.ABORT_ERR);
@@ -332,6 +332,7 @@ describe('FileTransfer', function() {
                 options.fileName = localFileName;
                 options.mimeType = "text/plain";
 
+                startTime = +new Date();
                 // removing options cause Android to timeout
                 ft.abort(); // should be a no-op.
                 ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
