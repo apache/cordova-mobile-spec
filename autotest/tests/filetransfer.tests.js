@@ -166,7 +166,7 @@ describe('FileTransfer', function() {
 
             var downloadFail = jasmine.createSpy().andCallFake(function(e) {
                 expect(e.code).toBe(FileTransferError.ABORT_ERR);
-                expect(new Date() - startTime).toBeLessThan(150);
+                expect(new Date() - startTime).toBeLessThan(300);
             });
 
             this.after(function() {
@@ -321,7 +321,7 @@ describe('FileTransfer', function() {
 
             var uploadFail = jasmine.createSpy().andCallFake(function(e) {
                 expect(e.code).toBe(FileTransferError.ABORT_ERR);
-                expect(new Date() - startTime).toBeLessThan(150);
+                expect(new Date() - startTime).toBeLessThan(300);
             });
 
             var fileWin = function(fileEntry) {
