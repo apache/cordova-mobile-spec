@@ -52,8 +52,8 @@
             startTime = +new Date,
             callCount = 0,
             durationMs = parseInt(document.getElementById('test-duration').value, 10) * 1000,
-            asyncEcho = !!document.getElementById('async-echo').value,
-            useSetTimeout = !!document.getElementById('use-setTimeout').value,
+            asyncEcho = document.getElementById('async-echo').checked,
+            useSetTimeout = document.getElementById('use-setTimeout').checked,
             jsToNativeMode = document.getElementById('js-native-modes').value,
             nativeToJsMode = document.getElementById('native-js-modes').value,
             payloadSize = +document.getElementById('payload-size').value,
@@ -83,7 +83,7 @@
             echo(win, fail, payload, asyncEcho);
         }
         
-        var logMsg = 'Started exec benchmark with setTimeout: ' + useSetTimeout + ' payload length: ' + payload.length;
+        var logMsg = 'Started exec benchmark with setTimeout: ' + useSetTimeout + ' asyncEcho: ' + asyncEcho + ' payload length: ' + payload.length;
         if (jsToNativeMode) {
             exec.setJsToNativeBridgeMode(+jsToNativeMode);
             logMsg += ' jsToNativeMode: ' + jsToNativeMode;
