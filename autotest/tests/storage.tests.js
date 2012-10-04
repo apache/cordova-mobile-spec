@@ -1,3 +1,24 @@
+/*
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+*/
+
 describe("Session Storage", function () {
     it("should exist", function () {
         expect(window.sessionStorage).toBeDefined();
@@ -153,9 +174,22 @@ describe("Session Storage", function () {
             expect(window.openDatabase);
         });
 
-        it("Should open a database", function() {
-            var db = openDatabase("Database", "1.0", "HTML5 Database API example", 200000);
-            expect(db).toBeDefined();
+        it("Should be able to create and drop tables", function() {
+            var win = jasmine.createSpy('win');
+            var fail1 = createDoNotCallSpy('fail1');
+            var fail2 = createDoNotCallSpy('fail2');
+            var db = openDatabase("Database", "1.0", "HTML5 Database API example", 5*1024*1024);
+            db.transaction(function(t) {
+                t.executeSql('CREATE TABLE IF NOT EXISTS foo(id int, name varchar(255));');
+                t.executeSql('CREATE TABLE IF NOT EXISTS foo2(id int, name varchar(255));');
+            }, fail1, step2);
+            function step2() {
+              db.transaction(function(t) {
+                  t.executeSql('DROP TABLE foo;');
+                  t.executeSql('DROP TABLE foo2');
+              }, fail2, win);
+            }
+            waitsForAny(win, fail1, fail2);
         });
     });
 });

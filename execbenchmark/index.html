@@ -1,3 +1,24 @@
+<!--
+
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+
+-->
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -31,8 +52,8 @@
             startTime = +new Date,
             callCount = 0,
             durationMs = parseInt(document.getElementById('test-duration').value, 10) * 1000,
-            asyncEcho = !!document.getElementById('async-echo').value,
-            useSetTimeout = !!document.getElementById('use-setTimeout').value,
+            asyncEcho = document.getElementById('async-echo').checked,
+            useSetTimeout = document.getElementById('use-setTimeout').checked,
             jsToNativeMode = document.getElementById('js-native-modes').value,
             nativeToJsMode = document.getElementById('native-js-modes').value,
             payloadSize = +document.getElementById('payload-size').value,
@@ -62,7 +83,7 @@
             echo(win, fail, payload, asyncEcho);
         }
         
-        var logMsg = 'Started exec benchmark with setTimeout: ' + useSetTimeout + ' payload length: ' + payload.length;
+        var logMsg = 'Started exec benchmark with setTimeout: ' + useSetTimeout + ' asyncEcho: ' + asyncEcho + ' payload length: ' + payload.length;
         if (jsToNativeMode) {
             exec.setJsToNativeBridgeMode(+jsToNativeMode);
             logMsg += ' jsToNativeMode: ' + jsToNativeMode;
@@ -119,6 +140,11 @@
   </head>
   <body id="stage" class="theme">
     <h1>exec() Benchmark</h1>
+    Before running on Android, set the following constants in NativeToJsMessagingBridge:
+    <ul>
+      <li>ENABLE_LOCATION_CHANGE_EXEC_MODE = true
+      <li>DISABLE_EXEC_CHAINING = true
+    </ul>
     <fieldset>
         <legend>Settings</legend>
         <label>Test Duration: <select id="test-duration"><option>1 Second</option><option>5 Seconds</option></select><br></label>
