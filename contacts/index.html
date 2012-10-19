@@ -39,7 +39,7 @@
     //-------------------------------------------------------------------------
     function getContacts() {
         obj = new ContactFindOptions();
-        obj.filter = "D"; //Brooks";
+        // show all contacts, so don't filter
         obj.multiple = true;
         navigator.contacts.find(
             ["displayName", "name", "phoneNumbers", "emails", "urls", "note"],
