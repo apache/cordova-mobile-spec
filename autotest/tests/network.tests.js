@@ -19,28 +19,36 @@
  *
 */
 
-describe('Network (navigator.network)', function () {
-	it("should exist", function() {
-        expect(navigator.network).toBeDefined();
-	});
+describe('Network (navigator.connection)', function () {
+    it("should exist", function() {
+        expect(navigator.network && navigator.network.connection).toBeDefined();
+        expect(navigator.connection).toBeDefined();
+    });
 
-    describe('Network Information API', function () {
-        it("connection should exist", function() {
-            expect(navigator.network.connection).toBeDefined();
-        });
+    it("should be set to a valid value", function() {
+        var validValues = {
+            'unknown': 1,
+            'ethernet': 1,
+            'wifi': 1,
+            '2g': 1,
+            '3g': 1,
+            '4g': 1,
+            'none': 1
+        };
+        expect(validValues[navigator.connection.type]).toBe(1);
+    });
 
-        it("should contain connection properties", function() {
-            expect(navigator.network.connection.type).toBeDefined();
-        });
+    it("should have the same value in deprecated and non-deprecated apis", function() {
+        expect(navigator.network.connection.type).toBe(navigator.connection.type);
+    });
 
-        it("should define constants for connection status", function() {
-            expect(Connection.UNKNOWN).toBe("unknown");
-            expect(Connection.ETHERNET).toBe("ethernet");
-            expect(Connection.WIFI).toBe("wifi");
-            expect(Connection.CELL_2G).toBe("2g");
-            expect(Connection.CELL_3G).toBe("3g");
-            expect(Connection.CELL_4G).toBe("4g");
-            expect(Connection.NONE).toBe("none");
-        });
+    it("should define constants for connection status", function() {
+        expect(Connection.UNKNOWN).toBe("unknown");
+        expect(Connection.ETHERNET).toBe("ethernet");
+        expect(Connection.WIFI).toBe("wifi");
+        expect(Connection.CELL_2G).toBe("2g");
+        expect(Connection.CELL_3G).toBe("3g");
+        expect(Connection.CELL_4G).toBe("4g");
+        expect(Connection.NONE).toBe("none");
     });
 });
