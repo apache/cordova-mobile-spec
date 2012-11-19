@@ -24,6 +24,7 @@ var deviceInfo = function() {
     document.getElementById("version").innerHTML = device.version;
     document.getElementById("uuid").innerHTML = device.uuid;
     document.getElementById("name").innerHTML = device.name;
+    document.getElementById("model").innerHTML = device.model;
     document.getElementById("width").innerHTML = screen.width;
     document.getElementById("height").innerHTML = screen.height;
     document.getElementById("colorDepth").innerHTML = screen.colorDepth;
