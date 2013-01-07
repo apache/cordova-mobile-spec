@@ -3052,6 +3052,98 @@ describe('File API', function() {
                 expect(verifier).toHaveBeenCalled();
             });
         });
+        it("should properly slice files, reading text", function() {
+            // path of file
+            var fileName = "reader.txt",
+                // file content
+                rule = "There is an exception to every rule.  Except this one.",
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(evt).toBeDefined();
+                    expect(evt.target.result).toBe("exception to every rule");
+                }),
+                fail = createFail('FileReader'),
+                filePath = root.fullPath + '/' + fileName,
+                // creates a FileWriter object
+                create_writer = function(fileEntry) {
+                    fileEntry.createWriter(write_file, fail);
+                },
+                // writes file and reads it back in
+                write_file = function(writer) {
+                    writer.onwriteend = read_file;
+                    writer.write(rule);
+                },
+                // reads file and compares content to what was written
+                read_file = function(evt) {
+                    var reader = new FileReader();
+                    reader.onloadend = verifier;
+                    var myFile = new File();
+
+                    myFile.fullPath = filePath;
+                    myFile.size = 54;
+                    myFile.end = 54;
+                    var sliced = myFile.slice(10, 40); // "n exception to every rule.  Ex"
+                    var sliced2 = sliced.slice(2, -5); // "exception to every rule"
+                    reader.readAsText(sliced2);
+                };
+
+            // create a file, write to it, and read it in again
+            runs(function() {
+                root.getFile(fileName, {create: true}, create_writer, fail);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).not.toHaveBeenCalled();
+                expect(verifier).toHaveBeenCalled();
+            });
+        });
+        it("should properly slice files, reading data URLs", function() {
+            // path of file
+            var fileName = "reader.txt",
+                // file content
+                rule = "There is an exception to every rule.  Except this one.",
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(evt).toBeDefined();
+                    expect(evt.target.result).toBe("data:text/plain;base64,ZXhjZXB0aW9uIHRvIGV2ZXJ5IHJ1bGU=");
+                }),
+                fail = createFail('FileReader'),
+                filePath = root.fullPath + '/' + fileName,
+                // creates a FileWriter object
+                create_writer = function(fileEntry) {
+                    fileEntry.createWriter(write_file, fail);
+                },
+                // writes file and reads it back in
+                write_file = function(writer) {
+                    writer.onwriteend = read_file;
+                    writer.write(rule);
+                },
+                // reads file and compares content to what was written
+                read_file = function(evt) {
+                    var reader = new FileReader();
+                    reader.onloadend = verifier;
+                    var myFile = new File();
+
+                    myFile.fullPath = filePath;
+                    myFile.size = 54;
+                    myFile.end = 54;
+                    var sliced = myFile.slice(10, 40); // "n exception to every rule.  Ex"
+                    var sliced2 = sliced.slice(2, -5); // "exception to every rule"
+                    reader.readAsDataURL(sliced2);
+                };
+
+            // create a file, write to it, and read it in again
+            runs(function() {
+                root.getFile(fileName, {create: true}, create_writer, fail);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).not.toHaveBeenCalled();
+                expect(verifier).toHaveBeenCalled();
+            });
+        });
     });
 
     describe('FileWriter', function(){
