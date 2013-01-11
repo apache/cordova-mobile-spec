@@ -3001,15 +3001,39 @@ describe('File API', function() {
             var myFile = new File();
             myFile.fullPath = root.fullPath + '/' + "doesnotexist.err";
 
-            runs(function() {
-                reader.readAsText(myFile);
-            });
+            reader.readAsText(myFile);
 
             waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+        });
+        // This test fails on Android <= 2.3 and iOS <= 5 due to a lack of
+        // Blob creation on these platforms.
+        it("should be able to read native blob objects", function() {
+            var contents = 'asdf';
+            var uint8Array = new Uint8Array(contents.length);
+            for (var i = 0; i < contents.length; ++i) {
+              uint8Array[i] = contents.charCodeAt(i);
+            }
+            var Builder = window.BlobBuilder || window.WebKitBlobBuilder;
+            var blob;
+            if (Builder) {
+                var builder = new Builder();
+                builder.append(uint8Array.buffer);
+                builder.append(contents);
+                blob = builder.getBlob("text/plain");
+            } else {
+                // iOS 6 does not support Views here.
+                blob = new Blob([uint8Array.buffer, contents]);
+            }
 
-            runs(function() {
-                expect(verifier).toHaveBeenCalled();
+            var verifier = jasmine.createSpy().andCallFake(function(evt) {
+                expect(evt).toBeDefined();
+                expect(evt.target.result).toBe('asdfasdf');
             });
+            var reader = new FileReader();
+            reader.onloadend = verifier;
+            reader.readAsText(blob);
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", 300);
         });
         it("should read file properly, Data URI", function() {
             // path of file
