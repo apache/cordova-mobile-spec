@@ -64,9 +64,9 @@
     };
 
     /**
-     * Select image from library
+     * Select image from library using a FILE_URI destination type
      */
-    function getImage() {
+    function getImageUsingFileUri() {
         navigator.camera.getPicture(
             function(data) {
                 var img = document.getElementById('camera_image');
@@ -84,7 +84,27 @@
             Camera.DestinationType.FILE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
     };
 
-    
+    /**
+     * Select image from library using a NATIVE_URI destination type
+     */
+    function getImageInfoUsingNativeUri() {
+        var onFileReceived = function(file) {
+            document.getElementById('camera_status').innerHTML = "Success; fullPath: " + file.fullPath + ", name: " + file.name + ", type: " + file.type + ", size: " + file.size + ", date: " + file.lastModifiedDate;
+        }
+        var onError = function(e) {
+            console.log("Error getting picture: " + e);
+            document.getElementById('camera_status').innerHTML = "Error getting picture.";
+        }
+        navigator.camera.getPicture(
+            function(data) {
+                var fileEntry = new FileEntry('image_name.png', data);
+                var file = fileEntry.file(onFileReceived, onError);
+            },
+            onError,
+            { quality: 50, destinationType:
+            Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+    };
+
     /**
      * Function called when page has finished loading.
      */
@@ -112,7 +132,8 @@
     </div>
     <h2>Action</h2>
     <div class="btn large" onclick="getPicture();">Take Picture</div>
-    <div class="btn large" onclick="getImage();">Select Image from Library</div>
+    <div class="btn large" onclick="getImageUsingFileUri();">Select Image Using File URI</div>
+    <div class="btn large" onclick="getImageInfoUsingNativeUri();">Select Image Using Native URI</div>
     <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
 </html>      
