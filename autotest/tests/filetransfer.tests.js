@@ -136,6 +136,34 @@ describe('FileTransfer', function() {
 
             waitsForAny(downloadWin, fail);
         });
+        it("should be able to download a file using file:// (when hosted from file://)", function() {
+            var fail = createDoNotCallSpy('downloadFail');
+            var remoteFile = window.location.href;
+            var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
+            var lastProgressEvent = null;
+
+            if (!/^file/.exec(remoteFile)) {
+                expect(remoteFile).toMatch(/^file:/);
+                return;
+            }
+
+            var downloadWin = jasmine.createSpy().andCallFake(function(entry) {
+                expect(entry.name).toBe(localFileName);
+                expect(lastProgressEvent.loaded).toBeGreaterThan(1);
+            });
+
+            this.after(function() {
+                deleteFile(localFileName);
+            });
+
+            var ft = new FileTransfer();
+            ft.onprogress = function(e) {
+                lastProgressEvent = e;
+            };
+            ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, fail);
+
+            waitsForAny(downloadWin, fail);
+        });
         it("should be able to download a file using https", function() {
             var remoteFile = "https://www.apache.org/licenses/";
             var localFileName = 'httpstest.html';
