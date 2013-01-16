@@ -107,6 +107,30 @@
             document.getElementById('camera_status').innerHTML += "FileEntry.getMetadata <b>success</b>: modificationTime = " + metadata.modificationTime + "<br />";
         };
 
+        var onMetadataSet = function() {
+            document.getElementById('camera_status').innerHTML += "FileEntry.setMetadata <b>error</b>: setMetadata succeeded when it should fail<br />";
+        };
+
+        var onMetadataSetError = function(e) {
+            document.getElementById('camera_status').innerHTML += "FileEntry.setMetadata <b>success</b> (failed as expected): " + e.code + "<br />"
+        };
+
+        var onFileEntryRemoved = function() {
+            document.getElementById('camera_status').innerHTML += "FileEntry.remove <b>error</b>: remove succeeded when it should fail<br />";
+        };
+
+        var onFileEntryRemoveError = function(e) {
+            document.getElementById('camera_status').innerHTML += "FileEntry.remove <b>success</b> (failed as expected): " + e.code + "<br />"
+        };
+
+        var onFileReadAsText = function(evt) {
+            document.getElementById('camera_status').innerHTML += "FileReader.readAsText <b>error</b>: readAsText succeeded when it should fail: " + evt.target.result + "<br />";
+        };
+
+        var onFileReadAsTextError = function(evt) {
+            document.getElementById('camera_status').innerHTML += "FileReader.readAsText <b>success</b> (failed as expected): " + evt.target.error.code + "<br />"
+        };
+
         var onFileReadAsDataURL = function(evt) {
             var img = document.getElementById('camera_image');
             img.style.visibility = "visible";
@@ -120,18 +144,25 @@
             document.getElementById('camera_status').innerHTML += "; type = " + file.type + "; size = " + file.size + "; date = " + file.lastModifiedDate + "<br />";
 
             // Test File API here.
-            var reader = new FileReader();
-            reader.onload = onFileReadAsDataURL;
-            reader.onerror = function(evt) {
+            var textReader = new FileReader();
+            textReader.onload = onFileReadAsText;
+            textReader.onerror = onFileReadAsTextError;
+            textReader.readAsText(file);
+
+            var dataUrlReader = new FileReader();
+            dataUrlReader.onload = onFileReadAsDataURL;
+            dataUrlReader.onerror = function(evt) {
                 onError(evt.target.error);
             };
-            reader.readAsDataURL(file);
+            dataUrlReader.readAsDataURL(file);
         };
 
         var onError = function(e) {
             console.log("Error getting picture: " + e.code);
-            document.getElementById('camera_status').innerHTML += "Error getting picture: " + e.code + "<br />";
+            document.getElementById('camera_status').innerHTML += "<b>Error</b> getting picture: " + e.code + "<br />";
         };
+
+        document.getElementById('camera_status').innerHTML = "";
 
         navigator.camera.getPicture(
             function(data) {
@@ -139,6 +170,8 @@
 
                 // Test FileEntry API here.
                 fileEntry.getMetadata(onMetadataReceived, onError);
+                fileEntry.setMetadata(onMetadataSet, onMetadataSetError, { "com.apple.MobileBackup": 1 });
+                fileEntry.remove(onFileEntryRemoved, onFileEntryRemoveError);
                 fileEntry.file(onFileReceived, onError);
             },
             onError,
