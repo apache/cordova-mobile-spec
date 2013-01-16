@@ -104,12 +104,46 @@
      */
     function getImageInfoUsingNativeUri() {
         var onFileReceived = function(file) {
-            document.getElementById('camera_status').innerHTML = "Success; fullPath: " + file.fullPath + ", name: " + file.name + ", type: " + file.type + ", size: " + file.size + ", date: " + file.lastModifiedDate;
-        }
+            var img = document.getElementById('camera_image');
+            img.style.visibility = "hidden";
+            document.getElementById('camera_status').innerHTML = "Success; fullPath = " + file.fullPath + "; name = " + file.name + "; type = " + file.type + "; size = " + file.size + "; date = " + file.lastModifiedDate;
+        };
         var onError = function(e) {
             console.log("Error getting picture: " + e);
-            document.getElementById('camera_status').innerHTML = "Error getting picture.";
-        }
+            document.getElementById('camera_status').innerHTML = "Error getting picture: " + e;
+        };
+        navigator.camera.getPicture(
+            function(data) {
+                var fileEntry = new FileEntry('image_name.png', data);
+                var file = fileEntry.file(onFileReceived, onError);
+            },
+            onError,
+            { quality: 50, destinationType:
+            Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+    };
+
+    /**
+     * Select image from library using a NATIVE_URI destination type
+     */
+    function getImageUsingNativeUri() {
+        var onFileReceived = function(file) {
+            var reader = new FileReader();
+            reader.onload = function(evt) {
+                var img = document.getElementById('camera_image');
+                img.style.visibility = "visible";
+                img.style.display = "block";
+                img.src = evt.target.result;
+                document.getElementById('camera_status').innerHTML = "Success";
+            };
+            reader.onerror = function(evt) {
+                onError(evt.target.error.code);
+            };
+            reader.readAsDataURL(file);
+        };
+        var onError = function(e) {
+            console.log("Error getting picture: " + e);
+            document.getElementById('camera_status').innerHTML = "Error getting picture: " + e;
+        };
         navigator.camera.getPicture(
             function(data) {
                 var fileEntry = new FileEntry('image_name.png', data);
@@ -195,6 +229,8 @@
     <div class="btn large" onclick="getImageUsingFileUri();">Select Image Using File URI</div>
     <div class="btn large" onclick="getImageInfoUsingNativeUri();">Select Image Using Native URI</div>
     <div class="btn large" onclick="getImageUsingFileUri(true);">Upload to jitsu with file URI</div>
+    <div class="btn large" onclick="getImageInfoUsingNativeUri();">Native URI: Select Image, Show Info</div>
+    <div class="btn large" onclick="getImageUsingNativeUri();">Native URI: Select Image, Show Image</div>
     <h3>input type=file</h3>
     <input type="file" onchange="testNativeFile(this)">
     <h3>capture=camera</h3>
