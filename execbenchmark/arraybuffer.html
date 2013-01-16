@@ -48,7 +48,7 @@
             startTime = +new Date,
             callCount = 0,
             durationMs = parseInt(document.getElementById('test-duration').value, 10) * 1000,
-            payloadSize = (+document.getElementById('payload-size').value) * 100,
+            payloadSize = (+document.getElementById('payload-size').value),
             payload = new ArrayBuffer(payloadSize);
 
         var payloadView = new Uint8Array(payload);
@@ -87,7 +87,9 @@
             appLog('Call failed!');
         }
         function echoMessage() {
-            echo(win, fail, payload); // TODO: test setTimeout
+            setTimeout(function() {
+                echo(win, fail, payload);
+            });
         }
 
         appLog('Started exec benchmark with payload length: ' + payloadView.length);
@@ -120,7 +122,7 @@
     <fieldset>
         <legend>Settings</legend>
         <label>Test Duration: <select id="test-duration"><option>1 Second</option><option>5 Seconds</option></select><br></label>
-        <label>Payload size (in 100s of bytes) <input id="payload-size" value="5" style="width:100px"></label><br>
+        <label>Payload size (in bytes) <input id="payload-size" value="1024" style="width:100px"></label><br>
         <button onclick="benchExec()">Benchmark exec</button><br>
     </fieldset>
     <h2>&nbsp</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a><br>
