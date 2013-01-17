@@ -210,6 +210,46 @@
         reader.readAsDataURL(file);
     }
 
+    function copyImageUsingNativeUri() {
+        var onFileMoved = function(fileEntry) {
+            document.getElementById('camera_status').innerHTML += "FileEntry.moveTo <b>error</b>: moveTo succeeded when it should fail<br />";
+        };
+
+        var onFileMoveError = function(e) {
+            document.getElementById('camera_status').innerHTML += "FileEntry.moveTo <b>success</b> (failed as expected): " + e.code + "<br />"
+        };
+
+        var onFileCopied = function(fileEntry) {
+            document.getElementById('camera_status').innerHTML += "FileEntry.copyTo <b>success</b>: file copied to " + fileEntry.fullPath + "<br />";
+        };
+
+        var onFileCopyError = function(e) {
+            document.getElementById('camera_status').innerHTML += "FileEntry.copyTo <b>error</b>: " + e.code + "<br />";
+        };
+
+        var onError = function(e) {
+            console.log("Error getting picture: " + e.code);
+            document.getElementById('camera_status').innerHTML += "<b>Error</b> getting picture: " + e.code + "<br />";
+        };
+
+        var onFileSystemReceived = function(fileSystem) {
+            navigator.camera.getPicture(
+                function(data) {
+                    var fileEntry = new FileEntry('image_name.png', data);
+                    var destDirEntry = fileSystem.root;
+
+                    // Test FileEntry API here.
+                    fileEntry.moveTo(destDirEntry, 'moved_file.png', onFileMoved, onFileMoveError);
+                    fileEntry.copyTo(destDirEntry, 'copied_file.png', onFileCopied, onFileCopyError);
+                },
+                onError,
+                { quality: 50, destinationType:
+                Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+        };
+
+        window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, onFileSystemReceived, null);
+    };
+
     /**
      * Function called when page has finished loading.
      */
@@ -242,6 +282,7 @@
     <div class="btn large" onclick="getImageInfoUsingNativeUri();">Native URI: Select Image, Show Info</div>
     <div class="btn large" onclick="getImageUsingNativeUri();">Native URI: Select Image, Show Image</div>
     <div class="btn large" onclick="getImageUsingNativeUri();">Select Image Using Native URI</div>
+    <div class="btn large" onclick="copyImageUsingNativeUri();">Copy Image Using Native URI</div>
     <h3>input type=file</h3>
     <input type="file" onchange="testNativeFile(this)">
     <h3>capture=camera</h3>
