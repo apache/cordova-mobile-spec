@@ -54,6 +54,7 @@
         //navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50,
         //    destinationType: Camera.DestinationType.FILE_URI, sourceType : Camera.PictureSourceType.CAMERA });
 
+        clearStatus();
         navigator.camera.getPicture(
             function(data) {
                 //img.src = "data:image/jpeg;base64," + data;
@@ -72,6 +73,7 @@
      * Select image from library using a FILE_URI destination type
      */
     function getImageUsingFileUri() {
+        clearStatus();
         navigator.camera.getPicture(
             function(data) {
                 showPicture(data);
@@ -148,8 +150,7 @@
             document.getElementById('camera_status').innerHTML += "<b>Error</b> getting picture: " + e.code + "<br />";
         };
 
-        document.getElementById('camera_status').innerHTML = "";
-
+        clearStatus();
         navigator.camera.getPicture(
             function(data) {
                 var fileEntry = new FileEntry('image_name.png', data);
@@ -247,8 +248,62 @@
                 Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
         };
 
+        clearStatus();
         window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, onFileSystemReceived, null);
     };
+
+    function writeImageUsingNativeUri() {
+        var onFileWrite = function(evt) {
+            document.getElementById('camera_status').innerHTML += "FileWriter.write <b>error</b>: write succeeded when it should fail<br />"
+        };
+
+        var onFileWriteError = function(evt) {
+            document.getElementById('camera_status').innerHTML += "FileWriter.write <b>success</b> (failed as expected): " + evt.target.error.code + "<br />"
+        };
+
+        var onFileTruncate = function(evt) {
+            document.getElementById('camera_status').innerHTML += "FileWriter.truncate <b>error</b>: truncate succeeded when it should fail<br />"
+        };
+
+        var onFileTruncateError = function(evt) {
+            document.getElementById('camera_status').innerHTML += "FileWriter.truncate <b>success</b> (failed as expected): " + evt.target.error.code + "<br />"
+        };
+
+        var onFileWriterReceived = function(fileWriter) {
+          fileWriter.onwrite = onFileWrite;
+          fileWriter.onerror = onFileWriteError;
+          fileWriter.write("some text!");
+        };
+
+        var onFileTruncateWriterReceived = function(fileWriter) {
+          fileWriter.onwrite = onFileTruncate;
+          fileWriter.onerror = onFileTruncateError;
+          fileWriter.truncate(10);
+        };
+
+        var onError = function(e) {
+            console.log("Error getting picture: " + e.code);
+            document.getElementById('camera_status').innerHTML += "<b>Error</b> getting picture: " + e.code + "<br />";
+        };
+
+        clearStatus();
+        navigator.camera.getPicture(
+            function(data) {
+                var fileEntry = new FileEntry('image_name.png', data);
+
+                // Test FileEntry API here.
+                fileEntry.createWriter(onFileWriterReceived, onError);
+                fileEntry.createWriter(onFileTruncateWriterReceived, onError);
+            },
+            onError,
+            { quality: 50, destinationType:
+            Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+    };
+
+    function clearStatus() {
+        document.getElementById('camera_status').innerHTML = "";
+        document.getElementById('camera_image').style.visibility = "hidden";
+    }
 
     /**
      * Function called when page has finished loading.
@@ -283,6 +338,7 @@
     <div class="btn large" onclick="getImageUsingNativeUri();">Native URI: Select Image, Show Image</div>
     <div class="btn large" onclick="getImageUsingNativeUri();">Select Image Using Native URI</div>
     <div class="btn large" onclick="copyImageUsingNativeUri();">Copy Image Using Native URI</div>
+    <div class="btn large" onclick="writeImageUsingNativeUri();">Write Image Using Native URI</div>
     <h3>input type=file</h3>
     <input type="file" onchange="testNativeFile(this)">
     <h3>capture=camera</h3>
