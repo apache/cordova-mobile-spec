@@ -138,7 +138,7 @@ describe('FileTransfer', function() {
         });
         it("should be able to download a file using file:// (when hosted from file://)", function() {
             var fail = createDoNotCallSpy('downloadFail');
-            var remoteFile = window.location.href;
+            var remoteFile = window.location.href.replace(/\?.*/, '');
             var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
             var lastProgressEvent = null;
 
