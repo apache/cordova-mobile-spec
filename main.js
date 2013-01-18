@@ -159,4 +159,5 @@ function init() {
     // doesn't have a scroll button
     // document.addEventListener("touchmove", preventBehavior, false);
     document.addEventListener("deviceready", deviceInfo, true);
+    document.getElementById("user-agent").textContent = navigator.userAgent;
 }

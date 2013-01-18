@@ -42,6 +42,11 @@
                 deviceReady = true;
                 console.log("Device="+device.platform+" "+device.version);
             }, false);
+        function updateUserAgent() {
+            document.getElementById("user-agent").textContent = navigator.userAgent;
+        }
+        updateUserAgent();
+        window.setInterval(updateUserAgent, 1500);
         window.setTimeout(function() {
         	if (!deviceReady) {
         		alert("Error: Apache Cordova did not initialize.  Demo will not run correctly.");
@@ -58,7 +63,9 @@
     <div id="info">
         Make sure http://www.google.com is white listed
         Make sure http://www.apple.com is not in the white list
+        <h4>User-Agent: <span id="user-agent"> </span></h4>
     </div>
+    <div onclick="backHome();">Back</div>
     <h1>Local URL</h1>
     <div class="btn large" onclick="window.open('local.html');">Default: CordovaWebView</div>
     <div class="btn large" onclick="window.open('local.html', '_self');">Target=Self: CordovaWebView</div>
@@ -80,6 +87,9 @@
     <div class="btn large" onclick="window.open('http://www.apple.com', '_blank');">Target=Blank: InAppBrowser</div>
     <div class="btn large" onclick="window.open('http://www.apple.com', 'random_string');">Target=Random: InAppBrowser</div>
     <div class="btn large" onclick="window.open('http://www.apple.com', 'random_string', 'location=no');">Target=Random, no location bar: InAppBrowser</div>
+    <h1>PDF URL</h1>
+    <div class="btn large" onclick="window.open('http://www.stluciadance.com/prospectus_file/sample.pdf');">Remote URL</div>
+    <div class="btn large" onclick="window.open('local.pdf', '_blank');">Local URL</div>
     <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
 </html>      

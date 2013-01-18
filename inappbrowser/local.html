@@ -27,14 +27,21 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"> <!-- ISO-8859-1 -->
     <title>Cordova Mobile Spec</title>
     <link rel="stylesheet" href="../master.css" type="text/css" media="screen" title="no title" charset="utf-8">
-    <script type="text/javascript" charset="utf-8" src="../cordova.js"></script>      
+    <script type="text/javascript" charset="utf-8" src="../cordova.js"></script>
   </head>
   <body id="stage" class="theme">
-  
     <h1>InAppBrowser - Local URL</h1>
     <div id="info">
         You have successfully loaded a local URL
-    </div>
+      </div>
+      <div>User-Agent = <span id="u-a"></span></div>
     <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
-</html>      
+  <script>
+      function updateUserAgent() {
+          document.getElementById("u-a").textContent = navigator.userAgent;
+      }
+      updateUserAgent();
+      window.setInterval(updateUserAgent, 1500);
+  </script>
+</html>
