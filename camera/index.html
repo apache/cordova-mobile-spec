@@ -111,6 +111,14 @@
             document.getElementById('camera_status').innerHTML += "FileEntry.remove <b>success</b> (failed as expected): " + e.code + "<br />"
         };
 
+        var onParentReceived = function() {
+            document.getElementById('camera_status').innerHTML += "FileEntry.getParent <b>error</b>: getParent succeeded when it should fail<br />";
+        };
+
+        var onGetParentError = function(e) {
+            document.getElementById('camera_status').innerHTML += "FileEntry.getParent <b>success</b> (failed as expected): " + e.code + "<br />"
+        };
+
         var onFileReadAsText = function(evt) {
             document.getElementById('camera_status').innerHTML += "FileReader.readAsText <b>error</b>: readAsText succeeded when it should fail: " + evt.target.result + "<br />";
         };
@@ -159,6 +167,7 @@
                 fileEntry.getMetadata(onMetadataReceived, onError);
                 fileEntry.setMetadata(onMetadataSet, onMetadataSetError, { "com.apple.MobileBackup": 1 });
                 fileEntry.remove(onFileEntryRemoved, onFileEntryRemoveError);
+                fileEntry.getParent(onParentReceived, onGetParentError);
                 fileEntry.file(onFileReceived, onError);
             },
             onError,
