@@ -37,6 +37,11 @@
     //-------------------------------------------------------------------------
     // Camera
     //-------------------------------------------------------------------------
+    var onGetPictureError = function(e) {
+        console.log("Error getting picture: " + e.code);
+        document.getElementById('camera_status').innerHTML += "<b>Error</b> getting picture: " + e.code + "<br />";
+    };
+
 
     function showPicture(url, callback) {
         var img = document.getElementById('camera_image');
@@ -109,36 +114,40 @@
             document.getElementById('camera_status').innerHTML += "FileEntry.getMetadata <b>success</b>: modificationTime = " + metadata.modificationTime + "<br />";
         };
 
-        var onMetadataSet = function() {
-            document.getElementById('camera_status').innerHTML += "FileEntry.setMetadata <b>error</b>: setMetadata succeeded when it should fail<br />";
+        var onGetMetadataError = function(e) {
+            handleUnexpectedError("FileEntry.getMetadata", e.code);
         };
 
-        var onMetadataSetError = function(e) {
-            document.getElementById('camera_status').innerHTML += "FileEntry.setMetadata <b>success</b> (failed as expected): " + e.code + "<br />"
+        var onMetadataSet = function() {
+            handleUnexpectedSuccess("FileEntry.setMetadata");
+        };
+
+        var onSetMetadataError = function(e) {
+            checkForExpectedError("FileEntry.setMetadata", undefined, e.code);
         };
 
         var onFileEntryRemoved = function() {
-            document.getElementById('camera_status').innerHTML += "FileEntry.remove <b>error</b>: remove succeeded when it should fail<br />";
+            handleUnexpectedSuccess("FileEntry.remove");
         };
 
         var onFileEntryRemoveError = function(e) {
-            document.getElementById('camera_status').innerHTML += "FileEntry.remove <b>success</b> (failed as expected): " + e.code + "<br />"
+            checkForExpectedError("FileEntry.remove", FileError.INVALID_MODIFICATION_ERR, e.code);
         };
 
         var onParentReceived = function() {
-            document.getElementById('camera_status').innerHTML += "FileEntry.getParent <b>error</b>: getParent succeeded when it should fail<br />";
+            handleUnexpectedSuccess("FileEntry.getParent");
         };
 
         var onGetParentError = function(e) {
-            document.getElementById('camera_status').innerHTML += "FileEntry.getParent <b>success</b> (failed as expected): " + e.code + "<br />"
+            checkForExpectedError("FileEntry.getParent", FileError.NOT_READABLE_ERR, e.code);
         };
 
         var onFileReadAsText = function(evt) {
-            document.getElementById('camera_status').innerHTML += "FileReader.readAsText <b>error</b>: readAsText succeeded when it should fail: " + evt.target.result + "<br />";
+            handleUnexpectedSuccess("FileReader.readAsText");
         };
 
         var onFileReadAsTextError = function(evt) {
-            document.getElementById('camera_status').innerHTML += "FileReader.readAsText <b>success</b> (failed as expected): " + evt.target.error.code + "<br />"
+            checkForExpectedError("FileReader.readAsText", FileError.NOT_READABLE_ERR, e.code);
         };
 
         var onFileReadAsDataURL = function(evt) {
@@ -167,9 +176,8 @@
             dataUrlReader.readAsDataURL(file);
         };
 
-        var onError = function(e) {
-            console.log("Error getting picture: " + e.code);
-            document.getElementById('camera_status').innerHTML += "<b>Error</b> getting picture: " + e.code + "<br />";
+        var onGetFileError = function(e) {
+            handleUnexpectedError("FileEntry.file", e.code);
         };
 
         clearStatus();
@@ -178,13 +186,13 @@
                 var fileEntry = new FileEntry('image_name.png', data);
 
                 // Test FileEntry API here.
-                fileEntry.getMetadata(onMetadataReceived, onError);
-                fileEntry.setMetadata(onMetadataSet, onMetadataSetError, { "com.apple.MobileBackup": 1 });
+                fileEntry.getMetadata(onMetadataReceived, onGetMetadataError);
+                fileEntry.setMetadata(onMetadataSet, onSetMetadataError, { "com.apple.MobileBackup": 1 });
                 fileEntry.remove(onFileEntryRemoved, onFileEntryRemoveError);
                 fileEntry.getParent(onParentReceived, onGetParentError);
-                fileEntry.file(onFileReceived, onError);
+                fileEntry.file(onFileReceived, onGetFileError);
             },
-            onError,
+            onGetPictureError,
             { quality: 50, destinationType:
             Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
     };
@@ -236,11 +244,11 @@
 
     function copyImageUsingNativeUri() {
         var onFileMoved = function(fileEntry) {
-            document.getElementById('camera_status').innerHTML += "FileEntry.moveTo <b>error</b>: moveTo succeeded when it should fail<br />";
+            handleUnexpectedSuccess("FileEntry.moveTo");
         };
 
         var onFileMoveError = function(e) {
-            document.getElementById('camera_status').innerHTML += "FileEntry.moveTo <b>success</b> (failed as expected): " + e.code + "<br />"
+            checkForExpectedError("FileEntry.moveTo", FileError.INVALID_MODIFICATION_ERR, e.code);
         };
 
         var onFileCopied = function(fileEntry) {
@@ -248,12 +256,7 @@
         };
 
         var onFileCopyError = function(e) {
-            document.getElementById('camera_status').innerHTML += "FileEntry.copyTo <b>error</b>: " + e.code + "<br />";
-        };
-
-        var onError = function(e) {
-            console.log("Error getting picture: " + e.code);
-            document.getElementById('camera_status').innerHTML += "<b>Error</b> getting picture: " + e.code + "<br />";
+            handleUnexpectedError("FileEntry.copyTo", e.code);
         };
 
         var onFileSystemReceived = function(fileSystem) {
@@ -266,7 +269,7 @@
                     fileEntry.moveTo(destDirEntry, 'moved_file.png', onFileMoved, onFileMoveError);
                     fileEntry.copyTo(destDirEntry, 'copied_file.png', onFileCopied, onFileCopyError);
                 },
-                onError,
+                onGetPictureError,
                 { quality: 50, destinationType:
                 Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
         };
@@ -277,36 +280,35 @@
 
     function writeImageUsingNativeUri() {
         var onFileWrite = function(evt) {
-            document.getElementById('camera_status').innerHTML += "FileWriter.write <b>error</b>: write succeeded when it should fail<br />"
+            handleUnexpectedSuccess("FileWriter.write");
         };
 
         var onFileWriteError = function(evt) {
-            document.getElementById('camera_status').innerHTML += "FileWriter.write <b>success</b> (failed as expected): " + evt.target.error.code + "<br />"
+            checkForExpectedError("FileWriter.write", FileError.NO_MODIFICATION_ALLOWED_ERR, evt.target.error.code);
         };
 
         var onFileTruncate = function(evt) {
-            document.getElementById('camera_status').innerHTML += "FileWriter.truncate <b>error</b>: truncate succeeded when it should fail<br />"
+            handleUnexpectedSuccess("FileWriter.truncate");
         };
 
         var onFileTruncateError = function(evt) {
-            document.getElementById('camera_status').innerHTML += "FileWriter.truncate <b>success</b> (failed as expected): " + evt.target.error.code + "<br />"
+            checkForExpectedError("FileWriter.truncate", FileError.NO_MODIFICATION_ALLOWED_ERR, evt.target.error.code);
         };
 
         var onFileWriterReceived = function(fileWriter) {
-          fileWriter.onwrite = onFileWrite;
-          fileWriter.onerror = onFileWriteError;
-          fileWriter.write("some text!");
+            fileWriter.onwrite = onFileWrite;
+            fileWriter.onerror = onFileWriteError;
+            fileWriter.write("some text!");
         };
 
         var onFileTruncateWriterReceived = function(fileWriter) {
-          fileWriter.onwrite = onFileTruncate;
-          fileWriter.onerror = onFileTruncateError;
-          fileWriter.truncate(10);
+            fileWriter.onwrite = onFileTruncate;
+            fileWriter.onerror = onFileTruncateError;
+            fileWriter.truncate(10);
         };
 
-        var onError = function(e) {
-            console.log("Error getting picture: " + e.code);
-            document.getElementById('camera_status').innerHTML += "<b>Error</b> getting picture: " + e.code + "<br />";
+        var onCreateWriterError = function(e) {
+            handleUnexpectedError("FileEntry.createWriter", e.code);
         };
 
         clearStatus();
@@ -315,18 +317,34 @@
                 var fileEntry = new FileEntry('image_name.png', data);
 
                 // Test FileEntry API here.
-                fileEntry.createWriter(onFileWriterReceived, onError);
-                fileEntry.createWriter(onFileTruncateWriterReceived, onError);
+                fileEntry.createWriter(onFileWriterReceived, onCreateWriterError);
+                fileEntry.createWriter(onFileTruncateWriterReceived, onCreateWriterError);
             },
-            onError,
+            onGetPictureError,
             { quality: 50, destinationType:
             Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+    };
+
+    function handleUnexpectedError(methodName, errorCode) {
+        document.getElementById('camera_status').innerHTML += "" + methodName + " <b>error</b> (code: " + errorCode + ").<br />";
+    };
+
+    function handleUnexpectedSuccess(methodName) {
+        document.getElementById('camera_status').innerHTML += "" + methodName + " <b>failure</b> (remove succeeded when it should fail).<br />";
+    };
+
+    function checkForExpectedError(methodName, expectedErrorCode, actualErrorCode) {
+        if (actualErrorCode == expectedErrorCode) {
+            document.getElementById('camera_status').innerHTML += "" + methodName + " <b>success</b> (failed as expected, with error code " + actualErrorCode + ").<br />";
+        } else {
+            document.getElementById('camera_status').innerHTML += "" + methodName + " <b>failure</b> (failed as expected, but with error code " + actualErrorCode + " instead of " + expectedErrorCode + ").<br />";
+        }
     };
 
     function clearStatus() {
         document.getElementById('camera_status').innerHTML = "";
         document.getElementById('camera_image').style.visibility = "hidden";
-    }
+    };
 
     /**
      * Function called when page has finished loading.
