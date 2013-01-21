@@ -37,6 +37,11 @@
     //-------------------------------------------------------------------------
     // Camera
     //-------------------------------------------------------------------------
+    var onGetPictureError = function(e) {
+        console.log("Error getting picture: " + e.code);
+        document.getElementById('camera_status').innerHTML += "<b>Error</b> getting picture: " + e.code + "<br />";
+    };
+
 
     function showPicture(url, callback) {
         var img = document.getElementById('camera_image');
@@ -54,6 +59,7 @@
         //navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50,
         //    destinationType: Camera.DestinationType.FILE_URI, sourceType : Camera.PictureSourceType.CAMERA });
 
+        clearStatus();
         navigator.camera.getPicture(
             function(data) {
                 //img.src = "data:image/jpeg;base64," + data;
@@ -72,6 +78,7 @@
      * Select image from library using a FILE_URI destination type
      */
     function getImageUsingFileUri() {
+        clearStatus();
         navigator.camera.getPicture(
             function(data) {
                 showPicture(data);
@@ -88,20 +95,90 @@
     /**
      * Select image from library using a NATIVE_URI destination type
      */
-    function getImageInfoUsingNativeUri() {
+    function getImageUsingNativeUri() {
+        var onMetadataReceived = function(metadata) {
+            document.getElementById('camera_status').innerHTML += "FileEntry.getMetadata <b>success</b>: modificationTime = " + metadata.modificationTime + "<br />";
+        };
+
+        var onGetMetadataError = function(e) {
+            handleUnexpectedError("FileEntry.getMetadata", e.code);
+        };
+
+        var onMetadataSet = function() {
+            handleUnexpectedSuccess("FileEntry.setMetadata");
+        };
+
+        var onSetMetadataError = function(e) {
+            checkForExpectedError("FileEntry.setMetadata", undefined, e.code);
+        };
+
+        var onFileEntryRemoved = function() {
+            handleUnexpectedSuccess("FileEntry.remove");
+        };
+
+        var onFileEntryRemoveError = function(e) {
+            checkForExpectedError("FileEntry.remove", FileError.INVALID_MODIFICATION_ERR, e.code);
+        };
+
+        var onParentReceived = function() {
+            handleUnexpectedSuccess("FileEntry.getParent");
+        };
+
+        var onGetParentError = function(e) {
+            checkForExpectedError("FileEntry.getParent", FileError.NOT_READABLE_ERR, e.code);
+        };
+
+        var onFileReadAsText = function(evt) {
+            handleUnexpectedSuccess("FileReader.readAsText");
+        };
+
+        var onFileReadAsTextError = function(evt) {
+            checkForExpectedError("FileReader.readAsText", FileError.NOT_READABLE_ERR, e.code);
+        };
+
+        var onFileReadAsDataURL = function(evt) {
+            var img = document.getElementById('camera_image');
+            img.style.visibility = "visible";
+            img.style.display = "block";
+            img.src = evt.target.result;
+            document.getElementById('camera_status').innerHTML += "FileReader.readAsDataURL <b>success</b><br />"
+        };
+
         var onFileReceived = function(file) {
-            document.getElementById('camera_status').innerHTML = "Success; fullPath: " + file.fullPath + ", name: " + file.name + ", type: " + file.type + ", size: " + file.size + ", date: " + file.lastModifiedDate;
-        }
-        var onError = function(e) {
-            console.log("Error getting picture: " + e);
-            document.getElementById('camera_status').innerHTML = "Error getting picture.";
-        }
+            document.getElementById('camera_status').innerHTML += "FileEntry.file <b>success</b>: fullPath = " + file.fullPath + "; name = " + file.name;
+            document.getElementById('camera_status').innerHTML += "; type = " + file.type + "; size = " + file.size + "; date = " + file.lastModifiedDate + "<br />";
+
+            // Test File API here.
+            var textReader = new FileReader();
+            textReader.onload = onFileReadAsText;
+            textReader.onerror = onFileReadAsTextError;
+            textReader.readAsText(file);
+
+            var dataUrlReader = new FileReader();
+            dataUrlReader.onload = onFileReadAsDataURL;
+            dataUrlReader.onerror = function(evt) {
+                onError(evt.target.error);
+            };
+            dataUrlReader.readAsDataURL(file);
+        };
+
+        var onGetFileError = function(e) {
+            handleUnexpectedError("FileEntry.file", e.code);
+        };
+
+        clearStatus();
         navigator.camera.getPicture(
             function(data) {
                 var fileEntry = new FileEntry('image_name.png', data);
-                var file = fileEntry.file(onFileReceived, onError);
+
+                // Test FileEntry API here.
+                fileEntry.getMetadata(onMetadataReceived, onGetMetadataError);
+                fileEntry.setMetadata(onMetadataSet, onSetMetadataError, { "com.apple.MobileBackup": 1 });
+                fileEntry.remove(onFileEntryRemoved, onFileEntryRemoveError);
+                fileEntry.getParent(onParentReceived, onGetParentError);
+                fileEntry.file(onFileReceived, onGetFileError);
             },
-            onError,
+            onGetPictureError,
             { quality: 50, destinationType:
             Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
     };
@@ -151,6 +228,110 @@
         reader.readAsDataURL(file);
     }
 
+    function copyImageUsingNativeUri() {
+        var onFileMoved = function(fileEntry) {
+            handleUnexpectedSuccess("FileEntry.moveTo");
+        };
+
+        var onFileMoveError = function(e) {
+            checkForExpectedError("FileEntry.moveTo", FileError.INVALID_MODIFICATION_ERR, e.code);
+        };
+
+        var onFileCopied = function(fileEntry) {
+            document.getElementById('camera_status').innerHTML += "FileEntry.copyTo <b>success</b>: file copied to " + fileEntry.fullPath + "<br />";
+        };
+
+        var onFileCopyError = function(e) {
+            handleUnexpectedError("FileEntry.copyTo", e.code);
+        };
+
+        var onFileSystemReceived = function(fileSystem) {
+            navigator.camera.getPicture(
+                function(data) {
+                    var fileEntry = new FileEntry('image_name.png', data);
+                    var destDirEntry = fileSystem.root;
+
+                    // Test FileEntry API here.
+                    fileEntry.moveTo(destDirEntry, 'moved_file.png', onFileMoved, onFileMoveError);
+                    fileEntry.copyTo(destDirEntry, 'copied_file.png', onFileCopied, onFileCopyError);
+                },
+                onGetPictureError,
+                { quality: 50, destinationType:
+                Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+        };
+
+        clearStatus();
+        window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, onFileSystemReceived, null);
+    };
+
+    function writeImageUsingNativeUri() {
+        var onFileWrite = function(evt) {
+            handleUnexpectedSuccess("FileWriter.write");
+        };
+
+        var onFileWriteError = function(evt) {
+            checkForExpectedError("FileWriter.write", FileError.NO_MODIFICATION_ALLOWED_ERR, evt.target.error.code);
+        };
+
+        var onFileTruncate = function(evt) {
+            handleUnexpectedSuccess("FileWriter.truncate");
+        };
+
+        var onFileTruncateError = function(evt) {
+            checkForExpectedError("FileWriter.truncate", FileError.NO_MODIFICATION_ALLOWED_ERR, evt.target.error.code);
+        };
+
+        var onFileWriterReceived = function(fileWriter) {
+            fileWriter.onwrite = onFileWrite;
+            fileWriter.onerror = onFileWriteError;
+            fileWriter.write("some text!");
+        };
+
+        var onFileTruncateWriterReceived = function(fileWriter) {
+            fileWriter.onwrite = onFileTruncate;
+            fileWriter.onerror = onFileTruncateError;
+            fileWriter.truncate(10);
+        };
+
+        var onCreateWriterError = function(e) {
+            handleUnexpectedError("FileEntry.createWriter", e.code);
+        };
+
+        clearStatus();
+        navigator.camera.getPicture(
+            function(data) {
+                var fileEntry = new FileEntry('image_name.png', data);
+
+                // Test FileEntry API here.
+                fileEntry.createWriter(onFileWriterReceived, onCreateWriterError);
+                fileEntry.createWriter(onFileTruncateWriterReceived, onCreateWriterError);
+            },
+            onGetPictureError,
+            { quality: 50, destinationType:
+            Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+    };
+
+    function handleUnexpectedError(methodName, errorCode) {
+        document.getElementById('camera_status').innerHTML += "" + methodName + " <b>error</b> (code: " + errorCode + ").<br />";
+    };
+
+    function handleUnexpectedSuccess(methodName) {
+        document.getElementById('camera_status').innerHTML += "" + methodName + " <b>failure</b> (remove succeeded when it should fail).<br />";
+    };
+
+    function checkForExpectedError(methodName, expectedErrorCode, actualErrorCode) {
+        if (actualErrorCode == expectedErrorCode) {
+            document.getElementById('camera_status').innerHTML += "" + methodName + " <b>success</b> (failed as expected, with error code " + actualErrorCode + ").<br />";
+        } else {
+            document.getElementById('camera_status').innerHTML += "" + methodName + " <b>failure</b> (failed as expected, but with error code " + actualErrorCode + " instead of " + expectedErrorCode + ").<br />";
+        }
+    };
+
+    function clearStatus() {
+        document.getElementById('camera_status').innerHTML = "";
+        document.getElementById('camera_image').style.visibility = "hidden";
+    };
+
     /**
      * Function called when page has finished loading.
      */
@@ -180,6 +361,11 @@
     <div class="btn large" onclick="getPicture();">Take Picture</div>
     <div class="btn large" onclick="getImageUsingFileUri();">Select Image Using File URI</div>
     <div class="btn large" onclick="getImageInfoUsingNativeUri();">Select Image Using Native URI</div>
+    <div class="btn large" onclick="getImageInfoUsingNativeUri();">Native URI: Select Image, Show Info</div>
+    <div class="btn large" onclick="getImageUsingNativeUri();">Native URI: Select Image, Show Image</div>
+    <div class="btn large" onclick="getImageUsingNativeUri();">Select Image Using Native URI</div>
+    <div class="btn large" onclick="copyImageUsingNativeUri();">Copy Image Using Native URI</div>
+    <div class="btn large" onclick="writeImageUsingNativeUri();">Write Image Using Native URI</div>
     <h3>input type=file</h3>
     <input type="file" onchange="testNativeFile(this)">
     <h3>capture=camera</h3>
