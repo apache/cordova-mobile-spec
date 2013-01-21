@@ -49,7 +49,7 @@
         img.style.display = "block";
         img.src = url;
         img.onloadend = callback;
-    }
+    };
 
     /**
      * Capture picture
@@ -183,51 +183,6 @@
             Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
     };
 
-    function testNativeFile(inputEl) {
-        // iOS 6 likes to dead-lock in the onchange context if you
-        // do any alerts or try to remote-debug.
-        window.setTimeout(function() {
-            testNativeFile2(inputEl);
-        }, 0);
-    }
-
-    function testNativeFile2(inputEl) {
-        if (!inputEl.value) {
-            alert('No file selected.');
-            return;
-        }
-        var file = inputEl.files[0];
-        if (!file) {
-            alert('Got value but no file.');
-            return;
-        }
-        var URLApi = window.URL || window.webkitURL;
-        var statusText = '';
-        if (URLApi) {
-            var blobURL = URLApi.createObjectURL(file);
-            if (blobURL) {
-                showPicture(blobURL, function() {
-                    URLApi.revokeObjectURL(blobURL);
-                });
-            } else {
-                statusText = 'URL.createObjectURL returned null';
-            }
-        } else {
-            statusText = 'URL.createObjectURL() not supported.';
-        }
-        document.getElementById('camera_status').innerHTML = statusText;
-        var reader = new FileReader();
-        reader.onloadend = function() {
-            if (!reader.result) {
-                statusText += ' FileReader.readAsDataURL() failed';
-            } else {
-                statusText += ' DataURL size: ' + reader.result.length;
-            }
-            document.getElementById('camera_status').innerHTML = statusText;
-        };
-        reader.readAsDataURL(file);
-    }
-
     function copyImageUsingNativeUri() {
         var onFileMoved = function(fileEntry) {
             handleUnexpectedSuccess("FileEntry.moveTo");
@@ -311,6 +266,76 @@
             Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
     };
 
+    function uploadImageUsingNativeUri() {
+        var onFileUploaded = function(response) {
+            document.getElementById('camera_status').innerHTML += "FileTransfer.upload <b>success</b>: response = " + response.responseCode + ".<br />";
+        };
+
+        var onFileUploadError = function(error) {
+            document.getElementById('camera_status').innerHTML += "FileTransfer.upload <b>error</b> (code: " + error.code + ").<br />";
+        };
+
+        clearStatus();
+        navigator.camera.getPicture(
+            function(data) {
+                var options = new FileUploadOptions();
+                options.fileName = "image.png";
+                options.mimeType = "image/png";
+
+                var fileTransfer = new FileTransfer();
+                fileTransfer.upload(data, "http://cordova-filetransfer.jitsu.com/upload", onFileUploaded, onFileUploadError, options);
+            },
+            onGetPictureError,
+            { quality: 50, destinationType:
+            Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+
+    };
+
+    function testNativeFile(inputEl) {
+        // iOS 6 likes to dead-lock in the onchange context if you
+        // do any alerts or try to remote-debug.
+        window.setTimeout(function() {
+            testNativeFile2(inputEl);
+        }, 0);
+    };
+
+    function testNativeFile2(inputEl) {
+        if (!inputEl.value) {
+            alert('No file selected.');
+            return;
+        }
+        var file = inputEl.files[0];
+        if (!file) {
+            alert('Got value but no file.');
+            return;
+        }
+        var URLApi = window.URL || window.webkitURL;
+        var statusText = '';
+        if (URLApi) {
+            var blobURL = URLApi.createObjectURL(file);
+            if (blobURL) {
+                showPicture(blobURL, function() {
+                    URLApi.revokeObjectURL(blobURL);
+                });
+            } else {
+                statusText = 'URL.createObjectURL returned null';
+            }
+        } else {
+            statusText = 'URL.createObjectURL() not supported.';
+        }
+        document.getElementById('camera_status').innerHTML = statusText;
+        var reader = new FileReader();
+        reader.onloadend = function() {
+            if (!reader.result) {
+                statusText += ' FileReader.readAsDataURL() failed';
+            } else {
+                statusText += ' DataURL size: ' + reader.result.length;
+            }
+            document.getElementById('camera_status').innerHTML = statusText;
+        };
+        reader.readAsDataURL(file);
+    };
+
     function handleUnexpectedError(methodName, errorCode) {
         document.getElementById('camera_status').innerHTML += "" + methodName + " <b>error</b> (code: " + errorCode + ").<br />";
     };
@@ -345,7 +370,7 @@
         		alert("Error: Apache Cordova did not initialize.  Demo will not run correctly.");
         	}
         },1000);
-    }
+    };
 
 </script>
 
@@ -360,12 +385,10 @@
     <h2>Action</h2>
     <div class="btn large" onclick="getPicture();">Take Picture</div>
     <div class="btn large" onclick="getImageUsingFileUri();">Select Image Using File URI</div>
-    <div class="btn large" onclick="getImageInfoUsingNativeUri();">Select Image Using Native URI</div>
-    <div class="btn large" onclick="getImageInfoUsingNativeUri();">Native URI: Select Image, Show Info</div>
-    <div class="btn large" onclick="getImageUsingNativeUri();">Native URI: Select Image, Show Image</div>
     <div class="btn large" onclick="getImageUsingNativeUri();">Select Image Using Native URI</div>
     <div class="btn large" onclick="copyImageUsingNativeUri();">Copy Image Using Native URI</div>
     <div class="btn large" onclick="writeImageUsingNativeUri();">Write Image Using Native URI</div>
+    <div class="btn large" onclick="uploadImageUsingNativeUri();">Upload Image Using Native URI</div>
     <h3>input type=file</h3>
     <input type="file" onchange="testNativeFile(this)">
     <h3>capture=camera</h3>
