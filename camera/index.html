@@ -70,8 +70,9 @@
                 console.log("Error getting picture: " + e);
                 document.getElementById('camera_status').innerHTML = "Error getting picture.";
             },
-            { quality: 50, destinationType:
-            Camera.DestinationType.FILE_URI, sourceType : Camera.PictureSourceType.CAMERA});
+            { quality: 50,
+              destinationType: Camera.DestinationType.FILE_URI,
+              sourceType : Camera.PictureSourceType.CAMERA });
     };
 
     /**
@@ -88,8 +89,8 @@
                 console.log("Error getting picture: " + e);
                 document.getElementById('camera_status').innerHTML = "Error getting picture.";
             },
-            { quality: 50, destinationType:
-            Camera.DestinationType.FILE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+            { destinationType: Camera.DestinationType.FILE_URI,
+              sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
     };
 
     /**
@@ -179,8 +180,8 @@
                 fileEntry.file(onFileReceived, onGetFileError);
             },
             onGetPictureError,
-            { quality: 50, destinationType:
-            Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+            { destinationType: Camera.DestinationType.NATIVE_URI,
+              sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
     };
 
     function copyImageUsingNativeUri() {
@@ -211,8 +212,8 @@
                     fileEntry.copyTo(destDirEntry, 'copied_file.png', onFileCopied, onFileCopyError);
                 },
                 onGetPictureError,
-                { quality: 50, destinationType:
-                Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+                { destinationType: Camera.DestinationType.NATIVE_URI,
+                  sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
         };
 
         clearStatus();
@@ -262,8 +263,8 @@
                 fileEntry.createWriter(onFileTruncateWriterReceived, onCreateWriterError);
             },
             onGetPictureError,
-            { quality: 50, destinationType:
-            Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+            { destinationType: Camera.DestinationType.NATIVE_URI,
+              sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
     };
 
     function uploadImageUsingNativeUri() {
@@ -286,9 +287,30 @@
                 fileTransfer.upload(data, "http://cordova-filetransfer.jitsu.com/upload", onFileUploaded, onFileUploadError, options);
             },
             onGetPictureError,
-            { quality: 50, destinationType:
-            Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+            { destinationType: Camera.DestinationType.NATIVE_URI,
+              sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
+    };
 
+    function displayImageUsingNativeUri() {
+        clearStatus();
+        navigator.camera.getPicture(
+            function(data) {
+                // First, we display the image using the img tag.
+                document.getElementById('camera_status').innerHTML += "img tag: <img src=\"" + data + "\" /><br />";
+
+                // Next, the canvas tag.
+                document.getElementById('camera_status').innerHTML += "canvas tag: <canvas id=\"nativeUriCanvas\" width=\"300\" height=\"300\"></canvas>";
+                var canvas = document.getElementById('nativeUriCanvas');
+                var context = canvas.getContext('2d');
+                var image = new Image();
+                image.onload = function() {
+                    context.drawImage(image, 0, 0);
+                };
+                image.src = data;
+            },
+            onGetPictureError,
+            { destinationType: Camera.DestinationType.NATIVE_URI,
+              sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
     };
 
     function testNativeFile(inputEl) {
@@ -385,10 +407,12 @@
     <h2>Action</h2>
     <div class="btn large" onclick="getPicture();">Take Picture</div>
     <div class="btn large" onclick="getImageUsingFileUri();">Select Image Using File URI</div>
-    <div class="btn large" onclick="getImageUsingNativeUri();">Select Image Using Native URI</div>
-    <div class="btn large" onclick="copyImageUsingNativeUri();">Copy Image Using Native URI</div>
-    <div class="btn large" onclick="writeImageUsingNativeUri();">Write Image Using Native URI</div>
-    <div class="btn large" onclick="uploadImageUsingNativeUri();">Upload Image Using Native URI</div>
+    <h2>Native URI</h2>
+    <div class="btn large" onclick="getImageUsingNativeUri();">Select Image</div>
+    <div class="btn large" onclick="copyImageUsingNativeUri();">Copy Image</div>
+    <div class="btn large" onclick="writeImageUsingNativeUri();">Write Image</div>
+    <div class="btn large" onclick="uploadImageUsingNativeUri();">Upload Image</div>
+    <div class="btn large" onclick="displayImageUsingNativeUri();">Display Image</div>
     <h3>input type=file</h3>
     <input type="file" onchange="testNativeFile(this)">
     <h3>capture=camera</h3>
