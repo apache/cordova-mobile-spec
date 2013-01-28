@@ -61,8 +61,8 @@
   
     <h1>InAppBrowser</h1>
     <div id="info">
-        Make sure http://www.google.com is white listed
-        Make sure http://www.apple.com is not in the white list
+        Make sure http://www.google.com is white listed. </br>
+        Make sure http://www.apple.com is not in the white list.</br>  In iOS, starred <span style="vertial-align:super">*</span> tests will leave the app with no way to return.  </br>
         <h4>User-Agent: <span id="user-agent"> </span></h4>
     </div>
     <div onclick="backHome();">Back</div>
@@ -74,8 +74,8 @@
     <div class="btn large" onclick="window.open('local.html', 'random_string');">Target=Random: InAppBrowser</div>
     <div class="btn large" onclick="window.open('local.html', 'random_string', 'location=no');">Target=Random, no location bar: InAppBrowser</div>
     <h1>White Listed URL</h1>
-    <div class="btn large" onclick="window.open('http://www.google.com');">Default: CordovaWebView</div>
-    <div class="btn large" onclick="window.open('http://www.google.com', '_self');">Target=Self: CordovaWebView</div>
+    <div class="btn large" onclick="window.open('http://www.google.com');">Default: CordovaWebView<span style="vertical-align:super">*</span></div>
+    <div class="btn large" onclick="window.open('http://www.google.com', '_self');">Target=Self: CordovaWebView<span style="vertical-align:super">*</span></div>
     <div class="btn large" onclick="window.open('http://www.google.com', '_system');">Target=System: System Browser</div>
     <div class="btn large" onclick="window.open('http://www.google.com', '_blank');">Target=Blank: InAppBrowser</div>
     <div class="btn large" onclick="window.open('http://www.google.com', 'random_string');">Target=Random: InAppBrowser</div>
