@@ -138,7 +138,7 @@ describe('FileTransfer', function() {
         });
         it("should be able to download a file using file:// (when hosted from file://)", function() {
             var fail = createDoNotCallSpy('downloadFail');
-            var remoteFile = window.location.href.replace(/\?.*/, '');
+            var remoteFile = window.location.href.replace(/\?.*/, '').replace(/ /g, '%20');
             var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
             var lastProgressEvent = null;
 
@@ -287,7 +287,6 @@ describe('FileTransfer', function() {
         });
     });
     describe('upload method', function() {
-
         it("should be able to upload a file", function() {
             var remoteFile = server + "/upload";
             var localFileName = "upload.txt";

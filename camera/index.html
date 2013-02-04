@@ -27,32 +27,37 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"> <!-- ISO-8859-1 -->
     <title>Cordova Mobile Spec</title>
     <link rel="stylesheet" href="../master.css" type="text/css" media="screen" title="no title" charset="utf-8">
-    <script type="text/javascript" charset="utf-8" src="../cordova.js"></script>      
+    <script type="text/javascript" charset="utf-8" src="../cordova.js"></script>
 
-      
+
 <script type="text/javascript" charset="utf-8">
 
     var deviceReady = false;
 
     //-------------------------------------------------------------------------
-    // Camera 
+    // Camera
     //-------------------------------------------------------------------------
+
+    function showPicture(url, callback) {
+        var img = document.getElementById('camera_image');
+        img.style.visibility = "visible";
+        img.style.display = "block";
+        img.src = url;
+        img.onloadend = callback;
+    }
 
     /**
      * Capture picture
      */
     function getPicture() {
-        
-        //navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50, 
+
+        //navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50,
         //    destinationType: Camera.DestinationType.FILE_URI, sourceType : Camera.PictureSourceType.CAMERA });
-        
+
         navigator.camera.getPicture(
             function(data) {
-                var img = document.getElementById('camera_image');
-                img.style.visibility = "visible";
-                img.style.display = "block";
                 //img.src = "data:image/jpeg;base64," + data;
-                img.src = data;
+                showPicture(data);
                 document.getElementById('camera_status').innerHTML = "Success";
             },
             function(e) {
@@ -69,11 +74,7 @@
     function getImageUsingFileUri() {
         navigator.camera.getPicture(
             function(data) {
-                var img = document.getElementById('camera_image');
-                img.style.visibility = "visible";
-                img.style.display = "block";
-                //img.src = "data:image/jpeg;base64," + data;
-                img.src = data;
+                showPicture(data);
                 document.getElementById('camera_status').innerHTML = "Success";
             },
             function(e) {
@@ -105,6 +106,51 @@
             Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
     };
 
+    function testNativeFile(inputEl) {
+        // iOS 6 likes to dead-lock in the onchange context if you
+        // do any alerts or try to remote-debug.
+        window.setTimeout(function() {
+            testNativeFile2(inputEl);
+        }, 0);
+    }
+
+    function testNativeFile2(inputEl) {
+        if (!inputEl.value) {
+            alert('No file selected.');
+            return;
+        }
+        var file = inputEl.files[0];
+        if (!file) {
+            alert('Got value but no file.');
+            return;
+        }
+        var URLApi = window.URL || window.webkitURL;
+        var statusText = '';
+        if (URLApi) {
+            var blobURL = URLApi.createObjectURL(file);
+            if (blobURL) {
+                showPicture(blobURL, function() {
+                    URLApi.revokeObjectURL(blobURL);
+                });
+            } else {
+                statusText = 'URL.createObjectURL returned null';
+            }
+        } else {
+            statusText = 'URL.createObjectURL() not supported.';
+        }
+        document.getElementById('camera_status').innerHTML = statusText;
+        var reader = new FileReader();
+        reader.onloadend = function() {
+            if (!reader.result) {
+                statusText += ' FileReader.readAsDataURL() failed';
+            } else {
+                statusText += ' DataURL size: ' + reader.result.length;
+            }
+            document.getElementById('camera_status').innerHTML = statusText;
+        };
+        reader.readAsDataURL(file);
+    }
+
     /**
      * Function called when page has finished loading.
      */
@@ -124,7 +170,7 @@
 
   </head>
   <body onload="init();" id="stage" class="theme">
-  
+
     <h1>Camera</h1>
     <div id="info">
         <b>Status:</b> <span id="camera_status"></span><br>
@@ -134,6 +180,14 @@
     <div class="btn large" onclick="getPicture();">Take Picture</div>
     <div class="btn large" onclick="getImageUsingFileUri();">Select Image Using File URI</div>
     <div class="btn large" onclick="getImageInfoUsingNativeUri();">Select Image Using Native URI</div>
+    <h3>input type=file</h3>
+    <input type="file" onchange="testNativeFile(this)">
+    <h3>capture=camera</h3>
+    <input type="file" accept="image/*;capture=camera" onchange="testNativeFile(this)">
+    <h3>capture=camcorder</h3>
+    <input type="file" accept="video/*;capture=camcorder" onchange="testNativeFile(this)">
+    <h3>capture=microphone</h3>
+    <input type="file" accept="audio/*;capture=microphone" onchange="testNativeFile(this)">
     <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
-</html>      
+</html>
