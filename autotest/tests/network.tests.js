@@ -50,5 +50,6 @@ describe('Network (navigator.connection)', function () {
         expect(Connection.CELL_3G).toBe("3g");
         expect(Connection.CELL_4G).toBe("4g");
         expect(Connection.NONE).toBe("none");
+        expect(Connection.CELL).toBe("cellular");
     });
 });
