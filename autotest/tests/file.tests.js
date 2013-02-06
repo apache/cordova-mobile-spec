@@ -3005,8 +3005,6 @@ describe('File API', function() {
 
             waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
         });
-        // This test fails on Android <= 2.3 and iOS <= 5 due to a lack of
-        // Blob creation on these platforms.
         it("should be able to read native blob objects", function() {
             var contents = 'asdf';
             var uint8Array = new Uint8Array(contents.length);
@@ -3022,9 +3020,14 @@ describe('File API', function() {
                 blob = builder.getBlob("text/plain");
             } else {
                 // iOS 6 does not support Views here.
-                blob = new Blob([uint8Array.buffer, contents]);
+                try {
+                    blob = new Blob([uint8Array.buffer, contents]);
+                } catch (e) {
+                    // Skip the test if we can't create a blob.
+                    // This happens on Android <= 2.3 and iOS <= 5.
+                    return;
+                }
             }
-
             var verifier = jasmine.createSpy().andCallFake(function(evt) {
                 expect(evt).toBeDefined();
                 expect(evt.target.result).toBe('asdfasdf');
