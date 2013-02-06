@@ -33,6 +33,7 @@
 <script type="text/javascript" charset="utf-8">
 
     var deviceReady = false;
+    var platformId = cordova.require('cordova/platform').id;
 
     //-------------------------------------------------------------------------
     // Camera
@@ -113,28 +114,20 @@
             checkForExpectedError("FileEntry.setMetadata", undefined, e.code);
         };
 
-        var onFileEntryRemoved = function() {
-            handleUnexpectedSuccess("FileEntry.remove");
-        };
-
-        var onFileEntryRemoveError = function(e) {
-            checkForExpectedError("FileEntry.remove", FileError.INVALID_MODIFICATION_ERR, e.code);
-        };
-
         var onParentReceived = function() {
-            handleUnexpectedSuccess("FileEntry.getParent");
+            if (platformId == 'ios') {
+                handleUnexpectedSuccess("FileEntry.getParent");
+            } else if (platformId == 'android') {
+                document.getElementById('camera_status').innerHTML += "FileEntry.getParent <b>success</b><br />"
+            }
         };
 
         var onGetParentError = function(e) {
-            checkForExpectedError("FileEntry.getParent", FileError.NOT_READABLE_ERR, e.code);
-        };
-
-        var onFileReadAsText = function(evt) {
-            handleUnexpectedSuccess("FileReader.readAsText");
-        };
-
-        var onFileReadAsTextError = function(evt) {
-            checkForExpectedError("FileReader.readAsText", FileError.NOT_READABLE_ERR, e.code);
+            if (platformId == 'ios') {
+                checkForExpectedError("FileEntry.getParent", FileError.NOT_READABLE_ERR, e.code);
+            } else if (platformId == 'android') {
+                handleUnexpectedError("FileEntry.getParent", e.code);
+            }
         };
 
         var onFileReadAsDataURL = function(evt) {
@@ -150,11 +143,6 @@
             document.getElementById('camera_status').innerHTML += "; type = " + file.type + "; size = " + file.size + "; date = " + file.lastModifiedDate + "<br />";
 
             // Test File API here.
-            var textReader = new FileReader();
-            textReader.onload = onFileReadAsText;
-            textReader.onerror = onFileReadAsTextError;
-            textReader.readAsText(file);
-
             var dataUrlReader = new FileReader();
             dataUrlReader.onload = onFileReadAsDataURL;
             dataUrlReader.onerror = function(evt) {
@@ -175,7 +163,6 @@
                 // Test FileEntry API here.
                 fileEntry.getMetadata(onMetadataReceived, onGetMetadataError);
                 fileEntry.setMetadata(onMetadataSet, onSetMetadataError, { "com.apple.MobileBackup": 1 });
-                fileEntry.remove(onFileEntryRemoved, onFileEntryRemoveError);
                 fileEntry.getParent(onParentReceived, onGetParentError);
                 fileEntry.file(onFileReceived, onGetFileError);
             },
@@ -185,20 +172,28 @@
     };
 
     function copyImageUsingNativeUri() {
-        var onFileMoved = function(fileEntry) {
-            handleUnexpectedSuccess("FileEntry.moveTo");
-        };
-
-        var onFileMoveError = function(e) {
-            checkForExpectedError("FileEntry.moveTo", FileError.INVALID_MODIFICATION_ERR, e.code);
-        };
-
         var onFileCopied = function(fileEntry) {
-            document.getElementById('camera_status').innerHTML += "FileEntry.copyTo <b>success</b>: file copied to " + fileEntry.fullPath + "<br />";
+            document.getElementById('camera_status').innerHTML += "FileEntry.copyTo <b>success</b><br />";
         };
 
         var onFileCopyError = function(e) {
             handleUnexpectedError("FileEntry.copyTo", e.code);
+        };
+
+        var onFileMoved = function(fileEntry) {
+            if (platformId == 'ios') {
+                handleUnexpectedSuccess("FileEntry.moveTo");
+            } else if (platformId == 'android') {
+                document.getElementById('camera_status').innerHTML += "FileEntry.moveTo <b>success</b><br />";
+            }
+        };
+
+        var onFileMoveError = function(e) {
+            if (platformId == 'ios') {
+                checkForExpectedError("FileEntry.moveTo", FileError.INVALID_MODIFICATION_ERR, e.code);
+            } else if (platformId == 'android') {
+                handleUnexpectedError("FileEntry.moveTo", e.code);
+            }
         };
 
         var onFileSystemReceived = function(fileSystem) {
@@ -208,8 +203,8 @@
                     var destDirEntry = fileSystem.root;
 
                     // Test FileEntry API here.
-                    fileEntry.moveTo(destDirEntry, 'moved_file.png', onFileMoved, onFileMoveError);
                     fileEntry.copyTo(destDirEntry, 'copied_file.png', onFileCopied, onFileCopyError);
+                    fileEntry.moveTo(destDirEntry, 'moved_file.png', onFileMoved, onFileMoveError);
                 },
                 onGetPictureError,
                 { destinationType: Camera.DestinationType.NATIVE_URI,
@@ -313,6 +308,36 @@
               sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
     };
 
+    function removeImageUsingNativeUri() {
+        var onFileEntryRemoved = function() {
+            if (platformId == 'ios') {
+                handleUnexpectedSuccess("FileEntry.remove");
+            } else if (platformId == 'android') {
+                document.getElementById('camera_status').innerHTML += "FileEntry.remove <b>success</b><br />"
+            }
+        };
+
+        var onFileEntryRemoveError = function(e) {
+            if (platformId == 'ios') {
+                checkForExpectedError("FileEntry.remove", FileError.INVALID_MODIFICATION_ERR, e.code);
+            } else if (platformId == 'android') {
+                handleUnexpectedError("FileEntry.remove", e.code);
+            }
+        };
+
+        clearStatus();
+        navigator.camera.getPicture(
+            function(data) {
+                var fileEntry = new FileEntry('image_name.png', data);
+
+                // Test FileEntry API here.
+                fileEntry.remove(onFileEntryRemoved, onFileEntryRemoveError);
+            },
+            onGetPictureError,
+            { destinationType: Camera.DestinationType.NATIVE_URI,
+              sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
+    };
+
     function testNativeFile(inputEl) {
         // iOS 6 likes to dead-lock in the onchange context if you
         // do any alerts or try to remote-debug.
@@ -363,7 +388,7 @@
     };
 
     function handleUnexpectedSuccess(methodName) {
-        document.getElementById('camera_status').innerHTML += "" + methodName + " <b>failure</b> (remove succeeded when it should fail).<br />";
+        document.getElementById('camera_status').innerHTML += "" + methodName + " <b>failure</b> (succeeded when it should fail).<br />";
     };
 
     function checkForExpectedError(methodName, expectedErrorCode, actualErrorCode) {
@@ -413,6 +438,7 @@
     <div class="btn large" onclick="writeImageUsingNativeUri();">Write Image</div>
     <div class="btn large" onclick="uploadImageUsingNativeUri();">Upload Image</div>
     <div class="btn large" onclick="displayImageUsingNativeUri();">Display Image</div>
+    <div class="btn large" onclick="removeImageUsingNativeUri();">Remove Image</div>
     <h3>input type=file</h3>
     <input type="file" onchange="testNativeFile(this)">
     <h3>capture=camera</h3>
