@@ -33,10 +33,16 @@
 <script type="text/javascript" charset="utf-8">
 
     var deviceReady = false;
+    var platformId = cordova.require('cordova/platform').id;
 
     //-------------------------------------------------------------------------
     // Camera
     //-------------------------------------------------------------------------
+    var onGetPictureError = function(e) {
+        console.log("Error getting picture: " + e.code);
+        document.getElementById('camera_status').innerHTML += "<b>Error</b> getting picture: " + e.code + "<br />";
+    };
+
 
     function showPicture(url, callback) {
         var img = document.getElementById('camera_image');
@@ -44,7 +50,7 @@
         img.style.display = "block";
         img.src = url;
         img.onloadend = callback;
-    }
+    };
 
     /**
      * Capture picture
@@ -54,6 +60,7 @@
         //navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50,
         //    destinationType: Camera.DestinationType.FILE_URI, sourceType : Camera.PictureSourceType.CAMERA });
 
+        clearStatus();
         navigator.camera.getPicture(
             function(data) {
                 //img.src = "data:image/jpeg;base64," + data;
@@ -64,14 +71,16 @@
                 console.log("Error getting picture: " + e);
                 document.getElementById('camera_status').innerHTML = "Error getting picture.";
             },
-            { quality: 50, destinationType:
-            Camera.DestinationType.FILE_URI, sourceType : Camera.PictureSourceType.CAMERA});
+            { quality: 50,
+              destinationType: Camera.DestinationType.FILE_URI,
+              sourceType : Camera.PictureSourceType.CAMERA });
     };
 
     /**
      * Select image from library using a FILE_URI destination type
      */
     function getImageUsingFileUri() {
+        clearStatus();
         navigator.camera.getPicture(
             function(data) {
                 showPicture(data);
@@ -81,29 +90,252 @@
                 console.log("Error getting picture: " + e);
                 document.getElementById('camera_status').innerHTML = "Error getting picture.";
             },
-            { quality: 50, destinationType:
-            Camera.DestinationType.FILE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+            { destinationType: Camera.DestinationType.FILE_URI,
+              sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
     };
 
     /**
      * Select image from library using a NATIVE_URI destination type
      */
-    function getImageInfoUsingNativeUri() {
+    function getImageUsingNativeUri() {
+        var onMetadataReceived = function(metadata) {
+            document.getElementById('camera_status').innerHTML += "FileEntry.getMetadata <b>success</b>: modificationTime = " + metadata.modificationTime + "<br />";
+        };
+
+        var onGetMetadataError = function(e) {
+            handleUnexpectedError("FileEntry.getMetadata", e.code);
+        };
+
+        var onMetadataSet = function() {
+            handleUnexpectedSuccess("FileEntry.setMetadata");
+        };
+
+        var onSetMetadataError = function(e) {
+            checkForExpectedError("FileEntry.setMetadata", undefined, e.code);
+        };
+
+        var onParentReceived = function() {
+            if (platformId == 'ios') {
+                handleUnexpectedSuccess("FileEntry.getParent");
+            } else if (platformId == 'android') {
+                document.getElementById('camera_status').innerHTML += "FileEntry.getParent <b>success</b><br />"
+            }
+        };
+
+        var onGetParentError = function(e) {
+            if (platformId == 'ios') {
+                checkForExpectedError("FileEntry.getParent", FileError.NOT_READABLE_ERR, e.code);
+            } else if (platformId == 'android') {
+                handleUnexpectedError("FileEntry.getParent", e.code);
+            }
+        };
+
+        var onFileReadAsDataURL = function(evt) {
+            var img = document.getElementById('camera_image');
+            img.style.visibility = "visible";
+            img.style.display = "block";
+            img.src = evt.target.result;
+            document.getElementById('camera_status').innerHTML += "FileReader.readAsDataURL <b>success</b><br />"
+        };
+
         var onFileReceived = function(file) {
-            document.getElementById('camera_status').innerHTML = "Success; fullPath: " + file.fullPath + ", name: " + file.name + ", type: " + file.type + ", size: " + file.size + ", date: " + file.lastModifiedDate;
-        }
-        var onError = function(e) {
-            console.log("Error getting picture: " + e);
-            document.getElementById('camera_status').innerHTML = "Error getting picture.";
-        }
+            document.getElementById('camera_status').innerHTML += "FileEntry.file <b>success</b>: fullPath = " + file.fullPath + "; name = " + file.name;
+            document.getElementById('camera_status').innerHTML += "; type = " + file.type + "; size = " + file.size + "; date = " + file.lastModifiedDate + "<br />";
+
+            // Test File API here.
+            var dataUrlReader = new FileReader();
+            dataUrlReader.onload = onFileReadAsDataURL;
+            dataUrlReader.onerror = function(evt) {
+                onError(evt.target.error);
+            };
+            dataUrlReader.readAsDataURL(file);
+        };
+
+        var onGetFileError = function(e) {
+            handleUnexpectedError("FileEntry.file", e.code);
+        };
+
+        clearStatus();
         navigator.camera.getPicture(
             function(data) {
                 var fileEntry = new FileEntry('image_name.png', data);
-                var file = fileEntry.file(onFileReceived, onError);
+
+                // Test FileEntry API here.
+                fileEntry.getMetadata(onMetadataReceived, onGetMetadataError);
+                fileEntry.setMetadata(onMetadataSet, onSetMetadataError, { "com.apple.MobileBackup": 1 });
+                fileEntry.getParent(onParentReceived, onGetParentError);
+                fileEntry.file(onFileReceived, onGetFileError);
             },
-            onError,
-            { quality: 50, destinationType:
-            Camera.DestinationType.NATIVE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+            onGetPictureError,
+            { destinationType: Camera.DestinationType.NATIVE_URI,
+              sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
+    };
+
+    function copyImageUsingNativeUri() {
+        var onFileCopied = function(fileEntry) {
+            document.getElementById('camera_status').innerHTML += "FileEntry.copyTo <b>success</b><br />";
+        };
+
+        var onFileCopyError = function(e) {
+            handleUnexpectedError("FileEntry.copyTo", e.code);
+        };
+
+        var onFileMoved = function(fileEntry) {
+            if (platformId == 'ios') {
+                handleUnexpectedSuccess("FileEntry.moveTo");
+            } else if (platformId == 'android') {
+                document.getElementById('camera_status').innerHTML += "FileEntry.moveTo <b>success</b><br />";
+            }
+        };
+
+        var onFileMoveError = function(e) {
+            if (platformId == 'ios') {
+                checkForExpectedError("FileEntry.moveTo", FileError.INVALID_MODIFICATION_ERR, e.code);
+            } else if (platformId == 'android') {
+                handleUnexpectedError("FileEntry.moveTo", e.code);
+            }
+        };
+
+        var onFileSystemReceived = function(fileSystem) {
+            navigator.camera.getPicture(
+                function(data) {
+                    var fileEntry = new FileEntry('image_name.png', data);
+                    var destDirEntry = fileSystem.root;
+
+                    // Test FileEntry API here.
+                    fileEntry.copyTo(destDirEntry, 'copied_file.png', onFileCopied, onFileCopyError);
+                    fileEntry.moveTo(destDirEntry, 'moved_file.png', onFileMoved, onFileMoveError);
+                },
+                onGetPictureError,
+                { destinationType: Camera.DestinationType.NATIVE_URI,
+                  sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
+        };
+
+        clearStatus();
+        window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, onFileSystemReceived, null);
+    };
+
+    function writeImageUsingNativeUri() {
+        var onFileWrite = function(evt) {
+            handleUnexpectedSuccess("FileWriter.write");
+        };
+
+        var onFileWriteError = function(evt) {
+            checkForExpectedError("FileWriter.write", FileError.NO_MODIFICATION_ALLOWED_ERR, evt.target.error.code);
+        };
+
+        var onFileTruncate = function(evt) {
+            handleUnexpectedSuccess("FileWriter.truncate");
+        };
+
+        var onFileTruncateError = function(evt) {
+            checkForExpectedError("FileWriter.truncate", FileError.NO_MODIFICATION_ALLOWED_ERR, evt.target.error.code);
+        };
+
+        var onFileWriterReceived = function(fileWriter) {
+            fileWriter.onwrite = onFileWrite;
+            fileWriter.onerror = onFileWriteError;
+            fileWriter.write("some text!");
+        };
+
+        var onFileTruncateWriterReceived = function(fileWriter) {
+            fileWriter.onwrite = onFileTruncate;
+            fileWriter.onerror = onFileTruncateError;
+            fileWriter.truncate(10);
+        };
+
+        var onCreateWriterError = function(e) {
+            handleUnexpectedError("FileEntry.createWriter", e.code);
+        };
+
+        clearStatus();
+        navigator.camera.getPicture(
+            function(data) {
+                var fileEntry = new FileEntry('image_name.png', data);
+
+                // Test FileEntry API here.
+                fileEntry.createWriter(onFileWriterReceived, onCreateWriterError);
+                fileEntry.createWriter(onFileTruncateWriterReceived, onCreateWriterError);
+            },
+            onGetPictureError,
+            { destinationType: Camera.DestinationType.NATIVE_URI,
+              sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
+    };
+
+    function uploadImageUsingNativeUri() {
+        var onFileUploaded = function(response) {
+            document.getElementById('camera_status').innerHTML += "FileTransfer.upload <b>success</b>: response = " + response.responseCode + ".<br />";
+        };
+
+        var onFileUploadError = function(error) {
+            document.getElementById('camera_status').innerHTML += "FileTransfer.upload <b>error</b> (code: " + error.code + ").<br />";
+        };
+
+        clearStatus();
+        navigator.camera.getPicture(
+            function(data) {
+                var options = new FileUploadOptions();
+                options.fileName = "image.png";
+                options.mimeType = "image/png";
+
+                var fileTransfer = new FileTransfer();
+                fileTransfer.upload(data, "http://cordova-filetransfer.jitsu.com/upload", onFileUploaded, onFileUploadError, options);
+            },
+            onGetPictureError,
+            { destinationType: Camera.DestinationType.NATIVE_URI,
+              sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
+    };
+
+    function displayImageUsingNativeUri() {
+        clearStatus();
+        navigator.camera.getPicture(
+            function(data) {
+                // First, we display the image using the img tag.
+                document.getElementById('camera_status').innerHTML += "img tag: <img src=\"" + data + "\" /><br />";
+
+                // Next, the canvas tag.
+                document.getElementById('camera_status').innerHTML += "canvas tag: <canvas id=\"nativeUriCanvas\" width=\"300\" height=\"300\"></canvas>";
+                var canvas = document.getElementById('nativeUriCanvas');
+                var context = canvas.getContext('2d');
+                var image = new Image();
+                image.onload = function() {
+                    context.drawImage(image, 0, 0);
+                };
+                image.src = data;
+            },
+            onGetPictureError,
+            { destinationType: Camera.DestinationType.NATIVE_URI,
+              sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
+    };
+
+    function removeImageUsingNativeUri() {
+        var onFileEntryRemoved = function() {
+            if (platformId == 'ios') {
+                handleUnexpectedSuccess("FileEntry.remove");
+            } else if (platformId == 'android') {
+                document.getElementById('camera_status').innerHTML += "FileEntry.remove <b>success</b><br />"
+            }
+        };
+
+        var onFileEntryRemoveError = function(e) {
+            if (platformId == 'ios') {
+                checkForExpectedError("FileEntry.remove", FileError.INVALID_MODIFICATION_ERR, e.code);
+            } else if (platformId == 'android') {
+                handleUnexpectedError("FileEntry.remove", e.code);
+            }
+        };
+
+        clearStatus();
+        navigator.camera.getPicture(
+            function(data) {
+                var fileEntry = new FileEntry('image_name.png', data);
+
+                // Test FileEntry API here.
+                fileEntry.remove(onFileEntryRemoved, onFileEntryRemoveError);
+            },
+            onGetPictureError,
+            { destinationType: Camera.DestinationType.NATIVE_URI,
+              sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
     };
 
     function testNativeFile(inputEl) {
@@ -112,7 +344,7 @@
         window.setTimeout(function() {
             testNativeFile2(inputEl);
         }, 0);
-    }
+    };
 
     function testNativeFile2(inputEl) {
         if (!inputEl.value) {
@@ -149,7 +381,28 @@
             document.getElementById('camera_status').innerHTML = statusText;
         };
         reader.readAsDataURL(file);
-    }
+    };
+
+    function handleUnexpectedError(methodName, errorCode) {
+        document.getElementById('camera_status').innerHTML += "" + methodName + " <b>error</b> (code: " + errorCode + ").<br />";
+    };
+
+    function handleUnexpectedSuccess(methodName) {
+        document.getElementById('camera_status').innerHTML += "" + methodName + " <b>failure</b> (succeeded when it should fail).<br />";
+    };
+
+    function checkForExpectedError(methodName, expectedErrorCode, actualErrorCode) {
+        if (actualErrorCode == expectedErrorCode) {
+            document.getElementById('camera_status').innerHTML += "" + methodName + " <b>success</b> (failed as expected, with error code " + actualErrorCode + ").<br />";
+        } else {
+            document.getElementById('camera_status').innerHTML += "" + methodName + " <b>failure</b> (failed as expected, but with error code " + actualErrorCode + " instead of " + expectedErrorCode + ").<br />";
+        }
+    };
+
+    function clearStatus() {
+        document.getElementById('camera_status').innerHTML = "";
+        document.getElementById('camera_image').style.visibility = "hidden";
+    };
 
     /**
      * Function called when page has finished loading.
@@ -164,7 +417,7 @@
         		alert("Error: Apache Cordova did not initialize.  Demo will not run correctly.");
         	}
         },1000);
-    }
+    };
 
 </script>
 
@@ -179,7 +432,13 @@
     <h2>Action</h2>
     <div class="btn large" onclick="getPicture();">Take Picture</div>
     <div class="btn large" onclick="getImageUsingFileUri();">Select Image Using File URI</div>
-    <div class="btn large" onclick="getImageInfoUsingNativeUri();">Select Image Using Native URI</div>
+    <h2>Native URI</h2>
+    <div class="btn large" onclick="getImageUsingNativeUri();">Select Image</div>
+    <div class="btn large" onclick="copyImageUsingNativeUri();">Copy Image</div>
+    <div class="btn large" onclick="writeImageUsingNativeUri();">Write Image</div>
+    <div class="btn large" onclick="uploadImageUsingNativeUri();">Upload Image</div>
+    <div class="btn large" onclick="displayImageUsingNativeUri();">Display Image</div>
+    <div class="btn large" onclick="removeImageUsingNativeUri();">Remove Image</div>
     <h3>input type=file</h3>
     <input type="file" onchange="testNativeFile(this)">
     <h3>capture=camera</h3>

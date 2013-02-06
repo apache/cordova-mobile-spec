@@ -35,11 +35,13 @@ describe('Camera Constants (window.Camera + navigator.camera)', function () {
         expect(window.Camera).toBeDefined();
     });
 
-    it("should contain two DestinationType constants", function() {
+    it("should contain three DestinationType constants", function() {
         expect(Camera.DestinationType.DATA_URL).toBe(0);
         expect(Camera.DestinationType.FILE_URI).toBe(1);
+        expect(Camera.DestinationType.NATIVE_URI).toBe(2);
         expect(navigator.camera.DestinationType.DATA_URL).toBe(0);
         expect(navigator.camera.DestinationType.FILE_URI).toBe(1);
+        expect(navigator.camera.DestinationType.NATIVE_URI).toBe(2);
     });
 
     it("should contain two EncodingType constants", function() {
