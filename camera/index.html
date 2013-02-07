@@ -46,41 +46,55 @@
         img.onloadend = callback;
     }
 
+    function getPictureFail(e) {
+        console.log("Error getting picture: " + e);
+        document.getElementById('camera_status').innerHTML = "Error getting picture.";
+    }
+
+    function getPictureWin(data) {
+        showPicture(data);
+        document.getElementById('camera_status').innerHTML = "Success";
+    }
+
     /**
      * Capture picture
      */
     function getPicture() {
-
-        //navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50,
-        //    destinationType: Camera.DestinationType.FILE_URI, sourceType : Camera.PictureSourceType.CAMERA });
-
-        navigator.camera.getPicture(
-            function(data) {
-                //img.src = "data:image/jpeg;base64," + data;
-                showPicture(data);
-                document.getElementById('camera_status').innerHTML = "Success";
-            },
-            function(e) {
-                console.log("Error getting picture: " + e);
-                document.getElementById('camera_status').innerHTML = "Error getting picture.";
-            },
+        navigator.camera.getPicture(getPictureWin, getPictureFail, getPictureFail,
             { quality: 50, destinationType:
             Camera.DestinationType.FILE_URI, sourceType : Camera.PictureSourceType.CAMERA});
-    };
+    }
+
+    function uploadImage(srcUrl) {
+        var ft = new FileTransfer(),
+            uploadcomplete=0,
+            progress = 0,
+            options = new FileUploadOptions();
+        options.fileKey="photo";
+        options.fileName='test.jpg';
+        options.mimeType="image/jpeg";
+        ft.onprogress = function(progressEvent) {
+          console.log('progress: ' + progressEvent.loaded + ' of ' + progressEvent.total);
+        };
+        var server = "http://cordova-filetransfer.jitsu.com";
+
+        ft.upload(srcUrl, server + '/upload', uploadedProfilePicture, function(message) { console.log("error: " + JSON.stringify(message)); }, options);
+        function uploadedProfilePicture(information_back){
+          console.log('win!');
+        }
+    }
 
     /**
      * Select image from library using a FILE_URI destination type
      */
-    function getImageUsingFileUri() {
+    function getImageUsingFileUri(upload) {
         navigator.camera.getPicture(
             function(data) {
-                showPicture(data);
-                document.getElementById('camera_status').innerHTML = "Success";
-            },
-            function(e) {
-                console.log("Error getting picture: " + e);
-                document.getElementById('camera_status').innerHTML = "Error getting picture.";
-            },
+                getPictureWin(data);
+                if (upload) {
+                    uploadImage(data);
+                }
+            }, getPictureFail,
             { quality: 50, destinationType:
             Camera.DestinationType.FILE_URI, sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
     };
@@ -180,6 +194,7 @@
     <div class="btn large" onclick="getPicture();">Take Picture</div>
     <div class="btn large" onclick="getImageUsingFileUri();">Select Image Using File URI</div>
     <div class="btn large" onclick="getImageInfoUsingNativeUri();">Select Image Using Native URI</div>
+    <div class="btn large" onclick="getImageUsingFileUri(true);">Upload to jitsu with file URI</div>
     <h3>input type=file</h3>
     <input type="file" onchange="testNativeFile(this)">
     <h3>capture=camera</h3>
