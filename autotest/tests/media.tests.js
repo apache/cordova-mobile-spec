@@ -135,7 +135,7 @@ describe('Media', function () {
 	});
 
     it("position should be set properly", function() {
-        var media1 = new Media("http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3"),
+        var media1 = new Media("http://cordova.apache.org/downloads/BlueZedEx.mp3"),
             test = jasmine.createSpy().andCallFake(function(position) {
                     console.log("position = " + position);
                     expect(position).toBeGreaterThan(0.0);
@@ -155,7 +155,7 @@ describe('Media', function () {
     });
 
     it("duration should be set properly", function() {
-        var media1 = new Media("http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3");
+        var media1 = new Media("http://cordova.apache.org/downloads/BlueZedEx.mp3");
         media1.play();
         waits(5000);
         runs(function () {

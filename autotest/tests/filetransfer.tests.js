@@ -188,7 +188,7 @@ describe('FileTransfer', function() {
         });
         it("should be stopped by abort() right away", function() {
             var downloadWin = createDoNotCallSpy('downloadWin');
-            var remoteFile = 'http://audio.ibeat.org/content/p1rj1s/p1rj1s_-_rockGuitar.mp3';
+            var remoteFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3';
             var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
             var startTime = +new Date();
 
