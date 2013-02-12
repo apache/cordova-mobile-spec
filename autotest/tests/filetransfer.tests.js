@@ -186,6 +186,32 @@ describe('FileTransfer', function() {
 
             waitsForAny(fileWin, downloadFail, fileFail);
         });
+        it("should not leave partial file due to abort", function() {
+            var downloadWin = createDoNotCallSpy('downloadWin');
+            var remoteFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3';
+            var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
+            var startTime = +new Date();
+
+            var downloadFail = jasmine.createSpy().andCallFake(function(e) {
+                expect(e.code).toBe(FileTransferError.ABORT_ERR);
+                var didNotExistSpy = jasmine.createSpy();
+                var existedSpy = createDoNotCallSpy('file existed after abort');
+                root.getFile(localFileName, null, existedSpy, didNotExistSpy);
+                waitsForAny(didNotExistSpy, existedSpy);
+            });
+
+            runs(function() {
+                var ft = new FileTransfer();
+                ft.onprogress = function(e) {
+                    if (e.loaded > 0) {
+                        ft.abort();
+                    }
+                };
+                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+            });
+
+            waitsForAny(downloadWin, downloadFail);
+        });
         it("should be stopped by abort() right away", function() {
             var downloadWin = createDoNotCallSpy('downloadWin');
             var remoteFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3';
