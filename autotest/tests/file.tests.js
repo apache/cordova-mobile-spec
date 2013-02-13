@@ -3023,8 +3023,19 @@ describe('File API', function() {
                 try {
                     blob = new Blob([uint8Array.buffer, contents]);
                 } catch (e) {
-                    // Skip the test if we can't create a blob.
-                    // This happens on Android <= 2.3 and iOS <= 5.
+                    var dvArray = window.device.version.split(".");
+                    var deviceVersion = dvArray[0].concat(".",dvArray[1]);
+                    if ((window.device.platform==="iOS" && deviceVersion<6.0) ||
+                        (window.device.platform==="Android" && deviceVersion<=2.3)){
+                        // Skip the test if we can't create a blob.
+                        // This happens on Android <= 2.3 and iOS < 6.0.
+                        return;
+                    }
+
+                    // This is a real spec failure if we reaching this point.
+                    // The purpose of the expect below is to fail the spec
+                    // and return a more readable error.
+                    expect('blob').toBe('created');
                     return;
                 }
             }
