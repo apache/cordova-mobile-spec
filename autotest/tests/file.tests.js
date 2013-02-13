@@ -3006,6 +3006,10 @@ describe('File API', function() {
             waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
         });
         it("should be able to read native blob objects", function() {
+            // Skip test if blobs are not supported (e.g.: Android 2.3).
+            if (typeof Blob == 'undefined') {
+                return;
+            }
             var contents = 'asdf';
             var uint8Array = new Uint8Array(contents.length);
             for (var i = 0; i < contents.length; ++i) {
@@ -3019,13 +3023,15 @@ describe('File API', function() {
                 builder.append(contents);
                 blob = builder.getBlob("text/plain");
             } else {
-                // iOS 6 does not support Views here.
                 try {
+                    // iOS 6 does not support Views, so pass in the buffer.
                     blob = new Blob([uint8Array.buffer, contents]);
                 } catch (e) {
-                    // Skip the test if we can't create a blob.
-                    // This happens on Android <= 2.3 and iOS <= 5.
-                    return;
+                    // Skip the test if we can't create a blob (e.g.: iOS 5).
+                    if (e instanceof TypeError) {
+                        return;
+                    }
+                    throw e;
                 }
             }
             var verifier = jasmine.createSpy().andCallFake(function(evt) {
