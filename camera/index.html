@@ -34,6 +34,7 @@
 
     var deviceReady = false;
     var platformId = cordova.require('cordova/platform').id;
+    var CameraPopoverOptions = cordova.require('cordova/plugin/CameraPopoverOptions');
 
     //-------------------------------------------------------------------------
     // Camera
@@ -97,7 +98,7 @@
      */
     function getImageUsingFileUri(upload) {
         clearStatus();
-        navigator.camera.getPicture(
+        var popoverHandle = navigator.camera.getPicture(
             function(data) {
                 getPictureWin(data);
                 if (upload) {
@@ -106,6 +107,12 @@
             }, getPictureFail,
             { destinationType: Camera.DestinationType.FILE_URI,
               sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+
+        // Reposition the popover if the orientation changes.
+        window.onorientationchange = function() {
+            var newPopoverOptions = new CameraPopoverOptions(0, 0, 100, 100, 0);
+            popoverHandle.setPosition(newPopoverOptions);
+        }
     };
 
     /**
