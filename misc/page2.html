@@ -26,10 +26,15 @@
     <meta name="viewport" content="width=device-width,height=device-height,user-scalable=no,maximum-scale=1.0,initial-scale=1.0" />
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <title>Cordova Mobile Spec</title>
-      <link rel="stylesheet" href="../master.css" type="text/css" media="screen" title="no title" charset="utf-8">
-      <script type="text/javascript" charset="utf-8" src="../cordova.js"></script>
-      <script type="text/javascript" charset="utf-8" src="../main.js"></script>
-
+    <link rel="stylesheet" href="../master.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" charset="utf-8" src="../cordova.js"></script>
+    <script type="text/javascript" charset="utf-8" src="../main.js"></script>
+    <style>
+      iframe, .iframe_container {
+        height:100px;
+        overflow:scroll;
+      }
+    </style>
   </head>
   <body onload="init();" id="stage" class="theme">
     <h1>Page2 App</h1>
@@ -42,6 +47,18 @@
         <h4>Width: <span id="width">  </span>,   Height: <span id="height"> 
                    </span>, Color Depth: <span id="colorDepth"></span></h4>
      </div>
-      <div ><button class="backBtn" onclick="backHome();">Back</button></div>
+     about:blank
+     <div class="iframe_container">
+       <iframe src="about:blank"></iframe>
+     </div>
+     whatheaders.com
+     <div class="iframe_container">
+       <iframe src="http://whatheaders.com"></iframe>
+     </div>
+     apache.org
+     <div class="iframe_container">
+       <iframe src="http://apache.org"></iframe>
+     </div>
+     <div><button class="backBtn" onclick="backHome();">Back</button></div>
   </body>
 </html>
