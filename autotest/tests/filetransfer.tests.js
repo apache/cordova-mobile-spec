@@ -102,15 +102,10 @@ describe('FileTransfer', function() {
     describe('download method', function() {
 
         // NOTE: if download tests are failing, check the white list
-        // Android
+        //
         //   <access origin="httpssss://example.com"/>
         //   <access origin="apache.org" subdomains="true" />
         //   <access origin="cordova-filetransfer.jitsu.com"/>
-        // iOS
-        //   # Cordova.plist
-        //   ExternalHosts
-        //     - Item 1 String cordova-filetransfer.jitsu.com
-        //     - Item 2 String *.apache.org
 
         it("should be able to download a file using http", function() {
             var fail = createDoNotCallSpy('downloadFail');
@@ -244,6 +239,26 @@ describe('FileTransfer', function() {
             var downloadFail = jasmine.createSpy().andCallFake(function(error) {
                 expect(error.http_status).toBe(404);
                 expect(error.http_status).not.toBe(401, "Ensure " + remoteFile + " is in the white list");
+            });
+
+            this.after(function() {
+                deleteFile(localFileName);
+            });
+            runs(function() {
+                var ft = new FileTransfer();
+                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+            });
+
+            waitsForAny(downloadWin, downloadFail);
+        });
+        it("should get response body on failure", function() {
+            var downloadWin = createDoNotCallSpy('downloadWin');
+
+            var remoteFile = server + "/404";
+            var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
+            var downloadFail = jasmine.createSpy().andCallFake(function(error) {
+                expect(error.body).toBeDefined();
+                expect(error.body).toEqual('You requested a 404');
             });
 
             this.after(function() {
