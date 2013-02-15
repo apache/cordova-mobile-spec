@@ -21,7 +21,7 @@
 
 describe('Notification (navigator.notification)', function () {
 	it("should exist", function() {
-        expect(navigator.notification).toBeDefined();
+                expect(navigator.notification).toBeDefined();
 	});
 
 	it("should contain a vibrate function", function() {
@@ -34,8 +34,13 @@ describe('Notification (navigator.notification)', function () {
 		expect(typeof navigator.notification.beep).toBe("function");
 	});
 
-	it("should contain a alert function", function() {
+	it("should contain an alert function", function() {
 		expect(typeof navigator.notification.alert).toBeDefined();
 		expect(typeof navigator.notification.alert).toBe("function");
+	});
+
+	it("should contain a confirm function", function() {
+		expect(typeof navigator.notification.confirm).toBeDefined();
+		expect(typeof navigator.notification.confirm).toBe("function");
 	});
 });
