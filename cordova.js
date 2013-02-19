@@ -19,7 +19,7 @@
  *
 */
 
-var VERSION='2.4.0';
+var VERSION='2.5.0rc1';
 var scripts = document.getElementsByTagName('script');
 var cordovaPath = scripts[scripts.length - 1].src.replace('cordova.js', 'cordova-'+VERSION+'.js');
 
