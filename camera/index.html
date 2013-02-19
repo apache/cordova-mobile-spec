@@ -34,6 +34,7 @@
 
     var deviceReady = false;
     var platformId = cordova.require('cordova/platform').id;
+    var CameraPopoverOptions = cordova.require('cordova/plugin/CameraPopoverOptions');
 
     //-------------------------------------------------------------------------
     // Camera
@@ -97,7 +98,7 @@
      */
     function getImageUsingFileUri(upload) {
         clearStatus();
-        navigator.camera.getPicture(
+        var popoverHandle = navigator.camera.getPicture(
             function(data) {
                 getPictureWin(data);
                 if (upload) {
@@ -106,10 +107,17 @@
             }, getPictureFail,
             { destinationType: Camera.DestinationType.FILE_URI,
               sourceType: Camera.PictureSourceType.PHOTOLIBRARY});
+
+        // Reposition the popover if the orientation changes.
+        window.onorientationchange = function() {
+            var newPopoverOptions = new CameraPopoverOptions(0, 0, 100, 100, 0);
+            popoverHandle.setPosition(newPopoverOptions);
+        }
     };
 
     /**
      * Select image from library using a NATIVE_URI destination type
+     * This calls FileEntry.getMetadata, FileEntry.setMetadata, FileEntry.getParent, FileEntry.file, and FileReader.readAsDataURL.
      */
     function getImageUsingNativeUri() {
         var onMetadataReceived = function(metadata) {
@@ -185,6 +193,10 @@
               sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
     };
 
+    /**
+     * Copy image from library using a NATIVE_URI destination type
+     * This calls FileEntry.copyTo and FileEntry.moveTo.
+     */
     function copyImageUsingNativeUri() {
         var onFileCopied = function(fileEntry) {
             document.getElementById('camera_status').innerHTML += "FileEntry.copyTo <b>success</b><br />";
@@ -229,6 +241,10 @@
         window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, onFileSystemReceived, null);
     };
 
+    /**
+     * Write image to library using a NATIVE_URI destination type
+     * This calls FileEntry.createWriter, FileWriter.write, and FileWriter.truncate.
+     */
     function writeImageUsingNativeUri() {
         var onFileWrite = function(evt) {
             handleUnexpectedSuccess("FileWriter.write");
@@ -276,6 +292,10 @@
               sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
     };
 
+    /**
+     * Upload image from library using a NATIVE_URI destination type
+     * This calls FileTransfer.upload.
+     */
     function uploadImageUsingNativeUri() {
         var onFileUploaded = function(response) {
             document.getElementById('camera_status').innerHTML += "FileTransfer.upload <b>success</b>: response = " + response.responseCode + ".<br />";
@@ -300,6 +320,10 @@
               sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
     };
 
+    /**
+     * Display image from library using a NATIVE_URI destination type
+     * This uses img and canvas tags.
+     */
     function displayImageUsingNativeUri() {
         clearStatus();
         navigator.camera.getPicture(
@@ -322,6 +346,10 @@
               sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
     };
 
+    /**
+     * Remove image from library using a NATIVE_URI destination type
+     * This calls FileEntry.remove.
+     */
     function removeImageUsingNativeUri() {
         var onFileEntryRemoved = function() {
             if (platformId == 'ios') {
