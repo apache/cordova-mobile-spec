@@ -3085,6 +3085,96 @@ describe('File API', function() {
                 expect(verifier).toHaveBeenCalled();
             });
         });
+        it("should read file properly, readAsBinaryString", function() {
+            // path of file
+            var fileName = "reader.txt",
+                filePath = root.fullPath + '/' + fileName,
+                fail = createFail('FileReader'),
+                // file content
+                rule = "There is an exception to every rule.  Except this one.",
+                // creates a FileWriter object
+                create_writer = function(fileEntry) {
+                    fileEntry.createWriter(write_file, fail);
+                },
+                // writes file and reads it back in
+                write_file = function(writer) {
+                    writer.onwriteend = read_file;
+                    writer.write(rule);
+                },
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(evt).toBeDefined();
+                    expect(evt.target.result).toBe(rule);
+                }),
+                // reads file and compares content to what was written
+                read_file = function(evt) {
+                    var reader = new FileReader();
+                    reader.onloadend = verifier;
+                    var myFile = new File();
+                    myFile.fullPath = filePath;
+                    reader.readAsBinaryString(myFile);
+                };
+
+            // create a file, write to it, and read it in again
+            runs(function() {
+                root.getFile(fileName, {create: true}, create_writer, fail);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).not.toHaveBeenCalled();
+                expect(verifier).toHaveBeenCalled();
+            });
+        });
+        it("should read file properly, readAsArrayBuffer", function() {
+            // path of file
+            var fileName = "reader.txt",
+                filePath = root.fullPath + '/' + fileName,
+                fail = createFail('FileReader'),
+                // file content
+                rule = "There is an exception to every rule.  Except this one.",
+                // creates a FileWriter object
+                create_writer = function(fileEntry) {
+                    fileEntry.createWriter(write_file, fail);
+                },
+                // writes file and reads it back in
+                write_file = function(writer) {
+                    writer.onwriteend = read_file;
+                    writer.write(rule);
+                },
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(evt).toBeDefined();
+
+                    var buf = new Uint8Array(evt.target.result);
+                    var match = buf.length == rule.length;
+
+                    for (var i = 0; match && i < buf.length; i++) {
+                        match = buf[i] == rule.charCodeAt(i);
+                    }
+
+                    expect(match).toBe(true);
+                }),
+                // reads file and compares content to what was written
+                read_file = function(evt) {
+                    var reader = new FileReader();
+                    reader.onloadend = verifier;
+                    var myFile = new File();
+                    myFile.fullPath = filePath;
+                    reader.readAsArrayBuffer(myFile);
+                };
+
+            // create a file, write to it, and read it in again
+            runs(function() {
+                root.getFile(fileName, {create: true}, create_writer, fail);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).not.toHaveBeenCalled();
+                expect(verifier).toHaveBeenCalled();
+            });
+        });
         it("should properly slice files, reading text", function() {
             // path of file
             var fileName = "reader.txt",
