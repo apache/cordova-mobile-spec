@@ -40,7 +40,6 @@ var cordovaPath = versionCordovaPath;
 })();
 
 if (!window._doNotWriteCordovaScript) {
-    console.log(cordovaPath);
     document.write('<script type="text/javascript" charset="utf-8" src="' + cordovaPath + '"></script>');
 }
 
