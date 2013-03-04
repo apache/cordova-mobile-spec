@@ -57,8 +57,14 @@
      </div>
      apache.org
      <div class="iframe_container">
-       <iframe src="http://apache.org"></iframe>
+       <iframe src="" id="apacheiframe"></iframe>
      </div>
      <div><button class="backBtn" onclick="backHome();">Back</button></div>
   </body>
+  <script>
+    setTimeout(function() {
+        console.log('loading iframe after timeout.');
+        document.querySelector('#apacheiframe').src = 'http://apache.org';
+    }, 2000);
+  </script>
 </html>
