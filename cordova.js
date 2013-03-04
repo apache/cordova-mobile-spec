@@ -26,21 +26,21 @@ var scripts = document.getElementsByTagName('script');
 var currentPath = scripts[scripts.length - 1].src;
 var platformCordovaPath = currentPath.replace("cordova.js", "cordova." + PLAT + ".js");
 var versionCordovaPath = currentPath.replace("cordova.js", "cordova-" + VERSION + ".js");
-var cordovaPath;
+var cordovaPath = versionCordovaPath;
 
 (function() {
     var xhr = new XMLHttpRequest();
     xhr.open("GET", platformCordovaPath, false);
     xhr.onreadystatechange = function() {
-        if (this.readyState != this.DONE) {
-            return;
+        if (this.readyState == this.DONE && this.responseText.length > 0) {
+            cordovaPath = platformCordovaPath;
         }
-        cordovaPath = (this.responseText.length > 0) ? platformCordovaPath : versionCordovaPath;
     };
     xhr.send(null);
 })();
 
 if (!window._doNotWriteCordovaScript) {
+    console.log(cordovaPath);
     document.write('<script type="text/javascript" charset="utf-8" src="' + cordovaPath + '"></script>');
 }
 
