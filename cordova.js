@@ -20,7 +20,7 @@
 */
 
 var VERSION='2.5.0';
-var PLAT = /Android/.exec(navigator.userAgent) ? 'android' : 'ios';
+var PLAT = /Android/.exec(navigator.userAgent) ? 'android' : /BB10/.exec(navigator.userAgent) ? 'blackberry' : 'ios';
 
 var scripts = document.getElementsByTagName('script');
 var currentPath = scripts[scripts.length - 1].src;
@@ -29,15 +29,14 @@ var versionCordovaPath = currentPath.replace("cordova.js", "cordova-" + VERSION 
 var cordovaPath;
 
 (function() {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", platformCordovaPath, false);
-    xhr.onreadystatechange = function() {
-        if (this.readyState != this.DONE) {
-            return;
-        }
-        cordovaPath = (this.responseText.length > 0) ? platformCordovaPath : versionCordovaPath;
-    };
-    xhr.send(null);
+    try {
+        var xhr = new XMLHttpRequest();
+        xhr.open("HEAD", platformCordovaPath, false);
+        xhr.send();
+        cordovaPath = (xhr.responseText.length > 0) ? platformCordovaPath : versionCordovaPath;
+    } catch (e) {
+        cordovaPath = versionCordovaPath;
+    }
 })();
 
 if (!window._doNotWriteCordovaScript) {
