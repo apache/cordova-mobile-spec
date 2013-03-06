@@ -37,6 +37,7 @@
     var CameraPopoverOptions = cordova.require('cordova/plugin/CameraPopoverOptions');
     var pictureUrl = null;
     var fileObj = null;
+    var fileEntry = null;
     var pageStartTime = +new Date();
 
     //-------------------------------------------------------------------------
@@ -55,6 +56,7 @@
         canvas.width = canvas.height = 1;
         pictureUrl = null;
         fileObj = null;
+        fileEntry = null;
     }
 
     function setPicture(url, callback) {
@@ -75,6 +77,16 @@
 
     function getPictureWin(data) {
         setPicture(data);
+        // TODO: Fix resolveLocalFileSystemURI to work with native-uri.
+        if (pictureUrl.indexOf('file:') == 0) {
+            resolveLocalFileSystemURI(data, function(e) {
+                fileEntry = e;
+                logCallback('resolveLocalFileSystemURI()', true)(e);
+            }, logCallback('resolveLocalFileSystemURI()', false));
+        } else {
+            var path = pictureUrl.replace(/^file:\/\/(localhost)?/, '').replace(/%20/g, ' ');
+            fileEntry = new FileEntry('image_name.png', path);
+        }
     }
 
     function getPicture() {
@@ -112,11 +124,6 @@
         }
     }
 
-    function makeFileEntry() {
-        var path = pictureUrl.replace(/^file:\/\/(localhost)?/, '').replace(/%20/g, ' ');
-        return new FileEntry('image_name.png', path);
-    }
-
     function logCallback(apiName, success) {
         return function() {
             log('Call to ' + apiName + (success ? ' success: ' : ' failed: ') + JSON.stringify([].slice.call(arguments)));
@@ -127,8 +134,8 @@
      * Select image from library using a NATIVE_URI destination type
      * This calls FileEntry.getMetadata, FileEntry.setMetadata, FileEntry.getParent, FileEntry.file, and FileReader.readAsDataURL.
      */
-    function getFileInfo() {
-        var onFileReadAsDataURL = function(evt) {
+    function readFile() {
+        function onFileReadAsDataURL(evt) {
             var img = document.getElementById('camera_image');
             img.style.visibility = "visible";
             img.style.display = "block";
@@ -136,31 +143,30 @@
             log("FileReader.readAsDataURL success");
         };
 
-        var onFileReceived = function(file) {
+        function onFileReceived(file) {
             log('Got file: ' + JSON.stringify(file));
             fileObj = file;
 
             var reader = new FileReader();
-            reader.onload = logCallback('FileReader.readAsDataURL', true);
-            reader.onerror = logCallback('FileReader.readAsDataURL', false);
-            reader.onloadend = function() {
-                log('DataURL size: ' + reader.result.length);
+            reader.onload = function() {
+                log('FileReader.readAsDataURL() - length = ' + reader.result.length);
             };
+            reader.onerror = logCallback('FileReader.readAsDataURL', false);
             reader.readAsDataURL(file);
         };
-
-        var fileEntry = makeFileEntry();
-
+        // Test out onFileReceived when the file object was set via a native <input> elements.
+        if (fileObj) {
+            onFileReceived(fileObj);
+        } else {
+            fileEntry.file(onFileReceived, logCallback('FileEntry.file', false));
+        }
+    }
+    function getFileInfo() {
         // Test FileEntry API here.
         fileEntry.getMetadata(logCallback('FileEntry.getMetadata', true), logCallback('FileEntry.getMetadata', false));
         fileEntry.setMetadata(logCallback('FileEntry.setMetadata', true), logCallback('FileEntry.setMetadata', false), { "com.apple.MobileBackup": 1 });
         fileEntry.getParent(logCallback('FileEntry.getParent', true), logCallback('FileEntry.getParent', false));
         fileEntry.getParent(logCallback('FileEntry.getParent', true), logCallback('FileEntry.getParent', false));
-        fileEntry.file(onFileReceived, logCallback('FileEntry.file', false));
-        // Test out onFileReceived when the file object was set via a native <input> elements.
-        if (fileObj) {
-            onFileReceived(fileObj);
-        }
     };
 
     /**
@@ -169,7 +175,6 @@
      */
     function copyImage() {
         var onFileSystemReceived = function(fileSystem) {
-            var fileEntry = makeFileEntry();
             var destDirEntry = fileSystem.root;
 
             // Test FileEntry API here.
@@ -197,7 +202,6 @@
             fileWriter.truncate(10);
         };
 
-        var fileEntry = makeFileEntry();
         fileEntry.createWriter(onFileWriterReceived, logCallback('FileEntry.createWriter', false));
         fileEntry.createWriter(onFileTruncateWriterReceived, null);
     };
@@ -241,7 +245,6 @@
      * This calls FileEntry.remove.
      */
     function removeImage() {
-        var fileEntry = makeFileEntry();
         fileEntry.remove(logCallback('FileEntry.remove', true), logCallback('FileEntry.remove', false));
     };
 
@@ -259,14 +262,14 @@
             alert('No file selected.');
             return;
         }
-        var file = inputEl.files[0];
-        if (!file) {
+        fileObj = inputEl.files[0];
+        if (!fileObj) {
             alert('Got value but no file.');
             return;
         }
         var URLApi = window.URL || window.webkitURL;
         if (URLApi) {
-            var blobURL = URLApi.createObjectURL(file);
+            var blobURL = URLApi.createObjectURL(fileObj);
             if (blobURL) {
                 setPicture(blobURL, function() {
                     URLApi.revokeObjectURL(blobURL);
@@ -364,7 +367,8 @@
     <div>capture=camcorder <input type="file" accept="video/*;capture=camcorder" onchange="testInputTag(this)"></div>
     <div>capture=microphone <input type="file" accept="audio/*;capture=microphone" onchange="testInputTag(this)"></div>
     <h2>Actions</h2>
-    <div class="btn large" onclick="getFileInfo();">Get File Object</div>
+    <div class="btn large" onclick="getFileInfo();">Get File Metadata</div>
+    <div class="btn large" onclick="readFile();">Read with FileReader</div>
     <div class="btn large" onclick="copyImage();">Copy Image</div>
     <div class="btn large" onclick="writeImage();">Write Image</div>
     <div class="btn large" onclick="uploadImage();">Upload Image</div>
