@@ -206,27 +206,6 @@
         fileEntry.createWriter(onFileTruncateWriterReceived, null);
     };
 
-    /**
-     * Upload image from library using a NATIVE_URI destination type
-     * This calls FileTransfer.upload.
-     */
-    function uploadImageUsingNativeUri() {
-        navigator.camera.getPicture(
-            function(data) {
-                var options = new FileUploadOptions();
-                options.fileName = "image.png";
-                options.mimeType = "image/png";
-
-                var fileTransfer = new FileTransfer();
-                fileTransfer.upload(data, "http://cordova-filetransfer.jitsu.com/upload",
-                  logCallback('FileTransfer.upload', true),
-                  logCallback('FileTransfer.upload', false), options);
-            },
-            onGetPictureError,
-            { destinationType: Camera.DestinationType.NATIVE_URI,
-              sourceType: Camera.PictureSourceType.PHOTOLIBRARY });
-    };
-
     function displayImageUsingCanvas() {
         var canvas = document.getElementById('canvas');
         var img = document.getElementById('camera_image');
