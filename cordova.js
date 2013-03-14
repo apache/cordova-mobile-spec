@@ -29,14 +29,18 @@ var versionCordovaPath = currentPath.replace("cordova.js", "cordova-" + VERSION 
 var cordovaPath = versionCordovaPath;
 
 (function() {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", platformCordovaPath, false);
-    xhr.onreadystatechange = function() {
-        if (this.readyState == this.DONE && this.responseText.length > 0) {
-            cordovaPath = platformCordovaPath;
-        }
-    };
-    xhr.send(null);
+    // XHR to local file is an error on some platforms, windowsphone for one 
+    try {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", platformCordovaPath, false);
+        xhr.onreadystatechange = function() {
+            if (this.readyState == this.DONE && this.responseText.length > 0) {
+                cordovaPath = platformCordovaPath;
+            }
+        };
+        xhr.send(null);
+    }
+    catch(e){} // access denied!
 })();
 
 if (!window._doNotWriteCordovaScript) {
