@@ -2917,80 +2917,6 @@ describe('File API', function() {
     });
 
     describe('read method', function(){
-        it("should read file properly, File object", function() {
-            // path of file
-            var fileName = "reader.txt",
-                // file content
-                rule = "There is an exception to every rule.  Except this one.",
-                verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(evt).toBeDefined();
-                    expect(evt.target.result).toBe(rule);
-                }),
-                fail = createFail('FileReader'),
-                filePath = root.fullPath + '/' + fileName,
-                // creates a FileWriter object
-                create_writer = function(fileEntry) {
-                    fileEntry.createWriter(write_file, fail);
-                },
-                // writes file and reads it back in
-                write_file = function(writer) {
-                    writer.onwriteend = read_file;
-                    writer.write(rule);
-                },
-                // reads file and compares content to what was written
-                read_file = function(evt) {
-                    var reader = new FileReader();
-                    reader.onloadend = verifier;
-                    var myFile = new File();
-
-                    myFile.fullPath = filePath;
-                    reader.readAsText(myFile);
-                };
-
-            // create a file, write to it, and read it in again
-            runs(function() {
-                root.getFile(fileName, {create: true}, create_writer, fail);
-            });
-
-            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(fail).not.toHaveBeenCalled();
-                expect(verifier).toHaveBeenCalled();
-            });
-        });
-        it("should read empty file properly", function() {
-            // path of file
-            var fileName = "empty.txt",
-                filePath = root.fullPath + '/' + fileName,
-                // file content
-                rule = "",
-                fail = createFail('FileReader'),
-                verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(evt).toBeDefined();
-                    expect(evt.target.result).toBe(rule);
-                }),
-                // reads file and compares content to what was written
-                read_file = function(evt) {
-                    var reader = new FileReader();
-                    reader.onloadend = verifier;
-                    var myFile = new File();
-                    myFile.fullPath = filePath;
-                    reader.readAsText(myFile);
-                };
-
-            // create a file, write to it, and read it in again
-            runs(function() {
-                root.getFile(fileName, {create: true}, read_file, fail);
-            });
-
-            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(fail).not.toHaveBeenCalled();
-                expect(verifier).toHaveBeenCalled();
-            });
-        });
         it("should error out on non-existent file", function() {
             var reader = new FileReader();
             var verifier = jasmine.createSpy().andCallFake(function(evt) {
@@ -3044,228 +2970,124 @@ describe('File API', function() {
 
             waitsFor(function() { return verifier.wasCalled; }, "verifier never called", 300);
         });
-        it("should read file properly, Data URI", function() {
-            // path of file
-            var fileName = "reader.txt",
-                filePath = root.fullPath + '/' + fileName,
-                fail = createFail('FileReader'),
-                // file content
-                rule = "There is an exception to every rule.  Except this one.",
-                // creates a FileWriter object
-                create_writer = function(fileEntry) {
-                    fileEntry.createWriter(write_file, fail);
+
+        function writeDummyFile(writeBinary, callback) {
+            var fileName = "dummy.txt",
+                fileEntry = null,
+                writerFail = createFail('createWriter'),
+                getFileFail = createFail('getFile'),
+                fileFail = createFail('file'),
+                callback = jasmine.createSpy().andCallFake(callback),
+                fileData = '\u20AC\xEB - There is an exception to every rule.  Except this one.',
+                fileDataAsBinaryString = '\xe2\x82\xac\xc3\xab - There is an exception to every rule.  Except this one.',
+                createWriter = function(fe) {
+                    fileEntry = fe;
+                    fileEntry.createWriter(writeFile, writerFail);
                 },
                 // writes file and reads it back in
-                write_file = function(writer) {
-                    writer.onwriteend = read_file;
-                    writer.write(rule);
-                },
-                verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(evt).toBeDefined();
-                    expect(evt.target.result.substr(0,23)).toBe("data:text/plain;base64,");
-                }),
-                // reads file and compares content to what was written
-                read_file = function(evt) {
-                    var reader = new FileReader();
-                    reader.onloadend = verifier;
-                    var myFile = new File();
-                    myFile.fullPath = filePath;
-                    reader.readAsDataURL(myFile);
+                writeFile = function(writer) {
+                    writer.onwriteend = function() {
+                        fileEntry.file(function(f) {
+                            callback(fileEntry, f, fileData, fileDataAsBinaryString);
+                        }, fileFail);
+                    };
+                    writer.write(fileData);
                 };
-
+            fileData += writeBinary ? 'bin:\x01\x00' : '';
+            fileDataAsBinaryString += writeBinary ? 'bin:\x01\x00' : '';
             // create a file, write to it, and read it in again
-            runs(function() {
-                root.getFile(fileName, {create: true}, create_writer, fail);
+            root.getFile(fileName, {create: true}, createWriter, getFileFail);
+            waitsForAny(getFileFail, writerFail, fileFail, callback);
+        }
+
+        function runReaderTest(funcName, writeBinary, verifierFunc, sliceStart, sliceEnd) {
+            writeDummyFile(writeBinary, function(fileEntry, file, fileData, fileDataAsBinaryString) {
+                var readWin = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(evt).toBeDefined();
+                    verifierFunc(evt, fileData, fileDataAsBinaryString);
+                });
+
+                var reader = new FileReader();
+                var readFail = createFail(funcName);
+                reader.onload = readWin;
+                reader.onerror = readFail;
+                if (sliceEnd !== undefined) {
+                    file = file.slice(sliceStart, sliceEnd);
+                } else if (sliceStart !== undefined) {
+                    file = file.slice(sliceStart);
+                }
+                reader[funcName](file);
+
+                waitsForAny(readWin, readFail);
             });
+        }
 
-            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+        function arrayBufferEqualsString(buf, str) {
+            var buf = new Uint8Array(ab);
+            var match = buf.length == str.length;
 
-            runs(function() {
-                expect(fail).not.toHaveBeenCalled();
-                expect(verifier).toHaveBeenCalled();
+            for (var i = 0; match && i < buf.length; i++) {
+                match = buf[i] == str.charCodeAt(i);
+            }
+            return match;
+        }
+
+        it("should read file properly, readAsText", function() {
+            runReaderTest('readAsText', false, function(evt, fileData, fileDataAsBinaryString) {
+                expect(evt.target.result).toBe(fileData);
+            });
+        });
+        it("should read file properly, Data URI", function() {
+            runReaderTest('readAsDataURL', true, function(evt, fileData, fileDataAsBinaryString) {
+                expect(evt.target.result.substr(0,23)).toBe("data:text/plain;base64,");
+                expect(evt.target.result.slice(23)).toBe(atob(fileData));
             });
         });
         it("should read file properly, readAsBinaryString", function() {
-            // path of file
-            var fileName = "reader.txt",
-                filePath = root.fullPath + '/' + fileName,
-                fail = createFail('FileReader'),
-                // file content
-                rule = "There is an exception to every rule.  Except this one.",
-                // creates a FileWriter object
-                create_writer = function(fileEntry) {
-                    fileEntry.createWriter(write_file, fail);
-                },
-                // writes file and reads it back in
-                write_file = function(writer) {
-                    writer.onwriteend = read_file;
-                    writer.write(rule);
-                },
-                verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(evt).toBeDefined();
-                    expect(evt.target.result).toBe(rule);
-                }),
-                // reads file and compares content to what was written
-                read_file = function(evt) {
-                    var reader = new FileReader();
-                    reader.onloadend = verifier;
-                    var myFile = new File();
-                    myFile.fullPath = filePath;
-                    reader.readAsBinaryString(myFile);
-                };
-
-            // create a file, write to it, and read it in again
-            runs(function() {
-                root.getFile(fileName, {create: true}, create_writer, fail);
-            });
-
-            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(fail).not.toHaveBeenCalled();
-                expect(verifier).toHaveBeenCalled();
+            runReaderTest('readAsBinaryString', true, function(evt, fileData, fileDataAsBinaryString) {
+                expect(evt.target.result).toBe(fileDataAsBinaryString);
             });
         });
         it("should read file properly, readAsArrayBuffer", function() {
-            // path of file
-            var fileName = "reader.txt",
-                filePath = root.fullPath + '/' + fileName,
-                fail = createFail('FileReader'),
-                // file content
-                rule = "There is an exception to every rule.  Except this one.",
-                // creates a FileWriter object
-                create_writer = function(fileEntry) {
-                    fileEntry.createWriter(write_file, fail);
-                },
-                // writes file and reads it back in
-                write_file = function(writer) {
-                    writer.onwriteend = read_file;
-                    writer.write(rule);
-                },
-                verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(evt).toBeDefined();
-
-                    var buf = new Uint8Array(evt.target.result);
-                    var match = buf.length == rule.length;
-
-                    for (var i = 0; match && i < buf.length; i++) {
-                        match = buf[i] == rule.charCodeAt(i);
-                    }
-
-                    expect(match).toBe(true);
-                }),
-                // reads file and compares content to what was written
-                read_file = function(evt) {
-                    var reader = new FileReader();
-                    reader.onloadend = verifier;
-                    var myFile = new File();
-                    myFile.fullPath = filePath;
-                    reader.readAsArrayBuffer(myFile);
-                };
-
-            // create a file, write to it, and read it in again
-            runs(function() {
-                root.getFile(fileName, {create: true}, create_writer, fail);
-            });
-
-            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(fail).not.toHaveBeenCalled();
-                expect(verifier).toHaveBeenCalled();
+            runReaderTest('readAsArrayBuffer', true, function(evt, fileData, fileDataAsBinaryString) {
+                expect(arrayBufferEqualsString(evt.target.result, fileDataAsBinaryString)).toBe(true);
             });
         });
-        it("should properly slice files, reading text", function() {
-            // path of file
-            var fileName = "reader.txt",
-                // file content
-                rule = "There is an exception to every rule.  Except this one.",
-                verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(evt).toBeDefined();
-                    expect(evt.target.result).toBe("exception to every rule");
-                }),
-                fail = createFail('FileReader'),
-                filePath = root.fullPath + '/' + fileName,
-                // creates a FileWriter object
-                create_writer = function(fileEntry) {
-                    fileEntry.createWriter(write_file, fail);
-                },
-                // writes file and reads it back in
-                write_file = function(writer) {
-                    writer.onwriteend = read_file;
-                    writer.write(rule);
-                },
-                // reads file and compares content to what was written
-                read_file = function(evt) {
-                    var reader = new FileReader();
-                    reader.onloadend = verifier;
-                    var myFile = new File();
-
-                    myFile.fullPath = filePath;
-                    myFile.size = 54;
-                    myFile.end = 54;
-                    var sliced = myFile.slice(10, 40); // "n exception to every rule.  Ex"
-                    var sliced2 = sliced.slice(2, -5); // "exception to every rule"
-                    reader.readAsText(sliced2);
-                };
-
-            // create a file, write to it, and read it in again
-            runs(function() {
-                root.getFile(fileName, {create: true}, create_writer, fail);
-            });
-
-            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(fail).not.toHaveBeenCalled();
-                expect(verifier).toHaveBeenCalled();
-            });
+        it("should read sliced file: readAsText", function() {
+            runReaderTest('readAsText', false, function(evt, fileData, fileDataAsBinaryString) {
+                expect(evt.target.result).toBe(fileDataAsBinaryString.slice(10, 40));
+            }, 10, 40);
         });
-        it("should properly slice files, reading data URLs", function() {
-            // path of file
-            var fileName = "reader.txt",
-                // file content
-                rule = "There is an exception to every rule.  Except this one.",
-                verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(evt).toBeDefined();
-                    expect(evt.target.result).toBe("data:text/plain;base64,ZXhjZXB0aW9uIHRvIGV2ZXJ5IHJ1bGU=");
-                }),
-                fail = createFail('FileReader'),
-                filePath = root.fullPath + '/' + fileName,
-                // creates a FileWriter object
-                create_writer = function(fileEntry) {
-                    fileEntry.createWriter(write_file, fail);
-                },
-                // writes file and reads it back in
-                write_file = function(writer) {
-                    writer.onwriteend = read_file;
-                    writer.write(rule);
-                },
-                // reads file and compares content to what was written
-                read_file = function(evt) {
-                    var reader = new FileReader();
-                    reader.onloadend = verifier;
-                    var myFile = new File();
-
-                    myFile.fullPath = filePath;
-                    myFile.size = 54;
-                    myFile.end = 54;
-                    var sliced = myFile.slice(10, 40); // "n exception to every rule.  Ex"
-                    var sliced2 = sliced.slice(2, -5); // "exception to every rule"
-                    reader.readAsDataURL(sliced2);
-                };
-
-            // create a file, write to it, and read it in again
-            runs(function() {
-                root.getFile(fileName, {create: true}, create_writer, fail);
-            });
-
-            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(fail).not.toHaveBeenCalled();
-                expect(verifier).toHaveBeenCalled();
-            });
+        it("should read sliced file: slice past eof", function() {
+            runReaderTest('readAsText', false, function(evt, fileData, fileDataAsBinaryString) {
+                expect(evt.target.result).toBe(fileData.slice(-5, 9999));
+            }, -5, 9999);
+        });
+        it("should read sliced file: slice to eof", function() {
+            runReaderTest('readAsText', false, function(evt, fileData, fileDataAsBinaryString) {
+                expect(evt.target.result).toBe(fileData.slice(-5));
+            }, -5);
+        });
+        it("should read empty slice", function() {
+            runReaderTest('readAsText', false, function(evt, fileData, fileDataAsBinaryString) {
+                expect(evt.target.result).toBe('');
+            }, 0, 0);
+        });
+        it("should read sliced file properly, readAsDataURL", function() {
+            runReaderTest('readAsDataURL', true, function(evt, fileData, fileDataAsBinaryString) {
+                expect(evt.target.result.slice(0, 23)).toBe("data:text/plain;base64,");
+                expect(evt.target.result.slice(23)).toBe(atob(fileDataAsBinaryString.slice( 10, -3)));
+            }, 10, -3);
+        });
+        it("should read sliced file properly, readAsBinaryString", function() {
+            runReaderTest('readAsBinaryString', true, function(evt, fileData, fileDataAsBinaryString) {
+                expect(evt.target.result).toBe(fileDataAsBinaryString.slice(-10, -5));
+            }, -10, -5);
+        });
+        it("should read sliced file properly, readAsArrayBuffer", function() {
+            runReaderTest('readAsArrayBuffer', true, function(evt, fileData, fileDataAsBinaryString) {
+                expect(arrayBufferEqualsString(evt.target.result, fileDataAsBinaryString.slice(0, -1))).toBe(true);
+            }, 0, -1);
         });
     });
 
@@ -3561,50 +3383,6 @@ describe('File API', function() {
             });
 
             waitsFor(function() { return verifier.wasCalled; }, "verifier", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(verifier).toHaveBeenCalled();
-                expect(fail).not.toHaveBeenCalled();
-            });
-        });
-        it("should write and read special characters", function() {
-            var fileName = "reader.txt",
-                filePath = root.fullPath + '/' + fileName,
-                theWriter,
-                // file content
-                rule = "H\u00EBll\u00F5 Euro \u20AC\u00A1",
-                fail = createFail('FileWriter'),
-                // creates a FileWriter object
-                create_writer = function(fileEntry) {
-                    fileEntry.createWriter(write_file, fail);
-                },
-                verifier = jasmine.createSpy().andCallFake(function(evt) {
-                    expect(evt).toBeDefined();
-                    expect(evt.target.result).toBe(rule);
-                    // cleanup
-                    deleteFile(fileName);
-                }),
-                // writes file and reads it back in
-                write_file = function(writer) {
-                    theWriter = writer;
-                    theWriter.onwriteend = read_file;
-                    theWriter.write(rule);
-                },
-                // reads file and compares content to what was written
-                read_file = function(evt) {
-                    var reader = new FileReader();
-                    reader.onloadend = verifier;
-                    var myFile = new File();
-                    myFile.fullPath = filePath;
-                    reader.readAsText(myFile);
-                };
-
-            // create a file, write to it, and read it in again
-            runs(function() {
-                createFile(fileName, create_writer, fail);
-            });
-
-            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
 
             runs(function() {
                 expect(verifier).toHaveBeenCalled();
