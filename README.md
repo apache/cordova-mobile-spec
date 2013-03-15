@@ -26,5 +26,6 @@ make sure you add the following entries to the whitelist!
 - cordova-filetransfer.jitsu.com
 - whatheaders.com
 - apache.org (with all subdomains)
+- www.google.com
 - httpssss://example.com (bad protocol necessary)
 
