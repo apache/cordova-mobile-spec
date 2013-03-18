@@ -30,7 +30,7 @@
     <script type="text/javascript" charset="utf-8" src="../cordova.js"></script>      
 
       
-<script type="text/javascript" charset="utf-8">
+    <script type="text/javascript" charset="utf-8">
 
     var deviceReady = false;
     
@@ -54,7 +54,41 @@
         },1000);
     }
 
-</script>
+    function openWithStyle(url, cssUrl) {
+        console.log("Check -1");
+        var iab = window.open(url, '_blank', 'location=yes');
+        if (cssUrl) {
+            iab.addEventListener('loadstop',
+                function(event) {
+                    iab.insertCSS({file: cssUrl});
+                }
+            );
+        } else {
+            iab.addEventListener('loadstop',
+                function(event) {
+                    iab.insertCSS({code:'#style-update-literal { display: block !important; }'});
+                }
+            );
+        }
+    }
+
+    function openWithScript(url, jsUrl) {
+        var iab = window.open(url, '_blank', 'location=yes');
+        if (jsUrl) {
+            iab.addEventListener('loadstop',
+                function(event) {
+                    iab.executeScript({file: jsUrl});
+                }
+            );
+        } else {
+            iab.addEventListener('loadstop',
+                function(event) {
+                    iab.executeScript({code:'document.getElementById("header").innerHTML = "Script literal successfully injected";'});
+                }
+            );
+        }
+    }
+    </script>
 
   </head>
   <body onload="init();" id="stage" class="theme">
@@ -90,6 +124,12 @@
     <h1>PDF URL</h1>
     <div class="btn large" onclick="window.open('http://www.stluciadance.com/prospectus_file/sample.pdf');">Remote URL</div>
     <div class="btn large" onclick="window.open('local.pdf', '_blank');">Local URL</div>
+    <h1>CSS / JS Injection</h1>
+    <div class="btn large" onclick="window.open('inject.html', '_blank');">Original Document</div>
+    <div class="btn large" onclick="openWithStyle('inject.html','inject.css');">CSS File Injection</div>
+    <div class="btn large" onclick="openWithStyle('inject.html');">CSS Literal Injection</div>
+    <div class="btn large" onclick="openWithScript('inject.html', 'inject.js');">Script File Injection</div>
+    <div class="btn large" onclick="openWithScript('inject.html');">Script Literal Injection</div>
     <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
 </html>      
