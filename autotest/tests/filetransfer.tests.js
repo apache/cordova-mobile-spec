@@ -231,6 +231,26 @@ describe('FileTransfer', function() {
 
             waitsForAny(downloadWin, downloadFail);
         });
+        it("should call the error callback on abort()", function() {
+            var downloadWin = createDoNotCallSpy('downloadWin');
+           var downloadFail = jasmine.createSpy().andCallFake(function(e) { console.log("Abort called") });
+            var remoteFile = 'http://cordova.apache.org/downloads/BlueZedEx.mp3';
+            var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
+            var startTime = +new Date();
+                
+            this.after(function() {
+                deleteFile(localFileName);
+            });
+            runs(function() {
+                var ft = new FileTransfer();
+                ft.abort(); // should be a no-op.
+                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+                ft.abort();
+                ft.abort(); // should be a no-op.
+            });
+                
+            waitsForAny(downloadFail);
+        });
         it("should get http status on failure", function() {
             var downloadWin = createDoNotCallSpy('downloadWin');
 
