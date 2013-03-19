@@ -76,6 +76,15 @@
             buttons);
     };
 
+    var promptDialog = function(message, title, buttons) {
+        navigator.notification.prompt(message,
+            function(r) {
+                console.log("You selected " + r.buttonIndex + " and entered: " + r.input1);
+                alert("You selected " + buttons[r.buttonIndex-1] + " and entered: " + r.input1);
+            },
+            title,
+            buttons);
+    };
     /**
      * Function called when page has finished loading.
      */
@@ -104,8 +113,10 @@
     <div class="btn large" onclick="beep();">Beep</div>
     <div class="btn large" onclick="vibrate();">Vibrate</div>
     <div class="btn large" onclick="alertDialog('You pressed alert.', 'Alert Dialog', 'Continue');">Alert Dialog</div>
-    <div class="btn large" onclick="confirmDialogA('You pressed confirm.', 'Confirm Dialog', 'Yes,No,Maybe');">Confirm Dialog A</div>
-    <div class="btn large" onclick="confirmDialogB('You pressed confirm.', 'Confirm Dialog', ['Yes', 'No', 'Maybe, Not Sure']);">Confirm Dialog B</div>
+    <div class="btn large" onclick="confirmDialogA('You pressed confirm.', 'Confirm Dialog', 'Yes,No,Maybe');">Confirm Dialog - Deprecated</div>
+    <div class="btn large" onclick="confirmDialogB('You pressed confirm.', 'Confirm Dialog', ['Yes', 'No', 'Maybe, Not Sure']);">Confirm Dialog</div>
+    <div class="btn large" onclick="promptDialog('You pressed prompt.', 'Prompt Dialog', ['Yes', 'No', 'Maybe, Not Sure']);">Prompt Dialog</div>
+    
     <div class="btn large" onclick="alert('You pressed alert.');">Built-in Alert Dialog</div>
     <div class="btn large" onclick="confirm('You selected confirm');">Built-in Confirm Dialog</div>
     <div class="btn large" onclick="prompt('This is a prompt.', 'Default value');">Built-in Prompt Dialog</div>
