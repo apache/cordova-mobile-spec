@@ -43,4 +43,9 @@ describe('Notification (navigator.notification)', function () {
 		expect(typeof navigator.notification.confirm).toBeDefined();
 		expect(typeof navigator.notification.confirm).toBe("function");
 	});
+	
+	it("should contain a prompt function", function() {
+		expect(typeof navigator.notification.prompt).toBeDefined();
+		expect(typeof navigator.notification.prompt).toBe("function");
+	});
 });
