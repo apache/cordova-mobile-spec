@@ -54,6 +54,14 @@
         },1000);
     }
 
+    function openWithErrorHandler(url) {
+        var iab = window.open(url, '_blank', 'location=yes');
+        iab.addEventListener('loaderror',
+             function(error) {
+                 alert("Error Channel Fired\nCode: " + error.code + "\nMessage: " +error.message);
+             }
+        );
+    }
 </script>
 
   </head>
@@ -90,6 +98,10 @@
     <h1>PDF URL</h1>
     <div class="btn large" onclick="window.open('http://www.stluciadance.com/prospectus_file/sample.pdf');">Remote URL</div>
     <div class="btn large" onclick="window.open('local.pdf', '_blank');">Local URL</div>
+    <h1>INVALID URL</h1>
+    <div class="btn large" onclick="openWithErrorHandler('x-ttp://www.invalid.com/');">Invalid Scheme</div>
+    <div class="btn large" onclick="openWithErrorHandler('http://www.inv;alid.com/');">Invalid Host</div>
+    <div class="btn large" onclick="openWithErrorHandler('nonexistent.html');">Missing File</div>
     <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
 </html>      
