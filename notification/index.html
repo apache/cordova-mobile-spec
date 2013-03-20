@@ -59,8 +59,13 @@
     var confirmDialogA = function(message, title, buttons) {
         navigator.notification.confirm(message,
             function(r) {
-                console.log("You selected " + r);
-                alert("You selected " + (buttons.split(","))[r-1]);
+                if(r===0){
+                  console.log("Dismissed dialog without making a selection.");
+                  alert("Dismissed dialog without making a selection.");
+                }else{
+                  console.log("You selected " + r);
+                  alert("You selected " + (buttons.split(","))[r-1]);
+                }
             },
             title,
             buttons);
@@ -69,8 +74,13 @@
     var confirmDialogB = function(message, title, buttons) {
         navigator.notification.confirm(message,
             function(r) {
+               if(r===0){
+                console.log("Dismissed dialog without making a selection.");
+                alert("Dismissed dialog without making a selection.");
+               }else{
                 console.log("You selected " + r);
                 alert("You selected " + buttons[r-1]);
+               }
             },
             title,
             buttons);
@@ -79,8 +89,17 @@
     var promptDialog = function(message, title, buttons) {
         navigator.notification.prompt(message,
             function(r) {
+               if(r && r.buttonIndex===0){
+                  var msg = "Dismissed dialog";
+                  if( r.input1 ){
+                      msg+=" with input: " + r.input1
+                   }
+                   console.log(msg);
+                   alert(msg);
+               }else{
                 console.log("You selected " + r.buttonIndex + " and entered: " + r.input1);
                 alert("You selected " + buttons[r.buttonIndex-1] + " and entered: " + r.input1);
+               }
             },
             title,
             buttons);
