@@ -20,7 +20,14 @@
 */
 
 var VERSION='2.5.0';
-var PLAT = /Android/.exec(navigator.userAgent) ? 'android' : 'ios';
+var PLAT;
+if (/Android/.exec(navigator.userAgent)) {
+    PLAT = 'android';
+} else if (/(iPad)|(iPhone)|(iPod)/.exec(navigator.userAgent)) {
+    PLAT = 'iOS';
+} else if (/(BB10)|(PlayBook)|(BlackBerry)/.exec(navigator.userAgent)) {
+    PLAT = 'blackberry';
+}
 
 var scripts = document.getElementsByTagName('script');
 var currentPath = scripts[scripts.length - 1].src;
@@ -28,7 +35,7 @@ var platformCordovaPath = currentPath.replace("cordova.js", "cordova." + PLAT + 
 var versionCordovaPath = currentPath.replace("cordova.js", "cordova-" + VERSION + ".js");
 var cordovaPath = versionCordovaPath;
 
-(function() {
+if (PLAT) {
     // XHR to local file is an error on some platforms, windowsphone for one 
     try {
         var xhr = new XMLHttpRequest();
@@ -41,7 +48,7 @@ var cordovaPath = versionCordovaPath;
         xhr.send(null);
     }
     catch(e){} // access denied!
-})();
+}
 
 if (!window._doNotWriteCordovaScript) {
     document.write('<script type="text/javascript" charset="utf-8" src="' + cordovaPath + '"></script>');
