@@ -109,9 +109,9 @@
      */
     function init() {
         document.addEventListener("deviceready", function() {
-            deviceReady = true;
-            console.log("Device="+device.platform+" "+device.version);
-        }, false);
+                deviceReady = true;
+                console.log("Device="+device.platform+" "+device.version);
+            }, false);
         window.setTimeout(function() {
             if (!deviceReady) {
                 alert("Error: Apache Cordova did not initialize.  Demo will not run correctly.");
