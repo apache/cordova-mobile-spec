@@ -20,8 +20,9 @@
 */
 
 describe('FileTransfer', function() {
-    // https://github.com/don/cordova-filetransfer
+    // https://github.com/apache/cordova-labs/tree/cordova-filetransfer
     var server = "http://cordova-filetransfer.jitsu.com";
+    var server_with_credentials = "http://cordova_user:cordova_password@cordova-filetransfer.jitsu.com";
 
     // deletes and re-creates the specified content
     var writeFile = function(fileName, fileContent, success, error) {
@@ -131,6 +132,50 @@ describe('FileTransfer', function() {
 
             waitsForAny(downloadWin, fail);
         });
+        it("should be able to download a file using http basic auth", function() {
+            var fail = createDoNotCallSpy('downloadFail');
+            var remoteFile = server_with_credentials + "/download_basic_auth"
+            var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
+            var lastProgressEvent = null;
+
+            var downloadWin = jasmine.createSpy().andCallFake(function(entry) {
+                expect(entry.name).toBe(localFileName);
+                expect(lastProgressEvent.loaded).toBeGreaterThan(1);
+            });
+
+            this.after(function() {
+                deleteFile(localFileName);
+            });
+            runs(function() {
+                var ft = new FileTransfer();
+                ft.onprogress = function(e) {
+                    lastProgressEvent = e;
+                };
+                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, fail);
+            });
+
+            waitsForAny(downloadWin, fail);
+        });
+        it("should get http status on basic auth failure", function() {
+            var downloadWin = createDoNotCallSpy('downloadWin');
+
+            var remoteFile = server + "/download_basic_auth";
+            var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
+            var downloadFail = jasmine.createSpy().andCallFake(function(error) {
+                expect(error.http_status).toBe(401);
+                expect(error.http_status).not.toBe(404, "Ensure " + remoteFile + " is in the white list");
+            });
+
+            this.after(function() {
+                deleteFile(localFileName);
+            });
+            runs(function() {
+                var ft = new FileTransfer();
+                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+            });
+
+            waitsForAny(downloadWin, downloadFail);
+        });        
         it("should be able to download a file using file:// (when hosted from file://)", function() {
             var fail = createDoNotCallSpy('downloadFail');
             var remoteFile = window.location.href.replace(/\?.*/, '').replace(/ /g, '%20');
@@ -378,6 +423,88 @@ describe('FileTransfer', function() {
             runs(function() {
                 expect(lastProgressEvent).not.toBeNull('expected progress events');
             });
+        });
+        it("should be able to upload a file with http basic auth", function() {
+            var remoteFile = server_with_credentials + "/upload_basic_auth";
+            var localFileName = "upload.txt";
+            var fileContents = 'This file should upload';
+
+            var fileFail = createDoNotCallSpy('fileFail');
+            var uploadFail = createDoNotCallSpy('uploadFail', "Ensure " + remoteFile + " is in the white list");
+            var lastProgressEvent = null;
+
+            var uploadWin = jasmine.createSpy().andCallFake(function(uploadResult) {
+                expect(uploadResult.bytesSent).toBeGreaterThan(0);
+                expect(uploadResult.responseCode).toBe(200);
+                expect(uploadResult.response).toMatch(/fields:\s*{\s*value1.*/);
+            });
+
+            var fileWin = function(fileEntry) {
+                ft = new FileTransfer();
+
+                var options = new FileUploadOptions();
+                options.fileKey = "file";
+                options.fileName = localFileName;
+                options.mimeType = "text/plain";
+
+                var params = new Object();
+                params.value1 = "test";
+                params.value2 = "param";
+                options.params = params;
+
+                ft.onprogress = function(e) {
+                    expect(e.lengthComputable).toBe(true);
+                    expect(e.total).toBeGreaterThan(0);
+                    expect(e.loaded).toBeGreaterThan(0);
+                    lastProgressEvent = e;
+                };
+
+                // removing options cause Android to timeout
+                ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
+            };
+
+            this.after(function() {
+                deleteFile(localFileName);
+            });
+            runs(function() {
+                writeFile(localFileName, fileContents, fileWin, fileFail);
+            });
+
+            waitsForAny(uploadWin, uploadFail, fileFail);
+            runs(function() {
+                expect(lastProgressEvent).not.toBeNull('expected progress events');
+            });
+        });
+        it("should get http status on basic auth failure", function() {
+            var fileFail = createDoNotCallSpy('fileFail');
+            var uploadWin = createDoNotCallSpy('uploadWin');
+
+            var remoteFile = server + "/upload_basic_auth";
+            var localFileName = "upload_expect_fail.txt";
+            var uploadFail = jasmine.createSpy().andCallFake(function(error) {
+                expect(error.http_status).toBe(401);
+                expect(error.http_status).not.toBe(404, "Ensure " + remoteFile + " is in the white list");
+            });
+
+            var fileWin = function(fileEntry) {
+                var ft = new FileTransfer();
+
+                var options = new FileUploadOptions();
+                options.fileKey="file";
+                options.fileName=fileEntry.name;
+                options.mimeType="text/plain";
+
+                ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
+            };
+
+            this.after(function() {
+                deleteFile(localFileName);
+            });
+            runs(function() {
+                writeFile(localFileName, "this file should fail to upload", fileWin, fileFail);
+            });
+
+            waitsForAny(uploadWin, uploadFail, fileFail);
         });
         it("should be stopped by abort() right away.", function() {
             var remoteFile = server + "/upload";
