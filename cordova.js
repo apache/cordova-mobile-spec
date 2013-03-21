@@ -41,13 +41,20 @@ if (PLAT) {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", platformCordovaPath, false);
         xhr.onreadystatechange = function() {
+
             if (this.readyState == this.DONE && this.responseText.length > 0) {
-                cordovaPath = platformCordovaPath;
+                if(parseInt(this.status) >= 400){
+                    cordovaPath = versionCordovaPath;
+                }else{
+                    cordovaPath = platformCordovaPath;
+                }
             }
         };
         xhr.send(null);
     }
-    catch(e){} // access denied!
+    catch(e){
+        cordovaPath = versionCordovaPath;
+    } // access denied!
 }
 
 if (!window._doNotWriteCordovaScript) {
