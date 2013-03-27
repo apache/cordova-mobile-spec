@@ -400,6 +400,7 @@ describe('FileTransfer', function() {
            var downloadWin = jasmine.createSpy().andCallFake(function(entry) {
                expect(entry.name).toBe(localFileName);
                expect(lastProgressEvent.loaded).toBeGreaterThan(1, 'loaded');
+               expect(lastProgressEvent.total).not.toBeLessThan(lastProgressEvent.loaded);
                expect(lastProgressEvent.lengthComputable).toBe(true, 'lengthComputable');
            });
 
