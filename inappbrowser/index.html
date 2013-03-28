@@ -67,11 +67,25 @@
         var iab = window.open(url, '_blank', 'location=yes');
         if (cssUrl) {
             iab.addEventListener('loadstop', function(event) {
-                iab.insertCSS({file: cssUrl});
+                iab.insertCSS({file: cssUrl}, function(results) {
+                    if (results && results.length === 0) {
+                        alert('Results verified');
+                    } else {
+                        console.log(results);
+                        alert('Got: ' + typeof(results) + '\n' + JSON.stringify(results));
+                    }
+                });
             });
         } else {
             iab.addEventListener('loadstop', function(event) {
-                iab.insertCSS({code:'#style-update-literal { \ndisplay: block !important; \n}'});
+                iab.insertCSS({code:'#style-update-literal { \ndisplay: block !important; \n}'}, function(results) {
+                    if (results && results.length === 0) {
+                        alert('Results verified');
+                    } else {
+                        console.log(results);
+                        alert('Got: ' + typeof(results) + '\n' + JSON.stringify(results));
+                    }
+                });
             });
         }
     }
@@ -80,16 +94,30 @@
         var iab = window.open(url, '_blank', 'location=yes');
         if (jsUrl) {
             iab.addEventListener('loadstop', function(event) {
-                iab.executeScript({file: jsUrl});
+                iab.executeScript({file: jsUrl}, function(results) {
+                    if (results && results.length === 0) {
+                        alert('Results verified');
+                    } else {
+                        console.log(results);
+                        alert('Got: ' + typeof(results) + '\n' + JSON.stringify(results));
+                    }
+                });
             });
         } else {
             iab.addEventListener('loadstop', function(event) {
                 var code = '(function(){\n' +
                   '    var header = document.getElementById("header");\n' +
                   '    header.innerHTML = "Script literal successfully injected";\n' +
-                  '    return {result:header};\n' +
+                  '    return "abc";\n' +
                   '})()';
-                iab.executeScript({code:code});
+                iab.executeScript({code:code}, function(results) {
+                    if (results && results.length === 1 && results[0] === 'abc') {
+                        alert('Results verified');
+                    } else {
+                        console.log(results);
+                        alert('Got: ' + typeof(results) + '\n' + JSON.stringify(results));
+                    }
+                });
             });
         }
     }
