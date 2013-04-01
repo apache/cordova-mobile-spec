@@ -24,7 +24,7 @@ var PLAT;
 if (/Android/.exec(navigator.userAgent)) {
     PLAT = 'android';
 } else if (/(iPad)|(iPhone)|(iPod)/.exec(navigator.userAgent)) {
-    PLAT = 'iOS';
+    PLAT = 'ios';
 } else if (/(BB10)|(PlayBook)|(BlackBerry)/.exec(navigator.userAgent)) {
     PLAT = 'blackberry';
 }
