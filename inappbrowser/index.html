@@ -63,38 +63,33 @@
         );
     }
 
-    function openWithStyle(url, cssUrl) {
+    function openWithStyle(url, cssUrl, useCallback) {
         var iab = window.open(url, '_blank', 'location=yes');
+        var callback = function(results) {
+            if (results && results.length === 0) {
+                alert('Results verified');
+            } else {
+                console.log(results);
+                alert('Got: ' + typeof(results) + '\n' + JSON.stringify(results));
+            }
+        };
         if (cssUrl) {
             iab.addEventListener('loadstop', function(event) {
-                iab.insertCSS({file: cssUrl}, function(results) {
-                    if (results && results.length === 0) {
-                        alert('Results verified');
-                    } else {
-                        console.log(results);
-                        alert('Got: ' + typeof(results) + '\n' + JSON.stringify(results));
-                    }
-                });
+                iab.insertCSS({file: cssUrl}, useCallback && callback);
             });
         } else {
             iab.addEventListener('loadstop', function(event) {
-                iab.insertCSS({code:'#style-update-literal { \ndisplay: block !important; \n}'}, function(results) {
-                    if (results && results.length === 0) {
-                        alert('Results verified');
-                    } else {
-                        console.log(results);
-                        alert('Got: ' + typeof(results) + '\n' + JSON.stringify(results));
-                    }
-                });
+                iab.insertCSS({code:'#style-update-literal { \ndisplay: block !important; \n}'},
+                              useCallback && callback);
             });
         }
     }
 
-    function openWithScript(url, jsUrl) {
+    function openWithScript(url, jsUrl, useCallback) {
         var iab = window.open(url, '_blank', 'location=yes');
         if (jsUrl) {
             iab.addEventListener('loadstop', function(event) {
-                iab.executeScript({file: jsUrl}, function(results) {
+                iab.executeScript({file: jsUrl}, useCallback && function(results) {
                     if (results && results.length === 0) {
                         alert('Results verified');
                     } else {
@@ -110,7 +105,7 @@
                   '    header.innerHTML = "Script literal successfully injected";\n' +
                   '    return "abc";\n' +
                   '})()';
-                iab.executeScript({code:code}, function(results) {
+                iab.executeScript({code:code}, useCallback && function(results) {
                     if (results && results.length === 1 && results[0] === 'abc') {
                         alert('Results verified');
                     } else {
@@ -163,9 +158,13 @@
     <h1>CSS / JS Injection</h1>
     <div class="btn large" onclick="window.open('inject.html', '_blank');">Original Document</div>
     <div class="btn large" onclick="openWithStyle('inject.html','inject.css');">CSS File Injection</div>
+    <div class="btn large" onclick="openWithStyle('inject.html','inject.css', true);">CSS File Injection (CB)</div>
     <div class="btn large" onclick="openWithStyle('inject.html');">CSS Literal Injection</div>
+    <div class="btn large" onclick="openWithStyle('inject.html', null, true);">CSS Literal Injection (CB)</div>
     <div class="btn large" onclick="openWithScript('inject.html', 'inject.js');">Script File Injection</div>
+    <div class="btn large" onclick="openWithScript('inject.html', 'inject.js', true);">Script File Injection (CB)</div>
     <div class="btn large" onclick="openWithScript('inject.html');">Script Literal Injection</div>
+    <div class="btn large" onclick="openWithScript('inject.html', null, true);">Script Literal Injection (CB)</div>
     <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
 </html>
