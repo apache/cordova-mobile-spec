@@ -20,16 +20,16 @@
 */
 
 describe('Compass (navigator.compass)', function () {
-    it("should exist", function() {
+    it("compass.spec.1 should exist", function() {
         expect(navigator.compass).toBeDefined();
     });
 
-    it("should contain a getCurrentHeading function", function() {
+    it("compass.spec.2 should contain a getCurrentHeading function", function() {
         expect(navigator.compass.getCurrentHeading).toBeDefined();
 		expect(typeof navigator.compass.getCurrentHeading == 'function').toBe(true);
 	});
 
-    it("getCurrentHeading success callback should be called with a Heading object", function() {
+    it("compass.spec.3 getCurrentHeading success callback should be called with a Heading object", function() {
         var win = jasmine.createSpy().andCallFake(function(a) {
                 expect(a instanceof CompassHeading).toBe(true);
                 expect(a.magneticHeading).toBeDefined();
@@ -54,18 +54,18 @@ describe('Compass (navigator.compass)', function () {
         });
 	});
 
-    it("should contain a watchHeading function", function() {
+    it("compass.spec.4 should contain a watchHeading function", function() {
         expect(navigator.compass.watchHeading).toBeDefined();
         expect(typeof navigator.compass.watchHeading == 'function').toBe(true);
     });
 
-    it("should contain a clearWatch function", function() {
+    it("compass.spec.5 should contain a clearWatch function", function() {
         expect(navigator.compass.clearWatch).toBeDefined();
         expect(typeof navigator.compass.clearWatch == 'function').toBe(true);
     });
 
     describe('Compass Constants (window.CompassError)', function () {
-        it("should exist", function() {
+        it("compass.spec.1 should exist", function() {
             expect(window.CompassError).toBeDefined();
             expect(window.CompassError.COMPASS_INTERNAL_ERR).toBe(0);
             expect(window.CompassError.COMPASS_NOT_SUPPORTED).toBe(20);
@@ -73,11 +73,11 @@ describe('Compass (navigator.compass)', function () {
     });
 
     describe('Compass Heading model (CompassHeading)', function () {
-        it("should exist", function() {
+        it("compass.spec.1 should exist", function() {
             expect(CompassHeading).toBeDefined();
         });
 
-        it("should be able to create a new CompassHeading instance with no parameters", function() {
+        it("compass.spec.8 should be able to create a new CompassHeading instance with no parameters", function() {
             var h = new CompassHeading();
             expect(h.magneticHeading).toBeDefined();
             expect(h.trueHeading).toBeDefined();
@@ -85,7 +85,7 @@ describe('Compass (navigator.compass)', function () {
             expect(typeof h.timestamp == 'number').toBe(true);
         });
 
-        it("should be able to create a new CompassHeading instance with parameters", function() {
+        it("compass.spec.9 should be able to create a new CompassHeading instance with parameters", function() {
             var h = new CompassHeading(1,2,3,4);
             expect(h.magneticHeading).toBe(1);
             expect(h.trueHeading).toBe(2);

@@ -34,17 +34,17 @@ var removeContact = function(){
 };
 
 describe("Contacts (navigator.contacts)", function () {
-    it("should exist", function() {
+    it("contacts.spec.1 should exist", function() {
         expect(navigator.contacts).toBeDefined();
     });
 
-    it("should contain a find function", function() {
+    it("contacts.spec.2 should contain a find function", function() {
         expect(navigator.contacts.find).toBeDefined();
         expect(typeof navigator.contacts.find).toBe('function');
     });
 
     describe("find method", function() {
-        it("success callback should be called with an array", function() {
+        it("contacts.spec.3 success callback should be called with an array", function() {
             var win = jasmine.createSpy().andCallFake(function(result) {
                     expect(result).toBeDefined();
                     expect(result instanceof Array).toBe(true);
@@ -65,7 +65,7 @@ describe("Contacts (navigator.contacts)", function () {
             });
         });
 
-        it("should throw an exception if success callback is empty", function() {
+        it("contacts.spec.4 should throw an exception if success callback is empty", function() {
             var fail = function() {};
             var obj = new ContactFindOptions();
             obj.filter="";
@@ -76,7 +76,7 @@ describe("Contacts (navigator.contacts)", function () {
             }).toThrow();
         });
 
-        it("error callback should be called when no fields are specified", function() {
+        it("contacts.spec.5 error callback should be called when no fields are specified", function() {
             var win = jasmine.createSpy(),
                 fail = jasmine.createSpy(function(result) {
                     expect(result).toBeDefined();
@@ -102,7 +102,7 @@ describe("Contacts (navigator.contacts)", function () {
 
             afterEach(removeContact);
 
-            it("should be able to find a contact by name", function() {
+            it("contacts.spec.6 should be able to find a contact by name", function() {
                 var foundName = jasmine.createSpy().andCallFake(function(result) {
                         var bFound = false;
                         try {
@@ -163,12 +163,12 @@ describe("Contacts (navigator.contacts)", function () {
 
     describe('create method', function() {
 
-        it("should exist", function() {
+        it("contacts.spec.1 should exist", function() {
             expect(navigator.contacts.create).toBeDefined();
             expect(typeof navigator.contacts.create).toBe('function');
         });
 
-        it("should return a Contact object", function() {
+        it("contacts.spec.8 should return a Contact object", function() {
             var bDay = new Date(1976, 7,4);
             var obj = navigator.contacts.create({"displayName": "test name", "gender": "male", "note": "my note", "name": {"formatted": "Mr. Test Name"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], "birthday": bDay});
 
@@ -185,7 +185,7 @@ describe("Contacts (navigator.contacts)", function () {
     });
 
     describe("Contact object", function () {
-        it("should be able to create instance", function() {
+        it("contacts.spec.9 should be able to create instance", function() {
             var contact = new Contact("a", "b", new ContactName("a", "b", "c", "d", "e", "f"), "c", [], [], [], [], [], "f", "i",
                 [], [], []);
             expect(contact).toBeDefined();
@@ -205,7 +205,7 @@ describe("Contacts (navigator.contacts)", function () {
             expect(contact.urls).toBeDefined();
         });
 
-        it("should be able to define a ContactName object", function() {
+        it("contacts.spec.10 should be able to define a ContactName object", function() {
             var contactName = new ContactName("Dr. First Last Jr.", "Last", "First", "Middle", "Dr.", "Jr.");
             expect(contactName).toBeDefined();
             expect(contactName.formatted).toBe("Dr. First Last Jr.");
@@ -216,7 +216,7 @@ describe("Contacts (navigator.contacts)", function () {
             expect(contactName.honorificSuffix).toBe("Jr.");
         });
 
-        it("should be able to define a ContactField object", function() {
+        it("contacts.spec.11 should be able to define a ContactField object", function() {
             var contactField = new ContactField("home", "8005551212", true);
             expect(contactField).toBeDefined();
             expect(contactField.type).toBe("home");
@@ -224,13 +224,13 @@ describe("Contacts (navigator.contacts)", function () {
             expect(contactField.pref).toBe(true);
         });
 
-        it("ContactField object should coerce type and value properties to strings", function() {
+        it("contacts.spec.12 ContactField object should coerce type and value properties to strings", function() {
             var contactField = new ContactField(12345678, 12345678, true);
             expect(contactField.type).toBe("12345678");
             expect(contactField.value).toBe("12345678");
         });
 
-        it("should be able to define a ContactAddress object", function() {
+        it("contacts.spec.13 should be able to define a ContactAddress object", function() {
             var contactAddress = new ContactAddress(true, "home", "a","b","c","d","e","f");
             expect(contactAddress).toBeDefined();
             expect(contactAddress.pref).toBe(true);
@@ -243,7 +243,7 @@ describe("Contacts (navigator.contacts)", function () {
             expect(contactAddress.country).toBe("f");
         });
 
-        it("should be able to define a ContactOrganization object", function() {
+        it("contacts.spec.14 should be able to define a ContactOrganization object", function() {
             var contactOrg = new ContactOrganization(true, "home", "a","b","c","d","e","f","g");
             expect(contactOrg).toBeDefined();
             expect(contactOrg.pref).toBe(true);
@@ -253,20 +253,20 @@ describe("Contacts (navigator.contacts)", function () {
             expect(contactOrg.title).toBe("c");
         });
 
-        it("should be able to define a ContactFindOptions object", function() {
+        it("contacts.spec.15 should be able to define a ContactFindOptions object", function() {
             var contactFindOptions = new ContactFindOptions("a", true, "b");
             expect(contactFindOptions).toBeDefined();
             expect(contactFindOptions.filter).toBe("a");
             expect(contactFindOptions.multiple).toBe(true);
         });
 
-        it("should contain a clone function", function() {
+        it("contacts.spec.16 should contain a clone function", function() {
             var contact = new Contact();
             expect(contact.clone).toBeDefined();
             expect(typeof contact.clone).toBe('function');
         });
 
-        it("clone function should make deep copy of Contact Object", function() {
+        it("contacts.spec.17 clone function should make deep copy of Contact Object", function() {
             var contact = new Contact();
             contact.id=1;
             contact.displayName="Test Name";
@@ -287,13 +287,13 @@ describe("Contacts (navigator.contacts)", function () {
             expect(clonedContact.connected).toBe(contact.connected);
         });
 
-        it("should contain a save function", function() {
+        it("contacts.spec.18 should contain a save function", function() {
             var contact = new Contact();
             expect(contact.save).toBeDefined();
             expect(typeof contact.save).toBe('function');
         });
 
-        it("should contain a remove function", function() {
+        it("contacts.spec.19 should contain a remove function", function() {
             var contact = new Contact();
             expect(contact.remove).toBeDefined();
             expect(typeof contact.remove).toBe('function');
@@ -301,7 +301,7 @@ describe("Contacts (navigator.contacts)", function () {
     });
 
     describe('save method', function () {
-        it("should be able to save a contact", function() {
+        it("contacts.spec.20 should be able to save a contact", function() {
             var bDay = new Date(1976, 6,4);
             gContactObj = navigator.contacts.create({"gender": "male", "note": "my note", "name": {"familyName": "Delete", "givenName": "Test"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], "birthday": bDay});
 
@@ -331,7 +331,7 @@ describe("Contacts (navigator.contacts)", function () {
             });
          });
         // HACK: there is a reliance between the previous and next test. This is bad form.
-        it("update a contact", function() {
+        it("contacts.spec.21 update a contact", function() {
             expect(gContactObj).toBeDefined();
 
             var bDay = new Date(1975, 5,4);
@@ -368,7 +368,7 @@ describe("Contacts (navigator.contacts)", function () {
     describe('Contact.remove method', function () {
         afterEach(removeContact);
 
-        it("calling remove on a contact has an id of null should return ContactError.UNKNOWN_ERROR", function() {
+        it("contacts.spec.22 calling remove on a contact has an id of null should return ContactError.UNKNOWN_ERROR", function() {
             var win = jasmine.createSpy();
             var fail = jasmine.createSpy().andCallFake(function(result) {
                 expect(result.code).toBe(ContactError.UNKNOWN_ERROR);
@@ -386,7 +386,7 @@ describe("Contacts (navigator.contacts)", function () {
             });
         });
 
-        it("calling remove on a contact that does not exist should return ContactError.UNKNOWN_ERROR", function() {
+        it("contacts.spec.23 calling remove on a contact that does not exist should return ContactError.UNKNOWN_ERROR", function() {
             var win = jasmine.createSpy();
             var fail = jasmine.createSpy().andCallFake(function(result) {
                 expect(result.code).toBe(ContactError.UNKNOWN_ERROR);
@@ -410,7 +410,7 @@ describe("Contacts (navigator.contacts)", function () {
     describe("Round trip Contact tests (creating + save + delete + find).", function () {
         afterEach(removeContact);
 
-        it("Creating, saving, finding a contact should work, removing it should work, after which we should not be able to find it, and we should not be able to delete it again.", function() {
+        it("contacts.spec.24 Creating, saving, finding a contact should work, removing it should work, after which we should not be able to find it, and we should not be able to delete it again.", function() {
             var done = false;
             runs(function () {
                 gContactObj = new Contact();
@@ -459,7 +459,7 @@ describe("Contacts (navigator.contacts)", function () {
     });
 
     describe('ContactError interface', function () {
-        it("ContactError constants should be defined", function() {
+        it("contacts.spec.25 ContactError constants should be defined", function() {
             expect(ContactError.UNKNOWN_ERROR).toBe(0);
             expect(ContactError.INVALID_ARGUMENT_ERROR).toBe(1);
             expect(ContactError.TIMEOUT_ERROR).toBe(2);

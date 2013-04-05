@@ -20,12 +20,12 @@
 */
 
 describe('Network (navigator.connection)', function () {
-    it("should exist", function() {
+    it("network.spec.1 should exist", function() {
         expect(navigator.network && navigator.network.connection).toBeDefined();
         expect(navigator.connection).toBeDefined();
     });
 
-    it("should be set to a valid value", function() {
+    it("network.spec.2 should be set to a valid value", function() {
         var validValues = {
             'unknown': 1,
             'ethernet': 1,
@@ -38,11 +38,11 @@ describe('Network (navigator.connection)', function () {
         expect(validValues[navigator.connection.type]).toBe(1);
     });
 
-    it("should have the same value in deprecated and non-deprecated apis", function() {
+    it("network.spec.3 should have the same value in deprecated and non-deprecated apis", function() {
         expect(navigator.network.connection.type).toBe(navigator.connection.type);
     });
 
-    it("should define constants for connection status", function() {
+    it("network.spec.4 should define constants for connection status", function() {
         expect(Connection.UNKNOWN).toBe("unknown");
         expect(Connection.ETHERNET).toBe("ethernet");
         expect(Connection.WIFI).toBe("wifi");

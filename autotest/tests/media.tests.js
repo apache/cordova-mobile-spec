@@ -25,7 +25,7 @@ describe('Media', function () {
 		expect(typeof Media).toBe("function");
 	});
 
-    it("should have the following properties", function() {
+    it("media.spec.1 should have the following properties", function() {
         var media1 = new Media("dummy");
         expect(media1.id).toBeDefined();
         expect(media1.src).toBeDefined();
@@ -43,70 +43,70 @@ describe('Media', function () {
 		expect(MediaError.MEDIA_ERR_NONE_SUPPORTED).toBe(4);
 	});
 
-    it("should contain a play function", function() {
+    it("media.spec.2 should contain a play function", function() {
         var media1 = new Media();
         expect(media1.play).toBeDefined();
         expect(typeof media1.play).toBe('function');
         media1.release();
     });
 
-    it("should contain a stop function", function() {
+    it("media.spec.3 should contain a stop function", function() {
         var media1 = new Media();
         expect(media1.stop).toBeDefined();
         expect(typeof media1.stop).toBe('function');
         media1.release();
     });
 
-    it("should contain a seekTo function", function() {
+    it("media.spec.4 should contain a seekTo function", function() {
         var media1 = new Media();
         expect(media1.seekTo).toBeDefined();
         expect(typeof media1.seekTo).toBe('function');
         media1.release();
     });
 
-    it("should contain a pause function", function() {
+    it("media.spec.5 should contain a pause function", function() {
         var media1 = new Media();
         expect(media1.pause).toBeDefined();
         expect(typeof media1.pause).toBe('function');
         media1.release();
     });
 
-    it("should contain a getDuration function", function() {
+    it("media.spec.6 should contain a getDuration function", function() {
         var media1 = new Media();
         expect(media1.getDuration).toBeDefined();
         expect(typeof media1.getDuration).toBe('function');
         media1.release();
     });
 
-    it("should contain a getCurrentPosition function", function() {
+    it("media.spec.7 should contain a getCurrentPosition function", function() {
         var media1 = new Media();
         expect(media1.getCurrentPosition).toBeDefined();
         expect(typeof media1.getCurrentPosition).toBe('function');
         media1.release();
     });
 
-    it("should contain a startRecord function", function() {
+    it("media.spec.8 should contain a startRecord function", function() {
         var media1 = new Media();
         expect(media1.startRecord).toBeDefined();
         expect(typeof media1.startRecord).toBe('function');
         media1.release();
     });
 
-    it("should contain a stopRecord function", function() {
+    it("media.spec.9 should contain a stopRecord function", function() {
         var media1 = new Media();
         expect(media1.stopRecord).toBeDefined();
         expect(typeof media1.stopRecord).toBe('function');
         media1.release();
     });
 
-    it("should contain a release function", function() {
+    it("media.spec.10 should contain a release function", function() {
         var media1 = new Media();
         expect(media1.release).toBeDefined();
         expect(typeof media1.release).toBe('function');
         media1.release();
     });
 
-    it("should contain a setVolume function", function() {
+    it("media.spec.11 should contain a setVolume function", function() {
         var media1 = new Media();
         expect(media1.setVolume).toBeDefined();
         expect(typeof media1.setVolume).toBe('function');
@@ -134,7 +134,7 @@ describe('Media', function () {
         });
 	});
 
-    it("position should be set properly", function() {
+    it("media.spec.12 position should be set properly", function() {
         var media1 = new Media("http://cordova.apache.org/downloads/BlueZedEx.mp3"),
             test = jasmine.createSpy().andCallFake(function(position) {
                     console.log("position = " + position);
@@ -154,7 +154,7 @@ describe('Media', function () {
         waitsFor(function () { return test.wasCalled; }, Tests.TEST_TIMEOUT);
     });
 
-    it("duration should be set properly", function() {
+    it("media.spec.13 duration should be set properly", function() {
         var media1 = new Media("http://cordova.apache.org/downloads/BlueZedEx.mp3");
         media1.play();
         waits(5000);

@@ -20,34 +20,34 @@
 */
 
 describe('Capture (navigator.device.capture)', function () {
-    it("should exist", function() {
+    it("capture.spec.1 should exist", function() {
         expect(navigator.device).toBeDefined();
         expect(navigator.device.capture).toBeDefined();
     });
 
-    it("should have the correct properties ", function() {
+    it("capture.spec.2 should have the correct properties ", function() {
         expect(navigator.device.capture.supportedAudioModes).toBeDefined();
         expect(navigator.device.capture.supportedImageModes).toBeDefined();
         expect(navigator.device.capture.supportedVideoModes).toBeDefined();
     });
 
-    it("should contain a captureAudio function", function() {
+    it("capture.spec.3 should contain a captureAudio function", function() {
         expect(navigator.device.capture.captureAudio).toBeDefined();
         expect(typeof navigator.device.capture.captureAudio == 'function').toBe(true);
     });
 
-    it("should contain a captureImage function", function() {
+    it("capture.spec.4 should contain a captureImage function", function() {
         expect(navigator.device.capture.captureImage).toBeDefined();
         expect(typeof navigator.device.capture.captureImage == 'function').toBe(true);
     });
 
-    it("should contain a captureVideo function", function() {
+    it("capture.spec.5 should contain a captureVideo function", function() {
         expect(navigator.device.capture.captureVideo).toBeDefined();
         expect(typeof navigator.device.capture.captureVideo == 'function').toBe(true);
     });
 
     describe('CaptureAudioOptions', function () {
-        it("CaptureAudioOptions constructor should exist", function() {
+        it("capture.spec.6 CaptureAudioOptions constructor should exist", function() {
             var options = new CaptureAudioOptions();
             expect(options).toBeDefined();
             expect(options.limit).toBeDefined();
@@ -57,7 +57,7 @@ describe('Capture (navigator.device.capture)', function () {
     });
 
     describe('CaptureImageOptions', function () {
-        it("CaptureImageOptions constructor should exist", function() {
+        it("capture.spec.7 CaptureImageOptions constructor should exist", function() {
             var options = new CaptureImageOptions();
             expect(options).toBeDefined();
             expect(options.limit).toBeDefined();
@@ -66,7 +66,7 @@ describe('Capture (navigator.device.capture)', function () {
     });
 
     describe('CaptureVideoOptions', function () {
-        it("CaptureVideoOptions constructor should exist", function() {
+        it("capture.spec.8 CaptureVideoOptions constructor should exist", function() {
             var options = new CaptureVideoOptions();
             expect(options).toBeDefined();
             expect(options.limit).toBeDefined();
@@ -76,14 +76,14 @@ describe('Capture (navigator.device.capture)', function () {
     });
 
     describe('CaptureError interface', function () {
-        it("CaptureError constants should be defined", function() {
+        it("capture.spec.9 CaptureError constants should be defined", function() {
             expect(CaptureError.CAPTURE_INTERNAL_ERR).toBe(0);
             expect(CaptureError.CAPTURE_APPLICATION_BUSY).toBe(1);
             expect(CaptureError.CAPTURE_INVALID_ARGUMENT).toBe(2);
             expect(CaptureError.CAPTURE_NO_MEDIA_FILES).toBe(3);
         });
 
-        it("CaptureError properties should exist", function() {
+        it("capture.spec.10 CaptureError properties should exist", function() {
             var error = new CaptureError();
             expect(error).toBeDefined();
             expect(error.code).toBeDefined();
@@ -91,7 +91,7 @@ describe('Capture (navigator.device.capture)', function () {
     });
 
     describe('MediaFileData', function () {
-        it("MediaFileData constructor should exist", function() {
+        it("capture.spec.11 MediaFileData constructor should exist", function() {
             var fileData = new MediaFileData();
             expect(fileData).toBeDefined();
             expect(fileData.bitrate).toBeDefined();
@@ -103,7 +103,7 @@ describe('Capture (navigator.device.capture)', function () {
     });
 
     describe('MediaFile', function () {
-        it("MediaFile constructor should exist", function() {
+        it("capture.spec.12 MediaFile constructor should exist", function() {
             var fileData = new MediaFile();
             expect(fileData).toBeDefined();
             expect(fileData.name).toBeDefined();

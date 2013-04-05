@@ -107,7 +107,7 @@ describe('File API', function() {
     };
 
     describe('FileError object', function() {
-        it("should define FileError constants", function() {
+        it("file.spec.1 should define FileError constants", function() {
             expect(FileError.NOT_FOUND_ERR).toBe(1);
             expect(FileError.SECURITY_ERR).toBe(2);
             expect(FileError.ABORT_ERR).toBe(3);
@@ -125,16 +125,16 @@ describe('File API', function() {
 
     describe('LocalFileSystem', function() {
 
-        it("should define LocalFileSystem constants", function() {
+        it("file.spec.2 should define LocalFileSystem constants", function() {
             expect(LocalFileSystem.TEMPORARY).toBe(0);
             expect(LocalFileSystem.PERSISTENT).toBe(1);
         });
 
         describe('window.requestFileSystem', function() {
-            it("should be defined", function() {
+            it("file.spec.3 should be defined", function() {
                 expect(window.requestFileSystem).toBeDefined();
             });
-            it("should be able to retrieve a PERSISTENT file system", function() {
+            it("file.spec.4 should be able to retrieve a PERSISTENT file system", function() {
                 var win = jasmine.createSpy().andCallFake(function(fileSystem) {
                     expect(fileSystem).toBeDefined();
                     expect(fileSystem.name).toBeDefined();
@@ -155,7 +155,7 @@ describe('File API', function() {
                     expect(win).toHaveBeenCalled();
                 });
             });
-            it("should be able to retrieve a TEMPORARY file system", function() {
+            it("file.spec.5 should be able to retrieve a TEMPORARY file system", function() {
                 var win = jasmine.createSpy().andCallFake(function(fileSystem) {
                     expect(fileSystem).toBeDefined();
                     expect(fileSystem.name).toBeDefined();
@@ -176,7 +176,7 @@ describe('File API', function() {
                     expect(win).toHaveBeenCalled();
                 });
             });
-            it("should error if you request a file system that is too large", function() {
+            it("file.spec.6 should error if you request a file system that is too large", function() {
                 var fail = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
                     expect(error).toBeFileError(FileError.QUOTA_EXCEEDED_ERR);
@@ -195,7 +195,7 @@ describe('File API', function() {
                     expect(fail).toHaveBeenCalled();
                 });
             });
-            it("should error out if you request a file system that does not exist", function() {
+            it("file.spec.7 should error out if you request a file system that does not exist", function() {
                 var fail = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
                     expect(error).toBeFileError(FileError.SYNTAX_ERR);
@@ -217,10 +217,10 @@ describe('File API', function() {
         });
 
         describe('window.resolveLocalFileSystemURI', function() {
-            it("should be defined", function() {
+            it("file.spec.3 should be defined", function() {
                 expect(window.resolveLocalFileSystemURI).toBeDefined();
             });
-            it("should resolve a valid file name", function() {
+            it("file.spec.9 should resolve a valid file name", function() {
                 var fileName = "resolve.file.uri",
                 win = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
@@ -251,7 +251,7 @@ describe('File API', function() {
 
                 waitsFor(function() { return resolveCallback.wasCalled; }, "createFile callback never called", Tests.TEST_TIMEOUT);
             });
-            it("resolve valid file name with parameters", function() {
+            it("file.spec.10 resolve valid file name with parameters", function() {
                 var fileName = "resolve.file.uri.params",
                 win = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
@@ -282,7 +282,7 @@ describe('File API', function() {
 
                 waitsFor(function() { return resolveCallback.wasCalled; }, "createFile callback never called", Tests.TEST_TIMEOUT);
             });
-            it("should error (NOT_FOUND_ERR) when resolving (non-existent) invalid file name", function() {
+            it("file.spec.11 should error (NOT_FOUND_ERR) when resolving (non-existent) invalid file name", function() {
                 var fail = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
                     expect(error).toBeFileError(FileError.NOT_FOUND_ERR);
@@ -301,7 +301,7 @@ describe('File API', function() {
                     expect(win).not.toHaveBeenCalled();
                 });
             });
-            it("should error (ENCODING_ERR) when resolving invalid URI with leading /", function() {
+            it("file.spec.12 should error (ENCODING_ERR) when resolving invalid URI with leading /", function() {
                 var fail = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
                     expect(error).toBeFileError(FileError.ENCODING_ERR);
@@ -324,7 +324,7 @@ describe('File API', function() {
     });
 
     describe('Metadata interface', function() {
-        it("should exist and have the right properties", function() {
+        it("file.spec.13 should exist and have the right properties", function() {
             var metadata = new Metadata();
             expect(metadata).toBeDefined();
             expect(metadata.modificationTime).toBeDefined();
@@ -332,7 +332,7 @@ describe('File API', function() {
     });
 
     describe('Flags interface', function() {
-        it("should exist and have the right properties", function() {
+        it("file.spec.13 should exist and have the right properties", function() {
             var flags = new Flags(false, true);
             expect(flags).toBeDefined();
             expect(flags.create).toBeDefined();
@@ -343,7 +343,7 @@ describe('File API', function() {
     });
 
     describe('FileSystem interface', function() {
-        it("should have a root that is a DirectoryEntry", function() {
+        it("file.spec.15 should have a root that is a DirectoryEntry", function() {
             var win = jasmine.createSpy().andCallFake(function(entry) {
                 expect(entry).toBeDefined();
                 expect(entry.isFile).toBe(false);
@@ -377,7 +377,7 @@ describe('File API', function() {
     });
 
     describe('DirectoryEntry', function() {
-        it("getFile: get Entry for file that does not exist", function() {
+        it("file.spec.16 getFile: get Entry for file that does not exist", function() {
             var fileName = "de.no.file",
                 filePath = root.fullPath + '/' + fileName,
                 fail = jasmine.createSpy().andCallFake(function(error) {
@@ -398,7 +398,7 @@ describe('File API', function() {
                 expect(win).not.toHaveBeenCalled();
             });
         });
-        it("etFile: create new file", function() {
+        it("file.spec.17 etFile: create new file", function() {
             var fileName = "de.create.file",
                 filePath = root.fullPath + '/' + fileName,
                 win = jasmine.createSpy().andCallFake(function(entry) {
@@ -424,7 +424,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("getFile: create new file (exclusive)", function() {
+        it("file.spec.18 getFile: create new file (exclusive)", function() {
             var fileName = "de.create.exclusive.file",
                 filePath = root.fullPath + '/' + fileName,
                 win = jasmine.createSpy().andCallFake(function(entry) {
@@ -451,7 +451,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("getFile: create file that already exists", function() {
+        it("file.spec.19 getFile: create file that already exists", function() {
             var fileName = "de.create.existing.file",
                 filePath = root.fullPath + '/' + fileName,
                 getFile = jasmine.createSpy().andCallFake(function(file) {
@@ -485,7 +485,7 @@ describe('File API', function() {
 
             waitsFor(function() { return getFile.wasCalled; }, "getFile was never called", Tests.TEST_TIMEOUT);
         });
-        it("getFile: create file that already exists (exclusive)", function() {
+        it("file.spec.20 getFile: create file that already exists (exclusive)", function() {
             var fileName = "de.create.exclusive.existing.file",
                 filePath = root.fullPath + '/' + fileName,
                 existingFile,
@@ -519,7 +519,7 @@ describe('File API', function() {
 
             waitsFor(function() { return getFile.wasCalled; }, "getFile never called", Tests.TEST_TIMEOUT);
         });
-        it("getFile: get Entry for existing file", function() {
+        it("file.spec.21 getFile: get Entry for existing file", function() {
             var fileName = "de.get.file",
                 filePath = root.fullPath + '/' + fileName,
                 win = jasmine.createSpy().andCallFake(function(entry) {
@@ -553,7 +553,7 @@ describe('File API', function() {
 
             waitsFor(function() { return getFile.wasCalled; }, "file creation", Tests.TEST_TIMEOUT);
         });
-        it("DirectoryEntry.getFile: get FileEntry for invalid path", function() {
+        it("file.spec.22 DirectoryEntry.getFile: get FileEntry for invalid path", function() {
             var fileName = "de:invalid:path",
                 fail = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
@@ -574,7 +574,7 @@ describe('File API', function() {
             });
 
         });
-        it("DirectoryEntry.getDirectory: get Entry for directory that does not exist", function() {
+        it("file.spec.23 DirectoryEntry.getDirectory: get Entry for directory that does not exist", function() {
             var dirName = "de.no.dir",
                 dirPath = root.fullPath + '/' + dirName,
                 fail = jasmine.createSpy().andCallFake(function(error) {
@@ -595,7 +595,7 @@ describe('File API', function() {
                 expect(win).not.toHaveBeenCalled();
             });
         });
-        it("DirectoryEntry.getDirectory: create new dir with space then resolveFileSystemURI", function() {
+        it("file.spec.24 DirectoryEntry.getDirectory: create new dir with space then resolveFileSystemURI", function() {
             var dirName = "de create dir",
                 dirPath = root.fullPath + '/' + dirName,
                 getDir = jasmine.createSpy().andCallFake(function(dirEntry) {
@@ -631,7 +631,7 @@ describe('File API', function() {
 
             waitsFor(function() { return getDir.wasCalled; }, "getDir never called", Tests.TEST_TIMEOUT);
         });
-        it("DirectoryEntry.getDirectory: create new dir with space resolveFileSystemURI with encoded URI", function() {
+        it("file.spec.25 DirectoryEntry.getDirectory: create new dir with space resolveFileSystemURI with encoded URI", function() {
             var dirName = "de create dir",
                 dirPath = root.fullPath + '/' + dirName,
                 getDir = jasmine.createSpy().andCallFake(function(dirEntry) {
@@ -667,7 +667,7 @@ describe('File API', function() {
             waitsFor(function() { return getDir.wasCalled; }, "getDir never called", Tests.TEST_TIMEOUT);
         });
 
-        it("DirectoryEntry.getDirectory: create new directory", function() {
+        it("file.spec.26 DirectoryEntry.getDirectory: create new directory", function() {
             var dirName = "de.create.dir",
                 dirPath = root.fullPath + '/' + dirName,
                 win = jasmine.createSpy().andCallFake(function(directory) {
@@ -695,7 +695,7 @@ describe('File API', function() {
             });
         });
 
-        it("DirectoryEntry.getDirectory: create new directory (exclusive)", function() {
+        it("file.spec.27 DirectoryEntry.getDirectory: create new directory (exclusive)", function() {
             var dirName = "de.create.exclusive.dir",
                 dirPath = root.fullPath + '/' + dirName,
                 win = jasmine.createSpy().andCallFake(function(directory) {
@@ -721,7 +721,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("DirectoryEntry.getDirectory: create directory that already exists", function() {
+        it("file.spec.28 DirectoryEntry.getDirectory: create directory that already exists", function() {
             var dirName = "de.create.existing.dir",
                 dirPath = root.fullPath + '/' + dirName,
                 getDir = jasmine.createSpy().andCallFake(function(directory) {
@@ -756,7 +756,7 @@ describe('File API', function() {
 
             waitsFor(function() { return getDir.wasCalled; }, "getDir never called", Tests.TEST_TIMEOUT);
         });
-        it("DirectoryEntry.getDirectory: create directory that already exists (exclusive)", function() {
+        it("file.spec.29 DirectoryEntry.getDirectory: create directory that already exists (exclusive)", function() {
             var dirName = "de.create.exclusive.existing.dir",
                 dirPath = root.fullPath + '/' + dirName,
                 existingDir,
@@ -790,7 +790,7 @@ describe('File API', function() {
 
             waitsFor(function() { return getDir.wasCalled; }, "getDir never called", Tests.TEST_TIMEOUT);
         });
-        it("DirectoryEntry.getDirectory: get Entry for existing directory", function() {
+        it("file.spec.30 DirectoryEntry.getDirectory: get Entry for existing directory", function() {
             var dirName = "de.get.dir",
                 dirPath = root.fullPath + '/' + dirName,
                 getDir = jasmine.createSpy().andCallFake(function(directory) {
@@ -822,7 +822,7 @@ describe('File API', function() {
             // create directory to kick off it
             root.getDirectory(dirName, {create:true}, getDir, fail);
         });
-        it("DirectoryEntry.getDirectory: get DirectoryEntry for invalid path", function() {
+        it("file.spec.31 DirectoryEntry.getDirectory: get DirectoryEntry for invalid path", function() {
             var dirName = "de:invalid:path",
                 fail = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
@@ -842,7 +842,7 @@ describe('File API', function() {
                 expect(win).not.toHaveBeenCalled();
             });
         });
-        it("DirectoryEntry.getDirectory: get DirectoryEntry for existing file", function() {
+        it("file.spec.32 DirectoryEntry.getDirectory: get DirectoryEntry for existing file", function() {
             var fileName = "de.existing.file",
                 existingFile,
                 filePath = root.fullPath + '/' + fileName,
@@ -876,7 +876,7 @@ describe('File API', function() {
 
             waitsFor(function() { return getDir.wasCalled; }, "getDir was called", Tests.TEST_TIMEOUT);
         });
-        it("DirectoryEntry.getFile: get FileEntry for existing directory", function() {
+        it("file.spec.33 DirectoryEntry.getFile: get FileEntry for existing directory", function() {
             var dirName = "de.existing.dir",
                 existingDir,
                 dirPath = root.fullPath + '/' + dirName,
@@ -910,7 +910,7 @@ describe('File API', function() {
 
             waitsFor(function() { return getFile.wasCalled; }, "getFile never called", Tests.TEST_TIMEOUT);
         });
-        it("DirectoryEntry.removeRecursively on directory", function() {
+        it("file.spec.34 DirectoryEntry.removeRecursively on directory", function() {
             var dirName = "de.removeRecursively",
                 subDirName = "dir",
                 dirPath = root.fullPath + '/' + dirName,
@@ -959,13 +959,13 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("createReader: create reader on existing directory", function() {
+        it("file.spec.35 createReader: create reader on existing directory", function() {
             // create reader for root directory
             var reader = root.createReader();
             expect(reader).toBeDefined();
             expect(typeof reader.readEntries).toBe('function');
         });
-        it("removeRecursively on root file system", function() {
+        it("file.spec.36 removeRecursively on root file system", function() {
             var remove = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
                     expect(error).toBeFileError(FileError.NO_MODIFICATION_ALLOWED_ERR);
@@ -988,7 +988,7 @@ describe('File API', function() {
 
     describe('DirectoryReader interface', function() {
         describe("readEntries", function() {
-            it("should read contents of existing directory", function() {
+            it("file.spec.37 should read contents of existing directory", function() {
                 var reader,
                     win = jasmine.createSpy().andCallFake(function(entries) {
                         expect(entries).toBeDefined();
@@ -1010,7 +1010,7 @@ describe('File API', function() {
                     expect(fail).not.toHaveBeenCalled();
                 });
             });
-            it("should read contents of directory that has been removed", function() {
+            it("file.spec.38 should read contents of directory that has been removed", function() {
                 var dirName = "de.createReader.notfound",
                     dirPath = root.fullPath + '/' + dirName,
                     entryCallback = jasmine.createSpy().andCallFake(function(directory) {
@@ -1065,11 +1065,11 @@ describe('File API', function() {
     });
 
     describe('File', function() {
-        it("constructor should be defined", function() {
+        it("file.spec.39 constructor should be defined", function() {
             expect(File).toBeDefined();
             expect(typeof File).toBe('function');
         });
-        it("should be define File attributes", function() {
+        it("file.spec.40 should be define File attributes", function() {
             var file = new File();
             expect(file.name).toBeDefined();
             expect(file.fullPath).toBeDefined();
@@ -1080,7 +1080,7 @@ describe('File API', function() {
     });
 
     describe('FileEntry', function() {
-        it("should be define FileEntry methods", function() {
+        it("file.spec.41 should be define FileEntry methods", function() {
             var fileName = "fe.methods",
                 itFileEntry = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
@@ -1104,7 +1104,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("createWriter should return a FileWriter object", function() {
+        it("file.spec.42 createWriter should return a FileWriter object", function() {
             var fileName = "fe.createWriter",
                 itFile,
                 entryCallback = jasmine.createSpy().andCallFake(function(fileEntry) {
@@ -1137,7 +1137,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("file should return a File object", function() {
+        it("file.spec.43 file should return a File object", function() {
             var fileName = "fe.file",
                 newFile,
                 entryCallback = jasmine.createSpy().andCallFake(function(fileEntry) {
@@ -1170,7 +1170,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("file: on File that has been removed", function() {
+        it("file.spec.44 file: on File that has been removed", function() {
             var fileName = "fe.no.file",
                 entryCallback = jasmine.createSpy().andCallFake(function(fileEntry) {
                     // create File object
@@ -1209,7 +1209,7 @@ describe('File API', function() {
         });
     });
     describe('Entry', function() {
-        it("Entry object", function() {
+        it("file.spec.45 Entry object", function() {
             var fileName = "entry",
                 fullPath = root.fullPath + '/' + fileName,
                 fail = createFail('Entry'),
@@ -1245,7 +1245,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("Entry.getMetadata on file", function() {
+        it("file.spec.46 Entry.getMetadata on file", function() {
             var fileName = "entry.metadata.file",
                 entryCallback = jasmine.createSpy().andCallFake(function(entry) {
                     runs(function() {
@@ -1271,7 +1271,7 @@ describe('File API', function() {
             // create a new file entry
             createFile(fileName, entryCallback, fail);
         });
-        it("Entry.getMetadata on directory", function() {
+        it("file.spec.47 Entry.getMetadata on directory", function() {
             var dirName = "entry.metadata.dir",
                 entryCallback = jasmine.createSpy().andCallFake(function(entry) {
                     runs(function() {
@@ -1301,7 +1301,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.getParent on file in root file system", function() {
+        it("file.spec.48 Entry.getParent on file in root file system", function() {
             var fileName = "entry.parent.file",
                 rootPath = root.fullPath,
                 fail = createFail('Entry'),
@@ -1332,7 +1332,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.getParent on directory in root file system", function() {
+        it("file.spec.49 Entry.getParent on directory in root file system", function() {
             var dirName = "entry.parent.dir",
                 rootPath = root.fullPath,
                 fail = createFail('Entry'),
@@ -1363,7 +1363,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("Entry.getParent on root file system", function() {
+        it("file.spec.50 Entry.getParent on root file system", function() {
             var rootPath = root.fullPath,
                 itParent = jasmine.createSpy().andCallFake(function(parent) {
                     expect(parent).toBeDefined();
@@ -1383,7 +1383,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("Entry.toURL on file", function() {
+        it("file.spec.51 Entry.toURL on file", function() {
             var fileName = "entry.uri.file",
                 rootPath = root.fullPath,
                 itURI = jasmine.createSpy().andCallFake(function(entry) {
@@ -1408,7 +1408,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("Entry.toURL on directory", function() {
+        it("file.spec.52 Entry.toURL on directory", function() {
             var dirName = "entry.uri.dir",
                 rootPath = root.fullPath,
                 itURI = jasmine.createSpy().andCallFake(function(entry) {
@@ -1433,7 +1433,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("Entry.remove on file", function() {
+        it("file.spec.53 Entry.remove on file", function() {
             var fileName = "entry.rm.file",
                 fullPath = root.fullPath + '/' + fileName,
                 win = createWin('Entry'),
@@ -1474,7 +1474,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("remove on empty directory", function() {
+        it("file.spec.54 remove on empty directory", function() {
             var dirName = "entry.rm.dir",
                 fullPath = root.fullPath + '/' + dirName,
                 entryCallback = jasmine.createSpy().andCallFake(function(entry) {
@@ -1516,7 +1516,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("remove on non-empty directory", function() {
+        it("file.spec.55 remove on non-empty directory", function() {
             var dirName = "entry.rm.dir.not.empty",
                 fullPath = root.fullPath + '/' + dirName,
                 fileName = "remove.txt",
@@ -1568,7 +1568,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("remove on root file system", function() {
+        it("file.spec.56 remove on root file system", function() {
             var itRemove = jasmine.createSpy().andCallFake(function(error) {
                 expect(error).toBeDefined();
                 expect(error).toBeFileError(FileError.NO_MODIFICATION_ALLOWED_ERR);
@@ -1587,7 +1587,7 @@ describe('File API', function() {
                 expect(itRemove).toHaveBeenCalled();
             });
         });
-        it("copyTo: file", function() {
+        it("file.spec.57 copyTo: file", function() {
             var file1 = "entry.copy.file1",
                 file2 = "entry.copy.file2",
                 fullPath = root.fullPath + '/' + file2,
@@ -1638,7 +1638,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("copyTo: file onto itself", function() {
+        it("file.spec.58 copyTo: file onto itself", function() {
             var file1 = "entry.copy.fos.file1",
                 entryCallback = jasmine.createSpy().andCallFake(function(entry) {
                     // copy file1 onto itself
@@ -1671,7 +1671,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("copyTo: directory", function() {
+        it("file.spec.59 copyTo: directory", function() {
             var file1 = "file1",
                 srcDir = "entry.copy.srcDir",
                 dstDir = "entry.copy.dstDir",
@@ -1745,7 +1745,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("copyTo: directory to backup at same root directory", function() {
+        it("file.spec.60 copyTo: directory to backup at same root directory", function() {
             var file1 = "file1",
                 srcDir = "entry.copy.srcDirSame",
                 dstDir = "entry.copy.srcDirSame-backup",
@@ -1804,7 +1804,7 @@ describe('File API', function() {
 
             waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists", 10000);
         });
-        it("copyTo: directory onto itself", function() {
+        it("file.spec.61 copyTo: directory onto itself", function() {
             var file1 = "file1",
                 srcDir = "entry.copy.dos.srcDir",
                 srcPath = root.fullPath + '/' + srcDir,
@@ -1869,7 +1869,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("copyTo: directory into itself", function() {
+        it("file.spec.62 copyTo: directory into itself", function() {
             var srcDir = "entry.copy.dis.srcDir",
                 dstDir = "entry.copy.dis.dstDir",
                 fail = createFail('Entry'),
@@ -1915,7 +1915,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("copyTo: directory that does not exist", function() {
+        it("file.spec.63 copyTo: directory that does not exist", function() {
             var file1 = "entry.copy.dnf.file1",
                 dstDir = "entry.copy.dnf.dstDir",
                 filePath = root.fullPath + '/' + file1,
@@ -1962,7 +1962,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("copyTo: invalid target name", function() {
+        it("file.spec.64 copyTo: invalid target name", function() {
             var file1 = "entry.copy.itn.file1",
                 file2 = "bad:file:name",
                 filePath = root.fullPath + '/' + file1,
@@ -1997,7 +1997,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("moveTo: file to same parent", function() {
+        it("file.spec.65 moveTo: file to same parent", function() {
             var file1 = "entry.move.fsp.file1",
                 file2 = "entry.move.fsp.file2",
                 srcPath = root.fullPath + '/' + file1,
@@ -2058,7 +2058,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("moveTo: file to new parent", function() {
+        it("file.spec.66 moveTo: file to new parent", function() {
             var file1 = "entry.move.fnp.file1",
                 dir = "entry.move.fnp.dir",
                 srcPath = root.fullPath + '/' + file1,
@@ -2130,7 +2130,7 @@ describe('File API', function() {
             });
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("moveTo: directory to same parent", function() {
+        it("file.spec.67 moveTo: directory to same parent", function() {
             var file1 = "file1",
                 srcDir = "entry.move.dsp.srcDir",
                 dstDir = "entry.move.dsp.dstDir",
@@ -2205,7 +2205,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("moveTo: directory to same parent with same name", function() {
+        it("file.spec.68 moveTo: directory to same parent with same name", function() {
             var file1 = "file1",
                 srcDir = "entry.move.dsp.srcDir",
                 dstDir = "entry.move.dsp.srcDir-backup",
@@ -2278,7 +2278,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("moveTo: directory to new parent", function() {
+        it("file.spec.69 moveTo: directory to new parent", function() {
             var file1 = "file1",
                 srcDir = "entry.move.dnp.srcDir",
                 dstDir = "entry.move.dnp.dstDir",
@@ -2351,7 +2351,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("moveTo: directory onto itself", function() {
+        it("file.spec.70 moveTo: directory onto itself", function() {
             var file1 = "file1",
                 srcDir = "entry.move.dos.srcDir",
                 srcPath = root.fullPath + '/' + srcDir,
@@ -2417,7 +2417,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("moveTo: directory into itself", function() {
+        it("file.spec.71 moveTo: directory into itself", function() {
             var srcDir = "entry.move.dis.srcDir",
                 dstDir = "entry.move.dis.dstDir",
                 srcPath = root.fullPath + '/' + srcDir,
@@ -2462,7 +2462,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("moveTo: file onto itself", function() {
+        it("file.spec.72 moveTo: file onto itself", function() {
             var file1 = "entry.move.fos.file1",
                 filePath = root.fullPath + '/' + file1,
                 win = createWin('Entry'),
@@ -2507,7 +2507,7 @@ describe('File API', function() {
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
-        it("moveTo: file onto existing directory", function() {
+        it("file.spec.73 moveTo: file onto existing directory", function() {
             var file1 = "entry.move.fod.file1",
                 dstDir = "entry.move.fod.dstDir",
                 subDir = "subDir",
@@ -2564,7 +2564,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("moveTo: directory onto existing file", function() {
+        it("file.spec.74 moveTo: directory onto existing file", function() {
             var file1 = "entry.move.dof.file1",
                 srcDir = "entry.move.dof.srcDir",
                 dirPath = root.fullPath + '/' + srcDir,
@@ -2614,7 +2614,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("copyTo: directory onto existing file", function() {
+        it("file.spec.75 copyTo: directory onto existing file", function() {
             var file1 = "entry.copy.dof.file1",
                 srcDir = "entry.copy.dof.srcDir",
                 dirPath = root.fullPath + '/' + srcDir,
@@ -2664,7 +2664,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("moveTo: directory onto directory that is not empty", function() {
+        it("file.spec.76 moveTo: directory onto directory that is not empty", function() {
             var srcDir = "entry.move.dod.srcDir",
                 dstDir = "entry.move.dod.dstDir",
                 subDir = "subDir",
@@ -2722,7 +2722,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("moveTo: file replace existing file", function() {
+        it("file.spec.77 moveTo: file replace existing file", function() {
             var file1 = "entry.move.frf.file1",
                 file2 = "entry.move.frf.file2",
                 file1Path = root.fullPath + '/' + file1,
@@ -2775,7 +2775,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("moveTo: directory replace empty directory", function() {
+        it("file.spec.78 moveTo: directory replace empty directory", function() {
             var file1 = "file1",
                 srcDir = "entry.move.drd.srcDir",
                 dstDir = "entry.move.drd.dstDir",
@@ -2837,7 +2837,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("moveTo: directory that does not exist", function() {
+        it("file.spec.79 moveTo: directory that does not exist", function() {
             var file1 = "entry.move.dnf.file1",
                 dstDir = "entry.move.dnf.dstDir",
                 filePath = root.fullPath + '/' + file1,
@@ -2871,7 +2871,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("moveTo: invalid target name", function() {
+        it("file.spec.80 moveTo: invalid target name", function() {
             var file1 = "entry.move.itn.file1",
                 file2 = "bad:file:name",
                 filePath = root.fullPath + '/' + file1,
@@ -2905,7 +2905,7 @@ describe('File API', function() {
     });
 
     describe('FileReader', function() {
-        it("should have correct methods", function() {
+        it("file.spec.81 should have correct methods", function() {
             var reader = new FileReader();
             expect(reader).toBeDefined();
             expect(typeof reader.readAsBinaryString).toBe('function');
@@ -2917,7 +2917,7 @@ describe('File API', function() {
     });
 
     describe('read method', function(){
-        it("should error out on non-existent file", function() {
+        it("file.spec.82 should error out on non-existent file", function() {
             var reader = new FileReader();
             var verifier = jasmine.createSpy().andCallFake(function(evt) {
                 expect(evt).toBeDefined();
@@ -2931,7 +2931,7 @@ describe('File API', function() {
 
             waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
         });
-        it("should be able to read native blob objects", function() {
+        it("file.spec.83 should be able to read native blob objects", function() {
             // Skip test if blobs are not supported (e.g.: Android 2.3).
             if (typeof Blob == 'undefined') {
                 return;
@@ -3032,59 +3032,59 @@ describe('File API', function() {
             return match;
         }
 
-        it("should read file properly, readAsText", function() {
+        it("file.spec.84 should read file properly, readAsText", function() {
             runReaderTest('readAsText', false, function(evt, fileData, fileDataAsBinaryString) {
                 expect(evt.target.result).toBe(fileData);
             });
         });
-        it("should read file properly, Data URI", function() {
+        it("file.spec.85 should read file properly, Data URI", function() {
             runReaderTest('readAsDataURL', true, function(evt, fileData, fileDataAsBinaryString) {
                 expect(evt.target.result.substr(0,23)).toBe("data:text/plain;base64,");
                 expect(evt.target.result.slice(23)).toBe(atob(fileData));
             });
         });
-        it("should read file properly, readAsBinaryString", function() {
+        it("file.spec.86 should read file properly, readAsBinaryString", function() {
             runReaderTest('readAsBinaryString', true, function(evt, fileData, fileDataAsBinaryString) {
                 expect(evt.target.result).toBe(fileDataAsBinaryString);
             });
         });
-        it("should read file properly, readAsArrayBuffer", function() {
+        it("file.spec.87 should read file properly, readAsArrayBuffer", function() {
             runReaderTest('readAsArrayBuffer', true, function(evt, fileData, fileDataAsBinaryString) {
                 expect(arrayBufferEqualsString(evt.target.result, fileDataAsBinaryString)).toBe(true);
             });
         });
-        it("should read sliced file: readAsText", function() {
+        it("file.spec.88 should read sliced file: readAsText", function() {
             runReaderTest('readAsText', false, function(evt, fileData, fileDataAsBinaryString) {
                 expect(evt.target.result).toBe(fileDataAsBinaryString.slice(10, 40));
             }, 10, 40);
         });
-        it("should read sliced file: slice past eof", function() {
+        it("file.spec.89 should read sliced file: slice past eof", function() {
             runReaderTest('readAsText', false, function(evt, fileData, fileDataAsBinaryString) {
                 expect(evt.target.result).toBe(fileData.slice(-5, 9999));
             }, -5, 9999);
         });
-        it("should read sliced file: slice to eof", function() {
+        it("file.spec.90 should read sliced file: slice to eof", function() {
             runReaderTest('readAsText', false, function(evt, fileData, fileDataAsBinaryString) {
                 expect(evt.target.result).toBe(fileData.slice(-5));
             }, -5);
         });
-        it("should read empty slice", function() {
+        it("file.spec.91 should read empty slice", function() {
             runReaderTest('readAsText', false, function(evt, fileData, fileDataAsBinaryString) {
                 expect(evt.target.result).toBe('');
             }, 0, 0);
         });
-        it("should read sliced file properly, readAsDataURL", function() {
+        it("file.spec.92 should read sliced file properly, readAsDataURL", function() {
             runReaderTest('readAsDataURL', true, function(evt, fileData, fileDataAsBinaryString) {
                 expect(evt.target.result.slice(0, 23)).toBe("data:text/plain;base64,");
                 expect(evt.target.result.slice(23)).toBe(atob(fileDataAsBinaryString.slice( 10, -3)));
             }, 10, -3);
         });
-        it("should read sliced file properly, readAsBinaryString", function() {
+        it("file.spec.93 should read sliced file properly, readAsBinaryString", function() {
             runReaderTest('readAsBinaryString', true, function(evt, fileData, fileDataAsBinaryString) {
                 expect(evt.target.result).toBe(fileDataAsBinaryString.slice(-10, -5));
             }, -10, -5);
         });
-        it("should read sliced file properly, readAsArrayBuffer", function() {
+        it("file.spec.94 should read sliced file properly, readAsArrayBuffer", function() {
             runReaderTest('readAsArrayBuffer', true, function(evt, fileData, fileDataAsBinaryString) {
                 expect(arrayBufferEqualsString(evt.target.result, fileDataAsBinaryString.slice(0, -1))).toBe(true);
             }, 0, -1);
@@ -3092,7 +3092,7 @@ describe('File API', function() {
     });
 
     describe('FileWriter', function(){
-        it("should have correct methods", function() {
+        it("file.spec.81 should have correct methods", function() {
             // retrieve a FileWriter object
             var fileName = "writer.methods",
                 fail = createFail('FileWriter'),
@@ -3122,7 +3122,7 @@ describe('File API', function() {
                 expect(verifier).toHaveBeenCalled();
             });
         });
-        it("should be able to write and append to file, createWriter", function() {
+        it("file.spec.96 should be able to write and append to file, createWriter", function() {
             var fileName = "writer.append",
                 theWriter,
                 filePath = root.fullPath + '/' + fileName,
@@ -3171,7 +3171,7 @@ describe('File API', function() {
                 expect(anotherVerifier).toHaveBeenCalled();
             });
         });
-        it("should be able to write and append to file, File object", function() {
+        it("file.spec.97 should be able to write and append to file, File object", function() {
             var fileName = "writer.append",
                 theWriter,
                 filePath = root.fullPath + '/' + fileName,
@@ -3218,7 +3218,7 @@ describe('File API', function() {
                 expect(anotherVerifier).toHaveBeenCalled();
             });
         });
-        it("should be able to seek to the middle of the file and write more data than file.length", function() {
+        it("file.spec.98 should be able to seek to the middle of the file and write more data than file.length", function() {
             var fileName = "writer.seek.write",
                 filePath = root.fullPath + '/' + fileName,
                 theWriter,
@@ -3266,7 +3266,7 @@ describe('File API', function() {
                 expect(anotherVerifier).toHaveBeenCalled();
             });
         });
-        it("should be able to seek to the middle of the file and write less data than file.length", function() {
+        it("file.spec.99 should be able to seek to the middle of the file and write less data than file.length", function() {
             var fileName = "writer.seek.write2",
                 filePath = root.fullPath + '/' + fileName,
                 // file content
@@ -3315,7 +3315,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("should be able to write XML data", function() {
+        it("file.spec.100 should be able to write XML data", function() {
             var fileName = "writer.xml",
                 filePath = root.fullPath + '/' + fileName,
                 fail = createFail('FileWriter'),
@@ -3352,7 +3352,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("should be able to write JSON data", function() {
+        it("file.spec.101 should be able to write JSON data", function() {
             var fileName = "writer.json",
                 filePath = root.fullPath + '/' + fileName,
                 theWriter,
@@ -3389,7 +3389,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("should be able to seek", function() {
+        it("file.spec.102 should be able to seek", function() {
             var fileName = "writer.seek",
                 // file content
                 rule = "There is an exception to every rule.  Except this one.",
@@ -3432,7 +3432,7 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("should be able to truncate", function() {
+        it("file.spec.103 should be able to truncate", function() {
             var fileName = "writer.truncate",
                 rule = "There is an exception to every rule.  Except this one.",
                 fail = createFail('FileWriter'),

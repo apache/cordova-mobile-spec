@@ -1,14 +1,14 @@
 describe('Globalization (navigator.globalization)', function () {
-    it("should exist", function() {
+    it("globalization.spec.1 should exist", function() {
         expect(navigator.globalization).toBeDefined();
     });
     
     describe("getLocaleName", function() {
-        it("should exist", function() {
+        it("globalization.spec.1 should exist", function() {
             expect(typeof navigator.globalization.getLocaleName).toBeDefined();
             expect(typeof navigator.globalization.getLocaleName == 'function').toBe(true);
         });
-        it("getLocaleName success callback should be called with a Properties object", function() {
+        it("globalization.spec.3 getLocaleName success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -31,11 +31,11 @@ describe('Globalization (navigator.globalization)', function () {
     });
     
     describe("dateToString", function() {
-        it("should exist", function() {
+        it("globalization.spec.1 should exist", function() {
             expect(typeof navigator.globalization.dateToString).toBeDefined();
             expect(typeof navigator.globalization.dateToString == 'function').toBe(true);
         });
-        it("dateToString using default options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.5 dateToString using default options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -55,7 +55,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("dateToString using formatLength=short and selector=date options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.6 dateToString using formatLength=short and selector=date options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -75,7 +75,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("dateToString using formatLength=full and selector=date options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.7 dateToString using formatLength=full and selector=date options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -95,7 +95,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("dateToString using formatLength=medium and selector=date and time(default) options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.8 dateToString using formatLength=medium and selector=date and time(default) options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -115,7 +115,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("dateToString using formatLength=long and selector=date and time(default) options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.9 dateToString using formatLength=long and selector=date and time(default) options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -135,7 +135,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("dateToString using formatLength=full and selector=date and time(default) options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.10 dateToString using formatLength=full and selector=date and time(default) options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -158,11 +158,11 @@ describe('Globalization (navigator.globalization)', function () {
     });
     
     describe("stringToDate", function() {
-        it("should exist", function() {
+        it("globalization.spec.1 should exist", function() {
             expect(typeof navigator.globalization.stringToDate).toBeDefined();
             expect(typeof navigator.globalization.stringToDate == 'function').toBe(true);
         });
-        it("stringToDate using default options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.12 stringToDate using default options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -203,7 +203,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("stringToDate using formatLength=short and selector=date options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.13 stringToDate using formatLength=short and selector=date options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -244,7 +244,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("stringToDate using formatLength=full and selector=date options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.14 stringToDate using formatLength=full and selector=date options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -284,7 +284,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("stringToDate using invalid date, error callback should be called with a GlobalizationError object", function() {
+        it("globalization.spec.15 stringToDate using invalid date, error callback should be called with a GlobalizationError object", function() {
             var win = jasmine.createSpy(),
                 fail = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
@@ -310,11 +310,11 @@ describe('Globalization (navigator.globalization)', function () {
     });
 
     describe("getDatePattern", function() {
-        it("should exist", function() {
+        it("globalization.spec.1 should exist", function() {
             expect(typeof navigator.globalization.getDatePattern).toBeDefined();
             expect(typeof navigator.globalization.getDatePattern == 'function').toBe(true);
         });
-        it("getDatePattern using default options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.17 getDatePattern using default options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -341,7 +341,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("getDatePattern using formatLength=medium and selector=date options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.18 getDatePattern using formatLength=medium and selector=date options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -371,11 +371,11 @@ describe('Globalization (navigator.globalization)', function () {
     });    
 
     describe("getDateNames", function() {
-        it("should exist", function() {
+        it("globalization.spec.1 should exist", function() {
             expect(typeof navigator.globalization.getDateNames).toBeDefined();
             expect(typeof navigator.globalization.getDateNames == 'function').toBe(true);
         });
-        it("getDateNames using default options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.20 getDateNames using default options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -396,7 +396,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("getDateNames using type=narrow and item=days options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.21 getDateNames using type=narrow and item=days options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -417,7 +417,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("getDateNames using type=narrow and item=months options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.22 getDateNames using type=narrow and item=months options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -438,7 +438,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("getDateNames using type=wide and item=days options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.23 getDateNames using type=wide and item=days options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -459,7 +459,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("getDateNames using type=wide and item=months options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.24 getDateNames using type=wide and item=months options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -483,11 +483,11 @@ describe('Globalization (navigator.globalization)', function () {
     });
     
     describe("isDayLightSavingsTime", function() {
-        it("should exist", function() {
+        it("globalization.spec.1 should exist", function() {
             expect(typeof navigator.globalization.isDayLightSavingsTime).toBeDefined();
             expect(typeof navigator.globalization.isDayLightSavingsTime == 'function').toBe(true);
         });
-        it("isDayLightSavingsTime using default options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.26 isDayLightSavingsTime using default options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -509,11 +509,11 @@ describe('Globalization (navigator.globalization)', function () {
     });
     
     describe("getFirstDayOfWeek", function() {
-        it("should exist", function() {
+        it("globalization.spec.1 should exist", function() {
             expect(typeof navigator.globalization.getFirstDayOfWeek).toBeDefined();
             expect(typeof navigator.globalization.getFirstDayOfWeek == 'function').toBe(true);
         });
-        it("getFirstDayOfWeek success callback should be called with a Properties object", function() {
+        it("globalization.spec.28 getFirstDayOfWeek success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -535,11 +535,11 @@ describe('Globalization (navigator.globalization)', function () {
     });
     
     describe("numberToString", function() {
-        it("should exist", function() {
+        it("globalization.spec.1 should exist", function() {
             expect(typeof navigator.globalization.numberToString).toBeDefined();
             expect(typeof navigator.globalization.numberToString == 'function').toBe(true);
         });
-        it("numberToString using default options, should be called with a Properties object", function() {
+        it("globalization.spec.30 numberToString using default options, should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -559,7 +559,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("numberToString using type=percent options, should be called with a Properties object", function() {
+        it("globalization.spec.31 numberToString using type=percent options, should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -579,7 +579,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("numberToString using type=currency options, should be called with a Properties object", function() {
+        it("globalization.spec.32 numberToString using type=currency options, should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -602,11 +602,11 @@ describe('Globalization (navigator.globalization)', function () {
     });
     
     describe("stringToNumber", function() {
-        it("should exist", function() {
+        it("globalization.spec.1 should exist", function() {
             expect(typeof navigator.globalization.stringToNumber).toBeDefined();
             expect(typeof navigator.globalization.stringToNumber == 'function').toBe(true);
         });
-        it("stringToNumber using default options, should be called with a Properties object", function() {
+        it("globalization.spec.34 stringToNumber using default options, should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -630,7 +630,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("stringToNumber using type=percent options, should be called with a Properties object", function() {
+        it("globalization.spec.35 stringToNumber using type=percent options, should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -657,11 +657,11 @@ describe('Globalization (navigator.globalization)', function () {
     });
     
     describe("getNumberPattern", function() {
-        it("should exist", function() {
+        it("globalization.spec.1 should exist", function() {
             expect(typeof navigator.globalization.getNumberPattern).toBeDefined();
             expect(typeof navigator.globalization.getNumberPattern == 'function').toBe(true);
         });
-        it("getNumberPattern using default options, success callback should be called with a Properties object", function() {
+        it("globalization.spec.37 getNumberPattern using default options, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -696,7 +696,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("getNumberPattern using type=percent, success callback should be called with a Properties object", function() {
+        it("globalization.spec.38 getNumberPattern using type=percent, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -731,7 +731,7 @@ describe('Globalization (navigator.globalization)', function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        it("getNumberPattern using type=currency, success callback should be called with a Properties object", function() {
+        it("globalization.spec.39 getNumberPattern using type=currency, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
@@ -769,11 +769,11 @@ describe('Globalization (navigator.globalization)', function () {
     });
     
     describe("getCurrencyPattern", function() {
-        it("should exist", function() {
+        it("globalization.spec.1 should exist", function() {
             expect(typeof navigator.globalization.getCurrencyPattern).toBeDefined();
             expect(typeof navigator.globalization.getCurrencyPattern == 'function').toBe(true);
         });
-        it("getCurrencyPattern using EUR for currency, success callback should be called with a Properties object", function() {
+        it("globalization.spec.41 getCurrencyPattern using EUR for currency, success callback should be called with a Properties object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');

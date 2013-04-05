@@ -1,5 +1,5 @@
 describe('data uris', function () {
-    it("should work with iframes", function() {
+    it("datauri.spec.1 should work with iframes", function() {
         var gotFoo = false,
             frame = document.createElement('iframe');
         function onMessage(msg) {
@@ -21,7 +21,7 @@ describe('data uris', function () {
             expect(gotFoo).toBe(true);
         });
     });
-    it("should work with images", function() {
+    it("datauri.spec.2 should work with images", function() {
         var img = new Image();
         img.onload = jasmine.createSpy('onLoad');
         img.onerror = jasmine.createSpy('onError');

@@ -20,28 +20,28 @@
 */
 
 describe('Geolocation (navigator.geolocation)', function () {
-    it("should exist", function() {
+    it("geolocation.spec.1 should exist", function() {
         expect(navigator.geolocation).toBeDefined();
     });
 
-    it("should contain a getCurrentPosition function", function() {
+    it("geolocation.spec.2 should contain a getCurrentPosition function", function() {
         expect(typeof navigator.geolocation.getCurrentPosition).toBeDefined();
         expect(typeof navigator.geolocation.getCurrentPosition == 'function').toBe(true);
     });
 
-    it("should contain a watchPosition function", function() {
+    it("geolocation.spec.3 should contain a watchPosition function", function() {
         expect(typeof navigator.geolocation.watchPosition).toBeDefined();
         expect(typeof navigator.geolocation.watchPosition == 'function').toBe(true);
     });
 
-    it("should contain a clearWatch function", function() {
+    it("geolocation.spec.4 should contain a clearWatch function", function() {
         expect(typeof navigator.geolocation.clearWatch).toBeDefined();
         expect(typeof navigator.geolocation.clearWatch == 'function').toBe(true);
     });
 
     describe('getCurrentPosition method', function() {
         describe('error callback', function() {
-            it("should be called if we set timeout to 0 and maximumAge to a very small number", function() {
+            it("geolocation.spec.5 should be called if we set timeout to 0 and maximumAge to a very small number", function() {
                 console.log("Here I am");
                 var win = jasmine.createSpy(),
                     fail = jasmine.createSpy();
@@ -62,7 +62,7 @@ describe('Geolocation (navigator.geolocation)', function () {
         });
 
         describe('success callback', function() {
-            it("should be called with a Position object", function() {
+            it("geolocation.spec.6 should be called with a Position object", function() {
                 var win = jasmine.createSpy().andCallFake(function(p) {
                           expect(p.coords).toBeDefined();
                           expect(p.timestamp).toBeDefined();
@@ -91,7 +91,7 @@ describe('Geolocation (navigator.geolocation)', function () {
             afterEach(function() {
                 navigator.geolocation.clearWatch(errorWatch);
             });
-            it("should be called if we set timeout to 0 and maximumAge to a very small number", function() {
+            it("geolocation.spec.5 should be called if we set timeout to 0 and maximumAge to a very small number", function() {
                 var win = jasmine.createSpy(),
                     fail = jasmine.createSpy();
 
@@ -116,7 +116,7 @@ describe('Geolocation (navigator.geolocation)', function () {
             afterEach(function() {
                 navigator.geolocation.clearWatch(successWatch);
             });
-            it("should be called with a Position object", function() {
+            it("geolocation.spec.6 should be called with a Position object", function() {
                 var win = jasmine.createSpy().andCallFake(function(p) {
                           expect(p.coords).toBeDefined();
                           expect(p.timestamp).toBeDefined();

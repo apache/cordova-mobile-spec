@@ -20,11 +20,11 @@
 */
 
 describe('Platform (cordova)', function () {
-    it("should exist", function() {
+    it("platform.spec.1 should exist", function() {
         expect(cordova).toBeDefined();
     });
 
-    it("exec method should exist", function() {
+    it("platform.spec.2 exec method should exist", function() {
         expect(cordova.exec).toBeDefined();
         expect(typeof cordova.exec).toBe('function');
     });

@@ -20,7 +20,7 @@
 */
 
 describe('Battery (navigator.battery)', function () {;
-    it("should exist", function() {
+    it("battery.spec.1 should exist", function() {
         expect(navigator.battery).toBeDefined();
     });
 });
