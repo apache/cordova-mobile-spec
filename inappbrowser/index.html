@@ -30,7 +30,7 @@
     <script type="text/javascript" charset="utf-8" src="../cordova.js"></script>      
 
       
-    <script type="text/javascript" charset="utf-8">
+<script type="text/javascript" charset="utf-8">
 
     var deviceReady = false;
     
@@ -62,38 +62,8 @@
              }
         );
     }
+</script>
 
-    function openWithStyle(url, cssUrl) {
-        var iab = window.open(url, '_blank', 'location=yes');
-        if (cssUrl) {
-            iab.addEventListener('loadstop', function(event) {
-                iab.insertCSS({file: cssUrl});
-            });
-        } else {
-            iab.addEventListener('loadstop', function(event) {
-                iab.insertCSS({code:'#style-update-literal { \ndisplay: block !important; \n}'});
-            });
-        }
-    }
-
-    function openWithScript(url, jsUrl) {
-        var iab = window.open(url, '_blank', 'location=yes');
-        if (jsUrl) {
-            iab.addEventListener('loadstop', function(event) {
-                iab.executeScript({file: jsUrl});
-            });
-        } else {
-            iab.addEventListener('loadstop', function(event) {
-                var code = '(function(){\n' +
-                  '    var header = document.getElementById("header");\n' +
-                  '    header.innerHTML = "Script literal successfully injected";\n' +
-                  '    return {result:header};\n' +
-                  '})()';
-                iab.executeScript({code:code});
-            });
-        }
-    }
-    </script>
   </head>
   <body onload="init();" id="stage" class="theme">
   
@@ -132,12 +102,6 @@
     <div class="btn large" onclick="openWithErrorHandler('x-ttp://www.invalid.com/');">Invalid Scheme</div>
     <div class="btn large" onclick="openWithErrorHandler('http://www.inv;alid.com/');">Invalid Host</div>
     <div class="btn large" onclick="openWithErrorHandler('nonexistent.html');">Missing File</div>
-    <h1>CSS / JS Injection</h1>
-    <div class="btn large" onclick="window.open('inject.html', '_blank');">Original Document</div>
-    <div class="btn large" onclick="openWithStyle('inject.html','inject.css');">CSS File Injection</div>
-    <div class="btn large" onclick="openWithStyle('inject.html');">CSS Literal Injection</div>
-    <div class="btn large" onclick="openWithScript('inject.html', 'inject.js');">Script File Injection</div>
-    <div class="btn large" onclick="openWithScript('inject.html');">Script Literal Injection</div>
     <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
-</html>
+</html>      
