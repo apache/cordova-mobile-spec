@@ -71,6 +71,7 @@
         iab.addEventListener('loadstart', logEvent, false);
         iab.addEventListener('loadstop', logEvent, false);
         iab.addEventListener('exit', logEvent, false);
+        return iab;
     }
 
     function openWithStyle(url, cssUrl, useCallback) {
