@@ -54,17 +54,27 @@
         },1000);
     }
 
-    function openWithErrorHandler(url) {
-        var iab = window.open(url, '_blank', 'location=yes');
-        iab.addEventListener('loaderror',
-             function(error) {
-                 alert("Error Channel Fired\nCode: " + error.code + "\nMessage: " +error.message);
-             }
-        );
+    function doOpen(url, target, params) {
+        var iab = window.open(url, target, params);
+        if (!iab) {
+            alert('window.open returned ' + iab);
+            return;
+        }
+        function logEvent(e) {
+            if (e.type == 'loaderror') {
+                console.log('IAB event=' + e.type + ' code=' + e.code + ' message=' + e.message);
+            } else {
+                console.log('IAB event=' + e.type);
+            }
+        }
+        iab.addEventListener('loaderror', logEvent, false);
+        iab.addEventListener('loadstart', logEvent, false);
+        iab.addEventListener('loadstop', logEvent, false);
+        iab.addEventListener('exit', logEvent, false);
     }
 
     function openWithStyle(url, cssUrl, useCallback) {
-        var iab = window.open(url, '_blank', 'location=yes');
+        var iab = doOpen(url, '_blank', 'location=yes');
         var callback = function(results) {
             if (results && results.length === 0) {
                 alert('Results verified');
@@ -86,7 +96,7 @@
     }
 
     function openWithScript(url, jsUrl, useCallback) {
-        var iab = window.open(url, '_blank', 'location=yes');
+        var iab = doOpen(url, '_blank', 'location=yes');
         if (jsUrl) {
             iab.addEventListener('loadstop', function(event) {
                 iab.executeScript({file: jsUrl}, useCallback && function(results) {
@@ -128,35 +138,38 @@
     </div>
     <div onclick="backHome();">Back</div>
     <h1>Local URL</h1>
-    <div class="btn large" onclick="window.open('local.html');">Default: CordovaWebView</div>
-    <div class="btn large" onclick="window.open('local.html', '_self');">Target=Self: CordovaWebView</div>
-    <div class="btn large" onclick="window.open('local.html', '_system');">Target=System: Error</div>
-    <div class="btn large" onclick="window.open('local.html', '_blank');">Target=Blank: InAppBrowser</div>
-    <div class="btn large" onclick="window.open('local.html', 'random_string');">Target=Random: InAppBrowser</div>
-    <div class="btn large" onclick="window.open('local.html', 'random_string', 'location=no');">Target=Random, no location bar: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('local.html');">Default: CordovaWebView</div>
+    <div class="btn large" onclick="doOpen('local.html', '_self');">Target=Self: CordovaWebView</div>
+    <div class="btn large" onclick="doOpen('local.html', '_system');">Target=System: Error</div>
+    <div class="btn large" onclick="doOpen('local.html', '_blank');">Target=Blank: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('local.html', 'random_string');">Target=Random: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'location=no');">Target=Random, no location bar: InAppBrowser</div>
     <h1>White Listed URL</h1>
-    <div class="btn large" onclick="window.open('http://www.google.com');">Default: CordovaWebView<span style="vertical-align:super">*</span></div>
-    <div class="btn large" onclick="window.open('http://www.google.com', '_self');">Target=Self: CordovaWebView<span style="vertical-align:super">*</span></div>
-    <div class="btn large" onclick="window.open('http://www.google.com', '_system');">Target=System: System Browser</div>
-    <div class="btn large" onclick="window.open('http://www.google.com', '_blank');">Target=Blank: InAppBrowser</div>
-    <div class="btn large" onclick="window.open('http://www.google.com', 'random_string');">Target=Random: InAppBrowser</div>
-    <div class="btn large" onclick="window.open('http://www.google.com', 'random_string', 'location=no');">Target=Random, no location bar: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('http://www.google.com');">Default: CordovaWebView<span style="vertical-align:super">*</span></div>
+    <div class="btn large" onclick="doOpen('http://www.google.com', '_self');">Target=Self: CordovaWebView<span style="vertical-align:super">*</span></div>
+    <div class="btn large" onclick="doOpen('http://www.google.com', '_system');">Target=System: System Browser</div>
+    <div class="btn large" onclick="doOpen('http://www.google.com', '_blank');">Target=Blank: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('http://www.google.com', 'random_string');">Target=Random: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('http://www.google.com', 'random_string', 'location=no');">Target=Random, no location bar: InAppBrowser</div>
     <h1>Non White Listed URL</h1>
-    <div class="btn large" onclick="window.open('http://www.apple.com');">Default: InAppBrowser</div>
-    <div class="btn large" onclick="window.open('http://www.apple.com', '_self');">Target=Self: InAppBrowser</div>
-    <div class="btn large" onclick="window.open('http://www.apple.com', '_system');">Target=System: System</div>
-    <div class="btn large" onclick="window.open('http://www.apple.com', '_blank');">Target=Blank: InAppBrowser</div>
-    <div class="btn large" onclick="window.open('http://www.apple.com', 'random_string');">Target=Random: InAppBrowser</div>
-    <div class="btn large" onclick="window.open('http://www.apple.com', 'random_string', 'location=no');">Target=Random, no location bar: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('http://www.apple.com');">Default: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('http://www.apple.com', '_self');">Target=Self: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('http://www.apple.com', '_system');">Target=System: System</div>
+    <div class="btn large" onclick="doOpen('http://www.apple.com', '_blank');">Target=Blank: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('http://www.apple.com', 'random_string');">Target=Random: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('http://www.apple.com', 'random_string', 'location=no');">Target=Random, no location bar: InAppBrowser</div>
+    <h1>Page with redirect</h1>
+    <div class="btn large" onclick="doOpen('http://google.com', 'random_string', 'location=no');">http://google.com (should 301)</div>
+    <div class="btn large" onclick="doOpen('http://www.zhihu.com/answer/16714076', 'random_string', 'location=no');">http://www.zhihu.com/answer/16714076 (should 302)</div>
     <h1>PDF URL</h1>
-    <div class="btn large" onclick="window.open('http://www.stluciadance.com/prospectus_file/sample.pdf');">Remote URL</div>
-    <div class="btn large" onclick="window.open('local.pdf', '_blank');">Local URL</div>
+    <div class="btn large" onclick="doOpen('http://www.stluciadance.com/prospectus_file/sample.pdf');">Remote URL</div>
+    <div class="btn large" onclick="doOpen('local.pdf', '_blank');">Local URL</div>
     <h1>INVALID URL</h1>
-    <div class="btn large" onclick="openWithErrorHandler('x-ttp://www.invalid.com/');">Invalid Scheme</div>
-    <div class="btn large" onclick="openWithErrorHandler('http://www.inv;alid.com/');">Invalid Host</div>
-    <div class="btn large" onclick="openWithErrorHandler('nonexistent.html');">Missing File</div>
+    <div class="btn large" onclick="doOpen('x-ttp://www.invalid.com/');">Invalid Scheme</div>
+    <div class="btn large" onclick="doOpen('http://www.inv;alid.com/');">Invalid Host</div>
+    <div class="btn large" onclick="doOpen('nonexistent.html');">Missing File</div>
     <h1>CSS / JS Injection</h1>
-    <div class="btn large" onclick="window.open('inject.html', '_blank');">Original Document</div>
+    <div class="btn large" onclick="doOpen('inject.html', '_blank');">Original Document</div>
     <div class="btn large" onclick="openWithStyle('inject.html','inject.css');">CSS File Injection</div>
     <div class="btn large" onclick="openWithStyle('inject.html','inject.css', true);">CSS File Injection (CB)</div>
     <div class="btn large" onclick="openWithStyle('inject.html');">CSS Literal Injection</div>
