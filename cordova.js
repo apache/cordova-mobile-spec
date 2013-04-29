@@ -19,7 +19,7 @@
  *
 */
 
-var VERSION='2.7.0rc1';
+var VERSION='2.7.0';
 var PLAT;
 if (/Android/.exec(navigator.userAgent)) {
     PLAT = 'android';
