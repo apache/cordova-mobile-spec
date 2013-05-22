@@ -59,7 +59,9 @@ if (PLAT) {
 }
 
 if (!window._doNotWriteCordovaScript) {
-    document.write('<script type="text/javascript" charset="utf-8" src="' + cordovaPath + '"></script>');
+    var script = document.createElement("script");
+    script.src = cordovaPath;
+    document.head.appendChild(script);
 }
 
 function backHome() {
