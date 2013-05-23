@@ -172,6 +172,12 @@ describe("Session Storage", function () {
     describe("HTML 5 Storage", function () {
         it("storage.spec.9 should exist", function() {
             expect(window.openDatabase);
+            
+        });
+        
+        it("storage.spec.17 should contain an openDatabase function", function() {
+            expect(window.openDatabase).toBeDefined();
+            expect(typeof window.openDatabase == 'function').toBe(true);
         });
 
         it("storage.spec.18 Should be able to create and drop tables", function() {
