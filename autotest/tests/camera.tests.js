@@ -28,6 +28,11 @@ describe('Camera (navigator.camera)', function () {
         expect(navigator.camera.getPicture).toBeDefined();
 		expect(typeof navigator.camera.getPicture == 'function').toBe(true);
 	});
+	
+	it("should contain a cleanup function", function() {
+        expect(navigator.camera.cleanup).toBeDefined();
+		expect(typeof navigator.camera.cleanup == 'function').toBe(true);
+	});
 });
 
 describe('Camera Constants (window.Camera + navigator.camera)', function () {
