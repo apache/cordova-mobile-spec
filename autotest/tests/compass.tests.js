@@ -20,7 +20,45 @@
 */
 
 describe('Compass (navigator.compass)', function () {
-    it("compass.spec.1 should exist", function() {
+	var hardwarefailure = false;
+	beforeEach(function() {
+        this.addMatchers({
+        	// check to see if the device has a compass, if it doesn't fail gracefully 
+            hasHardware: function() {
+        		var toreturn = true;
+        	    
+        		try{
+        			this.actual;
+        			toreturn = true;
+        		} catch (error){
+        			if (error.code == CompassError.COMPASS_NOT_SUPPORTED){
+        				hardwarefailure = true;
+            			toreturn = false;
+        			}
+        		}
+        		this.message = function () {
+        	       return "The device does not have compass support.  The remaining compass tests will be ignored.";
+        	    }
+
+        		return toreturn;
+            }
+        });
+	});
+	
+	afterEach(function () {
+		// We want to gracefully fail if there is a hardware failure
+		if(this.results_.failedCount > 0 && hardwarefailure == true) {
+			//there was a hardware failure, cancelling all tests
+			jasmine.Queue.prototype.next_ = function () { this.onComplete();}
+		}
+	});
+	
+	it("compass.hardwarecheck is compass supported", function() {
+		var f = function(){navigator.compass.getCurrentHeading(function onSuccess(){}, function onError(error) {})};
+		expect(f).hasHardware();
+	}); 
+	
+	it("compass.spec.1 should exist", function() {
         expect(navigator.compass).toBeDefined();
     });
 
