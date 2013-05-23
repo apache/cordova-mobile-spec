@@ -30,6 +30,16 @@ describe('Globalization (navigator.globalization)', function () {
         });
     });
     
+    describe('Globalization Constants (window.Globalization)', function () {
+        it("globalization.spec.1 should exist", function() {
+            expect(window.GlobalizationError).toBeDefined();
+            expect(window.GlobalizationError.UNKNOWN_ERROR).toBe(0);
+            expect(window.GlobalizationError.FORMATTING_ERROR).toBe(1);
+            expect(window.GlobalizationError.PARSING_ERROR).toBe(2);
+            expect(window.GlobalizationError.PATTERN_ERROR).toBe(3);
+        });
+    });
+    
     describe("dateToString", function() {
         it("globalization.spec.1 should exist", function() {
             expect(typeof navigator.globalization.dateToString).toBeDefined();
