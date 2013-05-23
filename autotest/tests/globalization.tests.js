@@ -3,6 +3,33 @@ describe('Globalization (navigator.globalization)', function () {
         expect(navigator.globalization).toBeDefined();
     });
     
+    describe("getPreferredLanguage", function() {
+        it("globalization.spec.1 should exist", function() {
+            expect(typeof navigator.globalization.getPreferredLanguage).toBeDefined();
+            expect(typeof navigator.globalization.getPreferredLanguage == 'function').toBe(true);
+        });
+        it("globalization.spec.3 getPreferredLanguage success callback should be called with a Properties object", function() {
+            var win = jasmine.createSpy().andCallFake(function(a) {
+                    expect(a).toBeDefined();
+                    expect(typeof a).toBe('object');
+                    expect(a.value).toBeDefined();
+                    expect(typeof a.value).toBe('string');
+                    expect(a.value.length > 0).toBe(true);
+                }),
+                fail = jasmine.createSpy();
+
+            runs(function () {
+                navigator.globalization.getPreferredLanguage(win, fail);
+            });
+
+            waitsFor(function () { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
+
+            runs(function () {
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+    });
+    
     describe("getLocaleName", function() {
         it("globalization.spec.1 should exist", function() {
             expect(typeof navigator.globalization.getLocaleName).toBeDefined();
