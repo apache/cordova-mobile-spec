@@ -33,6 +33,15 @@ describe('Media', function () {
         expect(media1._position).toBeDefined();
         media1.release();
     });
+    
+    it("should define constants for Media status", function() {
+        expect(Media).toBeDefined();
+        expect(Media.MEDIA_NONE).toBe(0);
+        expect(Media.MEDIA_STARTING).toBe(1);
+		expect(Media.MEDIA_RUNNING).toBe(2);
+		expect(Media.MEDIA_PAUSED).toBe(3);
+		expect(Media.MEDIA_STOPPED).toBe(4);
+	});
 
 	it("should define constants for Media errors", function() {
         expect(MediaError).toBeDefined();
