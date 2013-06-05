@@ -37,6 +37,19 @@
     //-------------------------------------------------------------------------
     // Contacts
     //-------------------------------------------------------------------------
+    function getContactsWithPartialOptions() {
+        navigator.contacts.find(
+            ["displayName"],
+            function (contacts) {
+                document.getElementById('contacts_results').innerHTML = "Found " + contacts.length + "contacts";;
+            },
+            function (e) {
+                document.getElementById('contacts_results').innerHTML = "Error: " + e.code;
+            }, {
+                multiple: true
+            });
+    };
+    
     function getContacts() {
         obj = new ContactFindOptions();
         // show all contacts, so don't filter
@@ -127,7 +140,8 @@
         <span id="contacts_results"> </span>
     </div>
     <h2>Action</h2>
-    <div class="btn large" onclick="getContacts();">Get phone's contacts</div>
+      <div class="btn large" onclick="getContacts();">Get phone's contacts</div>
+      <div class="btn large" onclick="getContactsWithPartialOptions();">Get phone's contacts using partial options (CB-3522)</div>
     <div class="btn large" onclick="addContact();">Add a new contact 'Dooney Evans'</div>
     <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
