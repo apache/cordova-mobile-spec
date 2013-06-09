@@ -64,6 +64,26 @@ describe("Contacts (navigator.contacts)", function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
+        
+        it("success callback should be called with an array, even if partial ContactFindOptions specified", function () {
+            var win = jasmine.createSpy().andCallFake(function (result) {
+                expect(result).toBeDefined();
+                expect(result instanceof Array).toBe(true);
+            }),
+                fail = jasmine.createSpy();
+
+            runs(function () {
+                navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], win, fail, {
+                    multiple: true
+                });
+            });
+
+            waitsFor(function () { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
+
+            runs(function () {
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
 
         it("contacts.spec.4 should throw an exception if success callback is empty", function() {
             var fail = function() {};
