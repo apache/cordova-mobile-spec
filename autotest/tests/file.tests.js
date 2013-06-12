@@ -3472,5 +3472,103 @@ describe('File API', function() {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
+        it("file.spec.104 should be able to write binary data from an ArrayBuffer", function() {
+            var fileName = "bufferwriter.bin",
+                filePath = root.fullPath + '/' + fileName,
+                theWriter,
+                // file content
+                data = new ArrayBuffer(32),
+                dataView = new Int8Array(data),
+                fail = createFail('FileWriter'),
+                // for verifying file length
+                length = 32,
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(theWriter.length).toBe(length);
+                    expect(theWriter.position).toBe(length);
+
+                    // cleanup
+                    deleteFile(fileName);
+                }),
+                // writes file content
+                write_file = function(fileEntry) {
+                    fileEntry.createWriter(function(writer) {
+                        theWriter = writer;
+                        theWriter.onwriteend = verifier;
+                        theWriter.write(data);
+                    }, fail);
+                };
+
+            for (i=0; i < dataView.length; i++) {
+                dataView[i] = i;
+            }
+
+            // creates file, then write content
+            runs(function() {
+                createFile(fileName, write_file);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
+        it("file.spec.105 should be able to write binary data from a Blob", function() {
+            var fileName = "blobwriter.bin",
+                filePath = root.fullPath + '/' + fileName,
+                theWriter,
+                fail = createFail('FileWriter'),
+                // file content
+                data = new ArrayBuffer(32),
+                dataView = new Int8Array(data),
+                blob,
+                // for verifying file length
+                length = 32,
+                verifier = jasmine.createSpy().andCallFake(function(evt) {
+                    expect(theWriter.length).toBe(length);
+                    expect(theWriter.position).toBe(length);
+
+                    // cleanup
+                    deleteFile(fileName);
+                }),
+                // writes file content
+                write_file = function(fileEntry) {
+                    fileEntry.createWriter(function(writer) {
+                        theWriter = writer;
+                        theWriter.onwriteend = verifier;
+                        theWriter.write(blob);
+                    }, fail);
+                };
+            for (i=0; i < dataView.length; i++) {
+                dataView[i] = i;
+            }
+            try {
+                // Mobile Safari: Use Blob constructor
+                blob = new Blob([data], {"type": "application/octet-stream"})
+            } catch(e) {
+                if (window.WebKitBlobBuilder) {
+                    // Android Browser: Use deprecated BlobBuilder
+                    var builder = new WebKitBlobBuilder()
+                    builder.append(data)
+                    blob = builder.getBlob('application/octet-stream');
+                } else {
+                    // We have no way defined to create a Blob, so fail
+                    fail();
+                }
+            }
+
+            // creates file, then write content
+            runs(function() {
+                createFile(fileName, write_file);
+            });
+
+            waitsFor(function() { return verifier.wasCalled; }, "verifier", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
     });
 });
