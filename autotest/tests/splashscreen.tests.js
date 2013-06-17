@@ -29,7 +29,7 @@ describe('Splashscreen (cordova)', function () {
         expect(typeof navigator.splashscreen.show).toBe('function');
     });
     
-    it("splashscreen.spec.2 exec method should exist", function() {
+    it("splashscreen.spec.3 exec method should exist", function() {
         expect(navigator.splashscreen.hide).toBeDefined();
         expect(typeof navigator.splashscreen.hide).toBe('function');
     });
