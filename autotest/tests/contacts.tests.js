@@ -507,7 +507,7 @@ describe("Contacts (navigator.contacts)", function () {
                         });
                     } else {
                         done = true;
-                    };
+                    }
                 };
                 var findFail = function(e) {
                     throw("Failure callback invoked in navigator.contacts.find call, test failed.");
