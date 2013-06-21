@@ -183,7 +183,7 @@ describe("Contacts (navigator.contacts)", function () {
 
     describe('create method', function() {
 
-        it("contacts.spec.1 should exist", function() {
+        it("contacts.spec.7 should exist", function() {
             expect(navigator.contacts.create).toBeDefined();
             expect(typeof navigator.contacts.create).toBe('function');
         });
