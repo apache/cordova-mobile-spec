@@ -95,13 +95,13 @@ describe('File API', function() {
     };
 
     var createFail = function(module) {
-        return jasmine.createSpy().andCallFake(function(err) {
+        return jasmine.createSpy("Fail").andCallFake(function(err) {
             console.log('[ERROR ' + module + '] ' + JSON.stringify(err));
         });
     };
 
     var createWin = function(module) {
-        return jasmine.createSpy().andCallFake(function() {
+        return jasmine.createSpy("Win").andCallFake(function() {
             console.log('[ERROR ' + module + '] Unexpected success callback');
         });
     };
@@ -1086,6 +1086,7 @@ describe('File API', function() {
                     expect(fileEntry).toBeDefined();
                     expect(typeof fileEntry.createWriter).toBe('function');
                     expect(typeof fileEntry.file).toBe('function');
+                    expect(fileEntry.file instanceof file).toBe(true);
 
                     // cleanup
                     fileEntry.remove(null, fail);
@@ -3585,6 +3586,112 @@ describe('File API', function() {
                 expect(verifier).toHaveBeenCalled();
                 expect(fail).not.toHaveBeenCalled();
             });
+        });
+        it("file.spec.106 should be able to write a File to a FileWriter", function() {
+            var dummyFileName = 'dummy.txt',
+                outputFileName = 'verify.txt',
+                dummyFileText = 'This text should be written to two files',
+                fail = createFail('FileWriter'),
+                verifier = jasmine.createSpy("verifier").andCallFake(function(outputFileWriter) {
+                    expect(outputFileWriter.length).toBe(dummyFileText.length);
+                    expect(outputFileWriter.position).toBe(dummyFileText.length);
+                    deleteFile(fileName);
+                }),
+                writeFile = function(fileName, fileData, win) {
+                    var theWriter,
+                        filePath = root.fullPath + '/' + fileName,
+                        // writes file content to new file
+                        write_file = function(fileEntry) {
+                            writerEntry = fileEntry;
+                            fileEntry.createWriter(function(writer) {
+                                theWriter = writer;
+                                writer.onwriteend = function(ev) {
+                                    if (typeof fileData.length !== "undefined") {
+                                        expect(theWriter.length).toBe(fileData.length);
+                                        expect(theWriter.position).toBe(fileData.length);
+                                    }
+                                    win(theWriter);
+                                }
+                                writer.onerror = fail;
+                                writer.write(fileData);
+                            }, fail);
+                        };
+                    createFile(fileName, write_file, fail);
+                },
+
+                openFile = function(fileName, callback) {
+                    root.getFile(fileName, {create: false}, function(fileEntry) {
+                        fileEntry.file(callback, fail);
+                    }, fail);
+                };
+
+            runs(function() {
+                writeFile(dummyFileName, dummyFileText, function(dummyFileWriter) {
+                    openFile(dummyFileName, function(file) {
+                        writeFile(outputFileName, file, verifier);
+                    });
+                });
+            });
+            waitsFor(function() { return (verifier.wasCalled || fail.wasCalled); }, "callbacks never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+
+        });
+        it("file.spec.107 should be able to write a sliced File to a FileWriter", function() {
+            var dummyFileName = 'dummy2.txt',
+                outputFileName = 'verify2.txt',
+                dummyFileText = 'This text should be written to two files',
+                fail = createFail('FileWriter'),
+                verifier = jasmine.createSpy("verifier").andCallFake(function(outputFileWriter) {
+                    expect(outputFileWriter.length).toBe(10);
+                    expect(outputFileWriter.position).toBe(10);
+                    deleteFile(fileName);
+                }),
+                writeFile = function(fileName, fileData, win) {
+                    var theWriter,
+                        filePath = root.fullPath + '/' + fileName,
+                        // writes file content to new file
+                        write_file = function(fileEntry) {
+                            writerEntry = fileEntry;
+                            fileEntry.createWriter(function(writer) {
+                                theWriter = writer;
+                                writer.onwriteend = function(ev) {
+                                    if (typeof fileData.length !== "undefined") {
+                                        expect(theWriter.length).toBe(fileData.length);
+                                        expect(theWriter.position).toBe(fileData.length);
+                                    }
+                                    win(theWriter);
+                                }
+                                writer.onerror = fail;
+                                writer.write(fileData);
+                            }, fail);
+                        };
+                    createFile(fileName, write_file, fail);
+                },
+
+                openFile = function(fileName, callback) {
+                    root.getFile(fileName, {create: false}, function(fileEntry) {
+                        fileEntry.file(callback, fail);
+                    }, fail);
+                };
+
+            runs(function() {
+                writeFile(dummyFileName, dummyFileText, function(dummyFileWriter) {
+                    openFile(dummyFileName, function(file) {
+                        writeFile(outputFileName, file.slice(10,20), verifier);
+                    });
+                });
+            });
+            waitsFor(function() { return (verifier.wasCalled || fail.wasCalled); }, "callbacks never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+
         });
     });
 });
