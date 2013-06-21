@@ -64,7 +64,7 @@ describe("Contacts (navigator.contacts)", function () {
                 expect(fail).not.toHaveBeenCalled();
             });
         });
-        
+
         it("success callback should be called with an array, even if partial ContactFindOptions specified", function () {
             var win = jasmine.createSpy().andCallFake(function (result) {
                 expect(result).toBeDefined();
@@ -428,8 +428,6 @@ describe("Contacts (navigator.contacts)", function () {
     });
 
     describe("Round trip Contact tests (creating + save + delete + find).", function () {
-        afterEach(removeContact);
-
         it("contacts.spec.24 Creating, saving, finding a contact should work, removing it should work, after which we should not be able to find it, and we should not be able to delete it again.", function() {
             var done = false;
             runs(function () {
@@ -489,4 +487,35 @@ describe("Contacts (navigator.contacts)", function () {
             expect(ContactError.PERMISSION_DENIED_ERROR).toBe(20);
         });
     });
+
+    describe("Contacts autotests cleanup", function () {
+        it("contacts.spec.26 Cleanup any DeleteMe contacts from Contacts tests.", function() {
+            var done = false;
+            var obj = new ContactFindOptions();
+            obj.filter="DeleteMe";
+            obj.multiple=true;
+            runs(function () {
+                var findSuccess = function (cs) {
+                    var contactObj = new Contact();
+                    if (cs.length>0){
+                        contactObj = cs[0];
+                        contactObj.remove(function(){
+                            console.log("[CONTACTS CLEANUP] DeleteMe contact successfully removed");
+                            navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], findSuccess, findFail, obj);
+                        },function(){
+                            console.log("[CONTACTS CLEANUP ERROR]: failed to remove DeleteMe contact");
+                        });
+                    } else {
+                        done = true;
+                    };
+                };
+                var findFail = function(e) {
+                    throw("Failure callback invoked in navigator.contacts.find call, test failed.");
+                };
+                navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], findSuccess, findFail, obj);
+            });
+            waitsFor(function () { return done; }, Tests.TEST_TIMEOUT);
+        });
+    });
+
 });
