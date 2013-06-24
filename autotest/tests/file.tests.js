@@ -3693,5 +3693,86 @@ describe('File API', function() {
             });
 
         });
+        it("file.spec.108 should be able to write binary data from a File", function() {
+            // Skip test if Blobs are not supported (e.g.: Android 2.3).
+            if (typeof window.Blob == 'undefined' || typeof window.ArrayBuffer == 'undefined') {
+                return;
+            }
+            var dummyFileName = "blobwriter.bin",
+                outputFileName = 'verify.bin',
+                fail = createFail('FileWriter'),
+                // file content
+                data = new ArrayBuffer(32),
+                dataView = new Int8Array(data),
+                blob,
+                // for verifying file length
+                length = 32,
+                verifier = jasmine.createSpy("verifier").andCallFake(function(outputFileWriter) {
+                    expect(outputFileWriter.length).toBe(length);
+                    expect(outputFileWriter.position).toBe(length);
+
+                    // cleanup
+                    deleteFile(fileName);
+                }),
+                writeFile = function(fileName, fileData, win) {
+                    var theWriter,
+                        filePath = root.fullPath + '/' + fileName,
+                        // writes file content to new file
+                        write_file = function(fileEntry) {
+                            writerEntry = fileEntry;
+                            fileEntry.createWriter(function(writer) {
+                                theWriter = writer;
+                                writer.onwriteend = function(ev) {
+                                    if (typeof fileData.length !== "undefined") {
+                                        expect(theWriter.length).toBe(fileData.length);
+                                        expect(theWriter.position).toBe(fileData.length);
+                                    }
+                                    win(theWriter);
+                                }
+                                writer.onerror = fail;
+                                writer.write(fileData);
+                            }, fail);
+                        };
+                    createFile(fileName, write_file, fail);
+                },
+
+                openFile = function(fileName, callback) {
+                    root.getFile(fileName, {create: false}, function(fileEntry) {
+                        fileEntry.file(callback, fail);
+                    }, fail);
+                };
+
+            for (i=0; i < dataView.length; i++) {
+                dataView[i] = i;
+            }
+            try {
+                // Mobile Safari: Use Blob constructor
+                blob = new Blob([data], {"type": "application/octet-stream"})
+            } catch(e) {
+                if (window.WebKitBlobBuilder) {
+                    // Android Browser: Use deprecated BlobBuilder
+                    var builder = new WebKitBlobBuilder()
+                    builder.append(data)
+                    blob = builder.getBlob('application/octet-stream');
+                } else {
+                    // We have no way defined to create a Blob, so fail
+                    fail();
+                }
+            }
+
+            runs(function() {
+                writeFile(dummyFileName, blob, function(dummyFileWriter) {
+                    openFile(dummyFileName, function(file) {
+                        writeFile(outputFileName, file, verifier);
+                    });
+                });
+            });
+            waitsFor(function() { return (verifier.wasCalled || fail.wasCalled); }, "callbacks never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(verifier).toHaveBeenCalled();
+                expect(fail).not.toHaveBeenCalled();
+            });
+        });
     });
 });
