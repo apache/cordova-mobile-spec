@@ -42,10 +42,6 @@
         navigator.notification.beep(3);
     };
 
-    var vibrate = function(){
-      navigator.notification.vibrate(1000);
-    };
-
     var alertDialog = function(message, title, button) {
         console.log("alertDialog()");
         navigator.notification.alert(message,
@@ -130,7 +126,6 @@
     
     <h2>Action</h2>
     <div class="btn large" onclick="beep();">Beep</div>
-    <div class="btn large" onclick="vibrate();">Vibrate</div>
     <div class="btn large" onclick="alertDialog('You pressed alert.', 'Alert Dialog', 'Continue');">Alert Dialog</div>
     <div class="btn large" onclick="confirmDialogA('You pressed confirm.', 'Confirm Dialog', 'Yes,No,Maybe');">Confirm Dialog - Deprecated</div>
     <div class="btn large" onclick="confirmDialogB('You pressed confirm.', 'Confirm Dialog', ['Yes', 'No', 'Maybe, Not Sure']);">Confirm Dialog</div>
