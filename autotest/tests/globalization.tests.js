@@ -450,7 +450,7 @@ describe('Globalization (navigator.globalization)', function () {
                 fail = jasmine.createSpy();
 
             runs(function () {
-                navigator.globalization.getDateNames(win, fail, {type: 'wide',item: 'days'});
+                navigator.globalization.getDateNames(win, fail, {type: 'wide', item: 'days'});
             });
 
             waitsFor(function () { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
@@ -471,7 +471,7 @@ describe('Globalization (navigator.globalization)', function () {
                 fail = jasmine.createSpy();
 
             runs(function () {
-                navigator.globalization.getDateNames(win, fail, {type: 'wide',item: 'months'});
+                navigator.globalization.getDateNames(win, fail, {type: 'wide', item: 'months'});
             });
 
             waitsFor(function () { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
