@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="org.apache.mobilespec" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>mobilespec</name>
+    <description>
+        Cordova test suite.
+    </description>
+    <access origin="audio.ibeat.org" />
+    <access origin="cordova-filetransfer.jitsu.com" />
+    <access origin="whatheaders.com" />
+    <access origin="apache.org" subdomains="true"/>
+    <access origin="www.google.com" />
+    <access origin="httpssss://example.com" />
+</widget>
