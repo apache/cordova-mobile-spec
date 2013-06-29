@@ -39,31 +39,7 @@ var PLAT;
 
 var scripts = document.getElementsByTagName('script');
 var currentPath = scripts[scripts.length - 1].src;
-var platformCordovaPath = currentPath.replace("cordova-incl.js", "cordova." + PLAT + ".js");
-var normalCordovaPath = currentPath.replace("cordova-incl.js", "cordova.js");
-var cordovaPath = normalCordovaPath;
-
-if (PLAT) {
-    // XHR to local file is an error on some platforms, windowsphone for one 
-    try {
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", platformCordovaPath, false);
-        xhr.onreadystatechange = function() {
-
-            if (this.readyState == this.DONE && this.responseText.length > 0) {
-                if(parseInt(this.status) >= 400){
-                    cordovaPath = normalCordovaPath;
-                }else{
-                    cordovaPath = platformCordovaPath;
-                }
-            }
-        };
-        xhr.send(null);
-    }
-    catch(e){
-        cordovaPath = normalCordovaPath;
-    } // access denied!
-}
+var cordovaPath = currentPath.replace("cordova-incl.js", "cordova.js");
 
 if (!window._doNotWriteCordovaScript) {
     if (PLAT != "windows8") {
