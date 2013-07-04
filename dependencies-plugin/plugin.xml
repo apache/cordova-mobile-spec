@@ -24,7 +24,7 @@
   <engines>
     <engine name="cordova" version=">=2.7" />
   </engines>
-
+  <platform name="android"/>
   <name>Mobile-Spec plugin to quickly pull in all cordova plugins</name>
 
   <dependency id="org.apache.cordova.core.battery-status" url="." subdir="../cordova-plugin-battery-status" />
@@ -40,6 +40,7 @@
   <dependency id="org.apache.cordova.core.geolocation" url="." subdir="../cordova-plugin-geolocation" />
   <dependency id="org.apache.cordova.core.globalization" url="." subdir="../cordova-plugin-globalization" />
   <dependency id="org.apache.cordova.core.inappbrowser" url="." subdir="../cordova-plugin-inappbrowser" />
+  <dependency id="org.apache.cordova.core.media" url="." subdir="../cordova-plugin-media" />
   <dependency id="org.apache.cordova.core.media-capture" url="." subdir="../cordova-plugin-media-capture" />
   <dependency id="org.apache.cordova.core.network-information" url="." subdir="../cordova-plugin-network-information" />
   <dependency id="org.apache.cordova.core.splashscreen" url="." subdir="../cordova-plugin-splashscreen" />
