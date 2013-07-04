@@ -3101,7 +3101,7 @@ describe('File API', function() {
     });
 
     describe('FileWriter', function(){
-        it("file.spec.81 should have correct methods", function() {
+        it("file.spec.95 should have correct methods", function() {
             // retrieve a FileWriter object
             var fileName = "writer.methods",
                 fail = createFail('FileWriter'),
