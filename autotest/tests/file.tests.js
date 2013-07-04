@@ -819,8 +819,11 @@ describe('File API', function() {
                 }),
                 fail = createFail('DirectoryEntry');
 
-            // create directory to kick off it
-            root.getDirectory(dirName, {create:true}, getDir, fail);
+            // create directory to kick it off
+            runs(function() {
+                root.getDirectory(dirName, {create:true}, getDir, fail);
+            });
+            waitsFor(function() { return getDir.wasCalled; }, "getDir never called", Tests.TEST_TIMEOUT);
         });
         it("file.spec.31 DirectoryEntry.getDirectory: get DirectoryEntry for invalid path", function() {
             var dirName = "de:invalid:path",
