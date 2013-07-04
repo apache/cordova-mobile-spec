@@ -877,7 +877,7 @@ describe('File API', function() {
                 root.getFile(fileName, {create:true}, getDir, fail);
             });
 
-            waitsFor(function() { return getDir.wasCalled; }, "getDir was called", Tests.TEST_TIMEOUT);
+            waitsFor(function() { return getDir.wasCalled; }, "getDir was never called", Tests.TEST_TIMEOUT);
         });
         it("file.spec.33 DirectoryEntry.getFile: get FileEntry for existing directory", function() {
             var dirName = "de.existing.dir",
