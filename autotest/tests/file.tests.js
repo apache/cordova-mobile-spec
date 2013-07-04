@@ -1273,7 +1273,11 @@ describe('File API', function() {
                 });
 
             // create a new file entry
-            createFile(fileName, entryCallback, fail);
+            runs(function() {
+                createFile(fileName, entryCallback, fail);
+            });
+
+            waitsFor(function() { return entryCallback.wasCalled; }, 'entryCallback never called', Tests.TEST_TIMEOUT);
         });
         it("file.spec.47 Entry.getMetadata on directory", function() {
             var dirName = "entry.metadata.dir",
