@@ -4,10 +4,11 @@
     <description>
         Cordova test suite.
     </description>
-    <access origin="audio.ibeat.org" />
-    <access origin="cordova-filetransfer.jitsu.com" />
-    <access origin="whatheaders.com" />
-    <access origin="apache.org" subdomains="true"/>
-    <access origin="www.google.com" />
+    <access origin="http://audio.ibeat.org" />
+    <access origin="http://cordova-filetransfer.jitsu.com" />
+    <access origin="http://whatheaders.com" />
+    <access origin="http://apache.org" subdomains="true"/>
+    <access origin="https://apache.org" subdomains="true"/>
+    <access origin="http://www.google.com" />
     <access origin="httpssss://example.com" />
 </widget>
