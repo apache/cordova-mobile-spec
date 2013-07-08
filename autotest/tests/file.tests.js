@@ -1013,6 +1013,37 @@ describe('File API', function() {
                     expect(fail).not.toHaveBeenCalled();
                 });
             });
+            it("file.spec.109 should return an empty entry list on the second call", function() {
+                var reader,
+                    initialWin = jasmine.createSpy().andCallFake(function(entries) {
+                        expect(entries).toBeDefined();
+                        expect(entries instanceof Array).toBe(true);
+                        expect(entries.length).not.toBe(0);
+                        // Run it again!
+                        reader.readEntries(finalWin, fail);
+                    }),
+                    finalWin = jasmine.createSpy().andCallFake(function(entries) {
+                        expect(entries).toBeDefined();
+                        expect(entries instanceof Array).toBe(true);
+                        expect(entries.length).toBe(0);
+                    }),
+                    fail = createFail('DirectoryReader');
+
+                // create reader for root directory
+                reader = root.createReader();
+                // read entries
+                runs(function() {
+                    reader.readEntries(initialWin, fail);
+                });
+
+                waitsFor(function() { return finalWin.wasCalled; }, "finalWin never called", Tests.TEST_TIMEOUT);
+
+                runs(function() {
+                    expect(initialWin).toHaveBeenCalled();
+                    expect(finalWin).toHaveBeenCalled();
+                    expect(fail).not.toHaveBeenCalled();
+                });
+            });
             it("file.spec.38 should read contents of directory that has been removed", function() {
                 var dirName = "de.createReader.notfound",
                     dirPath = root.fullPath + '/' + dirName,
