@@ -7,8 +7,8 @@
     <access origin="http://audio.ibeat.org" />
     <access origin="http://cordova-filetransfer.jitsu.com" />
     <access origin="http://whatheaders.com" />
-    <access origin="http://apache.org" subdomains="true"/>
-    <access origin="https://apache.org" subdomains="true"/>
+    <access origin="http://*.apache.org" />
+    <access origin="https://*.apache.org" />
     <access origin="http://www.google.com" />
     <access origin="httpssss://example.com" />
 </widget>
