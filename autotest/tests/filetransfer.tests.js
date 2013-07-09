@@ -323,7 +323,7 @@ describe('FileTransfer', function() {
             var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
             var downloadFail = jasmine.createSpy().andCallFake(function(error) {
                 expect(error.body).toBeDefined();
-                expect(error.body).toEqual('You requested a 404\n');
+                expect(error.body).toMatch('You requested a 404');
             });
 
             this.after(function() {
