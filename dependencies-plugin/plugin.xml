@@ -24,7 +24,7 @@
   <engines>
     <engine name="cordova" version=">=2.7" />
   </engines>
-
+  <platform name="android"/>
   <name>Mobile-Spec plugin to quickly pull in all cordova plugins</name>
 
   <dependency id="org.apache.cordova.core.battery-status" url="." subdir="../cordova-plugin-battery-status" />
