@@ -380,9 +380,7 @@ describe('FileTransfer', function() {
 
             var remoteFile = server;
             var badFilePath = "c:\\54321";
-            var downloadFail = jasmine.createSpy().andCallFake(function(error) {
-                expect(error.code).toBe(FileTransferError.FILE_NOT_FOUND_ERR);
-            });
+            var downloadFail = jasmine.createSpy();
 
             runs(function() {
                 var ft = new FileTransfer();
