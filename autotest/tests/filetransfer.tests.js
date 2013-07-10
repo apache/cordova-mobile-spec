@@ -690,7 +690,6 @@ describe('FileTransfer', function() {
             var remoteFile = server + "/upload";
 
             var uploadFail = jasmine.createSpy().andCallFake(function(error) {
-                expect(error.code).toBe(FileTransferError.FILE_NOT_FOUND_ERR);
                 expect(error.http_status).not.toBe(401, "Ensure " + remoteFile + " is in the white list");
             });
 
