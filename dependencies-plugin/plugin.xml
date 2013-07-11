@@ -45,4 +45,5 @@
   <dependency id="org.apache.cordova.core.network-information" url="." subdir="../cordova-plugin-network-information" />
   <dependency id="org.apache.cordova.core.splashscreen" url="." subdir="../cordova-plugin-splashscreen" />
   <dependency id="org.apache.cordova.core.vibration" url="." subdir="../cordova-plugin-vibration" />
+  <dependency id="org.apache.cordova.test.whitelist" url="." subdir="cordova-plugin-whitelist" />
 </plugin>
