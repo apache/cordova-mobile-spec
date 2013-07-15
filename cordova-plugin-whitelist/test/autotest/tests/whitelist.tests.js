@@ -93,7 +93,22 @@ describe('Whitelist API (cordova.whitelist)', function () {
         itShouldMatch('http://www.apache.org/', ['*://www.apache.org/*']);
         itShouldMatch('https://www.apache.org/', ['*://www.apache.org/*']);
         itShouldMatch('ftp://www.apache.org/', ['*://www.apache.org/*']);
+        itShouldMatch('file://www.apache.org/', ['*://www.apache.org/*']);
+        itShouldMatch('content://www.apache.org/', ['*://www.apache.org/*']);
+        itShouldMatch('foo://www.apache.org/', ['*://www.apache.org/*']);
         itShouldNotMatch('http://www.apache.com/', ['*://www.apache.org/*']);
+
+        itShouldMatch('http://www.apache.org/', ['*.apache.org']);
+        itShouldMatch('https://www.apache.org/', ['*.apache.org']);
+        itShouldNotMatch('ftp://www.apache.org/', ['*.apache.org']);
+
+        itShouldMatch('http://www.apache.org:81/', ['http://www.apache.org:81/*']);
+        itShouldMatch('http://user:pass@www.apache.org:81/foo/bar.html', ['http://www.apache.org:81/*']);
+        itShouldNotMatch('http://www.apache.org:80/', ['http://www.apache.org:81/*']);
+        itShouldNotMatch('http://www.apache.org/', ['http://www.apache.org:81/*']);
+        itShouldNotMatch('http://www.apache.org:foo/', ['http://www.apache.org:81/*']);
+        itShouldNotMatch('http://www.apache.org:81@www.apache.org/', ['http://www.apache.org:81/*']);
+        itShouldNotMatch('http://www.apache.org:81@www.evil.com/', ['http://www.apache.org:81/*']);
     });
 
     describe("Test function", function() {
