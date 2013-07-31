@@ -46,3 +46,8 @@ make sure you add the following entries to the whitelist!
 - www.google.com
 - httpssss://example.com (bad protocol necessary)
 
+### Performance ###
+
+For reference purposes, the document AndroidBridgePerformance_300.pdf in this directory outlines the Android bridge performance using mobile-spec and the manual bridge test. The tests were performed with Cordova 3.0.0.
+
+
