@@ -49,7 +49,7 @@
     }
 
     function benchExec() {
-        var echo = cordova.require('cordova/plugin/echo'),
+        var echo = cordova.echo,
             startTime = +new Date,
             callCount = 0,
             durationMs = parseInt(document.getElementById('test-duration').value, 10) * 1000,
