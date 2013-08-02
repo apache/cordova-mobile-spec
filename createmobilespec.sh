@@ -22,6 +22,9 @@
 # It currently installs only the iOS and Android platforms.
 # Based on: https://wiki.apache.org/cordova/WorkingWithThree#preview
 
+# TODO: Remove once CLI/plugman moves away from shelljs.exec().
+ulimit -S -n 4096
+
 if [[ ! -d cordova-mobile-spec ]]; then
   echo "Please run this script from the directory that contains cordova-mobile-spec"
   exit 1
