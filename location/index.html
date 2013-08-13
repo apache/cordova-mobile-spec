@@ -32,7 +32,8 @@
       
 <script type="text/javascript" charset="utf-8">
 
-    var deviceReady = false;
+    var origGeolocation = null;
+    var newGeolocation = null;
 
     //-------------------------------------------------------------------------
     // Location
@@ -42,8 +43,12 @@
     /**
      * Start watching location
      */
-    var watchLocation = function(geo) {
-        console.log("watchLocation()");
+    var watchLocation = function(usePlugin) {
+        var geo = usePlugin ? newGeolocation : origGeolocation;
+        if (!geo) {
+            alert('geolocation object is missing. usePlugin = ' + usePlugin);
+            return;
+        }
 
         // Success callback
         var success = function(p){
@@ -65,7 +70,12 @@
     /**
      * Stop watching the location
      */
-    var stopLocation = function(geo) {
+    var stopLocation = function(usePlugin) {
+        var geo = usePlugin ? newGeolocation : origGeolocation;
+        if (!geo) {
+            alert('geolocation object is missing. usePlugin = ' + usePlugin);
+            return;
+        }
         setLocationStatus("Stopped");
         if (watchLocationId) {
             geo.clearWatch(watchLocationId);
@@ -76,8 +86,12 @@
     /**
      * Get current location
      */
-    var getLocation = function(geo, opts) {
-        console.log("getLocation()");
+    var getLocation = function(usePlugin, opts) {
+        var geo = usePlugin ? newGeolocation : origGeolocation;
+        if (!geo) {
+            alert('geolocation object is missing. usePlugin = ' + usePlugin);
+            return;
+        }
 
         // Stop location if running
         stopLocation(geo);
@@ -124,14 +138,13 @@ var date = (new Date(p.timestamp));
      */
     function init() {
         document.addEventListener("deviceready", function() {
-                deviceReady = true;
-                console.log("Device="+device.platform+" "+device.version);
-            }, false);
-        window.setTimeout(function() {
-        	if (!deviceReady) {
-        		alert("Error: Apache Cordova did not initialize.  Demo will not run correctly.");
-        	}
-        },1000);
+            newGeolocation = navigator.geolocation;
+            origGeolocation = cordova.require('cordova/modulemapper').getOriginalSymbol(window, 'navigator.geolocation');
+            if (!origGeolocation) {
+                origGeolocation = newGeolocation;
+                newGeolocation = null;
+            }
+        }, false);
     }
 
 </script>
@@ -155,15 +168,15 @@ var date = (new Date(p.timestamp));
     </div>
     <h2>Action</h2>
     <h3>Use Built-in WebView navigator.geolocation</h3>
-    <a href="javascript:" class="btn large" onclick="getLocation(navigator.geolocation);">Get Location</a>
-    <a href="javascript:" class="btn large" onclick="watchLocation(navigator.geolocation);">Start Watching Location</a>
-    <a href="javascript:" class="btn large" onclick="stopLocation(navigator.geolocation);">Stop Watching Location</a>
-    <a href="javascript:" class="btn large" onclick="getLocation(navigator.geolocation, {maximumAge:30000});">Get Location Up to 30 Seconds Old</a>
+    <a href="javascript:" class="btn large" onclick="getLocation(false);">Get Location</a>
+    <a href="javascript:" class="btn large" onclick="watchLocation(false);">Start Watching Location</a>
+    <a href="javascript:" class="btn large" onclick="stopLocation(false);">Stop Watching Location</a>
+    <a href="javascript:" class="btn large" onclick="getLocation(false, {maximumAge:30000});">Get Location Up to 30 Seconds Old</a>
     <h3>USe Cordova Geolocation Plugin</h3>
-    <a href="javascript:" class="btn large" onclick="getLocation(cordova.require('cordova/plugin/geolocation'));">Get Location</a>
-    <a href="javascript:" class="btn large" onclick="watchLocation(cordova.require('cordova/plugin/geolocation'));">Start Watching Location</a>
-    <a href="javascript:" class="btn large" onclick="stopLocation(cordova.require('cordova/plugin/geolocation'));">Stop Watching Location</a>
-    <a href="javascript:" class="btn large" onclick="getLocation(cordova.require('cordova/plugin/geolocation'), {maximumAge:30000});">Get Location Up to 30 Seconds Old</a>
+    <a href="javascript:" class="btn large" onclick="getLocation(true);">Get Location</a>
+    <a href="javascript:" class="btn large" onclick="watchLocation(true);">Start Watching Location</a>
+    <a href="javascript:" class="btn large" onclick="stopLocation(true);">Stop Watching Location</a>
+    <a href="javascript:" class="btn large" onclick="getLocation(true, {maximumAge:30000});">Get Location Up to 30 Seconds Old</a>
     <h2>&nbsp;</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a>    
   </body>
 </html>      
