@@ -27,7 +27,6 @@
     <link rel="stylesheet" href="../master.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <script type="text/javascript" charset="utf-8" src="../cordova-incl.js"></script>      
     <script type="text/javascript" charset="utf-8" src="uubench.js"></script>
-    <script type="text/javascript" charset="utf-8" src="licensecontents.js"></script>
 <script>
     var exec = cordova.require('cordova/exec');
     var temp, pers, LICENSE_CONTENTS;
@@ -62,6 +61,7 @@
         min: 2000, // each benchmark should run for at least 2000ms
         done:function() { 
             $('loading').innerHTML = "Benchmarks complete.";
+            $('backBtn').style.display="block";
         }
     });
     var results = {};
@@ -127,7 +127,8 @@ function bench() {
         xhr.open("GET", "../LICENSE", true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
+                //The result status is being compared to 0 for success instead of 200. This is because the file and ftp schemes do not use HTTP result codes.
+                if (xhr.status == 0 && xhr.responseText.length > 0) {
                     next();
                 } else {
                     alert('There was a problem during XHR file read!');
@@ -175,7 +176,7 @@ function bench() {
 </script>
 
   </head>
-  <body>
+  <body id="stage" class="theme">
     <h1>Auto-Benchmarks</h1>
     <h2 id="loading"></h2>
     <table>
@@ -188,5 +189,6 @@ function bench() {
         <tbody id="table-results">
         </tbody>
     </table>
+    <h2>&nbsp</h2><a href="javascript:" class="backBtn" style="display:none" id='backBtn' onclick="backHome();">Back</a><br>
   </body>
 </html>      
