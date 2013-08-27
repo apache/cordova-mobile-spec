@@ -93,17 +93,37 @@ describe("XMLHttpRequest", function () {
         waitsForAny(win, lose);
     });
 
-    it("XMLHttpRequest.spec.5 should be able to load the (WP8 backwards compatability) root page www/index.html", function () {
-        var win = jasmine.createSpy().andCallFake(function (res) {});
-        var lose = createDoNotCallSpy('xhrFail');
-        var xhr = createXHR("www/index.html", true, win, lose);
-        waitsForAny(win, lose);
-    });
 
-    it("XMLHttpRequest.spec.6 should be able to load the (WP7 backwards compatability) root page app/www/index.html", function () {
-        var win = jasmine.createSpy().andCallFake(function (res) {});
-        var lose = createDoNotCallSpy('xhrFail');
-        var xhr = createXHR("app/www/index.html", true, win, lose);
-        waitsForAny(win, lose);
-    });
 });
+
+// only add these tests if we are testing on windows phone
+
+if (/Windows Phone/.exec(navigator.userAgent)) {
+
+    var createXHR = function (url, bAsync, win, lose) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url, bAsync);
+        xhr.onload = win;
+        xhr.onerror = lose;
+        xhr.send();
+        return xhr;
+    }
+
+    describe("XMLHttpRequest Windows Phone", function () {
+
+        console.log("running special windows tests");
+        it("XMLHttpRequest.spec.5 should be able to load the (WP8 backwards compatability) root page www/index.html", function () {
+            var win = jasmine.createSpy().andCallFake(function (res) { });
+            var lose = createDoNotCallSpy('xhrFail');
+            var xhr = createXHR("www/index.html", true, win, lose);
+            waitsForAny(win, lose);
+        });
+
+        it("XMLHttpRequest.spec.6 should be able to load the (WP7 backwards compatability) root page app/www/index.html", function () {
+            var win = jasmine.createSpy().andCallFake(function (res) { });
+            var lose = createDoNotCallSpy('xhrFail');
+            var xhr = createXHR("app/www/index.html", true, win, lose);
+            waitsForAny(win, lose);
+        });
+    });
+}
