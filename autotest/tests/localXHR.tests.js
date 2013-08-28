@@ -93,6 +93,22 @@ describe("XMLHttpRequest", function () {
         waitsForAny(win, lose);
     });
 
+    it("XMLHttpRequest.spec.5 should be able to load the current page ./???.html", function () {
+        var win = jasmine.createSpy().andCallFake(function (res) { });
+        var lose = createDoNotCallSpy('xhrFail');
+        var fileName = window.location.href.split('#')[0].split('/').pop();
+        var xhr = createXHR("./" + fileName, true, win, lose);
+        waitsForAny(win, lose);
+    });
+
+    it("XMLHttpRequest.spec.6 adds hash-path and loads file okay", function () {
+        window.location = window.location.href + "#asd/asd/asdasd";
+        var win = jasmine.createSpy().andCallFake(function (res) { });
+        var lose = createDoNotCallSpy('xhrFail');
+        var xhr = createXHR(window.location.href, true, win, lose);
+        waitsForAny(win, lose);
+    });
+
 
 });
 
@@ -112,14 +128,14 @@ if (/Windows Phone/.exec(navigator.userAgent)) {
     describe("XMLHttpRequest Windows Phone", function () {
 
         console.log("running special windows tests");
-        it("XMLHttpRequest.spec.5 should be able to load the (WP8 backwards compatability) root page www/index.html", function () {
+        it("XMLHttpRequest.spec.7 should be able to load the (WP8 backwards compatability) root page www/index.html", function () {
             var win = jasmine.createSpy().andCallFake(function (res) { });
             var lose = createDoNotCallSpy('xhrFail');
             var xhr = createXHR("www/index.html", true, win, lose);
             waitsForAny(win, lose);
         });
 
-        it("XMLHttpRequest.spec.6 should be able to load the (WP7 backwards compatability) root page app/www/index.html", function () {
+        it("XMLHttpRequest.spec.8 should be able to load the (WP7 backwards compatability) root page app/www/index.html", function () {
             var win = jasmine.createSpy().andCallFake(function (res) { });
             var lose = createDoNotCallSpy('xhrFail');
             var xhr = createXHR("app/www/index.html", true, win, lose);
