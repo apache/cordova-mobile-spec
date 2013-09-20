@@ -144,7 +144,13 @@ describe('Media', function () {
 	});
 
     it("media.spec.12 position should be set properly", function() {
-        var media1 = new Media("http://cordova.apache.org/downloads/BlueZedEx.mp3"),
+        var win = jasmine.createSpy();
+        var fail = jasmine.createSpy();
+        var mediaState=Media.STOPPED;
+        var statuschange= function(statusCode){
+            mediaState=statusCode;
+        };
+        var media1 = new Media("http://cordova.apache.org/downloads/BlueZedEx.mp3",win,fail,statuschange),
             test = jasmine.createSpy().andCallFake(function(position) {
                     console.log("position = " + position);
                     expect(position).toBeGreaterThan(0.0);
@@ -154,9 +160,11 @@ describe('Media', function () {
 
         media1.play();
 
-        waits(5000);
+        waitsFor(function () { return mediaState==Media.MEDIA_RUNNING; }, 10000);
 
         runs(function () {
+            expect(fail).not.toHaveBeenCalled();
+            expect(win).not.toHaveBeenCalled();
             media1.getCurrentPosition(test, function () {});
         });
 
@@ -164,11 +172,18 @@ describe('Media', function () {
     });
 
     it("media.spec.13 duration should be set properly", function() {
-        var media1 = new Media("http://cordova.apache.org/downloads/BlueZedEx.mp3");
+        var win = jasmine.createSpy();
+        var fail = jasmine.createSpy();
+        var mediaState=Media.STOPPED;
+        var statuschange= function(statusCode){
+            mediaState=statusCode;
+        };
+        var media1 = new Media("http://cordova.apache.org/downloads/BlueZedEx.mp3",win,fail,statuschange);
         media1.play();
-        waits(5000);
+        waitsFor(function () { return mediaState==Media.MEDIA_RUNNING; }, 10000);
         runs(function () {
             expect(media1.getDuration()).toBeGreaterThan(0.0);
+            expect(fail).not.toHaveBeenCalled();
         });
     });
 });
