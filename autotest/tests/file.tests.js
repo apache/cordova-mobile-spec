@@ -1125,7 +1125,6 @@ describe('File API', function() {
                     expect(fileEntry).toBeDefined();
                     expect(typeof fileEntry.createWriter).toBe('function');
                     expect(typeof fileEntry.file).toBe('function');
-                    expect(fileEntry.file instanceof file).toBe(true);
 
                     // cleanup
                     fileEntry.remove(null, fail);
@@ -3066,7 +3065,7 @@ describe('File API', function() {
             });
         }
 
-        function arrayBufferEqualsString(buf, str) {
+        function arrayBufferEqualsString(ab, str) {
             var buf = new Uint8Array(ab);
             var match = buf.length == str.length;
 
@@ -3638,7 +3637,7 @@ describe('File API', function() {
                 verifier = jasmine.createSpy("verifier").andCallFake(function(outputFileWriter) {
                     expect(outputFileWriter.length).toBe(dummyFileText.length);
                     expect(outputFileWriter.position).toBe(dummyFileText.length);
-                    deleteFile(fileName);
+                    deleteFile(outputFileName);
                 }),
                 writeFile = function(fileName, fileData, win) {
                     var theWriter,
@@ -3691,7 +3690,7 @@ describe('File API', function() {
                 verifier = jasmine.createSpy("verifier").andCallFake(function(outputFileWriter) {
                     expect(outputFileWriter.length).toBe(10);
                     expect(outputFileWriter.position).toBe(10);
-                    deleteFile(fileName);
+                    deleteFile(outputFileName);
                 }),
                 writeFile = function(fileName, fileData, win) {
                     var theWriter,
@@ -3755,7 +3754,7 @@ describe('File API', function() {
                     expect(outputFileWriter.position).toBe(length);
 
                     // cleanup
-                    deleteFile(fileName);
+                    deleteFile(outputFileName);
                 }),
                 writeFile = function(fileName, fileData, win) {
                     var theWriter,
