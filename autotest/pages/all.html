@@ -85,8 +85,14 @@
                   jasmineEnv.updateInterval = 1000;
 
                   var htmlReporter = new jasmine.HtmlReporter();
-
                   jasmineEnv.addReporter(htmlReporter);
+
+                  // the following will only be defined if the Medic plugin is loaded
+                  if('medic' in window) {
+                      if( medic.isEnabled() ) {
+                          jasmineEnv.addReporter(medic.getJSReporter());
+                      }
+                  }
 
                   jasmineEnv.specFilter = function(spec) {
                     return htmlReporter.specFilter(spec);
