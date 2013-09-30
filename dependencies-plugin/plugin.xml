@@ -27,24 +27,24 @@
 
   <name>Mobile-Spec plugin to quickly pull in all cordova plugins</name>
 
-  <dependency id="org.apache.cordova.core.battery-status" url="." subdir="../cordova-plugin-battery-status" />
-  <dependency id="org.apache.cordova.core.camera" url="." subdir="../cordova-plugin-camera" />
-  <dependency id="org.apache.cordova.core.console" url="." subdir="../cordova-plugin-console" />
-  <dependency id="org.apache.cordova.core.contacts" url="." subdir="../cordova-plugin-contacts" />
-  <dependency id="org.apache.cordova.core.device" url="." subdir="../cordova-plugin-device" />
-  <dependency id="org.apache.cordova.core.device-motion" url="." subdir="../cordova-plugin-device-motion" />
-  <dependency id="org.apache.cordova.core.device-orientation" url="." subdir="../cordova-plugin-device-orientation" />
-  <dependency id="org.apache.cordova.core.dialogs" url="." subdir="../cordova-plugin-dialogs" />
-  <dependency id="org.apache.cordova.core.file" url="." subdir="../cordova-plugin-file" />
-  <dependency id="org.apache.cordova.core.file-transfer" url="." subdir="../cordova-plugin-file-transfer" />
-  <dependency id="org.apache.cordova.core.geolocation" url="." subdir="../cordova-plugin-geolocation" />
-  <dependency id="org.apache.cordova.core.globalization" url="." subdir="../cordova-plugin-globalization" />
-  <dependency id="org.apache.cordova.core.inappbrowser" url="." subdir="../cordova-plugin-inappbrowser" />
-  <dependency id="org.apache.cordova.core.media" url="." subdir="../cordova-plugin-media" />
-  <dependency id="org.apache.cordova.core.media-capture" url="." subdir="../cordova-plugin-media-capture" />
-  <dependency id="org.apache.cordova.core.network-information" url="." subdir="../cordova-plugin-network-information" />
-  <dependency id="org.apache.cordova.core.splashscreen" url="." subdir="../cordova-plugin-splashscreen" />
-  <dependency id="org.apache.cordova.core.vibration" url="." subdir="../cordova-plugin-vibration" />
+  <dependency id="org.apache.cordova.battery-status" url="." subdir="../cordova-plugin-battery-status" />
+  <dependency id="org.apache.cordova.camera" url="." subdir="../cordova-plugin-camera" />
+  <dependency id="org.apache.cordova.console" url="." subdir="../cordova-plugin-console" />
+  <dependency id="org.apache.cordova.contacts" url="." subdir="../cordova-plugin-contacts" />
+  <dependency id="org.apache.cordova.device" url="." subdir="../cordova-plugin-device" />
+  <dependency id="org.apache.cordova.device-motion" url="." subdir="../cordova-plugin-device-motion" />
+  <dependency id="org.apache.cordova.device-orientation" url="." subdir="../cordova-plugin-device-orientation" />
+  <dependency id="org.apache.cordova.dialogs" url="." subdir="../cordova-plugin-dialogs" />
+  <dependency id="org.apache.cordova.file" url="." subdir="../cordova-plugin-file" />
+  <dependency id="org.apache.cordova.file-transfer" url="." subdir="../cordova-plugin-file-transfer" />
+  <dependency id="org.apache.cordova.geolocation" url="." subdir="../cordova-plugin-geolocation" />
+  <dependency id="org.apache.cordova.globalization" url="." subdir="../cordova-plugin-globalization" />
+  <dependency id="org.apache.cordova.inappbrowser" url="." subdir="../cordova-plugin-inappbrowser" />
+  <dependency id="org.apache.cordova.media" url="." subdir="../cordova-plugin-media" />
+  <dependency id="org.apache.cordova.media-capture" url="." subdir="../cordova-plugin-media-capture" />
+  <dependency id="org.apache.cordova.network-information" url="." subdir="../cordova-plugin-network-information" />
+  <dependency id="org.apache.cordova.splashscreen" url="." subdir="../cordova-plugin-splashscreen" />
+  <dependency id="org.apache.cordova.vibration" url="." subdir="../cordova-plugin-vibration" />
   <dependency id="org.apache.cordova.test.whitelist" url="." subdir="cordova-plugin-whitelist" />
   <dependency id="org.apache.cordova.test.echo" url="." subdir="cordova-plugin-echo" />
 </plugin>
