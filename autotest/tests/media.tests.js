@@ -144,13 +144,13 @@ describe('Media', function () {
 	});
 
     it("media.spec.12 position should be set properly", function() {
-        var win = jasmine.createSpy();
+        var playcomplete = jasmine.createSpy();
         var fail = jasmine.createSpy();
-        var mediaState=Media.STOPPED;
+        var mediaState=Media.MEDIA_STOPPED;
         var statuschange= function(statusCode){
             mediaState=statusCode;
         };
-        var media1 = new Media("http://cordova.apache.org/downloads/BlueZedEx.mp3",win,fail,statuschange),
+        var media1 = new Media("http://cordova.apache.org/downloads/BlueZedEx.mp3",playcomplete,fail,statuschange),
             test = jasmine.createSpy().andCallFake(function(position) {
                     console.log("position = " + position);
                     expect(position).toBeGreaterThan(0.0);
@@ -159,22 +159,24 @@ describe('Media', function () {
                 });
 
         media1.play();
-
         waitsFor(function () { return mediaState==Media.MEDIA_RUNNING; }, 10000);
-
+        // make sure we are at least one second into the file
+        waits(1000);
         runs(function () {
             expect(fail).not.toHaveBeenCalled();
-            expect(win).not.toHaveBeenCalled();
+             // note that the file is about 60 seconds long and we kill the play almost immediately
+             // as a result, the playcomplete should not happen
+            expect(playcomplete).not.toHaveBeenCalled();
             media1.getCurrentPosition(test, function () {});
         });
 
-        waitsFor(function () { return test.wasCalled; }, Tests.TEST_TIMEOUT);
+        waitsFor(function () { return test.wasCalled || fail.wasCalled; }, Tests.TEST_TIMEOUT);
     });
 
     it("media.spec.13 duration should be set properly", function() {
         var win = jasmine.createSpy();
         var fail = jasmine.createSpy();
-        var mediaState=Media.STOPPED;
+        var mediaState=Media.MEDIA_STOPPED;
         var statuschange= function(statusCode){
             mediaState=statusCode;
         };
