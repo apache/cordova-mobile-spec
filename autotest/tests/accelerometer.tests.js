@@ -108,11 +108,11 @@ describe('Accelerometer (navigator.accelerometer)', function () {
             navigator.accelerometer.clearWatch(id);
         });
 
-        it("accelerometer.spec.2 should exist", function() {
+        it("accelerometer.spec.6 should exist", function() {
             expect(navigator.accelerometer.watchAcceleration).toBeDefined();
             expect(typeof navigator.accelerometer.watchAcceleration == 'function').toBe(true);
         });
-        it("accelerometer.spec.3 success callback should be called with an Acceleration object", function() {
+        it("accelerometer.spec.7 success callback should be called with an Acceleration object", function() {
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a).toBeDefined();
                     expect(a.x).toBeDefined();
@@ -137,7 +137,7 @@ describe('Accelerometer (navigator.accelerometer)', function () {
             });
         });
 
-        it("accelerometer.spec.4 success callback Acceleration object should have (reasonable) values for x, y and z expressed in m/s^2", function() {
+        it("accelerometer.spec.8 success callback Acceleration object should have (reasonable) values for x, y and z expressed in m/s^2", function() {
             var reasonableThreshold = 15;
             var win = jasmine.createSpy().andCallFake(function(a) {
                     expect(a.x).toBeLessThan(reasonableThreshold);
@@ -160,7 +160,7 @@ describe('Accelerometer (navigator.accelerometer)', function () {
             });
         });
 
-        it("accelerometer.spec.5 success callback Acceleration object should return a recent timestamp", function() {
+        it("accelerometer.spec.9 success callback Acceleration object should return a recent timestamp", function() {
             var veryRecently = (new Date()).getTime();
             // Need to check that dates returned are not vastly greater than a recent time stamp.
             // In case the timestamps returned are ridiculously high
@@ -184,7 +184,7 @@ describe('Accelerometer (navigator.accelerometer)', function () {
     });
 
     describe("clearWatch", function() {
-        it("accelerometer.spec.2 should exist", function() {
+        it("accelerometer.spec.10 should exist", function() {
             expect(navigator.accelerometer.clearWatch).toBeDefined();
             expect(typeof navigator.accelerometer.clearWatch == 'function').toBe(true);
         });
