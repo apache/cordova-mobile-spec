@@ -25,6 +25,16 @@ describe('Accelerometer (navigator.accelerometer)', function () {
     });
 
     describe("getCurrentAcceleration", function() {
+        afterEach(function(){
+            // wait between testcases to avoid interference
+            var flag=false;
+            runs(function() {
+                setTimeout(function() {flag = true;}, 500);
+            });
+
+            waitsFor(function() {return flag;}, "flag to be true", Tests.TEST_TIMEOUT);
+        });
+
         it("accelerometer.spec.2 should exist", function() {
             expect(typeof navigator.accelerometer.getCurrentAcceleration).toBeDefined();
             expect(typeof navigator.accelerometer.getCurrentAcceleration == 'function').toBe(true);
