@@ -47,7 +47,16 @@ describe('Device Information (window.device)', function () {
         expect(window.device.cordova).toBeDefined();
 		expect((new String(window.device.cordova)).length > 0).toBe(true);
 	});
-	
+
+    it("should depend on the precense of cordova.version string", function() {
+            expect(window.cordova.version).toBeDefined();
+            expect((new String(window.cordova.version)).length > 0).toBe(true);
+    });
+
+    it("should contain cordova with same value of cordova.version", function() {
+            expect(window.device.cordova === window.cordova.version).toBe(true);
+    });
+
 	it("should contain a model specification that is a string", function() {
         expect(window.device.model).toBeDefined();
 		expect((new String(window.device.model)).length > 0).toBe(true);
