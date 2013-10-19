@@ -22,7 +22,7 @@
     id="org.cordova.mobile-spec-dependencies"
     version="1.0.0">
   <engines>
-    <engine name="cordova" version=">=2.7" />
+    <engine name="cordova" version=">=2.7.0" />
   </engines>
 
   <name>Mobile-Spec plugin to quickly pull in all cordova plugins</name>
