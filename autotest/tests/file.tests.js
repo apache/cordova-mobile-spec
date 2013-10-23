@@ -140,6 +140,8 @@ describe('File API', function() {
                     expect(fileSystem.name).toBeDefined();
                     expect(fileSystem.name).toBe("persistent");
                     expect(fileSystem.root).toBeDefined();
+                    expect(fileSystem.root.filesystem).toBeDefined();
+                    expect(fileSystem.root.filesystem).toBe(fileSystem);
                 }),
                 fail = createFail('window.requestFileSystem');
 
@@ -161,6 +163,8 @@ describe('File API', function() {
                     expect(fileSystem.name).toBeDefined();
                     expect(fileSystem.name).toBe("temporary");
                     expect(fileSystem.root).toBeDefined();
+                    expect(fileSystem.root.filesystem).toBeDefined();
+                    expect(fileSystem.root.filesystem).toBe(fileSystem);
                 }),
                 fail = createFail('window.requestFileSystem');
 
@@ -398,7 +402,7 @@ describe('File API', function() {
                 expect(win).not.toHaveBeenCalled();
             });
         });
-        it("file.spec.17 etFile: create new file", function() {
+        it("file.spec.17 getFile: create new file", function() {
             var fileName = "de.create.file",
                 filePath = root.fullPath + '/' + fileName,
                 win = jasmine.createSpy().andCallFake(function(entry) {
@@ -519,7 +523,7 @@ describe('File API', function() {
 
             waitsFor(function() { return getFile.wasCalled; }, "getFile never called", Tests.TEST_TIMEOUT);
         });
-        it("file.spec.21 getFile: get Entry for existing file", function() {
+        it("file.spec.21 DirectoryEntry.getFile: get Entry for existing file", function() {
             var fileName = "de.get.file",
                 filePath = root.fullPath + '/' + fileName,
                 win = jasmine.createSpy().andCallFake(function(entry) {
@@ -528,7 +532,8 @@ describe('File API', function() {
                     expect(entry.isDirectory).toBe(false);
                     expect(entry.name).toCanonicallyMatch(fileName);
                     expect(entry.fullPath).toCanonicallyMatch(filePath);
-
+                    expect(entry.filesystem).toBeDefined();
+                    expect(entry.filesystem).toBe(root.filesystem);
                     entry.remove(null, fail); //clean up
                 }),
                 fail = createFail('DirectoryEntry'),
@@ -608,6 +613,8 @@ describe('File API', function() {
                     waitsFor(function() { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
 
                     runs(function() {
+                        expect(dirEntry.filesystem).toBeDefined();
+                        expect(dirEntry.filesystem).toBe(root.filesystem);
                         expect(win).toHaveBeenCalled();
                         expect(fail).not.toHaveBeenCalled();
                     });
@@ -676,6 +683,8 @@ describe('File API', function() {
                     expect(directory.isDirectory).toBe(true);
                     expect(directory.name).toCanonicallyMatch(dirName);
                     expect(directory.fullPath).toCanonicallyMatch(dirPath);
+                    expect(directory.filesystem).toBeDefined();
+                    expect(directory.filesystem).toBe(root.filesystem);
 
                     // cleanup
                     directory.remove(null, fail);
@@ -704,6 +713,8 @@ describe('File API', function() {
                     expect(directory.isDirectory).toBe(true);
                     expect(directory.name).toCanonicallyMatch(dirName);
                     expect(directory.fullPath).toCanonicallyMatch(dirPath);
+                    expect(directory.filesystem).toBeDefined();
+                    expect(directory.filesystem).toBe(root.filesystem);
 
                     // cleanup
                     directory.remove(null, fail);
