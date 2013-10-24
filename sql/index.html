@@ -32,16 +32,24 @@
       
 <script type="text/javascript" charset="utf-8">
 
-    var deviceReady = false;
-
     //-------------------------------------------------------------------------
     // HTML5 Database
     //-------------------------------------------------------------------------
-    var db;
-    var callDatabase = function() {
-        db = openDatabase("mydb", "1.0", "Apache Cordova Demo", 20000);
-        if (db === null) {
-            databaseOutput("Database could not be opened.");
+    var dbs = [];
+    var quotas = [2000000, 2000000];
+    var names = ['mydb', 'rand' + Math.random()];
+    function openDb(index) {
+        try {
+            databaseOutput('Openning db with name: ' + names[index]);
+            return openDatabase(names[index], "1.0", "Apache Cordova Demo", quotas[index]);
+        } catch (e) {
+            databaseOutput('Got exception: ' + e);
+        }
+    }
+
+    var callDatabase = function(index) {
+        var db = dbs[index] = openDb(index);
+        if (!db) {
             return;
         }
         databaseOutput("Database opened.");
@@ -92,13 +100,13 @@
 
     };
 
-    var readDatabase = function() {
+    var readDatabase = function(index) {
+        var db = dbs[index];
     	if (!db) {
-    	    db = openDatabase("mydb", "1.0", "Apache Cordova Demo", 20000);
-    	    if (db === null) {
-                databaseOutput("Database could not be opened.");
+            db = dbs[index] = openDb(index);
+            if (!db) {
                 return;
-    	    }
+            }
         }
         db.transaction(function (tx) {
             tx.executeSql('SELECT * FROM DEMO WHERE id=2', [], function (tx, results) {
@@ -116,9 +124,15 @@
         });
     }
 
+    function increaseQuota(index) {
+        quotas[index] *= 2;
+        databaseOutput('quota ' + index + ' is now ' + quotas[index]);
+    }
+
     var databaseOutput = function(s) {
         var el = document.getElementById("database_results");
         el.innerHTML = el.innerHTML + s + "<br>";
+        el.scrollByLines(20000);
     };
     
     /**
@@ -126,14 +140,8 @@
      */
     function init() {
         document.addEventListener("deviceready", function() {
-                deviceReady = true;
-                console.log("Device="+device.platform+" "+device.version);
-            }, false);
-        window.setTimeout(function() {
-        	if (!deviceReady) {
-        		alert("Error: Apache Cordova did not initialize.  Demo will not run correctly.");
-        	}
-        },1000);
+            console.log("Device="+device.platform+" "+device.version);
+        }, false);
     }
 
 </script>
@@ -147,8 +155,13 @@
         <span id="database_results"></span>
     </div>
     <h2>Action</h2>
-    <div class="btn large" onclick="callDatabase();">Create, Add, Read Database</div>
-    <div class="btn large" onclick="readDatabase();">Read Database</div>
+    <div class="btn large" onclick="callDatabase(0);">Create, Add, Read Database (Constant name)</div>
+    <div class="btn large" onclick="readDatabase(0);">Read Database (Constant name)</div>
+    <div class="btn large" onclick="increaseQuota(0);">Increase Quota (Constant name)</div>
+    <div class="btn large" onclick="callDatabase(1);">Create, Add, Read Database (Random Name)</div>
+    <div class="btn large" onclick="readDatabase(1);">Read Database (Random Name)</div>
+    <div class="btn large" onclick="increaseQuota(1);">Increase Quota (Random Name)</div>
+    <div class="btn large" onclick="location = location.href">Reload Page</div>
     <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>    
   </body>
 </html>      
