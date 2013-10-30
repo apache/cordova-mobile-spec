@@ -16,15 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
 */
-var isWP8 = function() {
-    return window.device && window.device.platform && window.device.platform.toLowerCase() == 'win32nt';
-};
+var isWindowsPhone = cordova.platformId == 'windowsphone';
+
 describe('data uris', function () {
     it("datauri.spec.1 should work with iframes", function() {
-        // IE on WP8 considers 'data:' in frame.src string as protocol type
+        // IE on WP7/8 considers 'data:' in frame.src string as protocol type
         // so asks user to look for appropriating application in the market;
         // temporary skipped since requires user interaction
-        if (isWP8()) return;
+        if (isWindowsPhone) return;
         var gotFoo = false,
             frame = document.createElement('iframe');
         function onMessage(msg) {
