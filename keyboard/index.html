@@ -58,6 +58,10 @@
         width: 20%;
         height: 30px;
     }
+    
+    #error {
+        color: red;
+    }
 
     </style>
     <script>
@@ -68,6 +72,7 @@
     <script type="text/javascript" charset="utf-8">
 
     var deviceReady = false;
+    var keyboardPlugin = null;
     
     /**
      * Function called when page has finished loading.
@@ -75,19 +80,24 @@
     function init() {
         document.addEventListener("deviceready", function() {
                 deviceReady = true;
-                console.log("Device="+device.platform+" "+device.version);
+                keyboardPlugin = window.Keyboard; // for now, before plugin re-factor
+                                  
+                if (keyboardPlugin == null) {
+                    var msg = 'The plugin org.apache.cordova.keyboard was not found. Check that you have it installed.';
+                    alert(msg);
+                }
+
             }, false);
         window.setTimeout(function() {
         	if (!deviceReady) {
-        		alert("Error: Apache Cordova did not initialize.  Demo will not run correctly.");
+                var msg = 'Error: Apache Cordova did not initialize.  Demo will not run correctly.';
+                alert(msg);
         	}
         },1000);
     }
     
     function setShrinkView_hideFormAccessoryBar_andDisableScrollingInShrinkView(shrinkView, hideFormAccessoryBar, disableScrollingInShrinkView)
     {
-        var keyboardPlugin = Keyboard; // for now
-        
         keyboardPlugin.shrinkView(shrinkView);
         document.getElementById("shrinkView-arg").innerHTML = shrinkView;
         
