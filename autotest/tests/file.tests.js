@@ -1034,6 +1034,24 @@ describe('File API', function() {
                     expect(fail).not.toHaveBeenCalled();
                 });
             });
+            it("file.spec.37.1 should read contents of existing directory", function(done) {
+                var fail = createFail('DirectoryReader', done),
+                    dirName = 'readEntries.dir',
+                    fileName = 'readeEntries.file';
+                root.getDirectory(dirName, {create: true}, function(directory) {
+                    directory.getFile(fileName, {create: true}, function(fileEntry) {
+                        var reader = directory.createReader();
+                        reader.readEntries(function(entries) {
+                            expect(entries).toBeDefined();
+                            expect(entries instanceof Array).toBe(true);
+                            expect(entries.length).toBe(1);
+                            expect(entries[0].fullPath).toCanonicallyMatch(fileEntry.fullPath);
+                            // cleanup
+                            directory.removeRecursively(done, fail);
+                        }, fail);
+                    }, fail);
+                }, fail);
+            });
             it("file.spec.109 should return an empty entry list on the second call", function() {
                 var reader,
                     firstWin = jasmine.createSpy().andCallFake(function(entries) {
