@@ -1150,7 +1150,6 @@ describe('File API', function() {
         it("file.spec.40 should be define File attributes", function() {
             var file = new File();
             expect(file.name).toBeDefined();
-            expect(file.fullPath).toBeDefined();
             expect(file.type).toBeDefined();
             expect(file.lastModifiedDate).toBeDefined();
             expect(file.size).toBeDefined();
@@ -3009,7 +3008,10 @@ describe('File API', function() {
             });
             reader.onerror = verifier;
             var myFile = new File();
+            // old API internals: use fullPath in File object
             myFile.fullPath = joinURL(root.fullPath, "doesnotexist.err");
+            // new API internals: use localURL in File object
+            myFile.localURL = joinURL(root.toURL(), "doesnotexist.err");
 
             reader.readAsText(myFile);
 
@@ -3266,7 +3268,10 @@ describe('File API', function() {
         it("file.spec.97 should be able to write and append to file, File object", function() {
             var fileName = "writer.append",
                 theWriter,
+                // old API internals: use fullPath in File object
                 filePath = joinURL(root.fullPath, fileName),
+                // new API internals: use localURL in File object
+                localURL = joinURL(root.toURL(), fileName),
                 // file content
                 rule = "There is an exception to every rule.",
                 // for checking file length
@@ -3299,7 +3304,10 @@ describe('File API', function() {
             // create file, then write and append to it
             runs(function() {
                 var file = new File();
+                // old API internals: use fullPath in File object
                 file.fullPath = filePath;
+                // new API internals: use localURL in File object
+                file.localURL = localURL;
                 write_file(file);
             });
 
