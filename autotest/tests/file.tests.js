@@ -649,7 +649,15 @@ describe('File API', function() {
 
             waitsFor(function() { return getDir.wasCalled; }, "getDir never called", Tests.TEST_TIMEOUT);
         });
-        it("file.spec.25 DirectoryEntry.getDirectory: create new dir with space resolveFileSystemURI with encoded URI", function() {
+
+        // This test is excluded, and should probably be removed. Filesystem
+        // should always be properly encoded URLs, and *not* raw paths, and it
+        // doesn't make sense to double-encode the URLs and expect that to be
+        // handled by the implementation.
+        // If a particular platform uses paths internally rather than URLs,
+        // then that platform should careful to pass them correctly to its
+        // backend.
+        xit("file.spec.25 DirectoryEntry.getDirectory: create new dir with space resolveFileSystemURI with encoded URI", function() {
             var dirName = "de create dir",
                 dirPath = joinURL(root.fullPath, dirName),
                 getDir = jasmine.createSpy().andCallFake(function(dirEntry) {
