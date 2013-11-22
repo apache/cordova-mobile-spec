@@ -1722,7 +1722,9 @@ describe('File API', function() {
 
             // create a new file entry to kick off it
             runs(function() {
-                createFile(file1, entryCallback, fail);
+                deleteEntry(file2, function() {
+                    createFile(file1, entryCallback, fail);
+                }, fail);
             });
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
@@ -1829,7 +1831,9 @@ describe('File API', function() {
 
             // create a new directory entry to kick off it
             runs(function() {
-                createDirectory(srcDir, entryCallback, fail);
+                deleteEntry(dstDir, function() {
+                    createDirectory(srcDir, entryCallback, fail);
+                }, fail);
             });
 
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
@@ -1888,7 +1892,9 @@ describe('File API', function() {
 
             // create a new directory entry to kick off it
             runs(function() {
-                createDirectory(srcDir, entryCallback, fail);
+                deleteEntry(dstDir, function() {
+                    createDirectory(srcDir, entryCallback, fail);
+                }, fail);
             });
 
             waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists", 10000);
