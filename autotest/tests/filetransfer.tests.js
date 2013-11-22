@@ -127,7 +127,7 @@ describe('FileTransfer', function() {
                 ft.onprogress = function(e) {
                     lastProgressEvent = e;
                 };
-                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, fail);
+                ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, fail);
             });
 
             waitsForAny(downloadWin, fail);
@@ -151,7 +151,7 @@ describe('FileTransfer', function() {
                 ft.onprogress = function(e) {
                     lastProgressEvent = e;
                 };
-                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, fail);
+                ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, fail);
             });
 
             waitsForAny(downloadWin, fail);
@@ -171,7 +171,7 @@ describe('FileTransfer', function() {
             });
             runs(function() {
                 var ft = new FileTransfer();
-                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+                ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, downloadFail);
             });
 
             waitsForAny(downloadWin, downloadFail);
@@ -200,7 +200,7 @@ describe('FileTransfer', function() {
             ft.onprogress = function(e) {
                 lastProgressEvent = e;
             };
-            ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, fail);
+            ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, fail);
 
             waitsForAny(downloadWin, fail);
         });
@@ -221,7 +221,8 @@ describe('FileTransfer', function() {
             });
             runs(function() {
                 var ft = new FileTransfer();
-                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+                console.log("8");
+                ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, downloadFail);
             });
 
             waitsForAny(fileWin, downloadFail, fileFail);
@@ -247,7 +248,7 @@ describe('FileTransfer', function() {
                         ft.abort();
                     }
                 };
-                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+                ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, downloadFail);
             });
 
             waitsForAny(downloadWin, downloadFail);
@@ -269,7 +270,7 @@ describe('FileTransfer', function() {
             runs(function() {
                 var ft = new FileTransfer();
                 ft.abort(); // should be a no-op.
-                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+                ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, downloadFail);
                 ft.abort();
                 ft.abort(); // should be a no-op.
             });
@@ -289,7 +290,7 @@ describe('FileTransfer', function() {
             runs(function() {
                 var ft = new FileTransfer();
                 ft.abort(); // should be a no-op.
-                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+                ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, downloadFail);
                 ft.abort();
                 ft.abort(); // should be a no-op.
             });
@@ -311,7 +312,7 @@ describe('FileTransfer', function() {
             });
             runs(function() {
                 var ft = new FileTransfer();
-                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+                ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, downloadFail);
             });
 
             waitsForAny(downloadWin, downloadFail);
@@ -331,7 +332,7 @@ describe('FileTransfer', function() {
             });
             runs(function() {
                 var ft = new FileTransfer();
-                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+                ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, downloadFail);
             });
 
             waitsForAny(downloadWin, downloadFail);
@@ -354,7 +355,7 @@ describe('FileTransfer', function() {
             });
             runs(function() {
                 var ft = new FileTransfer();
-                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+                ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, downloadFail);
             });
 
             waitsForAny(downloadWin, downloadFail);
@@ -370,7 +371,7 @@ describe('FileTransfer', function() {
 
             runs(function() {
                 var ft = new FileTransfer();
-                ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+                ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, downloadFail);
             });
 
             waitsForAny(downloadWin, downloadFail);
@@ -410,7 +411,7 @@ describe('FileTransfer', function() {
                ft.onprogress = function(e) {
                    lastProgressEvent = e;
                };
-               ft.download(remoteFile, root.fullPath + "/" + localFileName, downloadWin, downloadFail);
+               ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, downloadFail);
            });
            waitsForAny(downloadWin, downloadFail);
         });
@@ -452,7 +453,7 @@ describe('FileTransfer', function() {
                 };
 
                 // removing options cause Android to timeout
-                ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
+                ft.upload(fileEntry.toURL(), remoteFile, uploadWin, uploadFail, options);
             };
 
             this.after(function() {
@@ -503,7 +504,7 @@ describe('FileTransfer', function() {
                 };
 
                 // removing options cause Android to timeout
-                ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
+                ft.upload(fileEntry.toURL(), remoteFile, uploadWin, uploadFail, options);
             };
 
             this.after(function() {
@@ -537,7 +538,7 @@ describe('FileTransfer', function() {
                 options.fileName=fileEntry.name;
                 options.mimeType="text/plain";
 
-                ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
+                ft.upload(fileEntry.toURL(), remoteFile, uploadWin, uploadFail, options);
             };
 
             this.after(function() {
@@ -573,7 +574,7 @@ describe('FileTransfer', function() {
                 startTime = +new Date();
                 // removing options cause Android to timeout
                 ft.abort(); // should be a no-op.
-                ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
+                ft.upload(fileEntry.toURL(), remoteFile, uploadWin, uploadFail, options);
                 ft.abort();
                 ft.abort(); // should be a no-op.
             };
@@ -606,7 +607,7 @@ describe('FileTransfer', function() {
                 options.fileName=fileEntry.name;
                 options.mimeType="text/plain";
 
-                ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
+                ft.upload(fileEntry.toURL(), remoteFile, uploadWin, uploadFail, options);
             };
 
             this.after(function() {
@@ -630,7 +631,7 @@ describe('FileTransfer', function() {
             });
             var fileWin = function(fileEntry) {
                 var ft = new FileTransfer();
-                ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, {});
+                ft.upload(fileEntry.toURL(), remoteFile, uploadWin, uploadFail, {});
             };
 
             this.after(function() {
@@ -654,7 +655,7 @@ describe('FileTransfer', function() {
             });
             var fileWin = function(fileEntry) {
                 var ft = new FileTransfer();
-                ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, {});
+                ft.upload(fileEntry.toURL(), remoteFile, uploadWin, uploadFail, {});
             };
 
             this.after(function() {
@@ -679,7 +680,7 @@ describe('FileTransfer', function() {
 
             runs(function() {
                 var ft = new FileTransfer();
-                ft.upload(root.fullPath + "/" + localFileName, remoteFile, uploadWin, uploadFail);
+                ft.upload(root.toURL() + "/" + localFileName, remoteFile, uploadWin, uploadFail);
             });
 
             waitsForAny(uploadWin, uploadFail);
@@ -734,7 +735,7 @@ describe('FileTransfer', function() {
                 };
 
                 // removing options cause Android to timeout
-                ft.upload(fileEntry.fullPath, remoteFile, uploadWin, uploadFail, options);
+                ft.upload(fileEntry.toURL(), remoteFile, uploadWin, uploadFail, options);
             };
 
             this.after(function() {
