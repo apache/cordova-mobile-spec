@@ -104,7 +104,6 @@ describe('Capture (navigator.device.capture)', function () {
             var fileData = new MediaFile();
             expect(fileData).toBeDefined();
             expect(fileData.name).toBeDefined();
-            expect(fileData.fullPath).toBeDefined();
             expect(fileData.type).toBeDefined();
             expect(fileData.lastModifiedDate).toBeDefined();
             expect(fileData.size).toBeDefined();
