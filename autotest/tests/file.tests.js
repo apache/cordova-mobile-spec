@@ -3231,7 +3231,7 @@ describe('File API', function() {
             });
         });
         it("file.spec.96 should be able to write and append to file, createWriter", function() {
-            var fileName = "writer.append",
+            var fileName = "writer.append.createWriter",
                 theWriter,
                 filePath = joinURL(root.fullPath, fileName),
                 // file content
@@ -3280,7 +3280,7 @@ describe('File API', function() {
             });
         });
         it("file.spec.97 should be able to write and append to file, File object", function() {
-            var fileName = "writer.append",
+            var fileName = "writer.append.File",
                 theWriter,
                 // old API internals: use fullPath in File object
                 filePath = joinURL(root.fullPath, fileName),
