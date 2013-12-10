@@ -40,6 +40,9 @@ describe('Geolocation (navigator.geolocation)', function () {
     });
 
     describe('getCurrentPosition method', function() {
+        // this api requires manual user confirmation on windows8 so skip it
+        if (cordova.platformId == 'windows8') return;
+        
         describe('error callback', function() {
             it("geolocation.spec.5 should be called if we set timeout to 0 and maximumAge to a very small number", function() {
                 console.log("Here I am");
@@ -92,6 +95,9 @@ describe('Geolocation (navigator.geolocation)', function () {
     });
 
     describe('watchPosition method', function() {
+        // this api requires manual user confirmation on windows8 so skip it
+        if (cordova.platformId == 'windows8') return;
+        
         describe('error callback', function() {
             var errorWatch = null;
 
