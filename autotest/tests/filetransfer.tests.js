@@ -748,4 +748,108 @@ describe('FileTransfer', function() {
             waitsForAny(uploadWin, uploadFail);
         });
     });
+    describe('Backwards compatibility', function() {
+        /* These specs exist to test that the previously supported API still works with
+         * the new version of file-transfer.
+         * They rely on an undocumented interface to File which provides absolute file
+         * paths, which are not used internally anymore.
+         * If that interface is not present, then these tests will silently succeed.
+         */
+        it("filetransfer.spec.28 should be able to download a file using local paths", function() {
+            var fail = createDoNotCallSpy('downloadFail');
+            var remoteFile = server + "/robots.txt"
+            var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
+            var localURL = root.toURL() + "/" + localFileName;
+            var lastProgressEvent = null;
+
+            var downloadWin = jasmine.createSpy().andCallFake(function(entry) {
+                expect(entry.name).toBe(localFileName);
+                expect(lastProgressEvent.loaded).toBeGreaterThan(1);
+            });
+            var unsupportedOperation = jasmine.createSpy("Operation not supported");
+
+            this.after(function() {
+                deleteFile(localFileName);
+            });
+            runs(function() {
+                /* This is an undocumented interface to File which exists only for testing
+                 * backwards compatibilty. By obtaining the raw filesystem path of the download
+                 * location, we can pass that to ft.download() to make sure that previously-stored
+                 * paths are still valid.
+                 */
+                cordova.exec(function(localPath) {
+                    var ft = new FileTransfer();
+                    ft.onprogress = function(e) {
+                        lastProgressEvent = e;
+                    };
+                    ft.download(remoteFile, localPath, downloadWin, fail);
+                }, unsupportedOperation, 'File', '_getLocalFilesystemPath', [localURL]);
+            });
+
+            waitsForAny(downloadWin, fail, unsupportedOperation);
+        });
+        it("filetransfer.spec.29 should be able to upload a file using local paths", function() {
+            var remoteFile = server + "/upload";
+            var localFileName = "upload.txt";
+            var fileContents = 'This file should upload';
+
+            var fileFail = createDoNotCallSpy('fileFail');
+            var uploadFail = createDoNotCallSpy('uploadFail', "Ensure " + remoteFile + " is in the white list");
+            var unsupportedOperation = jasmine.createSpy("Operation not supported");
+            var lastProgressEvent = null;
+
+            var uploadWin = jasmine.createSpy().andCallFake(function(uploadResult) {
+                expect(uploadResult.bytesSent).toBeGreaterThan(0);
+                expect(uploadResult.responseCode).toBe(200);
+                expect(uploadResult.response).toMatch(/fields:\s*{\s*value1.*/);
+            });
+
+            var fileWin = function(fileEntry) {
+                ft = new FileTransfer();
+
+                var options = new FileUploadOptions();
+                options.fileKey = "file";
+                options.fileName = localFileName;
+                options.mimeType = "text/plain";
+
+                var params = new Object();
+                params.value1 = "test";
+                params.value2 = "param";
+                options.params = params;
+
+                ft.onprogress = function(e) {
+                    expect(e.lengthComputable).toBe(true);
+                    expect(e.total).toBeGreaterThan(0);
+                    expect(e.loaded).toBeGreaterThan(0);
+                    lastProgressEvent = e;
+                };
+
+                // removing options cause Android to timeout
+
+                /* This is an undocumented interface to File which exists only for testing
+                 * backwards compatibilty. By obtaining the raw filesystem path of the download
+                 * location, we can pass that to ft.download() to make sure that previously-stored
+                 * paths are still valid.
+                 */
+                cordova.exec(function(localPath) {
+                    ft.upload(localPath, remoteFile, uploadWin, uploadFail, options);
+                }, unsupportedOperation, 'File', '_getLocalFilesystemPath', [fileEntry.toURL()]);
+
+            };
+
+            this.after(function() {
+                deleteFile(localFileName);
+            });
+            runs(function() {
+                writeFile(localFileName, fileContents, fileWin, fileFail);
+            });
+
+            waitsForAny(uploadWin, uploadFail, fileFail, unsupportedOperation);
+            runs(function() {
+                if (!unsupportedOperation.wasCalled) {
+                  expect(lastProgressEvent).not.toBeNull('expected progress events');
+                }
+            });
+        });
+    });
 });
