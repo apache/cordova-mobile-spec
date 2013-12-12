@@ -129,6 +129,11 @@ describe('Media', function () {
                 expect(result).toBeDefined();
                 expect(result.code).toBe(MediaError.MEDIA_ERR_ABORTED);
             });
+
+        //bb10 dialog pops up, preventing tests from running
+        if (cordova.platformId === 'blackberry10') {
+            return;
+        }
             
         runs(function () {
             badMedia = new Media("invalid.file.name", win,fail);
@@ -159,7 +164,13 @@ describe('Media', function () {
                 });
 
         media1.play();
-        waitsFor(function () { return mediaState==Media.MEDIA_RUNNING; }, 10000);
+
+        if (cordova.platformId !== 'blackberry10') {
+            waitsFor(function () { return mediaState==Media.MEDIA_RUNNING; }, 10000);
+        } else {
+            waits(5000);
+        }
+
         // make sure we are at least one second into the file
         waits(1000);
         runs(function () {
@@ -174,6 +185,11 @@ describe('Media', function () {
     });
 
     it("media.spec.13 duration should be set properly", function() {
+
+        if (cordova.platformId === 'blackberry10') {
+            return;
+        }
+
         var win = jasmine.createSpy();
         var fail = jasmine.createSpy();
         var mediaState=Media.MEDIA_STOPPED;

@@ -336,7 +336,9 @@ describe("Contacts (navigator.contacts)", function () {
 
             var saveSuccess = jasmine.createSpy().andCallFake(function(obj) {
                     expect(obj).toBeDefined();
-                    expect(obj.note).toBe('my note');
+                    if (cordova.platformId !== 'blackberry10') {
+                        expect(obj.note).toBe('my note');
+                    }
                     expect(obj.name.familyName).toBe('Delete');
                     expect(obj.name.givenName).toBe('Test');
                     expect(obj.emails.length).toBe(2);
@@ -373,7 +375,9 @@ describe("Contacts (navigator.contacts)", function () {
             var win = jasmine.createSpy().andCallFake(function(obj) {
                     expect(obj).toBeDefined();
                     expect(obj.id).toBe(gContactObj.id);
-                    expect(obj.note).toBe(noteText);
+                    if (cordova.platformId !== 'blackberry10') {
+                        expect(obj.note).toBe(noteText);
+                    }
                     expect(obj.birthday.toDateString()).toBe(bDay.toDateString());
                     expect(obj.emails.length).toBe(1);
                     expect(obj.emails[0].value).toBe('here@there.com');
