@@ -212,8 +212,10 @@
     <div class="btn large" onclick="doOpen('local.html', '_self');">Target=Self: CordovaWebView</div>
     <div class="btn large" onclick="doOpen('local.html', '_system');">Target=System: Error</div>
     <div class="btn large" onclick="doOpen('local.html', '_blank');">Target=Blank: InAppBrowser</div>
-    <div class="btn large" onclick="doOpen('local.html', 'random_string');">Target=Random: InAppBrowser</div>
-    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'location=no');">Target=Random, no location bar: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'location=no');">Target=Random, location=no: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'toolbarposition=bottom');">Target=Random, toolbarposition=bottom: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'toolbarposition=top');">Target=Random, toolbarposition=top: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'toolbarposition=top,location=no');">Target=Random, toolbarposition=top,location=no: InAppBrowser</div>
     <h1>White Listed URL</h1>
     <div class="btn large" onclick="doOpen('http://www.google.com');">Default: CordovaWebView<span style="vertical-align:super">*</span></div>
     <div class="btn large" onclick="doOpen('http://www.google.com', '_self');">Target=Self: CordovaWebView<span style="vertical-align:super">*</span></div>
