@@ -3880,4 +3880,51 @@ describe('File API', function() {
             });
         });
     });
+    describe('Backwards compatibility', function() {
+        /* These specs exist to test that the File plugin can still recognize file:///
+         * URLs, and can resolve them to FileEntry and DirectoryEntry objects.
+         * They rely on an undocumented interface to File which provides absolute file
+         * paths, which are not used internally anymore.
+         * If that interface is not present, then these tests will silently succeed.
+         */
+        it("file.spec.109 should be able to resolve a file:/// URL", function() {
+            var localFilename = 'file.txt';
+            var localURL = dirPath = joinURL(root.toURL(), 'file.txt');
+            var originalEntry;
+            
+            var unsupportedOperation = jasmine.createSpy("Operation not supported");
+
+			var resolveWin = jasmine.createSpy("resolveWin").andCallFake(function(fileEntry) {
+        		expect(fileEntry.toURL()).toEqual(originalEntry.toURL());
+                // cleanup
+                deleteFile(fileName);
+	        });
+            var resolveFail = createDoNotCallSpy('resolveFail');
+            var getFail = createDoNotCallSpy('getFail');
+			
+			runs(function() {
+                root.getFile(localFilename, {create: true}, function(entry) {
+                    originalEntry = entry;
+		            /* This is an undocumented interface to File which exists only for testing
+		             * backwards compatibilty. By obtaining the raw filesystem path of the download
+		             * location, we can pass that to ft.download() to make sure that previously-stored
+		             * paths are still valid.
+		             */
+		            cordova.exec(function(localPath) {
+		            	window.resolveLocalFileSystemURI("file://" + localPath, resolveWin, resolveFail);
+		            }, unsupportedOperation, 'File', '_getLocalFilesystemPath', [entry.toURL()]);
+                }, getFail);
+	        });
+	        
+            waitsForAny(resolveWin, resolveFail, getFail, unsupportedOperation);
+            
+            runs(function() {
+                if (!unsupportedOperation.wasCalled) {
+	                expect(resolveWin).toHaveBeenCalled();
+	                expect(resolveFail).not.toHaveBeenCalled();
+                }
+            });
+            
+        });
+    });
 });
