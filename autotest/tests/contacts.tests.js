@@ -26,6 +26,9 @@ var gContactId = null;
 
 var removeContact = function(){
     if (gContactObj) {
+        if (!gContactObj.id) {
+            return;
+        }
         gContactObj.remove(function(){},function(){
             console.log("[CONTACTS ERROR]: removeContact cleanup method failed to clean up test artifacts.");
         });
@@ -139,14 +142,12 @@ describe("Contacts (navigator.contacts)", function () {
                     }),
                     fail = jasmine.createSpy(),
                     test = jasmine.createSpy().andCallFake(function(savedContact) {
-                        console.log('in test');
                         // update so contact will get removed
                         gContactObj = savedContact;
                         // ----
                         // Find asserts
                         // ---
                         var findWin = jasmine.createSpy().andCallFake(function(object) {
-                                console.log('in findwin');
                                 expect(object instanceof Array).toBe(true);
                                 expect(object.length >= 1).toBe(true);
                                 expect(foundName(object)).toBe(true);
@@ -335,8 +336,7 @@ describe("Contacts (navigator.contacts)", function () {
                     expect(obj.emails[1].value).toBe('there@here.com');
                     expect(obj.birthday.toDateString()).toBe(bDay.toDateString());
                     expect(obj.addresses).toBe(null);
-                    // must store returned object in order to have id for update test below
-                    gContactObj = obj;
+                    obj.remove();
                 }),
                 saveFail = jasmine.createSpy();
 
@@ -352,33 +352,39 @@ describe("Contacts (navigator.contacts)", function () {
          });
         // HACK: there is a reliance between the previous and next test. This is bad form.
         it("contacts.spec.21 update a contact", function() {
-            expect(gContactObj).toBeDefined();
-
-            var bDay = new Date(1975, 5,4);
+            var bDay = new Date(1976, 6,4);
+            var gContactObj = navigator.contacts.create({"gender": "male", "note": "my note", "name": {"familyName": "Delete", "givenName": "Test"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], "birthday": bDay});
+            var savedObj;
             var noteText = "an UPDATED note";
-
+            bDay = new Date(1975, 5,4);
             var win = jasmine.createSpy().andCallFake(function(obj) {
                     expect(obj).toBeDefined();
-                    expect(obj.id).toBe(gContactObj.id);
+                    expect(obj.id).toBe(savedObj.id);
                     expect(obj.note).toBe(noteText);
                     expect(obj.birthday.toDateString()).toBe(bDay.toDateString());
                     expect(obj.emails.length).toBe(1);
                     expect(obj.emails[0].value).toBe('here@there.com');
-                    removeContact();         // Clean up contact object
-                }), fail = jasmine.createSpy().andCallFake(removeContact);
-
-            runs(function () {
-                // remove an email
-                gContactObj.emails[1].value = "";
-                // change birthday
-                gContactObj.birthday = bDay;
-                // update note
-                gContactObj.note = noteText;
-                gContactObj.save(win, fail);
+                    obj.remove();         // Clean up contact object
             });
-
+            fail = jasmine.createSpy().andCallFake(function(e) {
+                  removeContact();
+            });
+            runs(function () {
+                // save first contact
+                gContactObj.save(function(obj) {
+                    // preserve the contact in global for the test
+                    savedObj = obj;
+                    expect(savedObj.id).toBeTruthy();
+                    // remove an email
+                    savedObj.emails[1].value = "";
+                    // change birthday
+                    savedObj.birthday = bDay;
+                    // update note
+                    savedObj.note = noteText;
+                    savedObj.save(win, fail);
+                });
+            });
             waitsFor(function () { return win.wasCalled; }, "saveSuccess never called", Tests.TEST_TIMEOUT);
-
             runs(function () {
                 expect(fail).not.toHaveBeenCalled();
             });
@@ -496,6 +502,7 @@ describe("Contacts (navigator.contacts)", function () {
             obj.multiple=true;
             runs(function () {
                 var findSuccess = function (cs) {
+
                     var contactObj = new Contact();
                     if (cs.length>0){
                         contactObj = cs[0];
