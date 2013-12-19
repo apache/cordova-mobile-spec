@@ -324,7 +324,11 @@ describe("Contacts (navigator.contacts)", function () {
     describe('save method', function () {
         it("contacts.spec.20 should be able to save a contact", function() {
             var bDay = new Date(1976, 6,4);
-            gContactObj = navigator.contacts.create({"gender": "male", "note": "my note", "name": {"familyName": "Delete", "givenName": "Test"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], "birthday": bDay});
+            gContactObj = navigator.contacts.create({
+                "gender": "male", "note": "my note", 
+                "name": {"familyName": "Delete", "givenName": "Test"}, 
+                "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], 
+                "birthday": bDay});
 
             var saveSuccess = jasmine.createSpy().andCallFake(function(obj) {
                     expect(obj).toBeDefined();
@@ -353,17 +357,47 @@ describe("Contacts (navigator.contacts)", function () {
         // HACK: there is a reliance between the previous and next test. This is bad form.
         it("contacts.spec.21 update a contact", function() {
             var bDay = new Date(1976, 6,4);
-            var gContactObj = navigator.contacts.create({"gender": "male", "note": "my note", "name": {"familyName": "Delete", "givenName": "Test"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], "birthday": bDay});
+            // XXX: couldn't find anything about `gender` in docs
+            //      it doesn't work anyway (always *null*)
+            var gContactObj = navigator.contacts.create({"gender": "male", "note": "my note", "name": {"familyName": "Delete", "givenName": "Test"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], "birthday": bDay,
+              "addresses":  [new ContactAddress(true, "home", "a","b","c","d","e","f")],
+              "categories": [new ContactField('t', 'c', true)],
+              "organizations": [new ContactOrganization(true, 'a', 'b', 'c', 'd')]});
             var savedObj;
             var noteText = "an UPDATED note";
-            bDay = new Date(1975, 5,4);
+            bDay = new Date(1975, 5, 4);
             var win = jasmine.createSpy().andCallFake(function(obj) {
+                    // check if addresses are saved, updated and received 
+                    // without loosing data
                     expect(obj).toBeDefined();
                     expect(obj.id).toBe(savedObj.id);
                     expect(obj.note).toBe(noteText);
                     expect(obj.birthday.toDateString()).toBe(bDay.toDateString());
+                    expect(obj.emails).toNotBe(null);
                     expect(obj.emails.length).toBe(1);
                     expect(obj.emails[0].value).toBe('here@there.com');
+                    expect(obj.addresses).toNotBe(null);
+                    expect(obj.addresses[0]).toBeDefined();
+                    expect(obj.addresses[0].pref).toBe(true);
+                    expect(obj.addresses[0].type).toBe("home");
+                    expect(obj.addresses[0].formatted).toBe("a");
+                    expect(obj.addresses[0].streetAddress).toBe("b");
+                    expect(obj.addresses[0].locality).toBe("c");
+                    expect(obj.addresses[0].region).toBe("d");
+                    expect(obj.addresses[0].postalCode).toBe("e");
+                    expect(obj.addresses[0].country).toBe("f");
+                    expect(obj.categories).toNotBe(null);
+                    expect(obj.categories[0]).toBeDefined();
+                    expect(obj.categories[0].pref).toBe(true);
+                    expect(obj.categories[0].type).toBe("t");
+                    expect(obj.categories[0].value).toBe("c");
+                    expect(obj.organizations).toNotBe(null);
+                    expect(obj.organizations[0]).toBeDefined();
+                    expect(obj.organizations[0].pref).toBe(true);
+                    expect(obj.organizations[0].type).toBe("a");
+                    expect(obj.organizations[0].name).toBe("b");
+                    expect(obj.organizations[0].department).toBe("c");
+                    expect(obj.organizations[0].title).toBe("d");
                     obj.remove();         // Clean up contact object
             });
             fail = jasmine.createSpy().andCallFake(function(e) {
