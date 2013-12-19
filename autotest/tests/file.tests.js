@@ -3897,7 +3897,7 @@ describe('File API', function() {
 			var resolveWin = jasmine.createSpy("resolveWin").andCallFake(function(fileEntry) {
         		expect(fileEntry.toURL()).toEqual(originalEntry.toURL());
                 // cleanup
-                deleteFile(fileName);
+                deleteFile(localFilename);
 	        });
             var resolveFail = createDoNotCallSpy('resolveFail');
             var getFail = createDoNotCallSpy('getFail');
