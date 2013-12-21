@@ -32,7 +32,8 @@
 <script>
     var exec = cordova.require('cordova/exec'),
         appLogElem = null,
-        deviceReady = false;
+        deviceReady = false,
+        inProgress = false;
 
     function appLog(message) {
         if (!appLogElem) {
@@ -48,33 +49,56 @@
         appLogElem.innerHTML = '';
     }
 
+    function updateUi(val) {
+        inProgress = val;
+        var goBtn = document.getElementById('go-btn');
+        goBtn.textContent = inProgress ? 'Stop' : 'Start';
+    }
+
     function benchExec() {
+        updateUi(!inProgress);
+        if (!inProgress) {
+            return;
+        }
         var echo = cordova.echo,
             startTime = +new Date,
             callCount = 0,
+            elapsedMs,
+            lastReportMs = 0,
             durationMs = parseInt(document.getElementById('test-duration').value, 10) * 1000,
             asyncEcho = document.getElementById('async-echo').checked,
             useSetTimeout = document.getElementById('use-setTimeout').checked,
             jsToNativeMode = document.getElementById('js-native-modes').value,
             nativeToJsMode = document.getElementById('native-js-modes').value,
             payloadSize = +document.getElementById('payload-size').value,
+            soFarEl = document.getElementById('so-far'),
             payload = new Array(payloadSize * 10 + 1).join('012\n\n 6789');
-        
+
+        function reportProgress() {
+            var callsPerSecond = String(callCount * 1000 / elapsedMs).slice(0, 6);
+            soFarEl.textContent = callsPerSecond + ' ops';
+            appLog('Calls per second: ' + callsPerSecond);
+        }
         function win(result) {
             callCount++;
             if (result != payload) {
                 appLog('Wrong echo data!');
+                updateUi(false);
             }
-            var elapsedMs = new Date - startTime;
-            if (elapsedMs < durationMs) {
+            elapsedMs = new Date - startTime;
+            if (inProgress && elapsedMs < durationMs) {
+                if (elapsedMs - lastReportMs > 1000) {
+                    reportProgress();
+                    lastReportMs = elapsedMs;
+                }
                 if (useSetTimeout) {
                     setImmediate(echoMessage);
                 } else {
                     echoMessage();
                 }
             } else {
-                var callsPerSecond = callCount * 1000 / elapsedMs;
-                appLog('Calls per second: ' + callsPerSecond);
+                reportProgress();
+                updateUi(false);
             }
         }
         function fail() {
@@ -83,7 +107,7 @@
         function echoMessage() {
             echo(win, fail, payload, asyncEcho);
         }
-        
+
         var logMsg = 'Started exec benchmark with setTimeout: ' + useSetTimeout + ' asyncEcho: ' + asyncEcho + ' payload length: ' + payload.length;
         if (jsToNativeMode) {
             exec.setJsToNativeBridgeMode(+jsToNativeMode);
@@ -102,6 +126,15 @@
         }, 500);
     }
 
+    function configureDragMe() {
+        var dragMeEl = document.getElementById('drag-me');
+        dragMeEl.ontouchmove = function(e) {
+            e.preventDefault();
+            var touch = e.touches[0];
+            dragMeEl.style.left = touch.pageX - 50 + 'px';
+            dragMeEl.style.top = touch.pageY - 50 + 'px';
+        }
+    }
     function configure() {
         function configureModes(elemId, modes) {
             var selectElem = document.getElementById(elemId);
@@ -119,6 +152,7 @@
         if (exec.nativeToJsModes) {
             configureModes('native-js-modes', exec.nativeToJsModes);
         }
+        configureDragMe();
     }
 
 
@@ -149,16 +183,21 @@
     As of iOS 7.0.2, Andrew found that the iframe bridge is still the fastest on iOS.
     <fieldset>
         <legend>Settings</legend>
-        <label>Test Duration: <select id="test-duration"><option>1 Second</option><option>5 Seconds</option></select><br></label>
+        <label>Test Duration: <select id="test-duration"><option>1 Second</option><option>3 Seconds</option><option>10 seconds</option></select><br></label>
         <label style="display:none">JS-&gt;Native Bridge Mode: <select id="js-native-modes"></select><br></label>
         <label style="display:none">Native-&gt;JS Bridge Mode: <select id="native-js-modes"></select><br></label>
         <label><input type="checkbox" id="use-setTimeout"> Force async JS-&gt;Native (avoids evalAndFetch optimization on iOS)</label><br>
         <label><input type="checkbox" id="async-echo"> Force async Native-&gt;JS</label><br>
         <label>Payload size (in 100s of bytes) <input id="payload-size" value="5" style="width:100px"></label><br>
-        <button onclick="benchExec()">Benchmark exec</button><br>
+        <button id="go-btn" onclick="benchExec()">Start</button><br>
     </fieldset>
+    <div>some text.<br>
+        <div style="position:absolute;height:100px;background:red;width:100px;left:250px;top:50px;z-index:5" id="drag-me">Drag Me<div id="so-far"></div></div>
+        <input value="dummy input"> text box to see if focus is lost by bridge or if there is typing lag.
+    </div>
     <h2>&nbsp</h2><a href="javascript:" class="backBtn" onclick="backHome();">Back</a><br>
     <div>Results: <a href="javascript:clearLogs();">Clear</a></div>
-    <pre id="app-logs" style="white-space:pre-wrap;line-height:initial"></pre>
+    <pre id="app-logs" style="white-space:pre-wrap;line-height:initial; margin-bottom:500px"></pre>
+    You've reached the bottom.
   </body>
-</html>      
+</html>
