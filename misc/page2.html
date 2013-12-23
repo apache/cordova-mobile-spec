@@ -40,12 +40,7 @@
     <h1>Page2 App</h1>
     <h2>This is page 2 of a Apache Cordova app</h2>
     <div id="info">
-        <h4>Platform: <span id="platform">  </span></h4>
-        <h4>Version: <span id="version"> </span></h4>
-        <h4>UUID: <span id="uuid">  </span></h4>
-        <h4>Name: <span id="name"> </span></h4>
-        <h4>Width: <span id="width">  </span>,   Height: <span id="height"> 
-                   </span>, Color Depth: <span id="colorDepth"></span></h4>
+      loading...
      </div>
      about:blank
      <div class="iframe_container">
@@ -70,5 +65,8 @@
         console.log('loading iframe after timeout.');
         document.querySelector('#apacheiframe').src = 'http://apache.org';
     }, 2000);
+    document.addEventListener("deviceready", function() {
+        document.getElementById('info').textContent += '\nDevice is ready.';
+    }, false);
   </script>
 </html>
