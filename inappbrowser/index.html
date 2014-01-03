@@ -203,66 +203,202 @@
     <h1>InAppBrowser</h1>
     <div id="info">
         Make sure http://www.google.com is white listed. </br>
-        Make sure http://www.apple.com is not in the white list.</br>  In iOS, starred <span style="vertical-align:super">*</span> tests will leave the app with no way to return.  </br>
+        Make sure http://www.apple.com is not in the white list.</br>  In iOS, starred <span style="vertical-align:super">*</span> tests will put the app in a state with no way to return.  </br>
         <h4>User-Agent: <span id="user-agent"> </span></h4>
     </div>
-    <div onclick="backHome();">Back</div>
+    <div class="btn small" onclick="backHome();">Back</div>
+
     <h1>Local URL</h1>
-    <div class="btn large" onclick="doOpen('local.html');">Default: CordovaWebView</div>
-    <div class="btn large" onclick="doOpen('local.html', '_self');">Target=Self: CordovaWebView</div>
-    <div class="btn large" onclick="doOpen('local.html', '_system');">Target=System: Error</div>
-    <div class="btn large" onclick="doOpen('local.html', '_blank');">Target=Blank: InAppBrowser</div>
-    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'location=no,disallowoverscroll=yes');">Target=Random, location=no,disallowoverscroll=yes: InAppBrowser</div>
-    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'toolbarposition=bottom');">Target=Random, toolbarposition=bottom: InAppBrowser</div>
-    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'toolbarposition=top');">Target=Random, toolbarposition=top: InAppBrowser</div>
-    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'toolbarposition=top,location=no');">Target=Random, toolbarposition=top,location=no: InAppBrowser</div>
+    <div class="btn large" onclick="doOpen('local.html');">target = Default</div>
+    Expected result: opens successfully in CordovaWebView.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('local.html', '_self');">target=_self</div>
+    Expected result: opens successfully in CordovaWebView.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('local.html', '_system');">target=_system</div>
+    Expected result: fails to open.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('local.html', '_blank');">target=_blank</div>
+    Expected result: opens successfully in InAppBrowser with locationBar at top.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'location=no,disallowoverscroll=yes');">target=Random, location=no,disallowoverscroll=yes</div>
+    Expected result: opens successfully in InAppBrowser without locationBar.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'toolbarposition=bottom');">target=Random, toolbarposition=bottom</div>
+    Expected result: opens successfully in InAppBrowser with locationBar. On iOS the toolbar is at the bottom.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'toolbarposition=top');">target=Random, toolbarposition=top</div>
+    Expected result: opens successfully in InAppBrowser with locationBar. On iOS the toolbar is at the top.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('local.html', 'random_string', 'toolbarposition=top,location=no');">target=Random, toolbarposition=top,location=no</div>
+    Expected result: opens successfully in InAppBrowser with no locationBar. On iOS the toolbar is at the top.
+
     <h1>White Listed URL</h1>
-    <div class="btn large" onclick="doOpen('http://www.google.com');">Default: CordovaWebView<span style="vertical-align:super">*</span></div>
-    <div class="btn large" onclick="doOpen('http://www.google.com', '_self');">Target=Self: CordovaWebView<span style="vertical-align:super">*</span></div>
-    <div class="btn large" onclick="doOpen('http://www.google.com', '_system');">Target=System: System Browser</div>
-    <div class="btn large" onclick="doOpen('http://www.google.com', '_blank');">Target=Blank: InAppBrowser</div>
-    <div class="btn large" onclick="doOpen('http://www.google.com', 'random_string');">Target=Random: InAppBrowser</div>
-    <div class="btn large" onclick="doOpen('http://www.google.com', 'random_string', 'location=no');">Target=Random, no location bar: InAppBrowser</div>
+
+    <div class="btn large" onclick="doOpen('http://www.google.com');">target=Default<span style="vertical-align:super">*</span></div>
+    Expected result: open successfully in CordovaWebView to www.google.com.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('http://www.google.com', '_self');">target=_self<span style="vertical-align:super">*</span></div>
+    Expected result: open successfully in CordovaWebView to www.google.com.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('http://www.google.com', '_system');">target=_system</div>
+    Expected result: open successfully in system browser to www.google.com.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('http://www.google.com', '_blank');">target=_blank</div>
+    Expected result: open successfully in InAppBrowser to www.google.com.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('http://www.google.com', 'random_string');">target=Random</div>
+    Expected result: open successfully in InAppBrowser to www.google.com.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('http://www.google.com', 'random_string', 'location=no');">target=Random, no location bar<span style="vertical-align:super">*</span></div>
+    Expected result: open successfully in InAppBrowser to www.google.com with no location bar.
+
     <h1>Non White Listed URL</h1>
-    <div class="btn large" onclick="doOpen('http://www.apple.com');">Default: InAppBrowser</div>
-    <div class="btn large" onclick="doOpen('http://www.apple.com', '_self');">Target=Self: InAppBrowser</div>
-    <div class="btn large" onclick="doOpen('http://www.apple.com', '_system');">Target=System: System</div>
-    <div class="btn large" onclick="doOpen('http://www.apple.com', '_blank');">Target=Blank: InAppBrowser</div>
-    <div class="btn large" onclick="doOpen('http://www.apple.com', 'random_string');">Target=Random: InAppBrowser</div>
-    <div class="btn large" onclick="doOpen('http://www.apple.com', 'random_string', 'location=no');">Target=Random, no location bar: InAppBrowser</div>
+
+    <div class="btn large" onclick="doOpen('http://www.apple.com');">target=Default</div>
+    Expected result: open successfully in InAppBrowser to apple.com (_self enforces whitelist).
+
+    <p/>
+    <div class="btn large" onclick="doOpen('http://www.apple.com', '_self');">target=_self</div>
+    Expected result: open successfully in InAppBrowser to apple.com (_self enforces whitelist).
+
+    <p/>
+    <div class="btn large" onclick="doOpen('http://www.apple.com', '_system');">target=_system</div>
+    Expected result: open successfully in system browser to apple.com.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('http://www.apple.com', '_blank');">target=_blank</div>
+    Expected result: open successfully in InAppBrowser to apple.com.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('http://www.apple.com', 'random_string');">target=Random</div>
+    Expected result: open successfully in InAppBrowser to apple.com.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('http://www.apple.com', 'random_string', 'location=no');">target=Random, no location bar<span style="vertical-align:super">*</span></div>
+    Expected result: open successfully in InAppBrowser to apple.com without locationBar.
+
     <h1>Page with redirect</h1>
-    <div class="btn large" onclick="doOpen('http://google.com', 'random_string', '', 1);">http://google.com (should 301)</div>
-    <div class="btn large" onclick="doOpen('http://goo.gl/pUFqg', 'random_string', '', 2);">http://www.zhihu.com/answer/16714076 (should 302)</div>
+
+    <div class="btn large" onclick="doOpen('http://google.com', 'random_string', '', 1);">http://google.com</div>
+    Expected result: should 301 and open successfully in InAppBrowser to www.google.com.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('http://goo.gl/pUFqg', 'random_string', '', 2);">http://goo.gl/pUFqg</div>
+    Expected result: should 302 and open successfully in InAppBrowser to www.zhihu.com/answer/16714076.
+
     <h1>PDF URL</h1>
+
     <div class="btn large" onclick="doOpen('http://www.stluciadance.com/prospectus_file/sample.pdf');">Remote URL</div>
+    Expected result: InAppBrowser opens. PDF should render on iOS.
+
+    <p/>
     <div class="btn large" onclick="doOpen('local.pdf', '_blank');">Local URL</div>
-    <h1>INVALID URL</h1>
+    Expected result: InAppBrowser opens. PDF should render on iOS.
+
+    <h1>Invalid URL</h1>
+
     <div class="btn large" onclick="doOpen('x-ttp://www.invalid.com/', '_blank');">Invalid Scheme</div>
+    Expected result: fail to load in InAppBrowser.
+
+    <p/>
     <div class="btn large" onclick="doOpen('http://www.inv;alid.com/', '_blank');">Invalid Host</div>
-    <div class="btn large" onclick="doOpen('nonexistent.html', '_blank');">Missing File</div>
+    Expected result: fail to load in InAppBrowser.
+
+    <p/>
+    <div class="btn large" onclick="doOpen('nonexistent.html', '_blank');">Missing Local File</div>
+    Expected result: fail to load in InAppBrowser (404).
+
     <h1>CSS / JS Injection</h1>
+
     <div class="btn large" onclick="doOpen('inject.html', '_blank');">Original Document</div>
+    Expected result: open successfully in InAppBrowser without text "Style updated from..."
+
+    <p/> 
     <div class="btn large" onclick="openWithStyle('inject.html','inject.css');">CSS File Injection</div>
-    <div class="btn large" onclick="openWithStyle('inject.html','inject.css', true);">CSS File Injection (CB)</div>
+    Expected result: open successfully in InAppBrowser with "Style updated from file".
+
+    <p/>
+    <div class="btn large" onclick="openWithStyle('inject.html','inject.css', true);">CSS File Injection (callback)</div>
+    Expected result: open successfully in InAppBrowser with "Style updated from file", and alert dialog with text "Results verified".
+
+    <p/>
     <div class="btn large" onclick="openWithStyle('inject.html');">CSS Literal Injection</div>
-    <div class="btn large" onclick="openWithStyle('inject.html', null, true);">CSS Literal Injection (CB)</div>
+    Expected result: open successfully in InAppBrowser with "Style updated from literal".
+
+    <p/>
+    <div class="btn large" onclick="openWithStyle('inject.html', null, true);">CSS Literal Injection (callback)</div>
+    Expected result: open successfully in InAppBrowser with "Style updated from literal", and alert dialog with text "Results verified".
+
+    <p/>
     <div class="btn large" onclick="openWithScript('inject.html', 'inject.js');">Script File Injection</div>
-    <div class="btn large" onclick="openWithScript('inject.html', 'inject.js', true);">Script File Injection (CB)</div>
+    Expected result: open successfully in InAppBrowser with text "Script file successfully injected"
+
+    <p/>
+    <div class="btn large" onclick="openWithScript('inject.html', 'inject.js', true);">Script File Injection (callback)</div>
+    Expected result: open successfully in InAppBrowser with text "InAppBrowser - Script / Style Injection Test" and alert dialog with the text "Results verified".
+
+    <p/>
     <div class="btn large" onclick="openWithScript('inject.html');">Script Literal Injection</div>
-    <div class="btn large" onclick="openWithScript('inject.html', null, true);">Script Literal Injection (CB)</div>
+    Expected result: open successfully in InAppBrowser with the text "abc" in small font in the top left corner.
+
+    <p/>
+    <div class="btn large" onclick="openWithScript('inject.html', null, true);">Script Literal Injection (callback)</div>
+    Expected result: open successfully in InAppBrowser with text "InAppBrowser - Script / Style Injection Test" and alert dialog with the text "Results verified".
+
     <h1>Open Hidden </h1>
-    <div class="btn large" onclick="openHidden('http://google.com',true);">google.com hidden</div>
+    <div class="btn large" onclick="openHidden('http://google.com',true);">create hidden</div>
+    Expected result: no additional browser window. Alert appears with the text "background window loaded".
+
+    <p/>
     <div class="btn large" onclick="showHidden();">show hidden</div>
+    Expected result: after first clicking on previous test "create hidden", open successfully in InAppBrowser to google.com.
+
+    <p/>
     <div class="btn large" onclick="closeHidden();">close hidden</div>
+    Expected result: no output. But click on "show hidden" again and nothing should be shown.
+
+    <p/>
     <div class="btn large" onclick="openHidden('http://google.com',false);">google.com not hidden</div>
+    Expected result: open successfully in InAppBrowser to www.google.com
+
     <h1>Clearing Cache</h1>
+
     <div class="btn large" onclick="doOpen('http://www.google.com', '_blank', 'clearcache=yes');">Clear Browser Cache</div>
+    Expected result: ?
+
+    <p/>
     <div class="btn large" onclick="doOpen('http://www.google.com', '_blank', 'clearsessioncache=yes');">Clear Session Cache</div>
+    Expected result: ?
+
     <h1>Video tag</h1>
+
     <div class="btn large" onclick="doOpen('video.html', '_blank');">remote video</div>
-    <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
+    Expected result: open successfully in InAppBrowser with an embedded video that works after clicking the "play" button.
+
     <h1>Local with anchor tag</h1>
+
     <div class="btn large" onclick="doOpen('local.html#anchor1', '_blank');">Anchor1</div>
+    Expected result: open successfully in InAppBrowser to the local page, scrolled to the top.
+
+    <p/>
     <div class="btn large" onclick="doOpen('local.html#anchor2', '_blank');">Anchor2</div>
+    Expected result: open successfully in InAppBrowser to the local page, scrolled to the beginning of the tall div with border.
+    
+    <p/>
+    <div class="backBtn" onclick="backHome();">Back</div>
+
   </body>
 </html>

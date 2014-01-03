@@ -26,19 +26,32 @@
     <meta name="viewport" content="width=device-width,height=device-height,user-scalable=no,maximum-scale=1.0,initial-scale=1.0" />
     <meta http-equiv="Content-type" content="text/html; charset=utf-8"> <!-- ISO-8859-1 -->
     <title>IAB test page</title>
+    <script type="text/javascript" charset="utf-8" src="../cordova-incl.js"></script>
+    <script type="text/javascript" charset="utf-8">
+      function onDeviceReady() {
+          document.getElementById("hint").textContent = "Running CordovaWebView, deviceVersion=" + device.version + ", no toolbar should be present, Back link should work, logcat should NOT have failed 'gap:' calls.";
+      }
+      document.addEventListener("deviceready", onDeviceReady, false);
+    </script>
   </head>
   <body id="stage" class="theme">
-    <h1>InAppBrowser - Local URL</h1>
+    <h1>Local URL</h1>
     <div id="info">
         You have successfully loaded a local URL:
         <script>document.write(location.href)</script>
-      </div>
-      <div>User-Agent = <span id="u-a"></span></div>
-      <div><a href="http://www.google.com">Visit Google</a></div>
-      <div><a href="http://www.yahoo.com">Visit Yahoo</a></div>
-      <div><a href="http://www.stluciadance.com/prospectus_file/sample.pdf">Check out my remote PDF</a></div>
-      <div><a href="local.pdf">Check out my local PDF</a></div>
-    <h2> </h2><a href="javascript:;" onclick="history.back();">Back</div>
+    </div>
+    <hr />
+    <div>User-Agent = <span id="u-a"></span></div>
+    <hr />
+    <div id="hint">Likely running inAppBrowser: Device version from Cordova=not found, Back link should not work, toolbar may be present, logcat should show failed 'gap:' calls.</div>
+    <hr />
+    <div><a href="http://www.google.com">Visit Google</a> (whitelisted)</div>
+    <div><a href="http://www.yahoo.com">Visit Yahoo</a> (not whitelisted)</div>
+    <div><a href="http://www.stluciadance.com/prospectus_file/sample.pdf">Check out my remote PDF</a></div>
+    <div><a href="local.pdf">Check out my local PDF</a></div>
+    <p /><a href="javascript:;" onclick="history.back();">Back</a>
+    <p />
+    <a name="anchor2"></a>
     <div style="height: 1000px;border:1px solid red;">tall div with border</div>
   </body>
   <script>
