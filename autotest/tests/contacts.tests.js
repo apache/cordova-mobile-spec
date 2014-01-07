@@ -21,8 +21,9 @@
 
 // global to store a contact so it doesn't have to be created or retrieved multiple times
 // all of the setup/teardown test methods can reference the following variables to make sure to do the right cleanup
-var gContactObj = null;
-var gContactId = null;
+var gContactObj = null,
+    gContactId = null,
+    isWindowsPhone = cordova.platformId == 'windowsphone';
 
 var removeContact = function(){
     if (gContactObj) {
@@ -126,6 +127,10 @@ describe("Contacts (navigator.contacts)", function () {
             afterEach(removeContact);
 
             it("contacts.spec.6 should be able to find a contact by name", function() {
+
+                // this api requires manual user confirmation on WP7/8 so skip it
+                if (isWindowsPhone) return;
+
                 var foundName = jasmine.createSpy().andCallFake(function(result) {
                         var bFound = false;
                         try {
@@ -323,18 +328,30 @@ describe("Contacts (navigator.contacts)", function () {
 
     describe('save method', function () {
         it("contacts.spec.20 should be able to save a contact", function() {
+
+            // this api requires manual user confirmation on WP7/8 so skip it
+            if (isWindowsPhone) return;
+
             var bDay = new Date(1976, 6,4);
             gContactObj = navigator.contacts.create({
                 "gender": "male", "note": "my note", 
-                "name": {"familyName": "Delete", "givenName": "Test"}, 
+                "name": {"familyName": "Delete", "givenName": "Test", "formatted": "abcde"}, 
                 "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], 
                 "birthday": bDay});
 
             var saveSuccess = jasmine.createSpy().andCallFake(function(obj) {
                     expect(obj).toBeDefined();
-                    expect(obj.note).toBe('my note');
+                    if (cordova.platformId !== 'blackberry10') {
+                        expect(obj.note).toBe('my note');
+                    }
                     expect(obj.name.familyName).toBe('Delete');
                     expect(obj.name.givenName).toBe('Test');
+                    if (cordova.platformId !== 'firefoxos') {
+                        expect(obj.name.formatted).toBe('abcde');
+                    }
+                    if (cordova.platformId === 'firefoxos') {
+                        expect(obj.name.formatted).toBe('Test Delete');
+                    }
                     expect(obj.emails.length).toBe(2);
                     expect(obj.emails[0].value).toBe('here@there.com');
                     expect(obj.emails[1].value).toBe('there@here.com');
@@ -356,6 +373,9 @@ describe("Contacts (navigator.contacts)", function () {
          });
         // HACK: there is a reliance between the previous and next test. This is bad form.
         it("contacts.spec.21 update a contact", function() {
+            // this api requires manual user confirmation on WP7/8 so skip it
+            if (isWindowsPhone) return;
+
             var bDay = new Date(1976, 6,4);
             // XXX: couldn't find anything about `gender` in docs
             //      it doesn't work anyway (always *null*)
@@ -364,6 +384,7 @@ describe("Contacts (navigator.contacts)", function () {
               "categories": [new ContactField('t', 'c', true)],
               "organizations": [new ContactOrganization(true, 'a', 'b', 'c', 'd')]});
             var savedObj;
+
             var noteText = "an UPDATED note";
             bDay = new Date(1975, 5, 4);
             var win = jasmine.createSpy().andCallFake(function(obj) {
@@ -371,16 +392,22 @@ describe("Contacts (navigator.contacts)", function () {
                     // without loosing data
                     expect(obj).toBeDefined();
                     expect(obj.id).toBe(savedObj.id);
-                    expect(obj.note).toBe(noteText);
+                    if (cordova.platformId !== 'blackberry10') {
+                        expect(obj.note).toBe(noteText);
+                    }
                     expect(obj.birthday.toDateString()).toBe(bDay.toDateString());
                     expect(obj.emails).toNotBe(null);
                     expect(obj.emails.length).toBe(1);
                     expect(obj.emails[0].value).toBe('here@there.com');
                     expect(obj.addresses).toNotBe(null);
                     expect(obj.addresses[0]).toBeDefined();
-                    expect(obj.addresses[0].pref).toBe(true);
+                    if (cordova.platformId !== 'firefoxos') {
+                        expect(obj.addresses[0].pref).toBe(true);
+                    }
                     expect(obj.addresses[0].type).toBe("home");
-                    expect(obj.addresses[0].formatted).toBe("a");
+                    if (cordova.platformId !== 'firefoxos') {
+                        expect(obj.addresses[0].formatted).toBe("a");
+                    }
                     expect(obj.addresses[0].streetAddress).toBe("b");
                     expect(obj.addresses[0].locality).toBe("c");
                     expect(obj.addresses[0].region).toBe("d");
@@ -388,15 +415,25 @@ describe("Contacts (navigator.contacts)", function () {
                     expect(obj.addresses[0].country).toBe("f");
                     expect(obj.categories).toNotBe(null);
                     expect(obj.categories[0]).toBeDefined();
-                    expect(obj.categories[0].pref).toBe(true);
-                    expect(obj.categories[0].type).toBe("t");
+                    if (cordova.platformId !== 'firefoxos') {
+                        expect(obj.categories[0].pref).toBe(true);
+                    }
+                    if (cordova.platformId !== 'firefoxos') {
+                        expect(obj.categories[0].type).toBe("t");
+                    }
                     expect(obj.categories[0].value).toBe("c");
                     expect(obj.organizations).toNotBe(null);
                     expect(obj.organizations[0]).toBeDefined();
-                    expect(obj.organizations[0].pref).toBe(true);
-                    expect(obj.organizations[0].type).toBe("a");
+                    if (cordova.platformId !== 'firefoxos') {
+                        expect(obj.organizations[0].pref).toBe(true);
+                    }
+                    if (cordova.platformId !== 'firefoxos') {
+                        expect(obj.organizations[0].type).toBe("a");
+                    }
                     expect(obj.organizations[0].name).toBe("b");
-                    expect(obj.organizations[0].department).toBe("c");
+                    if (cordova.platformId !== 'firefoxos') {
+                        expect(obj.organizations[0].department).toBe("c");
+                    }
                     expect(obj.organizations[0].title).toBe("d");
                     obj.remove();         // Clean up contact object
             });
@@ -469,6 +506,10 @@ describe("Contacts (navigator.contacts)", function () {
 
     describe("Round trip Contact tests (creating + save + delete + find).", function () {
         it("contacts.spec.24 Creating, saving, finding a contact should work, removing it should work, after which we should not be able to find it, and we should not be able to delete it again.", function() {
+
+            // this api requires manual user confirmation on WP7/8 so skip it
+            if (isWindowsPhone) return;
+
             var done = false;
             runs(function () {
                 gContactObj = new Contact();
