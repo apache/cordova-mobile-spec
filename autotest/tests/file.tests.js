@@ -421,7 +421,7 @@ describe('File API', function() {
                     expect(entry.isFile).toBe(true);
                     expect(entry.isDirectory).toBe(false);
                     expect(entry.name).toCanonicallyMatch(fileName);
-                    expect(entry.fullPath).toBe(filePath);
+                    expect(entry.fullPath).toCanonicallyMatch(filePath);
                     // cleanup
                     entry.remove(null, null);
                 }),
@@ -447,7 +447,7 @@ describe('File API', function() {
                     expect(entry.isFile).toBe(true);
                     expect(entry.isDirectory).toBe(false);
                     expect(entry.name).toBe(fileName);
-                    expect(entry.fullPath).toBe(filePath);
+                    expect(entry.fullPath).toCanonicallyMatch(filePath);
 
                     // cleanup
                     entry.remove(null, null);
@@ -488,7 +488,7 @@ describe('File API', function() {
                     expect(entry.isFile).toBe(true);
                     expect(entry.isDirectory).toBe(false);
                     expect(entry.name).toCanonicallyMatch(fileName);
-                    expect(entry.fullPath).toBe(filePath);
+                    expect(entry.fullPath).toCanonicallyMatch(filePath);
 
                     // cleanup
                     entry.remove(null, fail);
@@ -658,7 +658,7 @@ describe('File API', function() {
         // then that platform should careful to pass them correctly to its
         // backend.
         xit("file.spec.25 DirectoryEntry.getDirectory: create new dir with space resolveFileSystemURI with encoded URI", function() {
-            var dirName = "de create dir",
+            var dirName = "de create dir2",
                 dirPath = joinURL(root.fullPath, dirName),
                 getDir = jasmine.createSpy().andCallFake(function(dirEntry) {
                     var dirURI = dirEntry.toURL();
