@@ -110,14 +110,26 @@ describe('FileTransfer', function() {
 
         it("filetransfer.spec.4 should be able to download a file using http", function() {
             var fail = createDoNotCallSpy('downloadFail');
+            var fileFail = createDoNotCallSpy('downloadFail');
             var remoteFile = server + "/robots.txt"
             var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
             var lastProgressEvent = null;
 
-            var downloadWin = jasmine.createSpy().andCallFake(function(entry) {
+            var fileWin = jasmine.createSpy().andCallFake(function(blob) {
+                expect(lastProgressEvent.loaded).not.toBeGreaterThan(blob.size);
+                console.log('\n\n\n\n\nAAAAAAAA4 = == ' + blob.size + ' ' + lastProgressEvent.loaded);
+            });
+
+            var downloadWin = function(entry) {
                 expect(entry.name).toBe(localFileName);
                 expect(lastProgressEvent.loaded).toBeGreaterThan(1);
-            });
+                if (lastProgressEvent.lengthComputable) {
+                    expect(lastProgressEvent.total).not.toBeLessThan(lastProgressEvent.loaded);
+                } else {
+                    expect(lastProgressEvent.total).toBe(0);
+                }
+                entry.file(fileWin, fileFail);
+            };
 
             this.after(function() {
                 deleteFile(localFileName);
@@ -130,7 +142,7 @@ describe('FileTransfer', function() {
                 ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, fail);
             });
 
-            waitsForAny(downloadWin, fail);
+            waitsForAny(fileWin, fail, fileFail);
         });
         it("filetransfer.spec.5 should be able to download a file using http basic auth", function() {
             var fail = createDoNotCallSpy('downloadFail');
@@ -141,6 +153,11 @@ describe('FileTransfer', function() {
             var downloadWin = jasmine.createSpy().andCallFake(function(entry) {
                 expect(entry.name).toBe(localFileName);
                 expect(lastProgressEvent.loaded).toBeGreaterThan(1);
+                if (lastProgressEvent.lengthComputable) {
+                    expect(lastProgressEvent.total).not.toBeLessThan(lastProgressEvent.loaded);
+                } else {
+                    expect(lastProgressEvent.total).toBe(0);
+                }
             });
 
             this.after(function() {
@@ -190,6 +207,11 @@ describe('FileTransfer', function() {
             var downloadWin = jasmine.createSpy().andCallFake(function(entry) {
                 expect(entry.name).toBe(localFileName);
                 expect(lastProgressEvent.loaded).toBeGreaterThan(1);
+                if (lastProgressEvent.lengthComputable) {
+                    expect(lastProgressEvent.total).not.toBeLessThan(lastProgressEvent.loaded);
+                } else {
+                    expect(lastProgressEvent.total).toBe(0);
+                }
             });
 
             this.after(function() {
@@ -209,21 +231,25 @@ describe('FileTransfer', function() {
             var localFileName = 'httpstest.html';
             var downloadFail = createDoNotCallSpy('downloadFail', 'Ensure ' + remoteFile + ' is in the white-list');
             var fileFail = createDoNotCallSpy('fileFail');
+            var lastProgressEvent = null;
             var downloadWin = function(entry) {
                 readFileEntry(entry, fileWin, fileFail);
             };
             var fileWin = jasmine.createSpy().andCallFake(function(content) {
-                expect(content).toMatch(/The Apache Software Foundation/); 
+                expect(content).toMatch(/The Apache Software Foundation/);
+                console.log('\n\n\n\n\nAAAAAAAA = == ' + content.length + ' ' + lastProgressEvent.total);
+                expect(lastProgressEvent.loaded).not.toBeGreaterThan(content.length);
             });
 
             this.after(function() {
                 deleteFile(localFileName);
             });
-            runs(function() {
-                var ft = new FileTransfer();
-                console.log("8");
-                ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, downloadFail);
-            });
+
+            var ft = new FileTransfer();
+            ft.onprogress = function(e) {
+                lastProgressEvent = e;
+            };
+            ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, downloadFail);
 
             waitsForAny(fileWin, downloadFail, fileFail);
         });
@@ -430,6 +456,7 @@ describe('FileTransfer', function() {
                 expect(uploadResult.bytesSent).toBeGreaterThan(0);
                 expect(uploadResult.responseCode).toBe(200);
                 expect(uploadResult.response).toMatch(/fields:\s*{\s*value1.*/);
+                expect(lastProgressEvent).not.toBeNull('expected progress events');
             });
 
             var fileWin = function(fileEntry) {
@@ -446,10 +473,11 @@ describe('FileTransfer', function() {
                 options.params = params;
 
                 ft.onprogress = function(e) {
+                    lastProgressEvent = e;
                     expect(e.lengthComputable).toBe(true);
                     expect(e.total).toBeGreaterThan(0);
                     expect(e.loaded).toBeGreaterThan(0);
-                    lastProgressEvent = e;
+                    expect(lastProgressEvent.total).not.toBeLessThan(lastProgressEvent.loaded);
                 };
 
                 // removing options cause Android to timeout
@@ -464,9 +492,6 @@ describe('FileTransfer', function() {
             });
 
             waitsForAny(uploadWin, uploadFail, fileFail);
-            runs(function() {
-                expect(lastProgressEvent).not.toBeNull('expected progress events');
-            });
         });
         it("filetransfer.spec.19 should be able to upload a file with http basic auth", function() {
             var remoteFile = server_with_credentials + "/upload_basic_auth";
@@ -517,6 +542,8 @@ describe('FileTransfer', function() {
             waitsForAny(uploadWin, uploadFail, fileFail);
             runs(function() {
                 expect(lastProgressEvent).not.toBeNull('expected progress events');
+                expect(lastProgressEvent.loaded).toBeGreaterThan(1, 'loaded');
+                expect(lastProgressEvent.total).not.toBeLessThan(lastProgressEvent.loaded);
             });
         });
         it("filetransfer.spec.6 should get http status on basic auth failure", function() {
@@ -781,6 +808,11 @@ describe('FileTransfer', function() {
                     var ft = new FileTransfer();
                     ft.onprogress = function(e) {
                         lastProgressEvent = e;
+                        if (lastProgressEvent.lengthComputable) {
+                            expect(lastProgressEvent.total).not.toBeLessThan(lastProgressEvent.loaded);
+                        } else {
+                            expect(lastProgressEvent.total).toBe(0);
+                        }
                     };
                     ft.download(remoteFile, localPath, downloadWin, fail);
                 }, unsupportedOperation, 'File', '_getLocalFilesystemPath', [localURL]);
@@ -847,7 +879,9 @@ describe('FileTransfer', function() {
             waitsForAny(uploadWin, uploadFail, fileFail, unsupportedOperation);
             runs(function() {
                 if (!unsupportedOperation.wasCalled) {
-                  expect(lastProgressEvent).not.toBeNull('expected progress events');
+                    expect(lastProgressEvent).not.toBeNull('expected progress events');
+                    expect(lastProgressEvent.loaded).toBeGreaterThan(1);
+                    expect(lastProgressEvent.total).not.toBeLessThan(lastProgressEvent.loaded);
                 }
             });
         });
