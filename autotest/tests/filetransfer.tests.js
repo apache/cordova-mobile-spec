@@ -117,7 +117,6 @@ describe('FileTransfer', function() {
 
             var fileWin = jasmine.createSpy().andCallFake(function(blob) {
                 expect(lastProgressEvent.loaded).not.toBeGreaterThan(blob.size);
-                console.log('\n\n\n\n\nAAAAAAAA4 = == ' + blob.size + ' ' + lastProgressEvent.loaded);
             });
 
             var downloadWin = function(entry) {
@@ -237,7 +236,6 @@ describe('FileTransfer', function() {
             };
             var fileWin = jasmine.createSpy().andCallFake(function(content) {
                 expect(content).toMatch(/The Apache Software Foundation/);
-                console.log('\n\n\n\n\nAAAAAAAA = == ' + content.length + ' ' + lastProgressEvent.total);
                 expect(lastProgressEvent.loaded).not.toBeGreaterThan(content.length);
             });
 
