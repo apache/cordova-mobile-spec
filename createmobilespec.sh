@@ -65,7 +65,7 @@ echo '{
 
 set -x
 ../cordova-cli/bin/cordova platform add ios android
-../cordova-cli/bin/cordova plugin add ../cordova-mobile-spec/dependencies-plugin
+../cordova-cli/bin/cordova plugin add ../cordova-mobile-spec/dependencies-plugin --searchpath "$REPO_PARENT"
 rm -rf platforms/ios/CordovaLib
 ../cordova-ios/bin/update_cordova_subproject platforms/ios/mobilespec.xcodeproj
 ../cordova-cli/bin/cordova prepare
