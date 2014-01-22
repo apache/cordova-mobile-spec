@@ -383,6 +383,7 @@ describe("Contacts (navigator.contacts)", function () {
               "addresses":  [new ContactAddress(true, "home", "a","b","c","d","e","f")],
               "categories": [new ContactField('t', 'c', true)],
               "organizations": [new ContactOrganization(true, 'a', 'b', 'c', 'd')]});
+            gContactObj.emails[gContactObj.emails.length] = new ContactField('some', 'added@by.contact.fie.ld', false);
             var savedObj;
 
             var noteText = "an UPDATED note";
@@ -447,7 +448,9 @@ describe("Contacts (navigator.contacts)", function () {
                     savedObj = obj;
                     expect(savedObj.id).toBeTruthy();
                     // remove an email
+                    expect(savedObj.emails[2].value).toBe('added@by.contact.fie.ld');
                     savedObj.emails[1].value = "";
+                    savedObj.emails[2].value = "";
                     // change birthday
                     savedObj.birthday = bDay;
                     // update note
