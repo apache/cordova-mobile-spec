@@ -135,7 +135,8 @@ describe("Contacts (navigator.contacts)", function () {
                         var bFound = false;
                         try {
                             for (var i=0; i < result.length; i++) {
-                                if (result[i].name.familyName == "Delete") {
+                                if (result[i].name.familyName == "Delete" 
+                                  && gContactObj.emails[0].value == 'here@there.com') {
                                     bFound = true;
                                     break;
                                 }
@@ -179,6 +180,7 @@ describe("Contacts (navigator.contacts)", function () {
                     gContactObj = new Contact();
                     gContactObj.name = new ContactName();
                     gContactObj.name.familyName = "Delete";
+                    gContactObj.emails = [new ContactField('work', 'here@there.com', false)];
                     gContactObj.save(test, fail);
                 });
 
@@ -389,54 +391,56 @@ describe("Contacts (navigator.contacts)", function () {
             var noteText = "an UPDATED note";
             bDay = new Date(1975, 5, 4);
             var win = jasmine.createSpy().andCallFake(function(obj) {
-                    // check if addresses are saved, updated and received 
-                    // without loosing data
-                    expect(obj).toBeDefined();
-                    expect(obj.id).toBe(savedObj.id);
-                    if (cordova.platformId !== 'blackberry10') {
-                        expect(obj.note).toBe(noteText);
-                    }
-                    expect(obj.birthday.toDateString()).toBe(bDay.toDateString());
-                    expect(obj.emails).toNotBe(null);
-                    expect(obj.emails.length).toBe(1);
-                    expect(obj.emails[0].value).toBe('here@there.com');
-                    expect(obj.addresses).toNotBe(null);
-                    expect(obj.addresses[0]).toBeDefined();
-                    if (cordova.platformId !== 'firefoxos') {
-                        expect(obj.addresses[0].pref).toBe(true);
-                    }
-                    expect(obj.addresses[0].type).toBe("home");
-                    if (cordova.platformId !== 'firefoxos') {
-                        expect(obj.addresses[0].formatted).toBe("a");
-                    }
-                    expect(obj.addresses[0].streetAddress).toBe("b");
-                    expect(obj.addresses[0].locality).toBe("c");
-                    expect(obj.addresses[0].region).toBe("d");
-                    expect(obj.addresses[0].postalCode).toBe("e");
-                    expect(obj.addresses[0].country).toBe("f");
-                    expect(obj.categories).toNotBe(null);
-                    expect(obj.categories[0]).toBeDefined();
-                    if (cordova.platformId !== 'firefoxos') {
-                        expect(obj.categories[0].pref).toBe(true);
-                    }
-                    if (cordova.platformId !== 'firefoxos') {
-                        expect(obj.categories[0].type).toBe("t");
-                    }
-                    expect(obj.categories[0].value).toBe("c");
-                    expect(obj.organizations).toNotBe(null);
-                    expect(obj.organizations[0]).toBeDefined();
-                    if (cordova.platformId !== 'firefoxos') {
-                        expect(obj.organizations[0].pref).toBe(true);
-                    }
-                    if (cordova.platformId !== 'firefoxos') {
-                        expect(obj.organizations[0].type).toBe("a");
-                    }
-                    expect(obj.organizations[0].name).toBe("b");
-                    if (cordova.platformId !== 'firefoxos') {
-                        expect(obj.organizations[0].department).toBe("c");
-                    }
-                    expect(obj.organizations[0].title).toBe("d");
-                    obj.remove();         // Clean up contact object
+                // check if addresses are saved, updated and received 
+                // without loosing data
+                expect(obj).toBeDefined();
+                expect(obj.id).toBe(savedObj.id);
+                // find the object again using find
+                if (cordova.platformId !== 'blackberry10') {
+                    expect(obj.note).toBe(noteText);
+                }
+                expect(obj.birthday.toDateString()).toBe(bDay.toDateString());
+                expect(obj.emails).toNotBe(null);
+                expect(obj.emails.length).toBe(2);
+                expect(obj.emails[0].value).toBe('here@there.com');
+                expect(obj.emails[1].value).toBe('added@by.contact.fie.ld');
+                expect(obj.addresses).toNotBe(null);
+                expect(obj.addresses[0]).toBeDefined();
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.addresses[0].pref).toBe(true);
+                }
+                expect(obj.addresses[0].type).toBe("home");
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.addresses[0].formatted).toBe("a");
+                }
+                expect(obj.addresses[0].streetAddress).toBe("b");
+                expect(obj.addresses[0].locality).toBe("c");
+                expect(obj.addresses[0].region).toBe("d");
+                expect(obj.addresses[0].postalCode).toBe("e");
+                expect(obj.addresses[0].country).toBe("f");
+                expect(obj.categories).toNotBe(null);
+                expect(obj.categories[0]).toBeDefined();
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.categories[0].pref).toBe(true);
+                }
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.categories[0].type).toBe("t");
+                }
+                expect(obj.categories[0].value).toBe("c");
+                expect(obj.organizations).toNotBe(null);
+                expect(obj.organizations[0]).toBeDefined();
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.organizations[0].pref).toBe(true);
+                }
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.organizations[0].type).toBe("a");
+                }
+                expect(obj.organizations[0].name).toBe("b");
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.organizations[0].department).toBe("c");
+                }
+                expect(obj.organizations[0].title).toBe("d");
+                obj.remove();         // Clean up contact object
             });
             fail = jasmine.createSpy().andCallFake(function(e) {
                   removeContact();
@@ -450,7 +454,6 @@ describe("Contacts (navigator.contacts)", function () {
                     // remove an email
                     expect(savedObj.emails[2].value).toBe('added@by.contact.fie.ld');
                     savedObj.emails[1].value = "";
-                    savedObj.emails[2].value = "";
                     // change birthday
                     savedObj.birthday = bDay;
                     // update note
