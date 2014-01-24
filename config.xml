@@ -30,4 +30,6 @@
     <access origin="https://*.apache.org" />
     <access origin="http://www.google.com" />
     <access origin="httpssss://example.com" />
+
+    <preference name="iosPersistentFileLocation" value="Library" />
 </widget>
