@@ -32,4 +32,5 @@
     <access origin="httpssss://example.com" />
 
     <preference name="iosPersistentFileLocation" value="Library" />
+    <preference name="AndroidPersistentFileLocation" value="Internal" />
 </widget>
