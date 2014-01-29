@@ -1054,6 +1054,9 @@ describe('File API', function() {
                             expect(entries instanceof Array).toBe(true);
                             expect(entries.length).toBe(1);
                             expect(entries[0].fullPath).toCanonicallyMatch(fileEntry.fullPath);
+                            expect(entries[0].filesystem).not.toBe(null)
+                            expect(entries[0].filesystem instanceof FileSystem).toBe(true)
+
                             // cleanup
                             directory.removeRecursively(done, fail);
                         }, fail);
