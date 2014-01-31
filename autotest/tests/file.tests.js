@@ -3969,5 +3969,97 @@ describe('File API', function() {
             waitsFor(function() { return resolveCallback.wasCalled; }, "createFile callback never called", Tests.TEST_TIMEOUT);
         });
 
+        it("file.spec.111 should not traverse above above the root directory", function() {
+            var fileName = "traverse.file.uri",
+                win = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.name).toBe(fileName);
+                    expect(fileEntry.fullPath).toBe('/' + fileName);
+
+                    // cleanup
+                    deleteEntry(fileName);
+                }),
+                fail = createFail('spec.111'),
+                createCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    // lookup file system entry
+                    runs(function() {
+                        root.getFile('../' + fileName, {create: false}, win, fail);
+                    });
+
+                    waitsFor(function() { return (win.wasCalled || fail.wasCalled); }, "getFile callback never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                });
+
+            // create a new file entry
+            runs(function() {
+                createFile(fileName, createCallback, fail);
+            });
+
+            waitsFor(function() { return createCallback.wasCalled; }, "createFile callback never called", Tests.TEST_TIMEOUT);
+        });
+
+        it("file.spec.112 should traverse above above the current directory", function() {
+            var fileName = "traverse2.file.uri",
+                dirName = "traverse2.subdir",
+                win = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.name).toBe(fileName);
+                    expect(fileEntry.fullPath).toBe('/' + fileName);
+
+                    // cleanup
+                    deleteEntry(fileName);
+                    deleteEntry(dirName);
+                }),
+                fail = createFail('spec.112'),
+                createCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    // lookup file system entry
+                    runs(function() {
+                        entry.getFile('../' + fileName, {create: false}, win, fail);
+                    });
+
+                    waitsFor(function() { return (win.wasCalled || fail.wasCalled); }, "getFile callback never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                });
+
+            // create a new directory and a file entry
+            runs(function() {
+                createFile(fileName, function(entry) {
+                    createDirectory(dirName, createCallback, fail);
+                }, fail);
+            });
+
+            waitsFor(function() { return createCallback.wasCalled; }, "createFile callback never called", Tests.TEST_TIMEOUT);
+        });
+
+        it("file.spec.113 getFile: get Entry should error for missing file above root directory", function() {
+            var fileName = "../missing.file",
+                filePath = joinURL(root.fullPath, fileName),
+                fail = jasmine.createSpy().andCallFake(function(error) {
+                    expect(error).toBeDefined();
+                    expect(error).toBeFileError(FileError.NOT_FOUND_ERR);
+                }),
+                win = createWin('DirectoryEntry');
+
+            // create:false, exclusive:false, file does not exist
+            runs(function() {
+                root.getFile(fileName, {create:false}, win, fail);
+            });
+
+            waitsFor(function() { return fail.wasCalled; }, "error callback never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+            });
+        });
+
     });
 });
