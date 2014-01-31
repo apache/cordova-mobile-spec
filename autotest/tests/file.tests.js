@@ -3930,4 +3930,44 @@ describe('File API', function() {
             
         });
     });
+    describe('Parent References', function() {
+        /* These specs verify that paths with parent references i("..") in them
+         * work correctly, and do not cause the application to crash.
+         */
+        it("file.spec.110 should not throw exception resolving parent refefences", function() {
+            /* This is a direct copy of file.spec.9, with the filename changed,
+             * as reported in CB-5721.
+             */
+            var fileName = "resolve.file.uri",
+                win = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.name).toCanonicallyMatch(fileName);
+
+                    // cleanup
+                    deleteEntry(fileName);
+                }),
+                fail = createFail('window.resolveLocalFileSystemURI'),
+                resolveCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    // lookup file system entry
+                    runs(function() {
+                        window.resolveLocalFileSystemURI(entry.toURL(), win, fail);
+                    });
+
+                    waitsFor(function() { return win.wasCalled; }, "resolveLocalFileSystemURI callback never called", Tests.TEST_TIMEOUT);
+
+                    runs(function() {
+                        expect(win).toHaveBeenCalled();
+                        expect(fail).not.toHaveBeenCalled();
+                    });
+                });
+
+            // create a new file entry
+            runs(function() {
+                createFile("../" + fileName, resolveCallback, fail);
+            });
+
+            waitsFor(function() { return resolveCallback.wasCalled; }, "createFile callback never called", Tests.TEST_TIMEOUT);
+        });
+
+    });
 });
