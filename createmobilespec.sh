@@ -43,7 +43,7 @@ echo "  ./cordova-coho/coho repo-update -r auto"
 REPO_PARENT="$PWD"
 set -e
 
-./cordova-cli/bin/cordova create mobilespec --link cordova-mobile-spec
+./cordova-cli/bin/cordova create mobilespec --link-to cordova-mobile-spec
 ( cd cordova-js; grunt ) || exit $?
 cd mobilespec
 echo '{
