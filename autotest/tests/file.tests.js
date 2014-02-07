@@ -1351,6 +1351,7 @@ describe('File API', function() {
                 itMetadata = jasmine.createSpy().andCallFake(function(metadata) {
                     expect(metadata).toBeDefined();
                     expect(metadata.modificationTime instanceof Date).toBe(true);
+                    expect(typeof metadata.size).toBe("number");
 
                     // cleanup
                     deleteEntry(fileName);
@@ -1381,6 +1382,8 @@ describe('File API', function() {
                 itMetadata = jasmine.createSpy().andCallFake(function(metadata) {
                     expect(metadata).toBeDefined();
                     expect(metadata.modificationTime instanceof Date).toBe(true);
+                    expect(typeof metadata.size).toBe("number");
+                    expect(metadata.size).toBe(0);
 
                     // cleanup
                     deleteEntry(dirName);
