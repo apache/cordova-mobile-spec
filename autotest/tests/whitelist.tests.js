@@ -109,6 +109,13 @@ describe('Whitelist API (cordova.whitelist)', function () {
         itShouldNotMatch('http://www.apache.org:foo/', ['http://www.apache.org:81/*']);
         itShouldNotMatch('http://www.apache.org:81@www.apache.org/', ['http://www.apache.org:81/*']);
         itShouldNotMatch('http://www.apache.org:81@www.evil.com/', ['http://www.apache.org:81/*']);
+
+        itShouldMatch('http://www.apache.org/foo/', ['*://*.apache.org/foo/*']);
+        itShouldMatch('http://www.apache.org/foo/bar', ['*://*.apache.org/foo/*']);
+        itShouldNotMatch('http://www.apache.org/bar/foo/', ['*://*.apache.org/foo/*']);
+        itShouldNotMatch('http://www.apache.org/Foo/', ['*://*.apache.org/foo/*']);
+        itShouldNotMatch('http://www.apache.org/Foo/bar', ['*://*.apache.org/foo/*']);
+
     });
 
     describe("Test function", function() {
