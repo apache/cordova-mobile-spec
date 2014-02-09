@@ -23,4 +23,29 @@ describe('Battery (navigator.battery)', function () {;
     it("battery.spec.1 should exist", function() {
         expect(navigator.battery).toBeDefined();
     });
+    
+    it("battery.spec.2 battery status success callback should be called with a Property object", function() {
+    	var win = jasmine.createSpy().andCallFake(function(a) {
+    		//console.log("Level: " + info.level + " isPlugged: " + info.isPlugged); 
+                expect(a instanceof Object).toBe(true);
+                expect(a.level).toBeDefined();
+                expect(typeof a.level == 'number').toBe(true);
+                expect(a.isPlugged).toBeDefined();
+                expect(typeof a.isPlugged == 'boolean').toBe(true);
+            });
+    	
+    	function addBattery() {
+            window.addEventListener("batterystatus", win, false);
+        }
+
+    	runs(function(){
+    		addBattery();
+    	})
+    	
+        waitsFor(function () { return win.wasCalled; }, "success callback never called", Tests.TEST_TIMEOUT);
+
+        runs(function () {
+            expect(win).toHaveBeenCalled();
+        });
+	});
 });
