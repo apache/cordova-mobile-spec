@@ -455,6 +455,9 @@ describe('FileTransfer', function() {
                 expect(uploadResult.responseCode).toBe(200);
                 expect(uploadResult.response).toMatch(/fields:\s*{\s*value1.*/);
                 expect(lastProgressEvent).not.toBeNull('expected progress events');
+                if (cordova.platformId == 'ios') {
+                    expect(uploadResult.headers && uploadResult.headers['Content-Type']).toBeDefined('Expected content-type header to be defined.');
+                }
             });
 
             var fileWin = function(fileEntry) {
