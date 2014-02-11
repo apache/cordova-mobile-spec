@@ -269,7 +269,11 @@ describe('File API', function() {
                 var fileName = "resolve.file.uri.params",
                 win = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
-                    expect(fileEntry.name).toBe(fileName);
+                    if (fileEntry.toURL().toLowerCase().substring(0,10) === "cdvfile://") {
+                        expect(fileEntry.name).toBe(fileName + "?1234567890");
+                    } else {
+                        expect(fileEntry.name).toBe(fileName);
+                    }
 
                     // cleanup
                     deleteEntry(fileName);
