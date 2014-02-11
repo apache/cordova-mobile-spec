@@ -270,7 +270,7 @@ describe('File API', function() {
                 win = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
                     if (fileEntry.toURL().toLowerCase().substring(0,10) === "cdvfile://") {
-                        expect(fileEntry.fullPath).toBe(fileName + "?1234567890");
+                        expect(fileEntry.fullPath).toBe("/" + fileName + "?1234567890");
                     }
                     expect(fileEntry.name).toBe(fileName);
 
