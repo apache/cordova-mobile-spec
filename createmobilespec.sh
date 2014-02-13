@@ -51,14 +51,10 @@ echo '{
   "name":"mobilespec",
   "lib": {
     "android": {
-      "uri": "'"$REPO_PARENT/cordova-android"'",
-      "version": "dev",
-      "id": "cordova-android-dev"
+      "uri": "'"$REPO_PARENT/cordova-android"'"
     },
     "ios": {
-      "uri": "'"$REPO_PARENT/cordova-ios"'",
-      "version": "dev",
-      "id": "cordova-ios-dev"
+      "uri": "'"$REPO_PARENT/cordova-ios"'"
     }
   }
 }' > .cordova/config.json
@@ -68,9 +64,9 @@ set -x
 ../cordova-cli/bin/cordova plugin add ../cordova-mobile-spec/dependencies-plugin --searchpath "$REPO_PARENT"
 rm -rf platforms/ios/CordovaLib
 ../cordova-ios/bin/update_cordova_subproject platforms/ios/mobilespec.xcodeproj
+cp ../cordova-js/pkg/cordova.android.js platforms/android/platform_www/cordova.js
+cp ../cordova-js/pkg/cordova.ios.js platforms/ios/platform_www/cordova.js
 ../cordova-cli/bin/cordova prepare
-cp ../cordova-js/pkg/cordova.android.js platforms/android/assets/www/cordova.js
-cp ../cordova-js/pkg/cordova.ios.js platforms/ios/www/cordova.js
 ln -s ../cordova-cli/bin/cordova cordova
 
 set +x
