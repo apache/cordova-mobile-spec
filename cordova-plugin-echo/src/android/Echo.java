@@ -22,7 +22,6 @@ package org.apache.cordova.test;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
-import org.apache.cordova.PluginResult.Status;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -34,7 +33,10 @@ import android.util.Base64;
 */
 public class Echo extends CordovaPlugin {
 
-	   /**
+
+     private volatile boolean bulkEchoing;
+
+     /**
      * Executes the request and returns PluginResult.
      *
      * @param action            The action to execute.
@@ -62,6 +64,30 @@ public class Echo extends CordovaPlugin {
                 return true;
             } else if(action.equals("echoMultiPart")) {
             	callbackContext.sendPluginResult( new PluginResult(PluginResult.Status.OK, args.getJSONObject(0)));
+                return true;
+            } else if(action.equals("stopEchoBulk")) {
+                bulkEchoing = false;
+            } else if(action.equals("echoBulk")) {
+                if (bulkEchoing) {
+                    return true;
+                }
+                final String payload = args.getString(0);
+                final int delayMs = args.getInt(1);
+                bulkEchoing = true;
+                cordova.getThreadPool().execute(new Runnable() {
+                    public void run() {
+                        while (bulkEchoing) {
+                            try {
+                                Thread.sleep(delayMs);
+                            } catch (InterruptedException e) {}
+                            PluginResult pr = new PluginResult(PluginResult.Status.OK, payload);
+                            pr.setKeepCallback(true);
+                            callbackContext.sendPluginResult(pr);
+                        }
+                        PluginResult pr = new PluginResult(PluginResult.Status.OK, payload);
+                        callbackContext.sendPluginResult(pr);
+                    }
+                });
                 return true;
             }
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));

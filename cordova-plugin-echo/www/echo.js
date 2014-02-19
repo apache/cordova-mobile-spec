@@ -51,3 +51,10 @@ module.exports = function(successCallback, errorCallback, message, forceAsync) {
     exec(successCallback, errorCallback, "Echo", action, args);
 };
 
+module.exports.bulkEcho = function(payload, delay, callback) {
+    exec(callback, null, "Echo", "echoBulk", [payload, delay]);
+};
+
+module.exports.stopBulkEcho = function() {
+    exec(null, null, "Echo", "stopEchoBulk", []);
+};
