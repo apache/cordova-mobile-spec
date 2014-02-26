@@ -27,48 +27,33 @@ if [[ ! -d cordova-mobile-spec ]]; then
   exit 1
 fi
 
-if [[ -e mobilespec ]]; then
-  echo "Directory \"mobilespec\" already exists. Delete it first then re-run."
+NAME=mobilespec-android
+
+if [[ -e $NAME ]]; then
+  echo "Directory \"$NAME\" already exists. Delete it first then re-run."
   exit 1
 fi
 
-echo "Creating mobilespec project. If you have any errors, it may be from missing repositories."
+echo "Creating $NAME project. If you have any errors, it may be from missing repositories."
 echo "To clone needed repositories:"
-echo "  ./cordova-coho/coho repo-clone -r plugins -r mobile-spec -r android -r ios -r cli"
+echo "  ./cordova-coho/coho repo-clone -r plugins -r mobile-spec -r android -r ios -r plugman"
 echo "To update all repositories:"
 echo "  ./cordova-coho/coho repo-update"
 REPO_PARENT="$PWD"
 set -e
 
-./cordova-cli/bin/cordova create mobilespec --link-to cordova-mobile-spec
+./cordova-android/bin/create $NAME org.apache.mobilespecplugman $NAME
 ( cd cordova-js; grunt ) || exit $?
-cd mobilespec
-echo '{
-  "id":"org.apache.mobilespec",
-  "name":"mobilespec",
-  "lib": {
-    "android": {
-      "uri": "'"$REPO_PARENT/cordova-android"'"
-    },
-    "ios": {
-      "uri": "'"$REPO_PARENT/cordova-ios"'"
-    }
-  }
-}' > .cordova/config.json
+cd $NAME
 
 set -x
-../cordova-cli/bin/cordova platform add ios android
-../cordova-cli/bin/cordova plugin add ../cordova-mobile-spec/dependencies-plugin --searchpath "$REPO_PARENT"
-rm -rf platforms/ios/CordovaLib
-../cordova-ios/bin/update_cordova_subproject platforms/ios/mobilespec.xcodeproj
-cp ../cordova-js/pkg/cordova.android.js platforms/android/platform_www/cordova.js
-cp ../cordova-js/pkg/cordova.ios.js platforms/ios/platform_www/cordova.js
-../cordova-cli/bin/cordova prepare
-ln -s ../cordova-cli/bin/cordova cordova
+rm -r assets/www/*
+cp -r ../cordova-mobile-spec/* assets/www
+cp ../cordova-js/pkg/cordova.android.js assets/www/cordova.js
+../cordova-plugman/main.js install --platform android --project . --plugin ../cordova-mobile-spec/dependencies-plugin --searchpath "$REPO_PARENT"
 
 set +x
-echo "App created in the mobilespec/ directory."
-echo "Symlink to CLI created as mobilespec/cordova"
+echo "App created in the $NAME/ directory."
 
 
 
