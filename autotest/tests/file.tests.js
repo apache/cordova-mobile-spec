@@ -4068,4 +4068,94 @@ describe('File API', function() {
         });
 
     });
+    describe('toNativeURL interface', function() {
+        /* These specs verify that FileEntries have a toNativeURL method
+         * which appears to be sane.
+         */
+        it("file.spec.114 fileEntry should have a toNativeURL method", function() {
+            var fileName = "native.file.uri",
+                win = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.name).toCanonicallyMatch(fileName);
+
+                    // cleanup
+                    deleteEntry(fileName);
+                }),
+                fail = createFail('window.resolveLocalFileSystemURI'),
+                createCallback = jasmine.createSpy().andCallFake(function(entry) {
+                    expect(entry.toNativeURL).toBeDefined();
+                    expect(typeof entry.toNativeURL).toBe('function');
+                    var nativeURL = entry.toNativeURL();
+                    expect(typeof nativeURL).toBe("string");
+                    expect(nativeURL.substring(0,7)).toEqual("file://");
+                    expect(nativeURL.substring(nativeURL.length - fileName.length)).toEqual(fileName);
+                });
+
+            // create a new file entry
+            runs(function() {
+                createFile(fileName, createCallback, fail);
+            });
+
+            waitsFor(function() { return createCallback.wasCalled; }, "createFile callback never called", Tests.TEST_TIMEOUT);
+        });
+        it("file.spec.115 DirectoryReader should return entries with toNativeURL method", function(done) {
+            var fail = createFail('DirectoryReader', done),
+                dirName = 'nativeEntries.dir',
+                fileName = 'nativeEntries.file',
+                checkEntries = jasmine.createSpy().andCallFake(function(entries) {
+                    expect(entries).toBeDefined();
+                    expect(entries instanceof Array).toBe(true);
+                    expect(entries.length).toBe(1);
+                    expect(entries[0].toNativeURL).toBeDefined();
+                    expect(typeof entries[0].toNativeURL).toBe('function');
+                    var nativeURL = entries[0].toNativeURL();
+                    expect(typeof nativeURL).toBe("string");
+                    expect(nativeURL.substring(0,7)).toEqual("file://");
+                    expect(nativeURL.substring(nativeURL.length - fileName.length)).toEqual(fileName);
+
+                    // cleanup
+                    directory.removeRecursively(done, fail);
+                });
+            // create a new file entry
+            runs(function() {
+            root.getDirectory(dirName, {create: true}, function(directory) {
+                directory.getFile(fileName, {create: true}, function(fileEntry) {
+                    var reader = directory.createReader();
+                    reader.readEntries(checkEntries, fail);
+                }, fail);
+            }, fail);
+            });
+
+            waitsFor(function() { return checkEntries.wasCalled; }, "checkEntries callback never called", Tests.TEST_TIMEOUT);
+        });
+        it("file.spec.116 resolveLocalFileSystemURL should return entries with toNativeURL method", function() {
+            var fileName = "native.resolve.uri",
+                win = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.name).toCanonicallyMatch(fileName);
+
+                    // cleanup
+                    deleteEntry(fileName);
+                }),
+                fail = createFail('window.resolveLocalFileSystemURI'),
+                checkEntry = jasmine.createSpy().andCallFake(function(entry) {
+                    expect(entry.toNativeURL).toBeDefined();
+                    expect(typeof entry.toNativeURL).toBe('function');
+                    var nativeURL = entry.toNativeURL();
+                    expect(typeof nativeURL).toBe("string");
+                    expect(nativeURL.substring(0,7)).toEqual("file://");
+                    expect(nativeURL.substring(nativeURL.length - fileName.length)).toEqual(fileName);
+                });
+
+            // create a new file entry
+            runs(function() {
+                createFile(fileName, function(entry) {
+                    resolveLocalFileSystemURL(entry.toURL(), checkEntry, fail);
+                }, fail);
+            });
+
+            waitsFor(function() { return checkEntry.wasCalled; }, "checkEntry callback never called", Tests.TEST_TIMEOUT);
+        });
+
+    });
 });

@@ -51,7 +51,8 @@
     }
 
     function bindEvents() {
-        document.getElementById('downloadImg').addEventListener('click', downloadImg, false);
+        document.getElementById('downloadImgCDV').addEventListener('click', downloadImgCDV, false);
+        document.getElementById('downloadImgNative').addEventListener('click', downloadImgNative, false);
     }
 
     function clearLog() {
@@ -75,9 +76,19 @@
         };
     }
 
-    function downloadImg(ev) {
+    function downloadImgNative(ev) {
         ev.preventDefault();
         ev.stopPropagation();
+        downloadImg(function(entry) { return entry.toNativeURL(); });
+    }
+
+    function downloadImgCDV(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        downloadImg(function(entry) { return entry.toURL(); });
+    }
+
+    function downloadImg(urlFn) {
         var filename = "feather0.gif";
         function download(fileSystem) {
             var ft = new FileTransfer();
@@ -86,8 +97,8 @@
             ft.download(imageURL, fileSystem.root.toURL() + "/" + filename, function(entry) {
                 logMessage("Download complete")
                 var imgElement = new Image();
-                logMessage("Image URL is " + entry.toURL(), "green");
-                imgElement.src = entry.toURL();
+                imgElement.src = urlFn(entry)
+                logMessage("Image URL is " + imgElement.src, "green");
                 logMessage("Inserting image");
                 document.getElementById("output").appendChild(imgElement);
             }, logError("ft.download"));
@@ -113,7 +124,8 @@
 
     <h1>File and File Transfer</h1>
     <h2>File</h2>
-    <div class="btn large" id="downloadImg">Download and display img</div>
+    <div class="btn large" id="downloadImgCDV">Download and display img (cdvfile)</div>
+    <div class="btn large" id="downloadImgNative">Download and display img (native)</div>
 
     <div id="log"></div>
     <div id="output"></div>
