@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<!--
+
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+
+-->
+
+
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,height=device-height,user-scalable=no,maximum-scale=1.0,initial-scale=1.0" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8"> <!-- ISO-8859-1 -->
+    <title>Cordova Mobile Spec</title>
+    <link rel="stylesheet" href="../master.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" charset="utf-8" src="../cordova-incl.js"></script>
+
+
+<script type="text/javascript" charset="utf-8">
+
+    var deviceReady = false;
+
+    /**
+     * Function called when page has finished loading.
+     */
+    function init() {
+        document.addEventListener("deviceready", function() {
+                deviceReady = true;
+                console.log("Device="+device.platform+" "+device.version);
+                bindEvents();
+            }, false);
+        window.setTimeout(function() {
+            if (!deviceReady) {
+                alert("Error: Apache Cordova did not initialize.  Demo will not run correctly.");
+            }
+        },1000);
+    }
+
+    function bindEvents() {
+        document.getElementById('downloadImg').addEventListener('click', downloadImg, false);
+    }
+
+    function clearLog() {
+        var log = document.getElementById("log");
+        log.innerHTML = "";
+    }
+
+    function logMessage(message, color) {
+        var log = document.getElementById("log");
+        var logLine = document.createElement('div');
+        if (color) {
+            logLine.style.color = color;
+        }
+        logLine.innerHTML = message;
+        log.appendChild(logLine);
+    }
+
+    function logError(serviceName) {
+        return function(err) {
+            logMessage("ERROR: " + serviceName + " " + JSON.stringify(err), "red");
+        };
+    }
+
+    function downloadImg(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        var filename = "feather0.gif";
+        function download(fileSystem) {
+            var ft = new FileTransfer();
+            var imageURL = "http://apache.org/images/feather-small.gif";
+            logMessage("Starting download");
+            ft.download(imageURL, fileSystem.root.toURL() + "/" + filename, function(entry) {
+                logMessage("Download complete")
+                var imgElement = new Image();
+                logMessage("Image URL is " + entry.toURL(), "green");
+                imgElement.src = entry.toURL();
+                logMessage("Inserting image");
+                document.getElementById("output").appendChild(imgElement);
+            }, logError("ft.download"));
+        }
+        clearLog();
+        logMessage("Requesting filesystem");
+        requestFileSystem(TEMPORARY, 0, function(fileSystem) {
+            logMessage("Checking for existing file");
+            fileSystem.root.getFile(filename, {create: false}, function(entry) {
+                logMessage("Removing existing file");
+                entry.remove(function() {
+                    download(fileSystem);
+                }, logError("entry.remove"));
+            }, function() {
+                download(fileSystem);
+            });
+        }, logError("requestFileSystem"));
+    }
+</script>
+
+  </head>
+  <body onload="init();" id="stage" class="theme">
+
+    <h1>File and File Transfer</h1>
+    <h2>File</h2>
+    <div class="btn large" id="downloadImg">Download and display img</div>
+
+    <div id="log"></div>
+    <div id="output"></div>
+    <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
+  </body>
+</html>
