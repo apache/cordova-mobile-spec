@@ -4156,6 +4156,160 @@ describe('File API', function() {
 
             waitsFor(function() { return checkEntry.wasCalled; }, "checkEntry callback never called", Tests.TEST_TIMEOUT);
         });
+    });
+    describe('resolveLocalFileSystemURL on file://', function() {
+        /* These specs verify that window.resolveLocalFileSystemURL works correctly on file:// URLs
+         */
+        it("file.spec.117 should not resolve native URLs outside of FS roots", function() {
+            var fail = jasmine.createSpy().andCallFake(function(error) {
+                expect(error).toBeDefined();
+            }),
+            win = createWin('window.resolveLocalFileSystemURI');
+
+            // lookup file system entry
+            runs(function() {
+                window.resolveLocalFileSystemURL("file:///this.is.an.invalid.url", win, fail);
+            });
+
+            waitsFor(function() { return fail.wasCalled; }, "error callback never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+            });
+        });
+        it("file.spec.118 should not resolve native URLs outside of FS roots", function() {
+            var fail = jasmine.createSpy().andCallFake(function(error) {
+                expect(error).toBeDefined();
+            }),
+            win = createWin('window.resolveLocalFileSystemURI');
+
+            // lookup file system entry
+            runs(function() {
+                window.resolveLocalFileSystemURL("file://localhost/this.is.an.invalid.url", win, fail);
+            });
+
+            waitsFor(function() { return fail.wasCalled; }, "error callback never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+            });
+        });
+        it("file.spec.119 should not resolve invalid native URLs", function() {
+            var fail = jasmine.createSpy().andCallFake(function(error) {
+                expect(error).toBeDefined();
+            }),
+            win = createWin('window.resolveLocalFileSystemURI');
+
+            // lookup file system entry
+            runs(function() {
+                window.resolveLocalFileSystemURL("file://localhost", win, fail);
+            });
+
+            waitsFor(function() { return fail.wasCalled; }, "error callback never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+            });
+        });
+        it("file.spec.120 should not resolve invalid native URLs with query strings", function() {
+            var fail = jasmine.createSpy().andCallFake(function(error) {
+                expect(error).toBeDefined();
+            }),
+            win = createWin('window.resolveLocalFileSystemURI');
+
+            // lookup file system entry
+            runs(function() {
+                window.resolveLocalFileSystemURL("file://localhost?test/test", win, fail);
+            });
+
+            waitsFor(function() { return fail.wasCalled; }, "error callback never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).toHaveBeenCalled();
+                expect(win).not.toHaveBeenCalled();
+            });
+        });
+        it("file.spec.121 should resolve native URLs returned by API", function() {
+            var fileName = "native.resolve.uri1",
+                fail = createFail('window.resolveLocalFileSystemURI'),
+                checkEntry = jasmine.createSpy().andCallFake(function(entry) {
+                    expect(entry.fullPath).toEqual("/" + fileName);
+                    // cleanup
+                    deleteEntry(fileName);
+                });
+
+            // create a new file entry
+            runs(function() {
+                createFile(fileName, function(entry) {
+                    resolveLocalFileSystemURL(entry.toNativeURL(), checkEntry, fail);
+                }, fail);
+            });
+
+            waitsFor(function() { return checkEntry.wasCalled; }, "checkEntry callback never called", Tests.TEST_TIMEOUT);
+        });
+        it("file.spec.122 should resolve native URLs returned by API with localhost", function() {
+            var fileName = "native.resolve.uri2",
+                fail = createFail('window.resolveLocalFileSystemURI'),
+                checkEntry = jasmine.createSpy().andCallFake(function(entry) {
+                    expect(entry.fullPath).toEqual("/" + fileName);
+                    // cleanup
+                    deleteEntry(fileName);
+                });
+
+            // create a new file entry
+            runs(function() {
+                createFile(fileName, function(entry) {
+                    var url = entry.toNativeURL();
+                    url = url.replace("///","//localhost/");
+                    resolveLocalFileSystemURL(url, checkEntry, fail);
+                }, fail);
+            });
+
+            waitsFor(function() { return checkEntry.wasCalled; }, "checkEntry callback never called", Tests.TEST_TIMEOUT);
+        });
+        it("file.spec.123 should resolve native URLs returned by API with query string", function() {
+            var fileName = "native.resolve.uri3",
+                fail = createFail('window.resolveLocalFileSystemURI'),
+                checkEntry = jasmine.createSpy().andCallFake(function(entry) {
+                    expect(entry.fullPath).toEqual("/" + fileName);
+                    // cleanup
+                    deleteEntry(fileName);
+                });
+
+            // create a new file entry
+            runs(function() {
+                createFile(fileName, function(entry) {
+                    var url = entry.toNativeURL();
+                    url = url + "?test/test";
+                    resolveLocalFileSystemURL(url, checkEntry, fail);
+                }, fail);
+            });
+
+            waitsFor(function() { return checkEntry.wasCalled; }, "checkEntry callback never called", Tests.TEST_TIMEOUT);
+        });
+        it("file.spec.124 should resolve native URLs returned by API with localhost and query string", function() {
+            var fileName = "native.resolve.uri4",
+                fail = createFail('window.resolveLocalFileSystemURI'),
+                checkEntry = jasmine.createSpy().andCallFake(function(entry) {
+                    expect(entry.fullPath).toEqual("/" + fileName);
+                    // cleanup
+                    deleteEntry(fileName);
+                });
+
+            // create a new file entry
+            runs(function() {
+                createFile(fileName, function(entry) {
+                    var url = entry.toNativeURL();
+                    url = url.replace("///","//localhost/") + "?test/test";
+                    resolveLocalFileSystemURL(url, checkEntry, fail);
+                }, fail);
+            });
+
+            waitsFor(function() { return checkEntry.wasCalled; }, "checkEntry callback never called", Tests.TEST_TIMEOUT);
+        });
 
     });
 });
