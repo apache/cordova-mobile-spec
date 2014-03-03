@@ -58,6 +58,7 @@
         document.getElementById('downloadImgNative').addEventListener('click', downloadImgNative, false);
         document.getElementById('downloadVideoCDV').addEventListener('click', downloadVideoCDV, false);
         document.getElementById('downloadVideoNative').addEventListener('click', downloadVideoNative, false);
+        document.getElementById('testPrivateURL').addEventListener('click', testPrivateURL, false);
     }
 
     function clearLog() {
@@ -136,6 +137,28 @@
             });
         }, logError("requestFileSystem"));
     }
+
+    function testPrivateURL(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        requestFileSystem(TEMPORARY, 0, function(fileSystem) {
+            logMessage("Temporary root is at " + fileSystem.root.toNativeURL());
+            fileSystem.root.getFile("testfile", {create: true}, function(entry) {
+                logMessage("Temporary file is at " + entry.toNativeURL());
+                if (entry.toNativeURL().substring(0,12) == "file:///var/") {
+                    logMessage("File starts with /var/, trying /private/var");
+                    var newURL = "file://localhost/private/var/" + entry.toNativeURL().substring(12) + "?and=another_thing";
+                    //var newURL = entry.toNativeURL();
+                    logMessage(newURL, 'blue');
+                    resolveLocalFileSystemURL(newURL, function(newEntry) {
+                        logMessage("Successfully resolved.", 'green');
+                        logMessage(newEntry.toURL(), 'blue');
+                        logMessage(newEntry.toNativeURL(), 'blue');
+                    }, logError("resolveLocalFileSystemURL"));
+                }
+            }, logError("getFile"));
+        }, logError("requestFileSystem"));
+    }
 </script>
 
   </head>
@@ -147,6 +170,8 @@
     <div class="btn large" id="downloadImgNative">Download and display img (native)</div>
     <div class="btn large" id="downloadVideoCDV">Download and play video (cdvfile)</div>
     <div class="btn large" id="downloadVideoNative">Download and play video (native)</div>
+
+    <div class="btn large" id="testPrivateURL">Test /private/ URL (iOS)</div>
 
     <div id="log"></div>
     <div id="output"></div>
