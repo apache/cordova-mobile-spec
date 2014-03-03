@@ -4310,6 +4310,167 @@ describe('File API', function() {
 
             waitsFor(function() { return checkEntry.wasCalled; }, "checkEntry callback never called", Tests.TEST_TIMEOUT);
         });
+    });
+    describe('cross-file-system copy and move', function() {
+        /* These specs verify that Entry.copyTo and Entry.moveTo work correctly
+         * when crossing filesystem boundaries.
+         */
+        it("file.spec.125 copyTo: temporary -> persistent", function() {
+            var file1 = "entry.copy.file1a",
+                file2 = "entry.copy.file2a",
+                sourceEntry,
+                fullPath = joinURL(root.fullPath, file2),
+                fail = createFail('Entry'),
+                validateFile = jasmine.createSpy().andCallFake(function(entry) {
+                    // a bit redundant since copy returned this entry already
+                    expect(entry).toBeDefined();
+                    expect(entry.isFile).toBe(true);
+                    expect(entry.isDirectory).toBe(false);
+                    expect(entry.name).toCanonicallyMatch(file2);
+                    expect(entry.fullPath).toCanonicallyMatch(fullPath);
+                    expect(entry.filesystem).toBeDefined();
+                    expect(entry.filesystem.name).toEqual("persistent");
+
+                    // cleanup
+                    entry.remove();
+                    sourceEntry.remove();
+                }),
+                createSourceAndTransfer = function() {
+                    temp_root.getFile(file1, {create: true}, function(entry) {
+                        expect(entry.filesystem).toBeDefined();
+                        expect(entry.filesystem.name).toEqual("temporary");
+                        sourceEntry = entry; // Save for later cleanup
+                        entry.copyTo(persistent_root, file2, validateFile, fail);
+                    }, fail);
+                };
+            // Delete any existing file to start things off
+            runs(function() {
+                persistent_root.getFile(file2, {}, function(entry) {
+                    entry.remove(createSourceAndTransfer, fail);
+                }, createSourceAndTransfer);
+            });
+
+            waitsFor(function() { return validateFile.wasCalled || fail.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("file.spec.126 copyTo: persistent -> temporary", function() {
+            var file1 = "entry.copy.file1b",
+                file2 = "entry.copy.file2b",
+                sourceEntry,
+                fullPath = joinURL(root.fullPath, file2),
+                fail = createFail('Entry'),
+                validateFile = jasmine.createSpy().andCallFake(function(entry) {
+                    expect(entry).toBeDefined();
+                    expect(entry.isFile).toBe(true);
+                    expect(entry.isDirectory).toBe(false);
+                    expect(entry.name).toCanonicallyMatch(file2);
+                    expect(entry.fullPath).toCanonicallyMatch(fullPath);
+                    expect(entry.filesystem.name).toEqual("temporary");
+
+                    // cleanup
+                    entry.remove();
+                    sourceEntry.remove();
+                }),
+                createSourceAndTransfer = function() {
+                    persistent_root.getFile(file1, {create: true}, function(entry) {
+                        expect(entry).toBeDefined();
+                        expect(entry.filesystem).toBeDefined();
+                        expect(entry.filesystem.name).toEqual("persistent");
+                        sourceEntry = entry; // Save for later cleanup
+                        entry.copyTo(temp_root, file2, validateFile, fail);
+                    }, fail);
+                };
+            // Delete any existing file to start things off
+            runs(function() {
+                temp_root.getFile(file2, {}, function(entry) {
+                    entry.remove(createSourceAndTransfer, fail);
+                }, createSourceAndTransfer);
+            });
+
+            waitsFor(function() { return validateFile.wasCalled || fail.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).not.toHaveBeenCalled();
+                expect(validateFile).toHaveBeenCalled();
+            });
+        });
+        it("file.spec.127 moveTo: temporary -> persistent", function() {
+            var file1 = "entry.copy.file1a",
+                file2 = "entry.copy.file2a",
+                sourceEntry,
+                fullPath = joinURL(root.fullPath, file2),
+                fail = createFail('Entry'),
+                validateFile = jasmine.createSpy().andCallFake(function(entry) {
+                    // a bit redundant since copy returned this entry already
+                    expect(entry).toBeDefined();
+                    expect(entry.isFile).toBe(true);
+                    expect(entry.isDirectory).toBe(false);
+                    expect(entry.name).toCanonicallyMatch(file2);
+                    expect(entry.fullPath).toCanonicallyMatch(fullPath);
+                    expect(entry.filesystem).toBeDefined();
+                    expect(entry.filesystem.name).toEqual("persistent");
+
+                    // cleanup
+                    entry.remove();
+                    sourceEntry.remove();
+                }),
+                createSourceAndTransfer = function() {
+                    temp_root.getFile(file1, {create: true}, function(entry) {
+                        expect(entry.filesystem).toBeDefined();
+                        expect(entry.filesystem.name).toEqual("temporary");
+                        sourceEntry = entry; // Save for later cleanup
+                        entry.moveTo(persistent_root, file2, validateFile, fail);
+                    }, fail);
+                };
+            // Delete any existing file to start things off
+            runs(function() {
+                persistent_root.getFile(file2, {}, function(entry) {
+                    entry.remove(createSourceAndTransfer, fail);
+                }, createSourceAndTransfer);
+            });
+
+            waitsFor(function() { return validateFile.wasCalled || fail.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+        });
+        it("file.spec.128 moveTo: persistent -> temporary", function() {
+            var file1 = "entry.copy.file1b",
+                file2 = "entry.copy.file2b",
+                sourceEntry,
+                fullPath = joinURL(root.fullPath, file2),
+                fail = createFail('Entry'),
+                validateFile = jasmine.createSpy().andCallFake(function(entry) {
+                    expect(entry).toBeDefined();
+                    expect(entry.isFile).toBe(true);
+                    expect(entry.isDirectory).toBe(false);
+                    expect(entry.name).toCanonicallyMatch(file2);
+                    expect(entry.fullPath).toCanonicallyMatch(fullPath);
+                    expect(entry.filesystem.name).toEqual("temporary");
+
+                    // cleanup
+                    entry.remove();
+                    sourceEntry.remove();
+                }),
+                createSourceAndTransfer = function() {
+                    persistent_root.getFile(file1, {create: true}, function(entry) {
+                        expect(entry).toBeDefined();
+                        expect(entry.filesystem).toBeDefined();
+                        expect(entry.filesystem.name).toEqual("persistent");
+                        sourceEntry = entry; // Save for later cleanup
+                        entry.moveTo(temp_root, file2, validateFile, fail);
+                    }, fail);
+                };
+            // Delete any existing file to start things off
+            runs(function() {
+                temp_root.getFile(file2, {}, function(entry) {
+                    entry.remove(createSourceAndTransfer, fail);
+                }, createSourceAndTransfer);
+            });
+
+            waitsFor(function() { return validateFile.wasCalled || fail.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+
+            runs(function() {
+                expect(fail).not.toHaveBeenCalled();
+                expect(validateFile).toHaveBeenCalled();
+            });
+        });
 
     });
 });
