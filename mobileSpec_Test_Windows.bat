@@ -70,32 +70,57 @@ ECHO         _______________ Deploying Mobile Spec Test ____________________
 date /t
 time /t
 SET GETCURRENTDIR="%cd%"
-::Check if GIT installation.
+::Check GIT installation.
 
+ECHO _____ Checking GIT program in environment ...
+VERIFY >NUL
+CALL GIT --version 2>NUL
+IF %ERRORLEVEL% EQU 0 (
+						ECHO ______Git is present in the environment	
+						GOTO CHECKCOHO
+						)
+IF %ERRORLEVEL% EQU 9009 ECHO ______ Git path not found at Path environmental variable
+ECHO.
+ECHO _____ Searching path from previous execution ...
+IF EXIST %TEMP%\gitenvpath.txt (
+								SET /p GITPATH=<%TEMP%\gitenvpath.txt
+								ECHO ______ Git path from previous execution %GITPATH%
+								IF EXIST %GITPATH%\git.exe GOTO SETGITHPATH_NW
+								)
+ECHO ______ Invalid git path from previous execution
 ECHO _____ Checking GIT under default paths ...
 SET GITPATH="%PROGRAMFILES%\git\cmd"
 IF EXIST %GITPATH%\git.exe GOTO SETGITPATH
-ECHO _____ GIT not found in %GITPATH%
+ECHO ______ GIT not found in %GITPATH%
 
 SET GITPATH="%PROGRAMFILES(X86)%\git\cmd"
 IF EXIST %GITPATH%\git.exe GOTO SETGITPATH
 
 :ENTER_PATH
-ECHO _____ GIT not found in %GITPATH%
-ECHO _____ Please, provide Git installation path to continue
-SET GITPATH=INVALID 
-FOR /f "tokens=*" %%a in ('cscript //logo "%temp%\BrowseFolder.vbs"') DO SET GITPATH=%%a 
+ECHO _____ GIT not found in %GITPATH%, neither in environment
+ECHO ______ Please, provide Git installation path to continue
+SET GITPATH=INVALID
+FOR /f "tokens=*" %%a in ('cscript //nologo "%temp%\BrowseFolder.vbs"') DO SET GITPATH=%%a 
 SET GITPATH=%GITPATH:~0,-1%
+SET GITPATH="%GITPATH%"
 ECHO %GITPATH%
-IF EXIST "%GITPATH%"\git.exe GOTO SETGITPATH
-ECHO _____ Invalid path, there was an error or you have cancelled ...
+IF EXIST %GITPATH%\git.exe GOTO SETGITPATH
+ECHO ______ Invalid path, there was an error or you have cancelled ...
+ECHO ______ Install Git, before another try out!!
 GOTO END
 
 :SETGITPATH
 ::SET PATH VARIABLE FOR GIT, THIS PATH VARIABLE IT WILL ONLY WORK FOR THE CURRENT COMMAND LINE SESSION, IT'S NOT PERMANENTLY.
+ECHO ______ Writing file path for future executions
+> %TEMP%\gitenvpath.txt (
+ECHO %GITPATH%
+						)
+:SETGITHPATH_NW
 ECHO _____ GIT found in %GITPATH%
+
 SET PATH=%PATH%;%GITPATH%
 
+:CHECKCOHO
 ::CHECK COHO
 CD ..
 SET BASEDIR=%CD%
@@ -119,7 +144,7 @@ GOTO CHECK_JS
 ECHO _____ Cordova-Coho repository not available 
 ECHO _____ Please, select Cordova-Coho download path
 set COHOPATH=INVALID
-for /f "tokens=*" %%a in ('cscript //logo "%temp%\BrowseFolder.vbs"') do set COHOPATH=%%a 
+for /f "tokens=*" %%a in ('cscript //nologo "%temp%\BrowseFolder.vbs"') do set COHOPATH=%%a 
 SET COHOPATH=%COHOPATH:~0,-1%
 IF "%COHOPATH%" EQU "INVALID" (
 							ECHO _____ Invalid path ...
@@ -267,7 +292,7 @@ ECHO ___ Enter plugin package and location path
 ECHO ___ Select plugin location path...
 PAUSE
 SET pluginpath=INVALID 
-FOR /f "tokens=*" %%a IN ('cscript //logo "%temp%\BrowseFolder.vbs"') DO SET pluginpath=%%a 
+FOR /f "tokens=*" %%a IN ('cscript //nologo "%temp%\BrowseFolder.vbs"') DO SET pluginpath=%%a 
 SET pluginpath=%pluginpath:~0,-1%
 IF "%pluginpath%" EQU "INVALID" (
 							ECHO _____ Invalid path ...
@@ -296,7 +321,7 @@ ECHO wscript.echo NULL
 ECHO END IF
 ECHO wscript.echo pluginId.getAttribute^( "id" ^)
 )
-FOR /f "tokens=*" %%a IN ('cscript //logo "%temp%\xmlAnalize.vbs"') DO SET plugin=%%a 
+FOR /f "tokens=*" %%a IN ('cscript //nologo "%temp%\xmlAnalize.vbs"') DO SET plugin=%%a 
 SET plugin=%plugin:~0,-1%
 IF "%plugin%" EQU "NULL" ( 
   ECHO _____ No plugin information found at "%pluginpath%"\plugin.xml
@@ -460,7 +485,7 @@ ECHO _____ XapDeployDll.exe found at %xap_path%
 GOTO LAUNCH_WP_EMULATOR
 :ENTER_XAP_PATH
 set xap_path=INVALID 
-for /f "tokens=*" %%a in ('cscript //logo "%temp%\BrowseFolder.vbs"') do set xap_path=%%a 
+for /f "tokens=*" %%a in ('cscript //nologo "%temp%\BrowseFolder.vbs"') do set xap_path=%%a 
 IF %xap_path% EQU "INVALID" (
 							ECHO _____ Invalid path ...
 							PAUSE
