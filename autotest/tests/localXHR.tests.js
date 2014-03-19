@@ -79,7 +79,7 @@ describe("XMLHttpRequest", function () {
 
         });
 
-        it("XMLHttpRequest.spec.10 should be able to load the current page using window.location with extra / [CB-6299]", function () {
+        it("XMLHttpRequest.spec.11 should be able to load the current page using window.location with extra / [CB-6299]", function () {
             var path = window.location.protocol + "/" + window.location.toString().substr(window.location.protocol.length);
             var win = jasmine.createSpy().andCallFake(function (res) { });
             var lose = createDoNotCallSpy('xhrFail');
