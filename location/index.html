@@ -157,14 +157,50 @@ var date = (new Date(p.timestamp));
     <div id="info">
         <b>Status:</b> <span id="location_status">Stopped</span>
         <table width="100%">
-            <tr><td><b>Latitude:</b></td><td id="latitude">&nbsp;</td></tr>
-            <tr><td><b>Longitude:</b></td><td id="longitude">&nbsp;</td></tr>
-            <tr><td><b>Altitude:</b></td><td id="altitude">&nbsp;</td></tr>
-            <tr><td><b>Accuracy:</b></td><td id="accuracy">&nbsp;</td></tr>
-            <tr><td><b>Heading:</b></td><td id="heading">&nbsp;</td></tr>
-            <tr><td><b>Speed:</b></td><td id="speed">&nbsp;</td></tr>
-            <tr><td><b>Altitude Accuracy:</b></td><td id="altitude_accuracy">&nbsp;</td></tr>
-            <tr><td><b>Time:</b></td><td id="timestamp">&nbsp;</td></tr>
+            <tr>
+                <td><b>Latitude:</b></td>
+                <td id="latitude">&nbsp;</td>
+                <td>(decimal degrees) geographic coordinate [<a href="http://dev.w3.org/geo/api/spec-source.html#lat">#ref]</a></td>
+            </tr>
+            <tr>
+                <td><b>Longitude:</b></td>
+                <td id="longitude">&nbsp;</td>
+                <td>(decimal degrees) geographic coordinate [<a href="http://dev.w3.org/geo/api/spec-source.html#lat">#ref]</a></td>
+            </tr>
+            <tr>
+                <td><b>Altitude:</b></td>
+                <td id="altitude">&nbsp;</td>
+                <td>null if not supported;<br>
+                    (meters) height above the [<a href="http://dev.w3.org/geo/api/spec-source.html#ref-wgs">WGS84</a>] ellipsoid. [<a href="http://dev.w3.org/geo/api/spec-source.html#altitude">#ref]</a></td>
+            </tr>
+            <tr>
+                <td><b>Accuracy:</b></td>
+                <td id="accuracy">&nbsp;</td>
+                <td>(meters; non-negative; 95% confidence level) the accuracy level of the latitude and longitude coordinates. [<a href="http://dev.w3.org/geo/api/spec-source.html#accuracy">#ref]</a></td>
+            </tr>
+            <tr>
+                <td><b>Heading:</b></td>
+                <td id="heading">&nbsp;</td>
+                <td>null if not supported;<br>
+                    NaN if speed == 0;<br>
+                    (degrees; 0° ≤ heading < 360°) direction of travel of the hosting device- counting clockwise relative to the true north. [<a href="http://dev.w3.org/geo/api/spec-source.html#heading">#ref]</a></td>
+            </tr>
+            <tr>
+                <td><b>Speed:</b></td>
+                <td id="speed">&nbsp;</td>
+                <td>null if not supported;<br>
+                    (meters per second; non-negative) magnitude of the horizontal component of the hosting device's current velocity. [<a href="http://dev.w3.org/geo/api/spec-source.html#speed">#ref]</a></td>
+            </tr>
+            <tr>
+                <td><b>Altitude Accuracy:</b></td>
+                <td id="altitude_accuracy">&nbsp;</td>
+                <td>null if not supported;<br>(meters; non-negative; 95% confidence level) the accuracy level of the altitude. [<a href="http://dev.w3.org/geo/api/spec-source.html#altitude-accuracy">#ref]</a></td>
+            </tr>
+            <tr>
+                <td><b>Time:</b></td>
+                <td id="timestamp">&nbsp;</td>
+                <td>(DOMTimeStamp) when the position was acquired [<a href="http://dev.w3.org/geo/api/spec-source.html#timestamp">#ref]</a></td>
+            </tr>
         </table>
     </div>
     <h2>Action</h2>
