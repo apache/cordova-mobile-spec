@@ -455,6 +455,9 @@ describe('FileTransfer', function() {
                 expect(uploadResult.responseCode).toBe(200);
                 expect(uploadResult.response).toMatch(/fields:\s*{\s*value1.*/);
                 expect(lastProgressEvent).not.toBeNull('expected progress events');
+                if (cordova.platformId == 'ios') {
+                    expect(uploadResult.headers && uploadResult.headers['Content-Type']).toBeDefined('Expected content-type header to be defined.');
+                }
             });
 
             var fileWin = function(fileEntry) {
@@ -882,6 +885,31 @@ describe('FileTransfer', function() {
                     expect(lastProgressEvent.total).not.toBeLessThan(lastProgressEvent.loaded);
                 }
             });
+        });
+    });
+    describe('native URL interface', function() {
+        it("filetransfer.spec.30 downloaded file entries should have a toNativeURL method", function() {
+            var fail = createDoNotCallSpy('downloadFail');
+            var remoteFile = server + "/robots.txt";
+            var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1)+".spec30";
+
+            var downloadWin = jasmine.createSpy().andCallFake(function(entry) {
+                expect(entry.toNativeURL).toBeDefined();
+                expect(typeof entry.toNativeURL).toBe("function");
+                var nativeURL = entry.toNativeURL();
+                expect(typeof nativeURL).toBe("string");
+                expect(nativeURL.substring(0,7)).toBe('file://');
+            });
+
+            this.after(function() {
+                deleteFile(localFileName);
+            });
+            runs(function() {
+                var ft = new FileTransfer();
+                ft.download(remoteFile, root.toURL() + "/" + localFileName, downloadWin, fail);
+            });
+
+            waitsForAny(downloadWin, fail);
         });
     });
 });

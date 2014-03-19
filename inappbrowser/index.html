@@ -112,10 +112,10 @@
                 }
             }
         }
-        iab.addEventListener('loaderror', logEvent, false);
-        iab.addEventListener('loadstart', logEvent, false);
-        iab.addEventListener('loadstop', logEvent, false);
-        iab.addEventListener('exit', logEvent, false);
+        iab.addEventListener('loaderror', logEvent);
+        iab.addEventListener('loadstart', logEvent);
+        iab.addEventListener('loadstop', logEvent);
+        iab.addEventListener('exit', logEvent);
 
         return iab;
     }

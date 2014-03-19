@@ -99,7 +99,7 @@
         if (pictureUrl.indexOf('file:') == 0) {
             resolveLocalFileSystemURI(data, function(e) {
                 fileEntry = e;
-                logCallback('resolveLocalFileSystemURI()', true)(e);
+                logCallback('resolveLocalFileSystemURI()', true)(e.toURL());
             }, logCallback('resolveLocalFileSystemURI()', false));
         } else if (pictureUrl.indexOf('data:image/jpeg;base64' == 0)) {
         	// do nothing

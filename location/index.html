@@ -109,9 +109,10 @@
             setLocationStatus("Error: "+e.code);
         };
 
+        setLocationStatus("Retrieving location...");
+
         // Get location
         geo.getCurrentPosition(success, fail, opts || {enableHighAccuracy: true}); //, {timeout: 10000});
-        setLocationStatus("Retrieving location...");
 
     };
 

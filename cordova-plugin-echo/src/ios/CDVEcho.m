@@ -17,8 +17,10 @@
  under the License.
  */
 
-#import "CDVEcho.h"
 #import <Cordova/CDV.h>
+
+@interface CDVEcho : CDVPlugin
+@end
 
 @implementation CDVEcho
 

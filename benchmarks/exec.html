@@ -53,6 +53,7 @@
         inProgress = val;
         var goBtn = document.getElementById('go-btn');
         goBtn.textContent = inProgress ? 'Stop' : 'Start';
+        cordova.echo.stopBulkEcho();
     }
 
     function benchExec() {
@@ -60,6 +61,7 @@
         if (!inProgress) {
             return;
         }
+
         var echo = cordova.echo,
             startTime = +new Date,
             callCount = 0,
@@ -68,6 +70,7 @@
             durationMs = parseInt(document.getElementById('test-duration').value, 10) * 1000,
             asyncEcho = document.getElementById('async-echo').checked,
             useSetTimeout = document.getElementById('use-setTimeout').checked,
+            bulkEcho = document.getElementById('bulk-echo').checked,
             jsToNativeMode = document.getElementById('js-native-modes').value,
             nativeToJsMode = document.getElementById('native-js-modes').value,
             payloadSize = +document.getElementById('payload-size').value,
@@ -80,6 +83,10 @@
             appLog('Calls per second: ' + callsPerSecond);
         }
         function win(result) {
+            if (!inProgress) {
+                console.log('got an excess echo');
+                return;
+            }
             callCount++;
             if (result != payload) {
                 appLog('Wrong echo data!');
@@ -91,7 +98,9 @@
                     reportProgress();
                     lastReportMs = elapsedMs;
                 }
-                if (useSetTimeout) {
+                if (bulkEcho) {
+                    // automatically keeps coming.
+                } else if (useSetTimeout) {
                     setImmediate(echoMessage);
                 } else {
                     echoMessage();
@@ -118,7 +127,11 @@
             logMsg += ' nativeToJsMode: ' + nativeToJsMode;
         }
         appLog(logMsg);
-        echoMessage();
+        if (bulkEcho) {
+          echo.bulkEcho(payload, 50, win);
+        } else {
+          echoMessage();
+        }
         setTimeout(function() {
             if (!callCount) {
                 alert('Echo plugin did not respond');
@@ -188,6 +201,7 @@
         <label style="display:none">Native-&gt;JS Bridge Mode: <select id="native-js-modes"></select><br></label>
         <label><input type="checkbox" id="use-setTimeout"> Force async JS-&gt;Native (avoids evalAndFetch optimization on iOS)</label><br>
         <label><input type="checkbox" id="async-echo"> Force async Native-&gt;JS</label><br>
+        <label><input type="checkbox" id="bulk-echo"> Bulk Echo Mode (test only native-&gt;JS)</label><br>
         <label>Payload size (in 100s of bytes) <input id="payload-size" value="5" style="width:100px"></label><br>
         <button id="go-btn" onclick="benchExec()">Start</button><br>
     </fieldset>
