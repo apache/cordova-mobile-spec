@@ -32,12 +32,16 @@ Tests.TEST_TIMEOUT = 7500;
 // Creates a spy that will fail if called.
 function createDoNotCallSpy(name, opt_extraMessage) {
     return jasmine.createSpy().andCallFake(function() {
-        var errorMessage = name + ' should not have been called.';
-        if (arguments.length) {
-            errorMessage += ' Got args: ' + JSON.stringify(arguments);
-        }
-        if (opt_extraMessage) {
-            errorMessage += '\n' + opt_extraMessage;
+        var errorMessage = "" + name + ' should not have been called.';
+        try {
+            if (arguments.length) {
+                errorMessage += ' Got args: ' + JSON.stringify(arguments);
+            }
+            if (opt_extraMessage) {
+                errorMessage += '\n' + opt_extraMessage;
+            }
+        } catch(e) {
+            errorMessage += " (Cannot print details)";
         }
         expect(false).toBe(true, errorMessage);
     });
