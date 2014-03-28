@@ -344,19 +344,19 @@
 
     <p/>
     <div class="btn large" onclick="openWithScript('inject.html', 'inject.js');">Script File Injection</div>
-    Expected result: open successfully in InAppBrowser with text "Script file successfully injected"
+    Expected result: open successfully in InAppBrowser with text "Script file successfully injected".
 
     <p/>
     <div class="btn large" onclick="openWithScript('inject.html', 'inject.js', true);">Script File Injection (callback)</div>
-    Expected result: open successfully in InAppBrowser with text "InAppBrowser - Script / Style Injection Test" and alert dialog with the text "Results verified".
+    Expected result: open successfully in InAppBrowser with text "Script file successfully injected" and alert dialog with the text "Results verified".
 
     <p/>
     <div class="btn large" onclick="openWithScript('inject.html');">Script Literal Injection</div>
-    Expected result: open successfully in InAppBrowser with the text "abc" in small font in the top left corner.
+    Expected result: open successfully in InAppBrowser with the text "Script literal successfully injected" .
 
     <p/>
     <div class="btn large" onclick="openWithScript('inject.html', null, true);">Script Literal Injection (callback)</div>
-    Expected result: open successfully in InAppBrowser with text "InAppBrowser - Script / Style Injection Test" and alert dialog with the text "Results verified".
+    Expected result: open successfully in InAppBrowser with the text "Script literal successfully injected" and alert dialog with the text "Results verified".
 
     <h1>Open Hidden </h1>
     <div class="btn large" onclick="openHidden('http://google.com',true);">create hidden</div>
