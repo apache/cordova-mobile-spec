@@ -21,14 +21,31 @@
 
 var fs = require('fs'),
     path = require('path'),
-    shelljs;
+    shelljs,
+    optimist;
 try {
     shelljs = require('shelljs');
+    optimist = require('optimist');
 } catch (e) {
     console.error('Missing module. Please run "npm install" from this directory:\n\t' +
                    path.dirname(__dirname));
     process.exit(2);
 }
+
+var tokens = process.argv.slice(2);
+var argv = optimist(tokens)
+           .default('android', false)
+           .default('ios', false)
+           .usage('Usage: $0 [--android] [--ios]\nDefault is to use Android and iOS.')
+           .argv;
+// preserve the original behavior when there are no args
+if (tokens.length === 0) {
+    argv.android = true;
+    argv.ios = true;
+}
+var platforms = [];
+if (argv.android) { platforms.push('android'); }
+if (argv.ios) { platforms.push('ios'); }
 
 if (!fs.existsSync('cordova-mobile-spec')) {
     console.log('Please run this script from the directory that contains cordova-mobile-spec');
@@ -42,7 +59,7 @@ if (fs.existsSync('mobilespec')) {
 
 console.log('Creating mobilespec project. If you have any errors, it may be from missing repositories.');
 console.log('To clone needed repositories:');
-console.log('  ./cordova-coho/coho repo-clone -r plugins -r mobile-spec -r android -r ios -r cli');
+console.log("  ./cordova-coho/coho repo-clone -r plugins -r mobile-spec -r cli -r " + platforms.join(' -r '));
 console.log('To update all repositories:');
 console.log('  ./cordova-coho/coho repo-update');
 
@@ -71,17 +88,24 @@ var localPlatforms = {
 JSON.stringify(localPlatforms).to('.cordova/config.json');
 
 console.log('Adding platforms...');
-shelljs.exec('../cordova-cli/bin/cordova platform add ios android');
+shelljs.exec('../cordova-cli/bin/cordova platform add ' + platforms.join(' '));
+
 console.log('Adding plugins...');
 shelljs.exec('../cordova-cli/bin/cordova plugin add ../cordova-mobile-spec/dependencies-plugin --searchpath ' + repoParent);
-console.log('Updating iOS subproject...');
-shelljs.rm('-rf', 'platforms/ios/CordovaLib');
-shelljs.exec('../cordova-ios/bin/update_cordova_subproject platforms/ios/mobilespec.xcodeproj');
+
+if (argv.ios) {
+    console.log('Updating iOS subproject...');
+    shelljs.rm('-rf', 'platforms/ios/CordovaLib');
+    shelljs.exec('../cordova-ios/bin/update_cordova_subproject platforms/ios/mobilespec.xcodeproj');
+}
+
 console.log('Updating js...');
-shelljs.cp('-f', '../cordova-js/pkg/cordova.android.js', 'platforms/android/platform_www/cordova.js');
-shelljs.cp('-f', '../cordova-js/pkg/cordova.ios.js', 'platforms/ios/platform_www/cordova.js');
+if (argv.android) { shelljs.cp('-f', '../cordova-js/pkg/cordova.android.js', 'platforms/android/platform_www/cordova.js'); }
+if (argv.ios) { shelljs.cp('-f', '../cordova-js/pkg/cordova.ios.js', 'platforms/ios/platform_www/cordova.js'); }
+
 console.log('Preparing...');
 shelljs.exec('../cordova-cli/bin/cordova prepare');
+
 console.log('Linking CLI...');
 fs.symlinkSync('../cordova-cli/bin/cordova', 'cordova');
 shelljs.popd();
