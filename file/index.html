@@ -45,6 +45,7 @@
                 deviceReady = true;
                 console.log("Device="+device.platform+" "+device.version);
                 bindEvents();
+                document.body.classList.add(device.platform.toLowerCase() + "-platform");
             }, false);
         window.setTimeout(function() {
             if (!deviceReady) {
@@ -59,6 +60,10 @@
         document.getElementById('downloadVideoCDV').addEventListener('click', downloadVideoCDV, false);
         document.getElementById('downloadVideoNative').addEventListener('click', downloadVideoNative, false);
         document.getElementById('testPrivateURL').addEventListener('click', testPrivateURL, false);
+        var fsButtons = document.querySelectorAll('.resolveFs');
+        for (var i=0; i < fsButtons.length; ++i) {
+            fsButtons[i].addEventListener('click', resolveFs, false);
+        }
     }
 
     function clearLog() {
@@ -159,6 +164,22 @@
             }, logError("getFile"));
         }, logError("requestFileSystem"));
     }
+
+    function resolveFs(ev) {
+        var fsURL = "cdvfile://localhost/" + ev.target.getAttribute('data-fsname') + "/";
+        logMessage("Resolving URL: " + fsURL);
+        resolveLocalFileSystemURL(fsURL, function(entry) {
+            logMessage("Success", 'green');
+            logMessage(entry.toURL(), 'blue');
+            logMessage(entry.toInternalURL(), 'blue');
+            logMessage("Resolving URL: " + entry.toURL());
+            resolveLocalFileSystemURL(entry.toURL(), function(entry2) {
+                logMessage("Success", 'green');
+                logMessage(entry2.toURL(), 'blue');
+                logMessage(entry2.toInternalURL(), 'blue');
+            }, logError("resolveLocalFileSystemURL"));
+        }, logError("resolveLocalFileSystemURL"));
+    }
 </script>
 
   </head>
@@ -171,7 +192,30 @@
     <div class="btn large" id="downloadVideoCDV">Download and play video (cdvfile)</div>
     <div class="btn large" id="downloadVideoNative">Download and play video (native)</div>
 
-    <div class="btn large" id="testPrivateURL">Test /private/ URL (iOS)</div>
+    <div class="ios platform">
+        <h2>iOS Special URL handling</h2>
+        <div class="btn large" id="testPrivateURL">Test /private/ URL (iOS)</div>
+
+        <h2>iOS Extra File Systems</h2>
+        <div class="btn large resolveFs" data-fsname="library">Resolve library FS</div>
+        <div class="btn large resolveFs" data-fsname="library-nosync">Resolve library-nosync FS</div>
+        <div class="btn large resolveFs" data-fsname="documents">Resolve documents FS</div>
+        <div class="btn large resolveFs" data-fsname="documents-nosync">Resolve documents-nosync FS</div>
+        <div class="btn large resolveFs" data-fsname="cache">Resolve cache FS</div>
+        <div class="btn large resolveFs" data-fsname="bundle">Resolve bundle FS</div>
+        <div class="btn large resolveFs" data-fsname="root">Resolve root FS</div>
+    </div>
+
+    <div class="android platform">
+        <h2>Android Extra File Systems</h2>
+        <div class="btn large resolveFs" data-fsname="files">Resolve files FS</div>
+        <div class="btn large resolveFs" data-fsname="files-external">Resolve files-external FS</div>
+        <div class="btn large resolveFs" data-fsname="documents">Resolve documents FS</div>
+        <div class="btn large resolveFs" data-fsname="sdcard">Resolve sdcard FS</div>
+        <div class="btn large resolveFs" data-fsname="cache">Resolve cache FS</div>
+        <div class="btn large resolveFs" data-fsname="cache-external">Resolve cache-external FS</div>
+        <div class="btn large resolveFs" data-fsname="root">Resolve root FS</div>
+    </div>
 
     <div id="log"></div>
     <div id="output"></div>
