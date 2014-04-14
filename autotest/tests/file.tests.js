@@ -3643,7 +3643,9 @@ describe('File API', function() {
         });
         it("file.spec.105 should be able to write binary data from a Blob", function() {
             // Skip test if Blobs are not supported (e.g.: Android 2.3).
-            if (typeof window.Blob == 'undefined' || typeof window.ArrayBuffer == 'undefined') {
+            if ( (typeof window.Blob != 'function' &&
+                  typeof window.WebKitBlobBuilder == 'undefined') ||
+                typeof window.ArrayBuffer == 'undefined') {
                 return;
             }
             var fileName = "blobwriter.bin",
@@ -3676,12 +3678,12 @@ describe('File API', function() {
             }
             try {
                 // Mobile Safari: Use Blob constructor
-                blob = new Blob([data], {"type": "application/octet-stream"})
+                blob = new Blob([data], {"type": "application/octet-stream"});
             } catch(e) {
                 if (window.WebKitBlobBuilder) {
                     // Android Browser: Use deprecated BlobBuilder
-                    var builder = new WebKitBlobBuilder()
-                    builder.append(data)
+                    var builder = new WebKitBlobBuilder();
+                    builder.append(data);
                     blob = builder.getBlob('application/octet-stream');
                 } else {
                     // We have no way defined to create a Blob, so fail
@@ -3689,17 +3691,18 @@ describe('File API', function() {
                 }
             }
 
-            // creates file, then write content
-            runs(function() {
-                createFile(fileName, write_file);
-            });
+            if (typeof blob !== 'undefined') {// creates file, then write content
+                runs(function() {
+                    createFile(fileName, write_file);
+                });
 
-            waitsFor(function() { return verifier.wasCalled; }, "verifier", Tests.TEST_TIMEOUT);
+                waitsFor(function() { return verifier.wasCalled; }, "verifier", Tests.TEST_TIMEOUT);
 
-            runs(function() {
-                expect(verifier).toHaveBeenCalled();
-                expect(fail).not.toHaveBeenCalled();
-            });
+                runs(function() {
+                    expect(verifier).toHaveBeenCalled();
+                    expect(fail).not.toHaveBeenCalled();
+                });
+            }
         });
         it("file.spec.106 should be able to write a File to a FileWriter", function() {
             var dummyFileName = 'dummy.txt',
@@ -3809,7 +3812,9 @@ describe('File API', function() {
         });
         it("file.spec.108 should be able to write binary data from a File", function() {
             // Skip test if Blobs are not supported (e.g.: Android 2.3).
-            if (typeof window.Blob == 'undefined' || typeof window.ArrayBuffer == 'undefined') {
+            if ( (typeof window.Blob != 'function' &&
+                  typeof window.WebKitBlobBuilder == 'undefined') ||
+                typeof window.ArrayBuffer == 'undefined') {
                 return;
             }
             var dummyFileName = "blobwriter.bin",
@@ -3861,12 +3866,12 @@ describe('File API', function() {
             }
             try {
                 // Mobile Safari: Use Blob constructor
-                blob = new Blob([data], {"type": "application/octet-stream"})
+                blob = new Blob([data], {"type": "application/octet-stream"});
             } catch(e) {
                 if (window.WebKitBlobBuilder) {
                     // Android Browser: Use deprecated BlobBuilder
-                    var builder = new WebKitBlobBuilder()
-                    builder.append(data)
+                    var builder = new WebKitBlobBuilder();
+                    builder.append(data);
                     blob = builder.getBlob('application/octet-stream');
                 } else {
                     // We have no way defined to create a Blob, so fail
@@ -3874,19 +3879,21 @@ describe('File API', function() {
                 }
             }
 
-            runs(function() {
-                writeFile(dummyFileName, blob, function(dummyFileWriter) {
-                    openFile(dummyFileName, function(file) {
-                        writeFile(outputFileName, file, verifier);
+            if (typeof blob !== 'undefined') {// creates file, then write content
+                runs(function() {
+                    writeFile(dummyFileName, blob, function(dummyFileWriter) {
+                        openFile(dummyFileName, function(file) {
+                            writeFile(outputFileName, file, verifier);
+                        });
                     });
                 });
-            });
-            waitsFor(function() { return (verifier.wasCalled || fail.wasCalled); }, "callbacks never called", Tests.TEST_TIMEOUT);
+                waitsFor(function() { return (verifier.wasCalled || fail.wasCalled); }, "callbacks never called", Tests.TEST_TIMEOUT);
 
-            runs(function() {
-                expect(verifier).toHaveBeenCalled();
-                expect(fail).not.toHaveBeenCalled();
-            });
+                runs(function() {
+                    expect(verifier).toHaveBeenCalled();
+                    expect(fail).not.toHaveBeenCalled();
+                });
+            }
         });
     });
     describe('Backwards compatibility', function() {
