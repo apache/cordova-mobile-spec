@@ -94,10 +94,11 @@ shelljs.config.fatal = true;
 try {
     delFileSync(ms_project_dir);
 } catch (e) {
-    //Why this?, well during tests, trying to delete the project directory after make an android build and emulation, the folder is locked by ADB.exe (Android Debug Bridge).
-    //Cordova allows project creation in an empty folder.
-    //It just locks the project folder, not the files under, so catching up the exception, allows to continue.
-    console.log("Not all files were deleted");
+//Why this?, well during tests, trying to delete the project directory after make an android build and emulation, the folder is locked by ADB.exe (Android Debug Bridge).
+    //Kill the process & relaunch the process
+    console.log("Not all files were deleted, killing Adb.exe process to unlock project folder ...");
+    shelljs.exec('TASKKILL /F /IM ADB.exe /T');
+    delFileSync(ms_project_dir);
 }
 
 // Creating the project
@@ -158,7 +159,7 @@ cordovaPlatforms.forEach(function (platform) {
 console.log('Adding plugins...');
 // Installing plugins, using local library and dependencies file.
 
-shelljs.exec(cordova_cli + ' plugin add ' + path.join(cordova_ms, 'dependencies-plugin') + ' --searchpath ' + coho_dir);
+shelljs.exec(cordova_cli +' plugin add ' + path.join(cordova_ms, 'dependencies-plugin') + ' --searchpath ' + coho_dir);
 
 // Updating Js files for each added platform
 console.log('Updating js for platforms...');
