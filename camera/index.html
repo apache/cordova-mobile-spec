@@ -96,7 +96,7 @@
     function getPictureWin(data) {
         setPicture(data);
         // TODO: Fix resolveLocalFileSystemURI to work with native-uri.
-        if (pictureUrl.indexOf('file:') == 0) {
+        if (pictureUrl.indexOf('file:') == 0 || pictureUrl.indexOf('content:') == 0) {
             resolveLocalFileSystemURI(data, function(e) {
                 fileEntry = e;
                 logCallback('resolveLocalFileSystemURI()', true)(e.toURL());
