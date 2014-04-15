@@ -106,6 +106,39 @@
         var options = { limit: 1, duration: 10 };
         navigator.device.capture.captureVideo(captureVideoWin, captureVideoFail, options);      
     }
+
+    function resolveMediaFileURL(mediaFile, callback) {
+        resolveLocalFileSystemURL(mediaFile.localURL, function(entry) {
+            log("Resolved by URL: " + mediaFile.localURL);
+            if (callback) callback();
+        }, function(err) {
+            log("Failed to resolve by URL: " + mediaFile.localURL);
+            log("Error: " + JSON.stringify(err));
+            if (callback) callback();
+        });
+    }
+
+    function resolveMediaFile(mediaFile, callback) {
+        resolveLocalFileSystemURL(mediaFile.fullPath, function(entry) {
+            log("Resolved by path: " + mediaFile.fullPath);
+            if (callback) callback();
+        }, function(err) {
+            log("Failed to resolve by path: " + mediaFile.fullPath);
+            log("Error: " + JSON.stringify(err));
+            if (callback) callback();
+        });
+    }
+        
+    function resolveVideo() {
+        clearStatus();
+        var options = { limit: 1, duration: 5 };
+        navigator.device.capture.captureVideo(function(mediaFiles) {
+            captureVideoWin(mediaFiles);
+            resolveMediaFile(mediaFiles[0], function() {
+                resolveMediaFileURL(mediaFiles[0]);
+            });
+        }, captureVideoFail, options);      
+    }
     
     function clearStatus() {
         document.getElementById('camera_status').innerHTML = '';
@@ -146,6 +179,7 @@
     <div class="btn large" onclick="getAudio();">Capture 10 secs of audio and play</div>
     <div class="btn large" onclick="getImage();">Capture 1 image</div>
     <div class="btn large" onclick="getVideo();">Capture 10 secs of video</div>
+    <div class="btn large" onclick="resolveVideo();">Capture 5 secs of video and resolve</div>
     <h2> </h2><div class="backBtn" onclick="backHome();">Back</div>
   </body>
 </html>
