@@ -69,7 +69,10 @@ shelljs.config.fatal = true;
 shelljs.exec('./cordova-cli/bin/cordova create mobilespec --link-to cordova-mobile-spec');
 
 shelljs.pushd('cordova-js');
-shelljs.exec('grunt');
+var code = shelljs.exec('grunt').code;
+if (code) {
+    process.exit(1);
+}
 shelljs.popd();
 
 shelljs.pushd('mobilespec');
