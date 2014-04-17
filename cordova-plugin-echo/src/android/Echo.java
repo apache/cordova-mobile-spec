@@ -62,6 +62,15 @@ public class Echo extends CordovaPlugin {
                 byte[] rawData= Base64.decode(data, Base64.DEFAULT);
             	callbackContext.sendPluginResult( new PluginResult(PluginResult.Status.OK, rawData));
                 return true;
+            } else if(action.equals("echoArrayBufferAsync")) {
+                cordova.getThreadPool().execute(new Runnable() {
+                    public void run() {
+                        String data = args.optString(0);
+                        byte[] rawData= Base64.decode(data, Base64.DEFAULT);
+                        callbackContext.sendPluginResult( new PluginResult(PluginResult.Status.OK, rawData));
+                    }
+                });
+                return true;
             } else if(action.equals("echoMultiPart")) {
             	callbackContext.sendPluginResult( new PluginResult(PluginResult.Status.OK, args.getJSONObject(0)));
                 return true;

@@ -56,6 +56,18 @@
         cordova.echo.stopBulkEcho();
     }
 
+    function createPayload(size, binary) {
+        if (!binary) {
+            return new Array(size * 10 + 1).join('012\n\n 6789');
+        }
+        size = size * 100;
+        var bufView = new Uint8Array(size);
+        for (var i = 0; i < size; ++i) {
+          bufView[i] = i % 20;
+        }
+        return bufView.buffer;
+    }
+
     function benchExec() {
         updateUi(!inProgress);
         if (!inProgress) {
@@ -74,8 +86,14 @@
             jsToNativeMode = document.getElementById('js-native-modes').value,
             nativeToJsMode = document.getElementById('native-js-modes').value,
             payloadSize = +document.getElementById('payload-size').value,
+            binaryPayload = document.getElementById('binary-payload').checked,
+            binaryAsyncEncode = document.getElementById('binary-async-encode').checked,
+            binaryAsyncDecode = document.getElementById('binary-async-decode').checked,
             soFarEl = document.getElementById('so-far'),
-            payload = new Array(payloadSize * 10 + 1).join('012\n\n 6789');
+            payload = createPayload(payloadSize, binaryPayload);
+
+        cordova.ASYNC_AB_ENCODE = binaryAsyncEncode;
+        cordova.ASYNC_AB_DECODE = binaryAsyncDecode;
 
         function reportProgress() {
             var callsPerSecond = String(callCount * 1000 / elapsedMs).slice(0, 6);
@@ -88,7 +106,7 @@
                 return;
             }
             callCount++;
-            if (result != payload) {
+            if (result.length !== payload.length || result.byteLength !== payload.byteLength) {
                 appLog('Wrong echo data!');
                 updateUi(false);
             }
@@ -117,7 +135,7 @@
             echo(win, fail, payload, asyncEcho);
         }
 
-        var logMsg = 'Started exec benchmark with setTimeout: ' + useSetTimeout + ' asyncEcho: ' + asyncEcho + ' payload length: ' + payload.length;
+        var logMsg = 'Started exec benchmark with setImmediate: ' + useSetTimeout + ' asyncEcho: ' + asyncEcho + ' payload length: ' + payloadSize;
         if (jsToNativeMode) {
             exec.setJsToNativeBridgeMode(+jsToNativeMode);
             logMsg += ' jsToNativeMode: ' + jsToNativeMode;
@@ -202,6 +220,10 @@
         <label><input type="checkbox" id="use-setTimeout"> Force async JS-&gt;Native (avoids evalAndFetch optimization on iOS)</label><br>
         <label><input type="checkbox" id="async-echo"> Force async Native-&gt;JS</label><br>
         <label><input type="checkbox" id="bulk-echo"> Bulk Echo Mode (test only native-&gt;JS)</label><br>
+        <label><input type="checkbox" id="binary-payload"> Binary Payload</label><br>
+        These two require async_base64_android branch of cordova-js<br>
+        <label><input type="checkbox" id="binary-async-encode"> Use FileReader to encode binary</label><br>
+        <label><input type="checkbox" id="binary-async-decode"> Use XHR to decode binary</label><br>
         <label>Payload size (in 100s of bytes) <input id="payload-size" value="5" style="width:100px"></label><br>
         <button id="go-btn" onclick="benchExec()">Start</button><br>
     </fieldset>

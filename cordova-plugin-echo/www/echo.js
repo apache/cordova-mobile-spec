@@ -35,10 +35,10 @@ module.exports = function(successCallback, errorCallback, message, forceAsync) {
     var args = messageIsMultipart ? message : [message];
 
     if (utils.typeName(message) == 'ArrayBuffer') {
-        if (forceAsync) {
-            console.warn('Cannot echo ArrayBuffer with forced async, falling back to sync.');
-        }
         action += 'ArrayBuffer';
+        if (forceAsync) {
+            action += 'Async';
+        }
     } else if (messageIsMultipart) {
         if (forceAsync) {
             console.warn('Cannot echo MultiPart Array with forced async, falling back to sync.');
