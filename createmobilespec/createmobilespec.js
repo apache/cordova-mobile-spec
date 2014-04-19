@@ -1,4 +1,4 @@
-
+#!/usr/bin/env node
     /**
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements.  See the NOTICE file
@@ -18,73 +18,76 @@
     under the License.
      */
 
-var fs = require('fs'),
-    path = require('path'),
-    child_process = require('child_process'),
-    shelljs;
+var fs            = require("fs"),
+    path          = require("path"),
+    child_process = require("child_process"),
+    shelljs,
+    optimist;
 
 // Dependencies requirements check
 try {
-    shelljs = require('shelljs');
+    shelljs = require("shelljs");
+    optimist = require("optimist");
 } catch (e) {
-    console.error('Missing module. Please run "npm install" from this directory:\n\t' +
-        path.dirname(__dirname));
+    console.error('Missing module. Please run \"npm install\" from this directory:\n\t' +
+                   path.dirname(__dirname));
     process.exit(2);
 }
-
-console.log('Creating mobilespec project. If you have any errors, it may be from missing repositories.');
-console.log('To clone needed repositories:');
-console.log('  ./cordova-coho/coho repo-clone -r plugins -r mobile-spec -r android -r ios -r cli');
-console.log('To update all repositories:');
-console.log('  ./cordova-coho/coho repo-update');
+// Print relevant information
+console.log("Creating \"mobilespec\" project. If you have any errors, it may be from missing repositories.");
+console.log("To clone needed repositories:");
+console.log("  ./cordova-coho/coho repo-clone -r plugins -r mobile-spec -r android -r ios -r cli");
+console.log("To update all repositories:");
+console.log("  ./cordova-coho/coho repo-update");
 
 // Setting up vars, folders and libraries, to ensure full compatibility cross platform, absolute paths are used instead of relative paths
-var mainModDir = process.cwd(),
+
 // Cordova Coho dir, it should contain all libraries and required repositories
 // [cordova-cli, cordova-android, cordova-blackberry, cordova-ios, cordova-windows, cordova-windows8, all plugins libraries, cordova-mobile-spec, cordova-js]
 // searchDir function it was added, to look for cordova-coho folder backwards, for cases like absolute/path/cordova-coho/cordova-coho/...All libraries
 // This is to make sure that cordova-coho exists and it's the right one.
-coho_dir = searchDir(mainModDir, 'cordova-coho'),
-cordova_cli = path.join(coho_dir, 'cordova-cli', 'bin', 'cordova'),
-cordova_ms = (path.join(coho_dir, 'cordova-mobile-spec')),
-cordova_js = (path.join(coho_dir, 'cordova-js')),
-ms_project_dir = (path.join(mainModDir, 'mobilespec'));
+var mainModDir     = process.cwd(),
+    coho_dir       = searchDir(mainModDir, "cordova-coho"),
+    cordova_cli    = path.join(coho_dir, "cordova-cli", "bin", "cordova"),
+    cordova_ms     = path.join(coho_dir, "cordova-mobile-spec"),
+    cordova_js     = path.join(coho_dir, "cordova-js"),
+    ms_project_dir = path.join(coho_dir, "mobilespec"),
+    platforms      = [],
+//Setting up optimist features
+    tokens         = process.argv.slice(2),
+    argv           = optimist(tokens)
+                     .usage("Usage: $0 [--platform].")
+                     .argv;
 
-// Main libraries and path's requirements check
+// Main libraries and path"s requirements check
 if (!fs.existsSync(coho_dir)) {
-    console.log('Please run this script from the directory that contains cordova-coho');
+    console.log("Please run this script from the directory that contains cordova-coho");
     shelljs.exit(1);
 }
 
 if (!fs.existsSync(cordova_ms)) {
-    console.log('Please run this script from the directory that contains cordova-mobile-spec');
+    console.log("Please run this script from the directory that contains cordova-mobile-spec");
     shelljs.exit(1);
 }
 
 if (!fs.existsSync(cordova_js)) {
-    console.log('Please run this script from the directory that contains cordova-js');
+    console.log("Please run this script from the directory that contains cordova-js");
     shelljs.exit(1);
 }
 
-//Determine which platforms are available
-// Default platforms [Android, Blackberry], both platforms works under Windows, Linux and Mac OS
-cordovaPlatforms = ['android', 'blackberry10'];
-if (/^win/.test(process.platform)) {
-    //Determine windows 8 platform
-    child_process.exec('wmic os get caption', function (error, stdout, stderr) {
-        if (error !== null) {
-            callback = 'Error performing command: ' + error + "\n" + stderr;
-        } else {
-            // If Windows 8, add Windows Phone 8 and Windows8 platform to the array
-            if ((/.*(Windows 8).*/gi).test(((stdout.replace(/\r\r\n/i, ': ')).replace(/\s\s+/g, '')).replace((/\n|\r/gi), ''))) {
-                cordovaPlatforms.push('wp8', 'windows8');
-            }
-        }
-    });
-} else {
-    //If Mac Os, add iOS platform
-    if (/^darwin/.test(process.platform))
-        cordovaPlatforms.push('ios');
+// No arguments throws error
+if (tokens.length === 0) {
+    throw new Error('No arguments found');
+}
+if (argv.help) {console.log("Usage: createmobilespec --platformName"); return;}
+if (argv.android) { platforms.push("android");}
+if (argv.ios) { platforms.push("ios");}
+if (argv.blackberry10) { platforms.push("blackberry10");}
+if (argv.wp8) { platforms.push("wp8");}
+if (argv.windows8) { platforms.push("windows8");}
+
+if (platforms.length === 0){
+    throw new Error ('No supported platforms');
 }
 
 // Setting up config.fatal as true, if something goes wrong the program it will terminate
@@ -94,15 +97,19 @@ shelljs.config.fatal = true;
 try {
     delFileSync(ms_project_dir);
 } catch (e) {
-//Why this?, well during tests, trying to delete the project directory after make an android build and emulation, the folder is locked by ADB.exe (Android Debug Bridge).
-    //Kill the process & relaunch the process
-    console.log("Not all files were deleted, killing Adb.exe process to unlock project folder ...");
-    shelljs.exec('TASKKILL /F /IM ADB.exe /T');
-    delFileSync(ms_project_dir);
-}
+    //The project directory after an android build and emulation is locked by ADB.exe (Android Debug Bridge).
+    //Kill the process & restart folder deletion
+        console.log("Not all files were deleted, killing Adb.exe process to unlock project folder ...");
+        if (/^win/.test(process.platform)) {
+        shelljs.exec("TASKKILL /F /IM ADB.exe /T");
+        delFileSync(ms_project_dir);
+        }else
+            throw new Error("Error during folder deletion, try to remove mobilespec project folder manually");
+    }
 
-// Creating the project
-shelljs.exec(cordova_cli + ' create mobilespec org.apache.cordova.mobilespec MobileSpec_Tests');
+// Creating the project, linked to cordova-mobile-spec library
+shelljs.pushd(coho_dir);
+shelljs.exec(cordova_cli + " create mobilespec org.apache.cordova.mobilespec MobileSpec_Tests --link-to cordova-mobile-spec");
 
 <<<<<<< HEAD
 shelljs.pushd('cordova-js');
@@ -113,14 +120,15 @@ if (code) {
 =======
 // Executing grunt task, to generate updated js files for each platform
 shelljs.pushd(cordova_js);
+<<<<<<< HEAD
 shelljs.exec('grunt');
 >>>>>>> 7a5475e... CB-6437[Improvements & support for more platforms]
 shelljs.popd();
+=======
+shelljs.exec("grunt");
+>>>>>>> 6313c9b... Added args logic & other changes
 
-// Creating .cordova/config.json
-fs.mkdirSync(path.join(ms_project_dir, '.cordova'));
-fs.writeFileSync(path.join(ms_project_dir, '.cordova', 'config.json'), '');
-shelljs.pushd('mobilespec');
+shelljs.pushd(ms_project_dir);
 
 // Config.json file ---> linked to local libraries
 var localPlatforms = {
@@ -134,7 +142,7 @@ var localPlatforms = {
             "uri" : coho_dir + "cordova-ios"
         },
         "blackberry10" : {
-            "uri" : path.join(coho_dir, "cordova-blackberry")
+            "uri" : coho_dir + "cordova-blackberry"
         },
         "wp8" : {
             "uri" : coho_dir + "cordova-wp8"
@@ -144,47 +152,42 @@ var localPlatforms = {
         }
     }
 };
-JSON.stringify(localPlatforms).to('.cordova/config.json');
-console.log('Preparing www ...');
+JSON.stringify(localPlatforms).to(".cordova/config.json");
 
-//Copy files from dir, [source, destination] add excluded dir array or files, default options force and recursive
-customCopy(cordova_ms, path.join(ms_project_dir, 'www'), [/.*(createmobilespec).*/i, /\.(git).*/i]);
-
-console.log('Adding platforms...');
 //Executing platform Add
-cordovaPlatforms.forEach(function (platform) {
-    console.log('Adding Platform: ' + platform);
-    shelljs.exec(cordova_cli + ' platform add ' + platform + ' --verbose');
+console.log("Adding platforms...");
+platforms.forEach(function (platform) {
+    console.log("Adding Platform: " + platform);
+    shelljs.exec(cordova_cli + " platform add " + platform + " --verbose");
 });
-console.log('Adding plugins...');
-// Installing plugins, using local library and dependencies file.
 
-shelljs.exec(cordova_cli +' plugin add ' + path.join(cordova_ms, 'dependencies-plugin') + ' --searchpath ' + coho_dir);
+// Installing plugins, using local library and dependencies file.
+console.log("Adding plugins...");
+shelljs.exec(cordova_cli +" plugin add " + path.join(cordova_ms, "dependencies-plugin") + " --searchpath " + coho_dir);
 
 // Updating Js files for each added platform
-console.log('Updating js for platforms...');
-cordovaPlatforms.forEach(function (platform) {
-    shelljs.cp('-f', path.join(cordova_js, 'pkg', 'cordova.' + (function () {
-                return platform === 'wp8' ? 'windowsphone' : platform;
+console.log("Updating js for platforms...");
+platforms.forEach(function (platform) {
+    shelljs.cp("-f", path.join(cordova_js, "pkg", "cordova." + (function () {
+                return platform === "wp8" ? "windowsphone" : platform;
             }
-                ()) + '.js'), path.join(ms_project_dir, 'platforms', platform, 'platform_www', 'cordova.js'));
-    console.log('Javascript file updated for ' + platform);
+                ()) + ".js"), path.join(ms_project_dir, "platforms", platform, "platform_www", "cordova.js"));
+    console.log("Javascript file updated for " + platform);
 });
 
 // Executing cordova prepare
-console.log('Preparing project...');
-shelljs.exec(cordova_cli + ' prepare');
-console.log('Linking CLI...');
+console.log("Preparing project...");
+shelljs.exec(cordova_cli + " prepare");
+console.log("Linking CLI...");
 // Writing link files to use Local CLI
 if (/^win/.test(process.platform)) {
-    var winBatchFile = 'node  "' + cordova_cli + '" %*';
-    fs.writeFileSync(path.join(ms_project_dir, 'cordova.bat'), winBatchFile);
+    var winBatchFile = "node  " + cordova_cli + " %*";
+    fs.writeFileSync(path.join(ms_project_dir, "cordova.bat"), winBatchFile);
 } else {
-    fs.symlinkSync(cordova_cli, 'cordova');
+    fs.symlinkSync(cordova_cli, "cordova");
 }
-fs.symlinkSync(cordova_cli, 'cordova');
-console.log('App created at:\n' + ms_project_dir);
-console.log('Symlink to CLI created as mobilespec/cordova');
+console.log("\"mobilespec\" project created at:\n" + ms_project_dir);
+console.log("Symlink to CLI created as mobilespec/cordova");
 
 // Looks for a directory in the provided path, from end to beginning
 // path/to/search/pathsamename_as_required/paths/pathrequired/path/path <------ Starts to look from here, the last one
@@ -219,21 +222,4 @@ function delFileSync(fileDir_Path) {
         fs.rmdirSync(fileDir_Path);
     }
     console.log("Deleted: " + fileDir_Path);
-}
-
-// Top level function to copy files from a source directory to other one, excluding the files or folders provided
-function customCopy(source, dest, excluded) {
-
-    var arrayDir = fs.readdirSync(source);
-    for (var k = 0; k < arrayDir.length; k++) {
-        var copyFlag = true;
-        for (var j = 0; j < excluded.length; j++)
-            if (excluded[j].test(arrayDir[k]))
-                copyFlag = false;
-        if (copyFlag) {
-            shelljs.cp('-Rf', path.join(source, arrayDir[k]), dest);
-            console.log(arrayDir[k] + ' copied');
-
-        }
-    }
 }

@@ -1,5 +1,5 @@
 { "name": "createmobilespec",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Create the mobilespec project and populate it.",
   "homepage": "http://cordova.apache.org",
   "bugs": { "url": "https://issues.apache.org/jira/browse/CB" },
@@ -9,6 +9,8 @@
   "repository": {
      "type": "git", 
      "url": "https://git-wip-us.apache.org/repos/asf/cordova-mobile-spec.git"},
-  "dependencies": { "shelljs": "0.2.6" },
+  "dependencies": { 
+    "shelljs": "0.2.6",
+    "optimist": "0.6.1" },
   "private": true
 }
