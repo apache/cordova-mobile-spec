@@ -50,13 +50,16 @@ var coho_dir       = process.cwd()+path.sep,
     cordova_cli    = path.join(coho_dir, "cordova-cli", "bin", "cordova"),
     cordova_ms     = path.join(coho_dir, "cordova-mobile-spec"),
     cordova_js     = path.join(coho_dir, "cordova-js"),
-    ms_project_dir = path.join(coho_dir, "mobilespec"),
     platforms      = [],
     //Setting up optimist features
     tokens         = process.argv.slice(2),
-    argv = optimist.usage('\n\nCreatemobilespec usage: \n$0 [--android] [--ios]')
+    argv = optimist.usage('\n\nMain usage: \n\n$0 [--android] [--blackberry10] [--ios] [--windows8] [--wp8]')
+                    .describe('help', 'Shows usage')
+                    .describe('platformId', 'Add supported platforms to mobilespec project (Android, Blackberry10, iOS, Windows 8, Windows Phone 8)')
                     .alias('h', 'help')
                     .argv;
+shelljs.pushd("../");
+var ms_project_dir = path.join(process.cwd(),"mobilespec");
 
 // Main libraries and path"s requirements check
 if (!fs.existsSync(coho_dir)) {
@@ -74,9 +77,11 @@ if (!fs.existsSync(cordova_js)) {
     shelljs.exit(1);
 }
 
-// No arguments throws error
+// No arguments show help
 if (tokens.length === 0) {
-    throw new Error('No arguments found');
+    console.log("\n\nNo Arguments were found");
+    optimist.showHelp();
+    process.exit(2);
 }
 
 if (argv.help) {optimist.showHelp(); return;}
@@ -86,12 +91,12 @@ if (argv.blackberry10) { platforms.push("blackberry10");}
 if (argv.wp8) { platforms.push("wp8");}
 if (argv.windows8) { platforms.push("windows8");}
 
+// No platforms show help
 if (platforms.length === 0){
-    throw new Error ('No supported platforms');
+    console.log("\n\nNo platforms were selected. Please choose at least one of the supported platforms.");
+    optimist.showHelp();
+    process.exit(2);
 }
-
-// Setting up config.fatal as true, if something goes wrong the program it will terminate
-shelljs.config.fatal = true;
 
 // Custom function to delete project folder, using recursive actions
 try {
@@ -107,8 +112,9 @@ try {
             throw new Error("Error during folder deletion, try to remove mobilespec project folder manually");
     }
 
+// Setting up config.fatal as true, if something goes wrong the program it will terminate
+shelljs.config.fatal = true;
 // Creating the project, linked to cordova-mobile-spec library
-shelljs.pushd(coho_dir);
 shelljs.exec(cordova_cli + " create mobilespec org.apache.cordova.mobilespec MobileSpec_Tests --link-to cordova-mobile-spec");
 
 <<<<<<< HEAD
@@ -130,6 +136,7 @@ shelljs.exec("grunt");
 
 // Config.json file ---> linked to local libraries
 shelljs.pushd(ms_project_dir);
+
 var localPlatforms = {
     "id" : "org.apache.cordova",
     "name" : "mobilespec",
