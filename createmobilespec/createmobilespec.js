@@ -17,7 +17,7 @@
     specific language governing permissions and limitations
     under the License.
      */
-
+     
 var fs            = require("fs"),
     path          = require("path"),
     child_process = require("child_process"),
@@ -41,23 +41,26 @@ console.log("To update all repositories:");
 console.log("  ./cordova-coho/coho repo-update");
 
 // Setting up vars, folders and libraries, to ensure full compatibility cross platform, absolute paths are used instead of relative paths
-
 // Cordova Coho dir, it should contain all libraries and required repositories
 // [cordova-cli, cordova-android, cordova-blackberry, cordova-ios, cordova-windows, cordova-windows8, all plugins libraries, cordova-mobile-spec, cordova-js]
 // searchDir function it was added, to look for cordova-coho folder backwards, for cases like absolute/path/cordova-coho/cordova-coho/...All libraries
 // This is to make sure that cordova-coho exists and it's the right one.
-var mainModDir     = process.cwd(),
-    coho_dir       = searchDir(mainModDir, "cordova-coho"),
+shelljs.pushd("../../../cordova-coho")
+var coho_dir       = process.cwd()+path.sep,
     cordova_cli    = path.join(coho_dir, "cordova-cli", "bin", "cordova"),
     cordova_ms     = path.join(coho_dir, "cordova-mobile-spec"),
     cordova_js     = path.join(coho_dir, "cordova-js"),
     ms_project_dir = path.join(coho_dir, "mobilespec"),
     platforms      = [],
-//Setting up optimist features
+    //Setting up optimist features
     tokens         = process.argv.slice(2),
-    argv           = optimist(tokens)
-                     .usage("Usage: $0 [--platform].")
-                     .argv;
+    argv = optimist.usage('\n\nCreatemobilespec usage: \n$0 [--android] [--ios]')
+                    .alias('h', 'help')
+                    .argv;
+console.log("Cordova coho: " + coho_dir);
+console.log("Cordova coho: " + cordova_cli);
+console.log("Cordova coho: " + cordova_ms);
+console.log("Cordova coho: " + ms_project_dir);
 
 // Main libraries and path"s requirements check
 if (!fs.existsSync(coho_dir)) {
@@ -79,7 +82,8 @@ if (!fs.existsSync(cordova_js)) {
 if (tokens.length === 0) {
     throw new Error('No arguments found');
 }
-if (argv.help) {console.log("Usage: createmobilespec --platformName"); return;}
+
+if (argv.help) {optimist.showHelp(); return;}
 if (argv.android) { platforms.push("android");}
 if (argv.ios) { platforms.push("ios");}
 if (argv.blackberry10) { platforms.push("blackberry10");}
@@ -95,14 +99,14 @@ shelljs.config.fatal = true;
 
 // Custom function to delete project folder, using recursive actions
 try {
-    delFileSync(ms_project_dir);
+    shelljs.rm('-r', ms_project_dir);
 } catch (e) {
     //The project directory after an android build and emulation is locked by ADB.exe (Android Debug Bridge).
     //Kill the process & restart folder deletion
-        console.log("Not all files were deleted, killing Adb.exe process to unlock project folder ...");
-        if (/^win/.test(process.platform)) {
+    console.log("Not all files were deleted, killing Adb.exe process to unlock project folder ...");
+    if (/^win/.test(process.platform)) {
         shelljs.exec("TASKKILL /F /IM ADB.exe /T");
-        delFileSync(ms_project_dir);
+        shelljs.rm('-r', ms_project_dir);
         }else
             throw new Error("Error during folder deletion, try to remove mobilespec project folder manually");
     }
@@ -128,9 +132,8 @@ shelljs.popd();
 shelljs.exec("grunt");
 >>>>>>> 6313c9b... Added args logic & other changes
 
-shelljs.pushd(ms_project_dir);
-
 // Config.json file ---> linked to local libraries
+shelljs.pushd(ms_project_dir);
 var localPlatforms = {
     "id" : "org.apache.cordova",
     "name" : "mobilespec",
@@ -179,6 +182,7 @@ platforms.forEach(function (platform) {
 console.log("Preparing project...");
 shelljs.exec(cordova_cli + " prepare");
 console.log("Linking CLI...");
+
 // Writing link files to use Local CLI
 if (/^win/.test(process.platform)) {
     var winBatchFile = "node  " + cordova_cli + " %*";
@@ -186,40 +190,6 @@ if (/^win/.test(process.platform)) {
 } else {
     fs.symlinkSync(cordova_cli, "cordova");
 }
+
 console.log("\"mobilespec\" project created at:\n" + ms_project_dir);
 console.log("Symlink to CLI created as mobilespec/cordova");
-
-// Looks for a directory in the provided path, from end to beginning
-// path/to/search/pathsamename_as_required/paths/pathrequired/path/path <------ Starts to look from here, the last one
-function searchDir(fullPath, dir) {
-    var newPath = "",
-    arrayDirs = fullPath.split(path.sep);
-    for (var i = arrayDirs.length; i > 0; i--) {
-        if (arrayDirs[i] === dir) {
-            for (var j = 0; j < i; j++) {
-                newPath += arrayDirs[j] + path.sep;
-            }
-            return (newPath + arrayDirs[i] + path.sep);
-        }
-    }
-    return false;
-}
-
-// Recursive function to delete a tree of directories or a single file, until every file in the directory is deleted, and the directory as well.
-function delFileSync(fileDir_Path) {
-    //Delete directory or file
-    //Determine if exists
-    if (fs.existsSync(fileDir_Path)) {
-        //If it's a directory check if it contains files inside, explore it.
-        fs.readdirSync(fileDir_Path).forEach(function (file) {
-            if (fs.lstatSync(path.join(fileDir_Path, file)).isDirectory()) {
-                delFileSync(path.join(fileDir_Path, file));
-            } else {
-                fs.unlinkSync(path.join(fileDir_Path, file));
-            }
-        });
-        //Finally delete folder
-        fs.rmdirSync(fileDir_Path);
-    }
-    console.log("Deleted: " + fileDir_Path);
-}
