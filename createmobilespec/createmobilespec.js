@@ -57,10 +57,6 @@ var coho_dir       = process.cwd()+path.sep,
     argv = optimist.usage('\n\nCreatemobilespec usage: \n$0 [--android] [--ios]')
                     .alias('h', 'help')
                     .argv;
-console.log("Cordova coho: " + coho_dir);
-console.log("Cordova coho: " + cordova_cli);
-console.log("Cordova coho: " + cordova_ms);
-console.log("Cordova coho: " + ms_project_dir);
 
 // Main libraries and path"s requirements check
 if (!fs.existsSync(coho_dir)) {
