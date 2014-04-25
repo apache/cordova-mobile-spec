@@ -27,6 +27,9 @@ var gContactObj = null,
 
 var removeContact = function(){
     if (gContactObj) {
+        if (!gContactObj.id) {
+            return;
+        }
         gContactObj.remove(function(){},function(){
             console.log("[CONTACTS ERROR]: removeContact cleanup method failed to clean up test artifacts.");
         });
@@ -132,7 +135,8 @@ describe("Contacts (navigator.contacts)", function () {
                         var bFound = false;
                         try {
                             for (var i=0; i < result.length; i++) {
-                                if (result[i].name.familyName == "Delete") {
+                                if (result[i].name.familyName == "Delete" 
+                                  && gContactObj.emails[0].value == 'here@there.com') {
                                     bFound = true;
                                     break;
                                 }
@@ -144,14 +148,12 @@ describe("Contacts (navigator.contacts)", function () {
                     }),
                     fail = jasmine.createSpy(),
                     test = jasmine.createSpy().andCallFake(function(savedContact) {
-                        console.log('in test');
                         // update so contact will get removed
                         gContactObj = savedContact;
                         // ----
                         // Find asserts
                         // ---
                         var findWin = jasmine.createSpy().andCallFake(function(object) {
-                                console.log('in findwin');
                                 expect(object instanceof Array).toBe(true);
                                 expect(object.length >= 1).toBe(true);
                                 expect(foundName(object)).toBe(true);
@@ -178,6 +180,7 @@ describe("Contacts (navigator.contacts)", function () {
                     gContactObj = new Contact();
                     gContactObj.name = new ContactName();
                     gContactObj.name.familyName = "Delete";
+                    gContactObj.emails = [new ContactField('work', 'here@there.com', false)];
                     gContactObj.save(test, fail);
                 });
 
@@ -332,7 +335,11 @@ describe("Contacts (navigator.contacts)", function () {
             if (isWindowsPhone) return;
 
             var bDay = new Date(1976, 6,4);
-            gContactObj = navigator.contacts.create({"gender": "male", "note": "my note", "name": {"familyName": "Delete", "givenName": "Test"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], "birthday": bDay});
+            gContactObj = navigator.contacts.create({
+                "gender": "male", "note": "my note", 
+                "name": {"familyName": "Delete", "givenName": "Test", "formatted": "abcde"}, 
+                "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], 
+                "birthday": bDay});
 
             var saveSuccess = jasmine.createSpy().andCallFake(function(obj) {
                     expect(obj).toBeDefined();
@@ -341,13 +348,18 @@ describe("Contacts (navigator.contacts)", function () {
                     }
                     expect(obj.name.familyName).toBe('Delete');
                     expect(obj.name.givenName).toBe('Test');
+                    if (cordova.platformId !== 'firefoxos') {
+                        expect(obj.name.formatted).toBe('abcde');
+                    }
+                    if (cordova.platformId === 'firefoxos') {
+                        expect(obj.name.formatted).toBe('Test Delete');
+                    }
                     expect(obj.emails.length).toBe(2);
                     expect(obj.emails[0].value).toBe('here@there.com');
                     expect(obj.emails[1].value).toBe('there@here.com');
                     expect(obj.birthday.toDateString()).toBe(bDay.toDateString());
                     expect(obj.addresses).toBe(null);
-                    // must store returned object in order to have id for update test below
-                    gContactObj = obj;
+                    obj.remove();
                 }),
                 saveFail = jasmine.createSpy();
 
@@ -363,39 +375,93 @@ describe("Contacts (navigator.contacts)", function () {
          });
         // HACK: there is a reliance between the previous and next test. This is bad form.
         it("contacts.spec.21 update a contact", function() {
-
             // this api requires manual user confirmation on WP7/8 so skip it
             if (isWindowsPhone) return;
 
-            expect(gContactObj).toBeDefined();
+            var bDay = new Date(1976, 6,4);
+            // XXX: couldn't find anything about `gender` in docs
+            //      it doesn't work anyway (always *null*)
+            var gContactObj = navigator.contacts.create({"gender": "male", "note": "my note", "name": {"familyName": "Delete", "givenName": "Test"}, "emails": [{"value": "here@there.com"}, {"value": "there@here.com"}], "birthday": bDay,
+              "addresses":  [new ContactAddress(true, "home", "a","b","c","d","e","f")],
+              "categories": [new ContactField('t', 'c', true)],
+              "organizations": [new ContactOrganization(true, 'a', 'b', 'c', 'd')]});
+            gContactObj.emails[gContactObj.emails.length] = new ContactField('some', 'added@by.contact.fie.ld', false);
+            var savedObj;
 
-            var bDay = new Date(1975, 5,4);
             var noteText = "an UPDATED note";
-
+            bDay = new Date(1975, 5, 4);
             var win = jasmine.createSpy().andCallFake(function(obj) {
-                    expect(obj).toBeDefined();
-                    expect(obj.id).toBe(gContactObj.id);
-                    if (cordova.platformId !== 'blackberry10') {
-                        expect(obj.note).toBe(noteText);
-                    }
-                    expect(obj.birthday.toDateString()).toBe(bDay.toDateString());
-                    expect(obj.emails.length).toBe(1);
-                    expect(obj.emails[0].value).toBe('here@there.com');
-                    removeContact();         // Clean up contact object
-                }), fail = jasmine.createSpy().andCallFake(removeContact);
-
-            runs(function () {
-                // remove an email
-                gContactObj.emails[1].value = "";
-                // change birthday
-                gContactObj.birthday = bDay;
-                // update note
-                gContactObj.note = noteText;
-                gContactObj.save(win, fail);
+                // check if addresses are saved, updated and received 
+                // without loosing data
+                expect(obj).toBeDefined();
+                expect(obj.id).toBe(savedObj.id);
+                // find the object again using find
+                if (cordova.platformId !== 'blackberry10') {
+                    expect(obj.note).toBe(noteText);
+                }
+                expect(obj.birthday.toDateString()).toBe(bDay.toDateString());
+                expect(obj.emails).toNotBe(null);
+                expect(obj.emails.length).toBe(2);
+                expect(obj.emails[0].value).toBe('here@there.com');
+                expect(obj.emails[1].value).toBe('added@by.contact.fie.ld');
+                expect(obj.addresses).toNotBe(null);
+                expect(obj.addresses[0]).toBeDefined();
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.addresses[0].pref).toBe(true);
+                }
+                expect(obj.addresses[0].type).toBe("home");
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.addresses[0].formatted).toBe("a");
+                }
+                expect(obj.addresses[0].streetAddress).toBe("b");
+                expect(obj.addresses[0].locality).toBe("c");
+                expect(obj.addresses[0].region).toBe("d");
+                expect(obj.addresses[0].postalCode).toBe("e");
+                expect(obj.addresses[0].country).toBe("f");
+                expect(obj.categories).toNotBe(null);
+                expect(obj.categories[0]).toBeDefined();
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.categories[0].pref).toBe(true);
+                }
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.categories[0].type).toBe("t");
+                }
+                expect(obj.categories[0].value).toBe("c");
+                expect(obj.organizations).toNotBe(null);
+                expect(obj.organizations[0]).toBeDefined();
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.organizations[0].pref).toBe(true);
+                }
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.organizations[0].type).toBe("a");
+                }
+                expect(obj.organizations[0].name).toBe("b");
+                if (cordova.platformId !== 'firefoxos') {
+                    expect(obj.organizations[0].department).toBe("c");
+                }
+                expect(obj.organizations[0].title).toBe("d");
+                obj.remove();         // Clean up contact object
             });
-
+            fail = jasmine.createSpy().andCallFake(function(e) {
+                  removeContact();
+            });
+            runs(function () {
+                // save first contact
+                gContactObj.save(function(obj) {
+                    // preserve the contact in global for the test
+                    savedObj = obj;
+                    expect(savedObj.id).toBeTruthy();
+                    // remove an email
+                    expect(savedObj.emails[2].value).toBe('added@by.contact.fie.ld');
+                    savedObj.emails[1].value = "";
+                    // change birthday
+                    savedObj.birthday = bDay;
+                    // update note
+                    savedObj.note = noteText;
+                    savedObj.save(win, fail);
+                });
+            });
             waitsFor(function () { return win.wasCalled; }, "saveSuccess never called", Tests.TEST_TIMEOUT);
-
             runs(function () {
                 expect(fail).not.toHaveBeenCalled();
             });
@@ -517,6 +583,7 @@ describe("Contacts (navigator.contacts)", function () {
             obj.multiple=true;
             runs(function () {
                 var findSuccess = function (cs) {
+
                     var contactObj = new Contact();
                     if (cs.length>0){
                         contactObj = cs[0];
