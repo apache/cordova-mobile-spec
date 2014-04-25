@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--
 
  Licensed to the Apache Software Foundation (ASF) under one
@@ -57,6 +57,7 @@
     function bindEvents() {
         document.getElementById('downloadImgCDV').addEventListener('click', downloadImgCDV, false);
         document.getElementById('downloadImgNative').addEventListener('click', downloadImgNative, false);
+        document.getElementById('downloadToNonExistentDir').addEventListener('click', downloadToNonExistentDir, false);
         document.getElementById('downloadVideoCDV').addEventListener('click', downloadVideoCDV, false);
         document.getElementById('downloadVideoNative').addEventListener('click', downloadVideoNative, false);
         document.getElementById('testPrivateURL').addEventListener('click', testPrivateURL, false);
@@ -99,6 +100,12 @@
         downloadImg(imageURL, function(entry) { return entry.toNativeURL(); }, new Image);
     }
 
+    function downloadToNonExistentDir(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        downloadImg(imageURL, function (entry) { return entry.toURL(); }, new Image, '/nonExistentDirTest/');
+    }
+
     function downloadVideoCDV(ev) {
         ev.preventDefault();
         ev.stopPropagation();
@@ -115,8 +122,9 @@
         downloadImg(videoURL, function(entry) { return entry.toNativeURL(); }, videoElement);
     }
 
-    function downloadImg(source, urlFn, element) {
-        var filename = source.substring(source.lastIndexOf("/")+1);
+    function downloadImg(source, urlFn, element, directory) {
+        var filename = source.substring(source.lastIndexOf("/") + 1);
+        filename = directory + filename || filename;
         function download(fileSystem) {
             var ft = new FileTransfer();
             logMessage("Starting download");
@@ -131,15 +139,27 @@
         clearLog();
         logMessage("Requesting filesystem");
         requestFileSystem(TEMPORARY, 0, function(fileSystem) {
-            logMessage("Checking for existing file");
-            fileSystem.root.getFile(filename, {create: false}, function(entry) {
-                logMessage("Removing existing file");
-                entry.remove(function() {
+            if (directory != undefined) {
+                logMessage("Checking for existing directory.");
+                fileSystem.root.getDirectory(directory, {}, function (dirEntry) {
+                    dirEntry.removeRecursively(function () {
+                        download(fileSystem);
+                    }, logError("dirEntry.removeRecursively"));
+                }, function () {
                     download(fileSystem);
-                }, logError("entry.remove"));
-            }, function() {
-                download(fileSystem);
-            });
+                });
+            }
+            else {
+                logMessage("Checking for existing file");
+                fileSystem.root.getFile(filename, { create: false }, function (entry) {
+                    logMessage("Removing existing file");
+                    entry.remove(function () {
+                        download(fileSystem);
+                    }, logError("entry.remove"));
+                }, function () {
+                    download(fileSystem);
+                });
+            }
         }, logError("requestFileSystem"));
     }
 
@@ -189,6 +209,7 @@
     <h2>File</h2>
     <div class="btn large" id="downloadImgCDV">Download and display img (cdvfile)</div>
     <div class="btn large" id="downloadImgNative">Download and display img (native)</div>
+    <div class="btn large" id="downloadToNonExistentDir">Download to a non-existent dir (should work)</div>
     <div class="btn large" id="downloadVideoCDV">Download and play video (cdvfile)</div>
     <div class="btn large" id="downloadVideoNative">Download and play video (native)</div>
 
