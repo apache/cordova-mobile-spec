@@ -100,7 +100,7 @@ if (platforms.length === 0){
 
 // Custom function to delete project folder, using recursive actions
 try {
-    shelljs.rm('-r', ms_project_dir);
+    shelljs.rm('-rf', ms_project_dir);
 } catch (e) {
     //The project directory after an android build and emulation is locked by ADB.exe (Android Debug Bridge).
     //Kill the process & restart folder deletion
@@ -115,24 +115,11 @@ try {
 // Setting up config.fatal as true, if something goes wrong the program it will terminate
 shelljs.config.fatal = true;
 // Creating the project, linked to cordova-mobile-spec library
-shelljs.exec(cordova_cli + " create mobilespec org.apache.cordova.mobilespec MobileSpec_Tests --link-to cordova-mobile-spec");
+shelljs.exec(cordova_cli + " create mobilespec org.apache.cordova.mobilespec MobileSpec_Tests --link-to cordova-coho/cordova-mobile-spec");
 
-<<<<<<< HEAD
-shelljs.pushd('cordova-js');
-var code = shelljs.exec('grunt').code;
-if (code) {
-    process.exit(1);
-}
-=======
 // Executing grunt task, to generate updated js files for each platform
 shelljs.pushd(cordova_js);
-<<<<<<< HEAD
-shelljs.exec('grunt');
->>>>>>> 7a5475e... CB-6437[Improvements & support for more platforms]
-shelljs.popd();
-=======
 shelljs.exec("grunt");
->>>>>>> 6313c9b... Added args logic & other changes
 
 // Config.json file ---> linked to local libraries
 shelljs.pushd(ms_project_dir);
