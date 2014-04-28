@@ -45,7 +45,7 @@ console.log("  ./cordova-coho/coho repo-update");
 // [cordova-cli, cordova-android, cordova-blackberry, cordova-ios, cordova-windows, cordova-windows8, all plugins libraries, cordova-mobile-spec, cordova-js]
 // searchDir function it was added, to look for cordova-coho folder backwards, for cases like absolute/path/cordova-coho/cordova-coho/...All libraries
 // This is to make sure that cordova-coho exists and it's the right one.
-shelljs.pushd("../../../cordova-coho")
+shelljs.pushd("../../../cordova-coho");
 var coho_dir       = process.cwd()+path.sep,
     cordova_cli    = path.join(coho_dir, "cordova-cli", "bin", "cordova"),
     cordova_ms     = path.join(coho_dir, "cordova-mobile-spec"),
