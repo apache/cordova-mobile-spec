@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-    /**
+
+/**
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements.  See the NOTICE file
     distributed with this work for additional information
@@ -16,7 +17,7 @@
     KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
     under the License.
-     */
+*/
      
 var fs            = require("fs"),
     path          = require("path"),
@@ -35,37 +36,32 @@ try {
 }
 // Print relevant information
 console.log("Creating \"mobilespec\" project. If you have any errors, it may be from missing repositories.");
-console.log("To clone needed repositories:");
-console.log("  ./cordova-coho/coho repo-clone -r plugins -r mobile-spec -r android -r ios -r cli");
+console.log("To clone needed repositories (android as an example):");
+console.log("  ./cordova-coho/coho repo-clone -r plugins -r mobile-spec -r android -r cli");
 console.log("To update all repositories:");
 console.log("  ./cordova-coho/coho repo-update");
 
 // Setting up vars, folders and libraries, to ensure full compatibility cross platform, absolute paths are used instead of relative paths
 // Cordova Coho dir, it should contain all libraries and required repositories
 // [cordova-cli, cordova-android, cordova-blackberry, cordova-ios, cordova-windows, cordova-windows8, all plugins libraries, cordova-mobile-spec, cordova-js]
-// searchDir function it was added, to look for cordova-coho folder backwards, for cases like absolute/path/cordova-coho/cordova-coho/...All libraries
-// This is to make sure that cordova-coho exists and it's the right one.
-shelljs.pushd("../../../cordova-coho");
-var coho_dir       = process.cwd()+path.sep,
-    cordova_cli    = path.join(coho_dir, "cordova-cli", "bin", "cordova"),
-    cordova_ms     = path.join(coho_dir, "cordova-mobile-spec"),
-    cordova_js     = path.join(coho_dir, "cordova-js"),
+var top_dir        = process.cwd()+path.sep,
+    cordova_cli    = path.join(top_dir, "cordova-cli", "bin", "cordova"),
+    cordova_ms     = path.join(top_dir, "cordova-mobile-spec"),
+    cordova_js     = path.join(top_dir, "cordova-js"),
     platforms      = [],
     //Setting up optimist features
     tokens         = process.argv.slice(2),
-    argv = optimist.usage('\n\nMain usage: \n\n$0 [--android] [--blackberry10] [--ios] [--windows8] [--wp8]')
+    argv = optimist.usage('\n\nMain usage: \n\n$0 [--android] [--blackberry10] [--ios] [--windows8] [--wp8] [-h|--help]')
                     .describe('help', 'Shows usage')
-                    .describe('platformId', 'Add supported platforms to mobilespec project (Android, Blackberry10, iOS, Windows 8, Windows Phone 8)')
+                    .describe('android', 'Add Android platform to mobilespec project')
+                    .describe('blackberry10', 'Add Blackberry 10 platform to mobilespec project')
+                    .describe('ios', 'Add iOS platform to mobilespec project')
+                    .describe('windows8', 'Add Windows 8 platform to mobilespec project')
+                    .describe('wp8', 'Add Windows Phone 8 to mobilespec project')
                     .alias('h', 'help')
                     .argv;
-shelljs.pushd("../");
-var ms_project_dir = path.join(process.cwd(),"mobilespec");
 
-// Main libraries and path"s requirements check
-if (!fs.existsSync(coho_dir)) {
-    console.log("Please run this script from the directory that contains cordova-coho");
-    shelljs.exit(1);
-}
+var ms_project_dir = path.join(top_dir,"mobilespec");
 
 if (!fs.existsSync(cordova_ms)) {
     console.log("Please run this script from the directory that contains cordova-mobile-spec");
@@ -115,11 +111,12 @@ try {
 // Setting up config.fatal as true, if something goes wrong the program it will terminate
 shelljs.config.fatal = true;
 // Creating the project, linked to cordova-mobile-spec library
-shelljs.exec(cordova_cli + " create mobilespec org.apache.cordova.mobilespec MobileSpec_Tests --link-to cordova-coho/cordova-mobile-spec");
+shelljs.exec(cordova_cli + " create mobilespec org.apache.cordova.mobilespec MobileSpec_Tests --link-to " + cordova_ms);
 
 // Executing grunt task, to generate updated js files for each platform
 shelljs.pushd(cordova_js);
 shelljs.exec("grunt");
+shelljs.popd();
 
 // Config.json file ---> linked to local libraries
 shelljs.pushd(ms_project_dir);
@@ -129,19 +126,19 @@ var localPlatforms = {
     "name" : "mobilespec",
     "lib" : {
         "android" : {
-            "uri" : coho_dir + "cordova-android"
+            "uri" : top_dir + "cordova-android"
         },
         "ios" : {
-            "uri" : coho_dir + "cordova-ios"
+            "uri" : top_dir + "cordova-ios"
         },
         "blackberry10" : {
-            "uri" : coho_dir + "cordova-blackberry"
+            "uri" : top_dir + "cordova-blackberry"
         },
         "wp8" : {
-            "uri" : coho_dir + "cordova-wp8"
+            "uri" : top_dir + "cordova-wp8"
         },
         "windows8" : {
-            "uri" : coho_dir + "cordova-windows"
+            "uri" : top_dir + "cordova-windows"
         }
     }
 };
@@ -156,7 +153,7 @@ platforms.forEach(function (platform) {
 
 // Installing plugins, using local library and dependencies file.
 console.log("Adding plugins...");
-shelljs.exec(cordova_cli +" plugin add " + path.join(cordova_ms, "dependencies-plugin") + " --searchpath " + coho_dir);
+shelljs.exec(cordova_cli +" plugin add " + path.join(cordova_ms, "dependencies-plugin") + " --searchpath " + top_dir);
 
 // Updating Js files for each added platform
 console.log("Updating js for platforms...");
@@ -171,8 +168,8 @@ platforms.forEach(function (platform) {
 // Executing cordova prepare
 console.log("Preparing project...");
 shelljs.exec(cordova_cli + " prepare");
-console.log("Linking CLI...");
 
+console.log("Linking CLI...");
 // Writing link files to use Local CLI
 if (/^win/.test(process.platform)) {
     var winBatchFile = "node  " + cordova_cli + " %*";
@@ -180,6 +177,8 @@ if (/^win/.test(process.platform)) {
 } else {
     fs.symlinkSync(cordova_cli, "cordova");
 }
+
+shelljs.popd();
 
 console.log("\"mobilespec\" project created at:\n" + ms_project_dir);
 console.log("Symlink to CLI created as mobilespec/cordova");
