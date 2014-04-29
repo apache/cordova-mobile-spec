@@ -22,10 +22,18 @@
 
 This project is a set of automated & manual tests that test Cordova core functionality.
 
-To set up the project, use `createmobilespec/createmobilespec.js`.
+To set up the project, use `cordova-mobile-spec/createmobilespec/createmobilespec.js`.
+
+### Requirements ###
+
+Repositories required:
+- **cordova-cli**(Install pre-requisites by running `npm install` inside of cordova-cli).
+- **cordova-js**(required [grunt-cli](https://github.com/gruntjs/grunt-cli) installed).
+- All **plugins**.
+- **Platforms** to test (cordova-android, cordova-ios, cordova-blackberry, cordova-wp8, cordova-windows).
+- **cordova-mobile-spec** (Install pre-requisites by running `npm install` inside of cordova-mobile-spec/createmobilespec).
+- All repositories must be checked out as peers of each other.
 
 ### Performance ###
 
 For reference purposes, the document AndroidBridgePerformance_300.pdf in this directory outlines the Android bridge performance using mobile-spec and the manual bridge test. The tests were performed with Cordova 3.0.0.
-
-
