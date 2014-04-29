@@ -27,8 +27,8 @@ To set up the project, use `cordova-mobile-spec/createmobilespec/createmobilespe
 ### Requirements ###
 
 Repositories required:
-- **cordova-cli**(Install pre-requisites by running `npm install` inside of cordova-cli).
-- **cordova-js**(required [grunt-cli](https://github.com/gruntjs/grunt-cli) installed).
+- **cordova-cli** (Install pre-requisites by running `npm install` inside of cordova-cli).
+- **cordova-js** (required [grunt-cli](https://github.com/gruntjs/grunt-cli) installed).
 - All **plugins**.
 - **Platforms** to test (cordova-android, cordova-ios, cordova-blackberry, cordova-wp8, cordova-windows).
 - **cordova-mobile-spec** (Install pre-requisites by running `npm install` inside of cordova-mobile-spec/createmobilespec).
