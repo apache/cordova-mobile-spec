@@ -5,6 +5,8 @@
       version="0.1.0">
     <name>Echo</name>
 
+    <js-module src="www/does-not-run.js" name="does-not-run" />
+
     <js-module src="www/echo.js" name="echo">
         <clobbers target="cordova.echo" />
     </js-module>
