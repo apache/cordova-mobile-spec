@@ -153,6 +153,8 @@ describe('File API', function() {
                     expect(fileSystem.root.filesystem).toBeDefined();
                     // Shouldn't use cdvfile by default.
                     expect(fileSystem.root.toURL()).not.toMatch(/^cdvfile:/);
+                    // All DirectoryEntry URLs should always have a trailing slash.
+                    expect(fileSystem.root.toURL()).toMatch(/\/$/);
                 }),
                 fail = createFail('window.requestFileSystem');
 
@@ -236,37 +238,44 @@ describe('File API', function() {
                 expect(window.resolveLocalFileSystemURI).toBeDefined();
             });
             it("file.spec.9 should resolve a valid file name", function() {
-                var fileName = "resolve.file.uri",
-                win = jasmine.createSpy().andCallFake(function(fileEntry) {
+                var createDirectoryFail = createFail('createDirectory');
+                var resolveFail = createFail('resolveLocalFileSystemURI');
+                var fileName = 'file.spec.9';
+                var win = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
                     expect(fileEntry.name).toCanonicallyMatch(fileName);
-                    // Shouldn't use cdvfile by default.
-                    expect(fileEntry.toURL()).not.toMatch(/^cdvfile:/);
+                    expect(fileEntry.toURL()).not.toMatch(/^cdvfile:/, 'should not use cdvfile URL');
+                    expect(fileEntry.toURL()).not.toMatch(/\/$/, 'URL should not end with a slash');
 
                     // cleanup
                     deleteEntry(fileName);
-                }),
-                fail = createFail('window.resolveLocalFileSystemURI');
-                resolveCallback = jasmine.createSpy().andCallFake(function(entry) {
+                });
+                function gotDirectory(entry) {
                     // lookup file system entry
-                    runs(function() {
-                        window.resolveLocalFileSystemURI(entry.toURL(), win, fail);
-                    });
+                    window.resolveLocalFileSystemURL(entry.toURL(), win, resolveFail);
+                }
+                createFile(fileName, gotDirectory, createDirectoryFail, createDirectoryFail);
+                waitsForAny(win, resolveFail, createDirectoryFail);
+            });
+            it("file.spec.9.5 should resolve a directory", function() {
+                var createDirectoryFail = createFail('createDirectory');
+                var resolveFail = createFail('resolveLocalFileSystemURI');
+                var fileName = 'file.spec.9.5';
+                var win = jasmine.createSpy().andCallFake(function(fileEntry) {
+                    expect(fileEntry).toBeDefined();
+                    expect(fileEntry.name).toCanonicallyMatch(fileName);
+                    expect(fileEntry.toURL()).not.toMatch(/^cdvfile:/, 'should not use cdvfile URL');
+                    expect(fileEntry.toURL()).toMatch(/\/$/, 'URL end with a slash');
 
-                    waitsFor(function() { return win.wasCalled; }, "resolveLocalFileSystemURI callback never called", Tests.TEST_TIMEOUT);
-
-                    runs(function() {
-                        expect(win).toHaveBeenCalled();
-                        expect(fail).not.toHaveBeenCalled();
-                    });
+                    // cleanup
+                    deleteEntry(fileName);
                 });
-
-                // create a new file entry
-                runs(function() {
-                    createFile(fileName, resolveCallback, fail);
-                });
-
-                waitsFor(function() { return resolveCallback.wasCalled; }, "createFile callback never called", Tests.TEST_TIMEOUT);
+                function gotDirectory(entry) {
+                    // lookup file system entry
+                    window.resolveLocalFileSystemURL(entry.toURL(), win, resolveFail);
+                }
+                createDirectory(fileName, gotDirectory, createDirectoryFail, createDirectoryFail);
+                waitsForAny(win, resolveFail, createDirectoryFail);
             });
             it("file.spec.10 resolve valid file name with parameters", function() {
                 var fileName = "resolve.file.uri.params",
@@ -2023,52 +2032,28 @@ describe('File API', function() {
             waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
         });
         it("file.spec.63 copyTo: directory that does not exist", function() {
-            var file1 = "entry.copy.dnf.file1",
-                dstDir = "entry.copy.dnf.dstDir",
-                filePath = joinURL(root.fullPath, file1),
-                dstPath = joinURL(root.fullPath, dstDir),
-                win = createWin('Entry'),
-                fail = createFail('Entry'),
-                entryCallback = jasmine.createSpy().andCallFake(function(entry) {
-                    // copy file to target directory that does not exist
-                    runs(function() {
-                        directory = new DirectoryEntry();
-                        directory.filesystem = root.filesystem;
-                        directory.fullPath = dstPath;
-                        entry.copyTo(directory, null, win, itCopy);
-                    });
+            var file1 = "entry.copy.dnf.file1";
+            var dirName = 'dir-foo';
+            var copySucceeded = createFail('copySucceeded');
+            var fail = createFail('Entry');
 
-                    waitsFor(function() { return itCopy.wasCalled; }, "itCopy never called", Tests.TEST_TIMEOUT);
-                }),
-                itCopy = jasmine.createSpy().andCallFake(function(error) {
-                    expect(error).toBeDefined();
-                    expect(error).toBeFileError(FileError.NOT_FOUND_ERR);
-                    runs(function() {
-                        root.getFile(file1, {create: false}, itFileExists, fail);
-                    });
-
-                    waitsFor(function() { return itFileExists.wasCalled; }, "itFileExists never called", Tests.TEST_TIMEOUT);
-
-                    runs(function() {
-                        expect(itFileExists).toHaveBeenCalled();
-                        expect(win).not.toHaveBeenCalled();
-                        expect(fail).not.toHaveBeenCalled();
-                    });
-                }),
-                itFileExists = jasmine.createSpy().andCallFake(function(fileEntry) {
-                    expect(fileEntry).toBeDefined();
-                    expect(fileEntry.fullPath).toCanonicallyMatch(filePath);
-
-                    // cleanup
-                    deleteEntry(file1);
-                });
-
-            // create a new file entry to kick off it
-            runs(function() {
-                createFile(file1, entryCallback, fail);
+            var copyFailed = jasmine.createSpy().andCallFake(function(error) {
+                expect(error).toBeDefined();
+                expect(error).toBeFileError(FileError.NOT_FOUND_ERR);
             });
 
-            waitsFor(function() { return entryCallback.wasCalled; }, "entryCallback never called", Tests.TEST_TIMEOUT);
+            function afterCreateFile(fileEntry) {
+                createDirectory(dirName, afterDirCreate, fail);
+                function afterDirCreate(dirEntry) {
+                    dirEntry.remove(afterDirRemove, fail);
+                    function afterDirRemove() {
+                        fileEntry.copyTo(dirEntry, null, copySucceeded, copyFailed);
+                    }
+                }
+            }
+            createFile(file1, afterCreateFile, fail);
+
+            waitsForAny(fail, copySucceeded, copyFailed);
         });
         it("file.spec.64 copyTo: invalid target name", function() {
             var file1 = "entry.copy.itn.file1",
