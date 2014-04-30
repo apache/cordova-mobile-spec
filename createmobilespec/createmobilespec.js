@@ -115,7 +115,10 @@ shelljs.exec(cordova_cli + " create mobilespec org.apache.cordova.mobilespec Mob
 
 // Executing grunt task, to generate updated js files for each platform
 shelljs.pushd(cordova_js);
-shelljs.exec("grunt");
+var code = shelljs.exec("grunt").code;
+if (code) {
+    process.exit(1);
+}
 shelljs.popd();
 
 // Config.json file ---> linked to local libraries
