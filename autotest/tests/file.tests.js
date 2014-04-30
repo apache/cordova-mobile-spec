@@ -3027,21 +3027,29 @@ describe('File API', function() {
 
     describe('read method', function(){
         it("file.spec.82 should error out on non-existent file", function() {
-            var reader = new FileReader();
+            var fileName = "somefile.txt";
+            var getFileFail = createFail('create');
+            var fileFail = createFail('file');
+            var deleteFail = createFail('delete');
+            var readWorked = createFail('read');
             var verifier = jasmine.createSpy().andCallFake(function(evt) {
                 expect(evt).toBeDefined();
                 expect(evt.target.error).toBeFileError(FileError.NOT_FOUND_ERR);
             });
-            reader.onerror = verifier;
-            var myFile = new File();
-            // old API internals: use fullPath in File object
-            myFile.fullPath = joinURL(root.fullPath, "doesnotexist.err");
-            // new API internals: use localURL in File object
-            myFile.localURL = joinURL(root.toURL(), "doesnotexist.err");
-
-            reader.readAsText(myFile);
-
-            waitsFor(function() { return verifier.wasCalled; }, "verifier never called", Tests.TEST_TIMEOUT);
+            root.getFile(fileName, {create: true}, afterGetFile, getFileFail);
+            function afterGetFile(entry) {
+                entry.file(afterFile, fileFail);
+            }
+            function afterFile(f) {
+                deleteEntry(fileName, afterDelete, deleteFail);
+                function afterDelete() {
+                    var reader = new FileReader();
+                    reader.onerror = verifier;
+                    reader.onload = readWorked;
+                    reader.readAsText(f);
+                }
+            }
+            waitsForAny(getFileFail, fileFail, deleteFail, readWorked, verifier);
         });
         it("file.spec.83 should be able to read native blob objects", function() {
             // Skip test if blobs are not supported (e.g.: Android 2.3).
@@ -3294,14 +3302,11 @@ describe('File API', function() {
         it("file.spec.97 should be able to write and append to file, File object", function() {
             var fileName = "writer.append.File",
                 theWriter,
-                // old API internals: use fullPath in File object
-                filePath = joinURL(root.fullPath, fileName),
-                // new API internals: use localURL in File object
-                localURL = joinURL(root.toURL(), fileName),
                 // file content
                 rule = "There is an exception to every rule.",
                 // for checking file length
                 length = rule.length,
+                createWriterFail = createFail('createWriter'),
                 verifier = jasmine.createSpy().andCallFake(function(evt) {
                     expect(theWriter.length).toBe(length);
                     expect(theWriter.position).toBe(length);
@@ -3319,30 +3324,20 @@ describe('File API', function() {
 
                     // cleanup
                     deleteFile(fileName);
-                }),
-                // writes initial file content
-                write_file = function(file) {
-                    theWriter = new FileWriter(file);
-                    theWriter.onwriteend = verifier;
-                    theWriter.write(rule);
-                };
+                });
+            function afterCreateWriter(w) {
+                theWriter = w;
+                theWriter.onwriteend = verifier;
+                theWriter.write(rule);
+            }
+            function afterGetFile(fileEntry) {
+                fileEntry.createWriter(afterCreateWriter, createWriterFail);
+            }
 
-            // create file, then write and append to it
-            runs(function() {
-                var file = new File();
-                // old API internals: use fullPath in File object
-                file.fullPath = filePath;
-                // new API internals: use localURL in File object
-                file.localURL = localURL;
-                write_file(file);
-            });
+            var getFileFail = createFail('create');
+            root.getFile(fileName, {create: true}, afterGetFile, getFileFail);
 
-            waitsFor(function() { return anotherVerifier.wasCalled; }, "verifier", Tests.TEST_TIMEOUT);
-
-            runs(function() {
-                expect(verifier).toHaveBeenCalled();
-                expect(anotherVerifier).toHaveBeenCalled();
-            });
+            waitsForAny(anotherVerifier, getFileFail, createWriterFail);
         });
         it("file.spec.98 should be able to seek to the middle of the file and write more data than file.length", function() {
             var fileName = "writer.seek.write",
@@ -3913,27 +3908,27 @@ describe('File API', function() {
             
             var unsupportedOperation = jasmine.createSpy("Operation not supported");
 
-			var resolveWin = jasmine.createSpy("resolveWin").andCallFake(function(fileEntry) {
-        		expect(fileEntry.toURL()).toEqual(originalEntry.toURL());
+            var resolveWin = jasmine.createSpy("resolveWin").andCallFake(function(fileEntry) {
+                expect(fileEntry.toURL()).toEqual(originalEntry.toURL());
                 // cleanup
                 deleteFile(localFilename);
-	        });
+            });
             var resolveFail = createDoNotCallSpy('resolveFail');
             var getFail = createDoNotCallSpy('getFail');
 			
-			runs(function() {
+            runs(function() {
                 root.getFile(localFilename, {create: true}, function(entry) {
                     originalEntry = entry;
-		            /* This is an undocumented interface to File which exists only for testing
-		             * backwards compatibilty. By obtaining the raw filesystem path of the download
-		             * location, we can pass that to ft.download() to make sure that previously-stored
-		             * paths are still valid.
-		             */
-		            cordova.exec(function(localPath) {
-		            	window.resolveLocalFileSystemURI("file://" + localPath, resolveWin, resolveFail);
-		            }, unsupportedOperation, 'File', '_getLocalFilesystemPath', [entry.toURL()]);
+                    /* This is an undocumented interface to File which exists only for testing
+                     * backwards compatibilty. By obtaining the raw filesystem path of the download
+                     * location, we can pass that to ft.download() to make sure that previously-stored
+                     * paths are still valid.
+                     */
+                    cordova.exec(function(localPath) {
+                        window.resolveLocalFileSystemURI("file://" + encodeURI(localPath), resolveWin, resolveFail);
+                    }, unsupportedOperation, 'File', '_getLocalFilesystemPath', [entry.toURL()]);
                 }, getFail);
-	        });
+            });
 	        
             waitsForAny(resolveWin, resolveFail, getFail, unsupportedOperation);
             
