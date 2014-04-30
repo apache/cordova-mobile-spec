@@ -151,7 +151,8 @@ describe('File API', function() {
                     expect(fileSystem.name).toBe("persistent");
                     expect(fileSystem.root).toBeDefined();
                     expect(fileSystem.root.filesystem).toBeDefined();
-                    expect(fileSystem.root.filesystem).toBe(fileSystem);
+                    // Shouldn't use cdvfile by default.
+                    expect(fileSystem.root.toURL()).not.toMatch(/^cdvfile:/);
                 }),
                 fail = createFail('window.requestFileSystem');
 
@@ -239,6 +240,8 @@ describe('File API', function() {
                 win = jasmine.createSpy().andCallFake(function(fileEntry) {
                     expect(fileEntry).toBeDefined();
                     expect(fileEntry.name).toCanonicallyMatch(fileName);
+                    // Shouldn't use cdvfile by default.
+                    expect(fileEntry.toURL()).not.toMatch(/^cdvfile:/);
 
                     // cleanup
                     deleteEntry(fileName);
