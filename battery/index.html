@@ -51,22 +51,22 @@
 
     /* Battery */
     function updateInfo(info) {
-        document.getElementById('level').innerText = info.level;
-        document.getElementById('isPlugged').innerText = info.isPlugged;
+        document.getElementById('level').textContent = info.level;
+        document.getElementById('isPlugged').textContent = info.isPlugged;
         if (info.level > 5) {
-            document.getElementById('crit').innerText = "false";
+            document.getElementById('crit').textContent = "false";
         }
         if (info.level > 20) {
-            document.getElementById('low').innerText = "false";
+            document.getElementById('low').textContent = "false";
         }
     }
     
     function batteryLow(info) {
-        document.getElementById('low').innerText = "true";
+        document.getElementById('low').textContent = "true";
     }
     
     function batteryCritical(info) {
-        document.getElementById('crit').innerText = "true";
+        document.getElementById('crit').textContent = "true";
     }
     
     function addBattery() {
