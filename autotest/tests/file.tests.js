@@ -3065,7 +3065,7 @@ describe('File API', function() {
             fileData += writeBinary ? 'bin:\x01\x00' : '';
             fileDataAsBinaryString += writeBinary ? 'bin:\x01\x00' : '';
             // create a file, write to it, and read it in again
-            root.getFile(fileName, {create: true}, createWriter, getFileFail);
+            createFile(fileName, createWriter, getFileFail);
             waitsForAny(getFileFail, writerFail, fileFail, callback);
         }
 
