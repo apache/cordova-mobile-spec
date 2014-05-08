@@ -459,7 +459,15 @@ describe('FileTransfer', function() {
             var uploadWin = jasmine.createSpy().andCallFake(function(uploadResult) {
                 expect(uploadResult.bytesSent).toBeGreaterThan(0);
                 expect(uploadResult.responseCode).toBe(200);
-                expect(uploadResult.response).toMatch(/fields:\s*{\s*value1.*/);
+                var obj = null;
+                try {
+                    obj = JSON.parse(uploadResult.response);
+                    expect(obj.fields).toBeDefined();
+                    expect(obj.fields.value1).toBe("test");
+                    expect(obj.fields.value2).toBe("param");
+                } catch (e) {
+                    expect(obj).not.toBeNull('returned data from server should be valid json');
+                }
                 expect(lastProgressEvent).not.toBeNull('expected progress events');
                 if (cordova.platformId == 'ios') {
                     expect(uploadResult.headers && uploadResult.headers['Content-Type']).toBeDefined('Expected content-type header to be defined.');
@@ -512,7 +520,15 @@ describe('FileTransfer', function() {
             var uploadWin = jasmine.createSpy().andCallFake(function(uploadResult) {
                 expect(uploadResult.bytesSent).toBeGreaterThan(0);
                 expect(uploadResult.responseCode).toBe(200);
-                expect(uploadResult.response).toMatch(/fields:\s*{\s*value1.*/);
+                var obj = null;
+                try {
+                    obj = JSON.parse(uploadResult.response);
+                    expect(obj.fields).toBeDefined();
+                    expect(obj.fields.value1).toBe("test");
+                    expect(obj.fields.value2).toBe("param");
+                } catch (e) {
+                    expect(obj).not.toBeNull('returned data from server should be valid json');
+                }
             });
 
             var fileWin = function(fileEntry) {
@@ -840,7 +856,15 @@ describe('FileTransfer', function() {
             var uploadWin = jasmine.createSpy().andCallFake(function(uploadResult) {
                 expect(uploadResult.bytesSent).toBeGreaterThan(0);
                 expect(uploadResult.responseCode).toBe(200);
-                expect(uploadResult.response).toMatch(/fields:\s*{\s*value1.*/);
+                var obj = null;
+                try {
+                    obj = JSON.parse(uploadResult.response);
+                    expect(obj.fields).toBeDefined();
+                    expect(obj.fields.value1).toBe("test");
+                    expect(obj.fields.value2).toBe("param");
+                } catch (e) {
+                    expect(obj).not.toBeNull('returned data from server should be valid json');
+                }
             });
 
             var fileWin = function(fileEntry) {
