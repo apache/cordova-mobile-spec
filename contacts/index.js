@@ -84,7 +84,6 @@ function init() {
 
 
 window.onload = function() {
-  console.log('onload');
   document.getElementById('getContacts').addEventListener("click", getContacts);
   document.getElementById('addContact').addEventListener("click", addContact);
   document.getElementById('backHome').addEventListener("click", backHome);
