@@ -198,7 +198,7 @@ describe('FileTransfer', function() {
             var localFileName = remoteFile.substring(remoteFile.lastIndexOf('/')+1);
             var lastProgressEvent = null;
 
-            if (!/^file/.exec(remoteFile)) {
+            if (!/^file/.exec(remoteFile) && cordova.platformId !== 'blackberry10') {
                 expect(remoteFile).toMatch(/^file:/);
                 return;
             }
@@ -415,6 +415,12 @@ describe('FileTransfer', function() {
             waitsForAny(downloadWin, downloadFail);
         });
         it("filetransfer.spec.17 progress should work with gzip encoding", function() {
+
+           //lengthComputable false on bb10 when downloading gzip 
+           if (cordova.platformId === 'blackberry10') {
+                return;
+           }
+
            var downloadFail = createDoNotCallSpy('downloadFail');
            var remoteFile = "http://www.apache.org/";
            var localFileName = "index.html";
