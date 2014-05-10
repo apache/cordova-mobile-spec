@@ -159,7 +159,7 @@ if (argv.plugman) {
         "name" :  "mobilespec",
         "lib" :   { "android" :      { "uri" : top_dir + "cordova-android" },
                     "ios" :          { "uri" : top_dir + "cordova-ios" },
-                    "blackberry10" : { "uri" : top_dir + "cordova-blackberry" },
+                    "blackberry10" : { "uri" : top_dir + "cordova-blackberry" + path.sep + "blackberry10" },
                     "wp8" :          { "uri" : top_dir + "cordova-wp8" },
                     "windows8" :     { "uri" : top_dir + "cordova-windows" }
         }
