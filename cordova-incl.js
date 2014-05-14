@@ -41,7 +41,7 @@ var PLAT;
 
 var scripts = document.getElementsByTagName('script');
 var currentPath = scripts[scripts.length - 1].src;
-if (PLAT !== "blackberry10" && PLAT !== "firefoxos") {
+if (PLAT !== "blackberry10" && PLAT !== "firefoxos" && PLAT !== 'windowsphone') {
     currentPath += '?paramShouldBeIgnored';
 }
 var cordovaPath = currentPath.replace("cordova-incl.js", "cordova.js");

@@ -31,7 +31,13 @@
     <access origin="http://www.google.com" />
     <access origin="http://techslides.com" />
     <access origin="httpssss://example.com" />
-
+    <platform name="blackberry10">
+        <access origin="file:///" />
+        <access origin="https://www.apache.org" />
+        <access origin="http://cordova.apache.org" />
+        <access origin="http://foobar.apache.org" />
+        <access origin="http://www.apache.org" />
+    </platform>
     <preference name="iosPersistentFileLocation" value="Library" />
     <preference name="AndroidPersistentFileLocation" value="Internal" />
 </widget>
