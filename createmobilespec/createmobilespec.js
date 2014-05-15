@@ -65,7 +65,7 @@ var top_dir =             process.cwd() + path.sep,
                           "ios": "www",
                           "windows8": "www",
                           "wp8": "www"},
-    argv = optimist.usage("\nUsage: $0 [--android] [--blackberry10] [--ios] [--windows8] [--wp8] [-h|--help] [--plugman] [--global]\n" +
+    argv = optimist.usage("\nUsage: $0 [--android] [--blackberry10] [--ios] [--windows8] [--wp8] [-h|--help] [--plugman] [--global] [--skipjs]\n" +
                           "At least one platform must be specified.\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.")
                    .describe("help", "Shows usage.")
@@ -76,8 +76,10 @@ var top_dir =             process.cwd() + path.sep,
                    .describe("wp8", "Add Windows Phone 8 to the mobile-spec projec.t")
                    .describe("plugman", "Use /bin/create and plugman directly instead of the CLI.")
                    .describe("global", "Use the globally-installed cordova and the downloaded platforms/plugins from the registry instead of the local git repo. Will use the local git repo of mobile-spec. Generally used only to test RC or production releases. Cannot be used with --plugman.")
+                   .describe("skipjs", "Do not update the platform's cordova.js from the js git repo, use the one already present in the platform. Rarely used, generally to test RC releases. Cannot be used with --global because it is implied when --global is used.")
                    .boolean("plugman")
                    .boolean("global")
+                   .boolean("skipjs")
                    .alias("h", "help")
                    .argv;
 
@@ -101,6 +103,11 @@ if (argv.wp8) { platforms.push("wp8"); }
 if (argv.windows8) { platforms.push("windows8"); }
 if (argv.plugman && argv.global) {
     console.log("The --global option can not be used with the --plugman option.");
+    optimist.showHelp();
+    return;
+}
+if (argv.skipjs && argv.global) {
+    console.log("The --skipjs option can not be used with the --global option.");
     optimist.showHelp();
     return;
 }
@@ -231,7 +238,9 @@ if (argv.plugman) {
 
 ////////////////////// update js files for each platform from cordova-js
 
-if (!argv.global) {
+if (argv.skipjs) {
+    console.log("Skipping the js update.");
+} else if (!argv.global) {
     console.log("Updating js for platforms...");
 
     shelljs.pushd(cordova_js_git_dir);
