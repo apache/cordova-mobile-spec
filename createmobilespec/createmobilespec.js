@@ -66,8 +66,8 @@ var top_dir =             process.cwd() + path.sep,
                           "windows8": "www",
                           "wp8": "www"},
     argv = optimist.usage("\nUsage: $0 [--android] [--blackberry10] [--ios] [--windows8] [--wp8] [-h|--help] [--plugman] [--global] [--skipjs]\n" +
-                          "At least one platform must be specified.\n" +
-                          "A project will be created with the mobile-spec app and all the core plugins.")
+                          "A project will be created with the mobile-spec app and all the core plugins.\n" +
+                          "At least one platform must be specified. See the included README.md.")
                    .describe("help", "Shows usage.")
                    .describe("android", "Add Android platform when creating the mobile-spec project.")
                    .describe("blackberry10", "Add Blackberry 10 platform when creating the mobile-spec project.")
