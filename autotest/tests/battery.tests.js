@@ -124,20 +124,31 @@ describe('Battery (navigator.battery)', function () {
     });
 
     it("battery.spec.5 should NOT fire events when charging or level is increasing", function () {
-        // batterycritical should not fire when level increases to 5 ( CB-4519 )
-        var onEvent;
-        runs(function () {
+       var onEvent;
+       // setup: batterycritical should fire when level decreases (100->4) ( CB-4519 )
+       runs(function () {
+            onEvent = jasmine.createSpy("onbatterycritical");
+            navigator.battery._status({ level: 100, isPlugged: false });
+            window.addEventListener("batterycritical", onEvent, false);
+            navigator.battery._status({ level: 4, isPlugged: false });
+            });
+       waits(100);
+       runs(function () {
+            expect(onEvent).toHaveBeenCalled();
+            });
+       
+       // batterycritical should not fire when level increases (4->5)( CB-4519 )
+       runs(function () {
             onEvent = jasmine.createSpy("onbatterycritical");
             navigator.battery._status({ level: 4, isPlugged: false });
             window.addEventListener("batterycritical", onEvent, false);
             navigator.battery._status({ level: 5, isPlugged: false });
-        });
-        waits(100);
-        runs(function () {
+            });
+       waits(100);
+       runs(function () {
             expect(onEvent).not.toHaveBeenCalled();
-        });
-
-        // batterylow should not fire when level increases to 5 ( CB-4519 )
+            });
+        // batterylow should not fire when level increases (5->20) ( CB-4519 )
         runs(function () {
             onEvent = jasmine.createSpy("onbatterylow");
             window.addEventListener("batterylow", onEvent, false);
