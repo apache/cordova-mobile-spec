@@ -217,10 +217,11 @@ if (argv.plugman) {
 if (argv.plugman) {
     console.log("Adding plugins using plugman...");
     platforms.forEach(function (platform) {
-        var projName = getProjName(platform);
+        var projName = getProjName(platform),
+            nodeCommand = /^win/.test(process.platform) ? process.argv[0] +" " : "";
         shelljs.pushd(projName);
         // plugin path must be relative and not absolute (sigh)
-        shelljs.exec(path.join(top_dir, "cordova-plugman", "main.js") + 
+        shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") + 
                      " install --platform " + platform +
                      " --project . --plugin " + path.join("..", "cordova-mobile-spec", "dependencies-plugin") +
                      " --searchpath " + top_dir);
