@@ -835,7 +835,10 @@ describe('Globalization (navigator.globalization)', function () {
             expect(typeof navigator.globalization.getCurrencyPattern == 'function').toBe(true);
         });
         it("globalization.spec.41 getCurrencyPattern using EUR for currency, success callback should be called with a Properties object", function() {
-            var win = jasmine.createSpy().andCallFake(function(a) {
+            if (cordova.platformId === "windowsphone") {
+                return;
+            }
+            var win = jasmine.createSpy().andCallFake(function (a) {
                     expect(a).toBeDefined();
                     expect(typeof a).toBe('object');
                     expect(a.pattern).toBeDefined();
