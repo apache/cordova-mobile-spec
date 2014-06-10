@@ -161,3 +161,5 @@ function init() {
     document.addEventListener("deviceready", deviceInfo, true);
     document.getElementById("user-agent").textContent = navigator.userAgent;
 }
+
+window.onload = init;
