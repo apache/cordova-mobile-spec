@@ -728,7 +728,11 @@ describe('Globalization (navigator.globalization)', function () {
                     expect(typeof a).toBe('object');
                     expect(a.pattern).toBeDefined();
                     expect(typeof a.pattern).toBe('string');
-                    expect(a.pattern.length > 0).toBe(true);
+                    if (cordova.platformId === "windowsphone") {
+                        expect(a.pattern.length == 0).toBe(true);
+                    } else {
+                        expect(a.pattern.length > 0).toBe(true);
+                    }
                     expect(typeof a.symbol).toBe('string');
                     expect(typeof a.fraction).toBe('number');
                     expect(typeof a.rounding).toBe('number');
