@@ -26,6 +26,7 @@ function bindEvents() {
     document.getElementById('downloadVideoCDV').addEventListener('click', downloadVideoCDV, false);
     document.getElementById('downloadVideoNative').addEventListener('click', downloadVideoNative, false);
     document.getElementById('testPrivateURL').addEventListener('click', testPrivateURL, false);
+    document.getElementById('testNotModified').addEventListener('click', testNotModified, false);
     var fsButtons = document.querySelectorAll('.resolveFs');
     for (var i=0; i < fsButtons.length; ++i) {
         fsButtons[i].addEventListener('click', resolveFs, false);
@@ -79,6 +80,25 @@ function downloadVideoNative(ev) {
     var videoElement = document.createElement('video');
     videoElement.controls = "controls";
     downloadImg(videoURL, function(entry) { return entry.toNativeURL(); }, videoElement);
+}
+
+function testNotModified(ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    var ft = new FileTransfer();
+    var lastModified = new Date();
+    var headers = { "If-Modified-Since": lastModified.toUTCString()};
+    logMessage("Starting cached download with headers: " + JSON.stringify(headers));
+    ft.download(imageURL, "", function() {
+        logError("ft.download");
+    }, function (error) {
+      if (error.code === 5) {
+        logMessage("Success, the file was not modified.", "green");
+      } else {
+        logError("ft.download");
+      }
+
+    }, false, {headers: headers});
 }
 
 function downloadImg(source, urlFn, element) {
