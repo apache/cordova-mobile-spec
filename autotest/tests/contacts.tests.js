@@ -56,7 +56,7 @@ describe("Contacts (navigator.contacts)", function () {
             runs(function () {
                 obj.filter="";
                 obj.multiple=true;
-                navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], win, fail, obj);
+                navigator.contacts.find(win, fail, ["displayName", "name", "phoneNumbers", "emails"], obj);
             });
 
             waitsFor(function () { return win.wasCalled; }, "win never called", Tests.TEST_TIMEOUT);
@@ -74,7 +74,7 @@ describe("Contacts (navigator.contacts)", function () {
                 fail = jasmine.createSpy();
 
             runs(function () {
-                navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], win, fail, {
+                navigator.contacts.find(win, fail, ["displayName", "name", "phoneNumbers", "emails"], {
                     multiple: true
                 });
             });
@@ -93,7 +93,7 @@ describe("Contacts (navigator.contacts)", function () {
             obj.multiple=true;
 
             expect(function () {
-                navigator.contacts.find(["displayName", "name", "emails", "phoneNumbers"], null, fail, obj);
+                navigator.contacts.find(null, fail, ["displayName", "name", "emails", "phoneNumbers"], obj);
             }).toThrow();
         });
 
@@ -108,7 +108,7 @@ describe("Contacts (navigator.contacts)", function () {
             runs(function () {
                 obj.filter="";
                 obj.multiple=true;
-                navigator.contacts.find([], win, fail, obj);
+                navigator.contacts.find(win, fail, [], obj);
             });
 
             waitsFor(function () { return fail.wasCalled; }, Tests.TEST_TIMEOUT);
@@ -163,7 +163,7 @@ describe("Contacts (navigator.contacts)", function () {
                         obj.multiple=true;
 
                         runs(function () {
-                            navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], findWin, findFail, obj);
+                            navigator.contacts.find(findWin, findFail, ["displayName", "name", "phoneNumbers", "emails"], obj);
                         });
 
                         waitsFor(function () { return foundName.wasCalled; }, "foundName not done", Tests.TEST_TIMEOUT);
@@ -476,7 +476,7 @@ describe("Contacts (navigator.contacts)", function () {
                             var obj = new ContactFindOptions();
                             obj.filter="DeleteMe";
                             obj.multiple=true;
-                            navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], findWinAgain, findFailAgain, obj);
+                            navigator.contacts.find(findWinAgain, findFailAgain, ["displayName", "name", "phoneNumbers", "emails"], obj);
                         }, function(e) {
                             throw("Newly created contact's remove function invoked error callback. Test failed.");
                         });
@@ -487,7 +487,7 @@ describe("Contacts (navigator.contacts)", function () {
                     var obj = new ContactFindOptions();
                     obj.filter="DeleteMe";
                     obj.multiple=true;
-                    navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], findWin, findFail, obj);
+                    navigator.contacts.find(findWin, findFail, ["displayName", "name", "phoneNumbers", "emails"], obj);
                 }, function(e) {
                     throw("Contact creation failed, error callback was invoked.");
                 });
@@ -522,7 +522,7 @@ describe("Contacts (navigator.contacts)", function () {
                         contactObj = cs[0];
                         contactObj.remove(function(){
                             console.log("[CONTACTS CLEANUP] DeleteMe contact successfully removed");
-                            navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], findSuccess, findFail, obj);
+                            navigator.contacts.find(findSuccess, findFail, ["displayName", "name", "phoneNumbers", "emails"], obj);
                         },function(){
                             console.log("[CONTACTS CLEANUP ERROR]: failed to remove DeleteMe contact");
                         });
@@ -533,7 +533,7 @@ describe("Contacts (navigator.contacts)", function () {
                 var findFail = function(e) {
                     throw("Failure callback invoked in navigator.contacts.find call, test failed.");
                 };
-                navigator.contacts.find(["displayName", "name", "phoneNumbers", "emails"], findSuccess, findFail, obj);
+                navigator.contacts.find(findSuccess, findFail, ["displayName", "name", "phoneNumbers", "emails"], obj);
             });
             waitsFor(function () { return done; }, Tests.TEST_TIMEOUT);
         });
