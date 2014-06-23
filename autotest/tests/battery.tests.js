@@ -21,15 +21,14 @@
 
 describe('Battery (navigator.battery)', function () {
 
-
+    // used to keep the count of event listeners > 0, in order to avoid battery level being updated with the real value when adding the first listener during test cases
+    var dummyOnEvent = jasmine.createSpy();
     beforeEach(function () {
-
+        window.addEventListener("batterycritical", dummyOnEvent, false);
     });
 
     afterEach(function () {
-        
-
-
+        window.removeEventListener("batterystatus", dummyOnEvent, false);
     });
 
 
