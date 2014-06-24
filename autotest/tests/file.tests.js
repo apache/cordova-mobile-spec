@@ -234,7 +234,7 @@ describe('File API', function() {
         });
 
         describe('window.resolveLocalFileSystemURI', function() {
-            it("file.spec.3 should be defined", function() {
+            it("file.spec.8 should be defined", function() {
                 expect(window.resolveLocalFileSystemURI).toBeDefined();
             });
             it("file.spec.9 should resolve a valid file name", function() {
