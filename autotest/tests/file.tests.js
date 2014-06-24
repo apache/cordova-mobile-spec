@@ -2978,7 +2978,7 @@ describe('File API', function() {
 
     describe('read method', function(){
         it("file.spec.82 should error out on non-existent file", function() {
-            var fileName = "somefile.txt";
+            var fileName = cordova.platformId === 'windowsphone' ? root.toURL() + "/" + "somefile.txt" : "somefile.txt";
             var getFileFail = createFail('create');
             var fileFail = createFail('file');
             var deleteFail = createFail('delete');
