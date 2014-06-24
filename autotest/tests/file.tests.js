@@ -1515,6 +1515,7 @@ describe('File API', function() {
                 dirName2 = "num 2",
                 rootPath = root.fullPath,
                 fail = createFail('Entry');
+                expectedPath = cordova.platformId === 'windowsphone' ? '//num 1/num 2' : '/num%201/num%202/';
 
             createDirectory(dirName1, createNext, fail);
             function createNext(e1) {
@@ -1523,7 +1524,7 @@ describe('File API', function() {
             var check = jasmine.createSpy().andCallFake(function(entry) {
                 var uri = entry.toURL();
                 expect(uri).toBeDefined();
-                expect(uri).toContain('/num%201/num%202/');
+                expect(uri).toContain(expectedPath);
                 expect(uri.indexOf(rootPath)).not.toBe(-1);
                 // cleanup
                 deleteEntry(dirName1);
