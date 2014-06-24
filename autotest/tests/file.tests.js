@@ -312,7 +312,7 @@ describe('File API', function() {
                 waitsFor(function() { return resolveCallback.wasCalled; }, "createFile callback never called", Tests.TEST_TIMEOUT);
             });
             it("file.spec.11 should error (NOT_FOUND_ERR) when resolving (non-existent) invalid file name", function() {
-                var fileName = joinURL(root.toURL(), "this.is.not.a.valid.file.txt");
+                var fileName = cordova.platformId === 'windowsphone' ? root.toURL() + "/" + "this.is.not.a.valid.file.txt": joinURL(root.toURL(),  "this.is.not.a.valid.file.txt");
                 fail = jasmine.createSpy().andCallFake(function(error) {
                     expect(error).toBeDefined();
                     expect(error).toBeFileError(FileError.NOT_FOUND_ERR);
