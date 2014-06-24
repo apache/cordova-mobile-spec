@@ -4028,6 +4028,7 @@ describe('File API', function() {
         /* These specs verify that FileEntries have a toNativeURL method
          * which appears to be sane.
          */
+        var pathExpect = cordova.platformId === 'windowsphone' ? "//nativ" : "file://";
         it("file.spec.114 fileEntry should have a toNativeURL method", function() {
             var fileName = "native.file.uri",
                 win = jasmine.createSpy().andCallFake(function(fileEntry) {
@@ -4043,7 +4044,7 @@ describe('File API', function() {
                     expect(typeof entry.toNativeURL).toBe('function');
                     var nativeURL = entry.toNativeURL();
                     expect(typeof nativeURL).toBe("string");
-                    expect(nativeURL.substring(0,7)).toEqual("file://");
+                    expect(nativeURL.substring(0,7)).toEqual(pathExpect);
                     expect(nativeURL.substring(nativeURL.length - fileName.length)).toEqual(fileName);
                 });
 
@@ -4066,7 +4067,7 @@ describe('File API', function() {
                     expect(typeof entries[0].toNativeURL).toBe('function');
                     var nativeURL = entries[0].toNativeURL();
                     expect(typeof nativeURL).toBe("string");
-                    expect(nativeURL.substring(0,7)).toEqual("file://");
+                    expect(nativeURL.substring(0,7)).toEqual(pathExpect);
                     expect(nativeURL.substring(nativeURL.length - fileName.length)).toEqual(fileName);
 
                     // cleanup
