@@ -190,24 +190,19 @@ if (argv.plugman) {
     // Config.json file ---> linked to local libraries
     shelljs.pushd(cli_project_dir);
     var localPlatforms = {
-        "id" :    "org.apache.cordova",
-        "name" :  "mobilespec",
-        "lib" :   { "android" :      { "uri" : top_dir + "cordova-android" },
-                    "ios" :          { "uri" : top_dir + "cordova-ios" },
-                    "blackberry10" : { "uri" : top_dir + "cordova-blackberry" },
-                    "wp8" :          { "uri" : top_dir + "cordova-wp8" },
-                    "windows8" :     { "uri" : top_dir + "cordova-windows" }
-        }
+        "android" : top_dir + "cordova-android" ,
+        "ios" : top_dir + "cordova-ios" ,
+        "blackberry10" : top_dir + "cordova-blackberry" ,
+        "wp8" : top_dir + "cordova-wp8" ,
+        "windows8" : top_dir + "cordova-windows"
     };
-    if (!argv.global) {
-        JSON.stringify(localPlatforms).to(".cordova/config.json");
-    }
 
     // Executing platform Add
     console.log("Adding platforms...");
     platforms.forEach(function (platform) {
         console.log("Adding Platform: " + platform);
-        shelljs.exec(cli + " platform add " + platform + " --verbose");
+        var platformArg = argv.global ? platform : localPlatforms[platform];
+        shelljs.exec(cli + ' platform add "' + platformArg + '" --verbose');
     });
     shelljs.popd();
 }
