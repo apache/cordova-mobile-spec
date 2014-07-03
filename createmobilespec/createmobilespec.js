@@ -41,7 +41,6 @@ var top_dir =             process.cwd() + path.sep,
     cli_local_bin =       path.join(top_dir, "cordova-cli", "bin", "cordova"),
     mobile_spec_git_dir = path.join(top_dir, "cordova-mobile-spec"),
     cordova_js_git_dir =  path.join(top_dir, "cordova-js"),
-    cli_project_dir =     path.join(top_dir, "mobilespec"),
     platforms =           [],
     // where to find the /bin/create command and www dir in a non-CLI project
     platform_layout =     { "android":      { "bin": "cordova-android", 
@@ -65,21 +64,18 @@ var top_dir =             process.cwd() + path.sep,
                           "ios": "www",
                           "windows8": "www",
                           "wp8": "www"},
-    argv = optimist.usage("\nUsage: $0 [--android] [--blackberry10] [--ios] [--windows8] [--wp8] [-h|--help] [--plugman] [--global] [--skipjs]\n" +
+    argv = optimist.usage("\nUsage: $0 [--android] [--blackberry10] [--ios] [--windows8] [--wp8] [-h|--help] [--plugman] [--global] [--skipjs] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.")
-                   .describe("help", "Shows usage.")
-                   .describe("android", "Add Android platform when creating the mobile-spec project.")
-                   .describe("blackberry10", "Add Blackberry 10 platform when creating the mobile-spec project.")
-                   .describe("ios", "Add iOS platform when creating the mobile-spec project.")
-                   .describe("windows8", "Add Windows 8 (desktop) platform when creating the mobile-spec project.")
-                   .describe("wp8", "Add Windows Phone 8 when creating the mobile-spec project.")
-                   .describe("plugman", "Use /bin/create and plugman directly instead of the CLI.")
-                   .describe("global", "Use the globally-installed cordova and the downloaded platforms/plugins from the registry instead of the local git repo. Will use the local git repo of mobile-spec. Generally used only to test RC or production releases. Cannot be used with --plugman.")
-                   .describe("skipjs", "Do not update the platform's cordova.js from the js git repo, use the one already present in the platform. Rarely used, generally to test RC releases. Cannot be used with --global because it is implied when --global is used.")
-                   .boolean("plugman")
-                   .boolean("global")
-                   .boolean("skipjs")
+                   .boolean("help").describe("help", "Shows usage.")
+                   .boolean("android").describe("android", "Add Android platform when creating the mobile-spec project.")
+                   .boolean("blackberry10").describe("blackberry10", "Add Blackberry 10 platform when creating the mobile-spec project.")
+                   .boolean("ios").describe("ios", "Add iOS platform when creating the mobile-spec project.")
+                   .boolean("windows8").describe("windows8", "Add Windows 8 (desktop) platform when creating the mobile-spec project.")
+                   .boolean("wp8").describe("wp8", "Add Windows Phone 8 when creating the mobile-spec project.")
+                   .boolean("plugman").describe("plugman", "Use /bin/create and plugman directly instead of the CLI.")
+                   .boolean("global").describe("global", "Use the globally-installed cordova and the downloaded platforms/plugins from the registry instead of the local git repo. Will use the local git repo of mobile-spec. Generally used only to test RC or production releases. Cannot be used with --plugman.")
+                   .boolean("skipjs").describe("skipjs", "Do not update the platform's cordova.js from the js git repo, use the one already present in the platform. Rarely used, generally to test RC releases. Cannot be used with --global because it is implied when --global is used.")
                    .alias("h", "help")
                    .argv;
 
@@ -121,6 +117,9 @@ if (platforms.length === 0){
 
 // select between the globally-installed one on your path or your local git repo
 var cli = argv.global ? "cordova" : cli_local_bin;
+
+var projectDirName = argv._[0] || "mobilespec";
+var cli_project_dir = path.join(top_dir, projectDirName);
 
 // Print relevant information
 if (argv.global) {
@@ -185,7 +184,7 @@ if (argv.plugman) {
     // Create the project using "cordova create"
     myDelete(cli_project_dir);
     console.log("Creating project mobilespec...");
-    shelljs.exec(cli + " create mobilespec org.apache.cordova.mobilespec MobileSpec_Tests --link-to cordova-mobile-spec");
+    shelljs.exec(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --link-to cordova-mobile-spec");
 
     // Config.json file ---> linked to local libraries
     shelljs.pushd(cli_project_dir);
