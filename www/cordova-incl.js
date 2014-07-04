@@ -27,8 +27,11 @@ var PLAT;
         ios: /(iPad)|(iPhone)|(iPod)/,
         blackberry10: /(BB10)/,
         blackberry: /(PlayBook)|(BlackBerry)/,
-        windows8: /MSAppHost/,
+        // Since Windows Phone 8.1 uses completely different API more similar to Windows 8
+        // than to Windows phone 8 we need to detect it separately.
+        windowsphone81: /Windows Phone 8.1/,
         windowsphone: /Windows Phone/,
+        windows8: /MSAppHost/,
         firefoxos: /Firefox/
     };
     for (var key in platforms) {
@@ -41,13 +44,13 @@ var PLAT;
 
 var scripts = document.getElementsByTagName('script');
 var currentPath = scripts[scripts.length - 1].src;
-if (PLAT !== "blackberry10" && PLAT !== "firefoxos" && PLAT !== 'windowsphone') {
+if (PLAT !== "blackberry10" && PLAT !== "firefoxos" && PLAT !== 'windowsphone' && PLAT !== 'windowsphone81') {
     currentPath += '?paramShouldBeIgnored';
 }
 var cordovaPath = currentPath.replace("cordova-incl.js", "cordova.js");
 
 if (!window._doNotWriteCordovaScript) {
-    if (PLAT != "windows8") {
+    if (PLAT != "windows8" && PLAT != "windowsphone81") {
         document.write('<script type="text/javascript" charset="utf-8" src="' + cordovaPath + '"></script>');
     } else {
         var s = document.createElement('script');
@@ -73,10 +76,10 @@ function addListenerToClass(className, listener, argsArray, action, doNotWrap) {
       callListener = listener;
     }
     for (var i = 0; i < elements.length; ++i) {
-      var item = elements[i];  
+      var item = elements[i];
       item.addEventListener(action, callListener, false);
     }
-};
+}
 
 function backHome() {
     if (window.device && device.platform && (device.platform.toLowerCase() == 'android' || device.platform.toLowerCase() == 'amazon-fireos')) {
