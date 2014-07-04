@@ -3763,7 +3763,7 @@ describe('File API', function() {
             // Skip test if Blobs are not supported (e.g.: Android 2.3).
             if ( (typeof window.Blob != 'function' &&
                   typeof window.WebKitBlobBuilder == 'undefined') ||
-                typeof window.ArrayBuffer == 'undefined') {
+                  cordova.platformId === 'windowsphone') {
                 return;
             }
             var dummyFileName = "blobwriter.bin",
