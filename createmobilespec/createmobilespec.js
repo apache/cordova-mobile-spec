@@ -43,12 +43,14 @@ var top_dir =             process.cwd() + path.sep,
     cordova_js_git_dir =  path.join(top_dir, "cordova-js"),
     platforms =           [],
     // where to find the /bin/create command and www dir in a non-CLI project
-    platform_layout =     { "android":      { "bin": "cordova-android", 
-                                              "www": "assets" + path.sep + "www" },
+    platform_layout =     { "android":      { "bin": "cordova-android",
+                                              "www": "assets" + path.sep + "www",
+                                              "config": "res" + path.sep + "xml" },
                             "blackberry10": { "bin": "cordova-blackberry" + path.sep + "blackberry10",
                                               "www": "www" },
                             "ios":          { "bin": "cordova-ios",
-                                              "www": "www" },
+                                              "www": "www",
+                                              "config": "CUSTOM" },
                             "windows8":     { "bin": "cordova-windows" + path.sep + "windows8",
                                               "www": "www" },
                             "wp8":          { "bin": "cordova-wp8" + path.sep + "wp8",
@@ -178,13 +180,20 @@ if (argv.plugman) {
         console.log("Creating project " + projName + "...");
         shelljs.exec(platform_layout[platform].bin + path.sep + "bin" + path.sep + "create " + projName + " org.apache.cordova.mobilespecplugman " + projName);
         shelljs.rm("-r", path.join(top_dir, projName, platform_layout[platform].www));
-        shelljs.cp("-r", path.join(mobile_spec_git_dir, "*"), path.join(top_dir, projName, platform_layout[platform].www));
+        shelljs.cp("-r", path.join(mobile_spec_git_dir, "www"), path.join(top_dir, projName, platform_layout[platform].www));
+        var configPath = platform == 'ios' ? getProjName(platform) : platform[platform].config;
+        if (configPath) {
+          shelljs.cp("-f", path.join(mobile_spec_git_dir, "config.xml"), path.join(top_dir, projName, configPath));
+        } else {
+          console.warn('createmobilespec doesn\'t know where config.xml goes for platform ' + platform);
+        }
     });
 } else {
     // Create the project using "cordova create"
     myDelete(cli_project_dir);
     console.log("Creating project mobilespec...");
-    shelljs.exec(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --link-to cordova-mobile-spec");
+    shelljs.exec(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --link-to cordova-mobile-spec/www");
+    shelljs.cp("-f", path.join(mobile_spec_git_dir, 'config.xml'), path.join(projectDirName, 'config.xml'));
 
     // Config.json file ---> linked to local libraries
     shelljs.pushd(cli_project_dir);
