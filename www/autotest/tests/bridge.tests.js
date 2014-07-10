@@ -28,7 +28,7 @@ describe('Bridge', function() {
             ifr.onload = function() {
                 var stolenSecret = ifr.contentWindow.prompt('', 'gap_init:');
                 done = true;
-                expect(stolenSecret).toBe(null);
+                expect(!!stolenSecret).toBe(false);
             };
             document.body.appendChild(ifr);
             waitsFor(function() { return done; });
