@@ -21,6 +21,12 @@ function interceptOnline() {
 function interceptOffline() {
   eventOutput("Offline event intercepted");
 }
+function interceptVolumeDownButton() {
+  eventOutput("Volumedown button event intercepted");
+}
+function interceptVolumeUpButton() {
+  eventOutput("Volumeup button event intercepted");
+}
 
 var eventOutput = function(s) {
     var el = document.getElementById("results");
@@ -87,6 +93,18 @@ window.onload = function() {
   });
   addListenerToClass('stopInterceptOfOffline', function() {
     document.removeEventListener('offline', interceptOffline, false);
+  });
+  addListenerToClass('interceptVolumeDownButton', function() {
+    document.addEventListener('volumedownbutton', interceptVolumeDownButton, false);
+  });
+  addListenerToClass('stopInterceptOfVolumeDownButton', function() {
+    document.removeEventListener('volumedownbutton', interceptVolumeDownButton, false);
+  });
+  addListenerToClass('interceptVolumeUpButton', function() {
+    document.addEventListener('volumeupbutton', interceptVolumeUpButton, false);
+  });
+  addListenerToClass('stopInterceptOfVolumeUpButton', function() {
+    document.removeEventListener('volumeupbutton', interceptVolumeUpButton, false);
   });
 
   addListenerToClass('backBtn', backHome);
