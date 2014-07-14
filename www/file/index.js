@@ -89,13 +89,11 @@ function testNotModified(ev) {
     var lastModified = new Date();
     var headers = { "If-Modified-Since": lastModified.toUTCString()};
     logMessage("Starting cached download with headers: " + JSON.stringify(headers));
-    ft.download(imageURL, "", function() {
-        logError("ft.download");
-    }, function (error) {
+    ft.download(imageURL, "", logError("ft.download"),function (error) {
       if (error.code === 5) {
         logMessage("Success, the file was not modified.", "green");
       } else {
-        logError("ft.download");
+        logError("ft.download")("The error code was " + error.code + ": " + error.exception);
       }
 
     }, false, {headers: headers});
