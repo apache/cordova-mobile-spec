@@ -21,7 +21,12 @@ function doColor1() {
 }
 
 function doColor2() {
-    log('set color=default');
+    log('set style=translucent black');
+    StatusBar.styleBlackTranslucent();
+}
+
+function doColor3() {
+    log('set style=default');
     StatusBar.styleDefault();
 }
 
@@ -47,6 +52,7 @@ window.onload = function() {
   addListenerToClass('action-hide', doHide);
   addListenerToClass('action-color1', doColor1);
   addListenerToClass('action-color2', doColor2);
+  addListenerToClass('action-color3', doColor3);
   addListenerToClass('action-overlays', doOverlay);
   addListenerToClass('backBtn', backHome);
   init();
