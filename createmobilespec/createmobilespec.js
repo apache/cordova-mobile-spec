@@ -240,6 +240,22 @@ if (argv.plugman) {
     shelljs.popd();
 }
 
+////////////////////// install new-style test plugins
+
+if (argv.plugman) {
+  // TODO
+} else {
+    shelljs.pushd(cli_project_dir);
+    console.log("Adding plugin tests using CLI...");
+    shelljs.ls('plugins').forEach(function(plugin) {
+      var potential_tests_plugin_xml = path.join('plugins', plugin, 'tests', 'plugin.xml')
+      if (fs.existsSync(potential_tests_plugin_xml)) {
+        shelljs.exec(cli + " plugin add " + path.dirname(potential_tests_plugin_xml));
+      }
+    });
+    shelljs.popd();
+}
+
 ////////////////////// update js files for each platform from cordova-js
 
 if (argv.skipjs) {
