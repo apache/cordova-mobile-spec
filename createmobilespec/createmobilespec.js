@@ -201,7 +201,7 @@ if (argv.plugman) {
         "android" : top_dir + "cordova-android" ,
         "ios" : top_dir + "cordova-ios" ,
         "blackberry10" : top_dir + "cordova-blackberry" ,
-        "wp8" : top_dir + "cordova-wp8" ,
+        "wp8" : top_dir + "cordova-wp8" + path.sep + "wp8",
         "windows8" : top_dir + "cordova-windows"
     };
 
