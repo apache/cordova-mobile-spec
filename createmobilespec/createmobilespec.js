@@ -19,6 +19,7 @@
     under the License.
 */
 
+/*jslint node: true */
 'use strict';
      
 var fs            = require("fs"),
@@ -53,18 +54,22 @@ var top_dir =             process.cwd() + path.sep,
                                               "config": "CUSTOM" },
                             "windows8":     { "bin": "cordova-windows" + path.sep + "windows8",
                                               "www": "www" },
+                            "windows":      { "bin": "cordova-windows" + path.sep + "windows",
+                                              "www": "www" },
                             "wp8":          { "bin": "cordova-wp8" + path.sep + "wp8",
                                               "www": "www" } },
     platform_dirs =       {"android": "cordova-android",
                            "blackberry10": "cordova-blackberry",
                            "ios": "cordova-ios",
                            "windows8": "cordova-windows" + path.sep + "windows8",
+                           "windows": "cordova-windows" + path.sep + "windows",
                            "wp8": "cordova-wp8" + path.sep + "wp8"},
     // where to put the cordova.js file in a non-CLI project
     platform_www_dirs =   {"android": "assets" + path.sep + "www",
                           "blackberry10": "www",
                           "ios": "www",
                           "windows8": "www",
+                          "windows": "www",
                           "wp8": "www"},
     argv = optimist.usage("\nUsage: $0 [--android] [--blackberry10] [--ios] [--windows8] [--wp8] [-h|--help] [--plugman] [--global] [--skipjs] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
@@ -74,6 +79,7 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("blackberry10").describe("blackberry10", "Add Blackberry 10 platform when creating the mobile-spec project.")
                    .boolean("ios").describe("ios", "Add iOS platform when creating the mobile-spec project.")
                    .boolean("windows8").describe("windows8", "Add Windows 8 (desktop) platform when creating the mobile-spec project.")
+                   .boolean("windows").describe("windows", "Add Windows (universal) platform when creating the mobile-spec project.")
                    .boolean("wp8").describe("wp8", "Add Windows Phone 8 when creating the mobile-spec project.")
                    .boolean("plugman").describe("plugman", "Use /bin/create and plugman directly instead of the CLI.")
                    .boolean("global").describe("global", "Use the globally-installed cordova and the downloaded platforms/plugins from the registry instead of the local git repo. Will use the local git repo of mobile-spec. Generally used only to test RC or production releases. Cannot be used with --plugman.")
@@ -99,6 +105,7 @@ if (argv.ios) { platforms.push("ios"); }
 if (argv.blackberry10) { platforms.push("blackberry10"); }
 if (argv.wp8) { platforms.push("wp8"); }
 if (argv.windows8) { platforms.push("windows8"); }
+if (argv.windows) { platforms.push("windows"); }
 if (argv.plugman && argv.global) {
     console.log("The --global option can not be used with the --plugman option.");
     optimist.showHelp();
@@ -202,7 +209,8 @@ if (argv.plugman) {
         "ios" : top_dir + "cordova-ios" ,
         "blackberry10" : top_dir + "cordova-blackberry" ,
         "wp8" : top_dir + "cordova-wp8" + path.sep + "wp8",
-        "windows8" : top_dir + "cordova-windows"
+        "windows8" : top_dir + "cordova-windows",
+        "windows" : path.join(top_dir, "cordova-windows", "windows")
     };
 
     // Executing platform Add
@@ -224,7 +232,7 @@ if (argv.plugman) {
             nodeCommand = /^win/.test(process.platform) ? process.argv[0] +" " : "";
         shelljs.pushd(projName);
         // plugin path must be relative and not absolute (sigh)
-        shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") + 
+        shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
                      " install --platform " + platform +
                      " --project . --plugin " + path.join("..", "cordova-mobile-spec", "dependencies-plugin") +
                      " --searchpath " + top_dir);
@@ -235,6 +243,7 @@ if (argv.plugman) {
     var searchpath = argv.global ? "" : " --searchpath " + top_dir;
     shelljs.pushd(cli_project_dir);
     console.log("Adding plugins using CLI...");
+    console.log("Searchpath:", searchpath);
     shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") +
                  searchpath);
     shelljs.popd();
@@ -248,7 +257,7 @@ if (argv.plugman) {
     shelljs.pushd(cli_project_dir);
     console.log("Adding plugin tests using CLI...");
     shelljs.ls('plugins').forEach(function(plugin) {
-      var potential_tests_plugin_xml = path.join('plugins', plugin, 'tests', 'plugin.xml')
+      var potential_tests_plugin_xml = path.join('plugins', plugin, 'tests', 'plugin.xml');
       if (fs.existsSync(potential_tests_plugin_xml)) {
         shelljs.exec(cli + " plugin add " + path.dirname(potential_tests_plugin_xml));
       }
