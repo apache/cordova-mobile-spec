@@ -1,38 +1,13 @@
 var deviceReady = false;
 
-function interceptBackbutton() {
-  eventOutput("Back button intercepted");
-}
-function interceptMenubutton() {
-  eventOutput("Menu button intercepted");
-}
-function interceptSearchbutton() {
-  eventOutput("Search button intercepted");
-}
-function interceptResume() {
-  eventOutput("Resume event intercepted");
-}
-function interceptPause() {
-  eventOutput("Pause event intercepted");
-}
-function interceptOnline() {
-  eventOutput("Online event intercepted");
-}
-function interceptOffline() {
-  eventOutput("Offline event intercepted");
-}
-function interceptVolumeDownButton() {
-  eventOutput("Volumedown button event intercepted");
-}
-function interceptVolumeUpButton() {
-  eventOutput("Volumeup button event intercepted");
+function logEvent(e) {
+  eventOutput("Got Event: " + e.type);
 }
 
 var eventOutput = function(s) {
     var el = document.getElementById("results");
     el.innerHTML = el.innerHTML + s + "<br>";
 };
-
 
 /**
  * Function called when page has finished loading.
@@ -53,58 +28,58 @@ function init() {
 
 window.onload = function() {
   addListenerToClass('interceptBackButton', function() {
-    document.addEventListener('backbutton', interceptBackbutton, false);
+    document.addEventListener('backbutton', logEvent, false);
   });
   addListenerToClass('stopInterceptOfBackButton', function() {
-    document.removeEventListener('backbutton', interceptBackbutton, false);
+    document.removeEventListener('backbutton', logEvent, false);
   });
   addListenerToClass('interceptMenuButton', function() {
-    document.addEventListener('menubutton', interceptMenubutton, false);
+    document.addEventListener('menubutton', logEvent, false);
   });
   addListenerToClass('stopInterceptOfMenuButton', function() {
-    document.removeEventListener('menubutton', interceptMenubutton, false);
+    document.removeEventListener('menubutton', logEvent, false);
   });
   addListenerToClass('interceptSearchButton', function() {
-    document.addEventListener('searchbutton', interceptSearchbutton, false);
+    document.addEventListener('searchbutton', logEvent, false);
   });
   addListenerToClass('stopInterceptOfSearchButton', function() {
-    document.removeEventListener('searchbutton', interceptSearchbutton, false);
-  });
-  addListenerToClass('interceptResume', function() {
-    document.addEventListener('resume', interceptResume, false);
-  });
-  addListenerToClass('stopInterceptOfResume', function() {
-    document.removeEventListener('resume', interceptResume, false);
-  });
-  addListenerToClass('interceptPause', function() {
-    document.addEventListener('pause', interceptPause, false);
-  });
-  addListenerToClass('stopInterceptOfPause', function() {
-    document.removeEventListener('pause', interceptPause, false);
-  });
-  addListenerToClass('interceptOnline', function() {
-    document.addEventListener('online', interceptOnline, false);
-  });
-  addListenerToClass('stopInterceptOfOnline', function() {
-    document.removeEventListener('online', interceptOnline, false);
-  });
-  addListenerToClass('interceptOffline', function() {
-    document.addEventListener('offline', interceptOffline, false);
-  });
-  addListenerToClass('stopInterceptOfOffline', function() {
-    document.removeEventListener('offline', interceptOffline, false);
-  });
-  addListenerToClass('interceptVolumeDownButton', function() {
-    document.addEventListener('volumedownbutton', interceptVolumeDownButton, false);
-  });
-  addListenerToClass('stopInterceptOfVolumeDownButton', function() {
-    document.removeEventListener('volumedownbutton', interceptVolumeDownButton, false);
+    document.removeEventListener('searchbutton', logEvent, false);
   });
   addListenerToClass('interceptVolumeUpButton', function() {
-    document.addEventListener('volumeupbutton', interceptVolumeUpButton, false);
+    document.addEventListener('volumeup', logEvent, false);
   });
   addListenerToClass('stopInterceptOfVolumeUpButton', function() {
-    document.removeEventListener('volumeupbutton', interceptVolumeUpButton, false);
+    document.removeEventListener('volumeup', logEvent, false);
+  });
+  addListenerToClass('interceptVolumeDownButton', function() {
+    document.addEventListener('volumedown', logEvent, false);
+  });
+  addListenerToClass('stopInterceptOfVolumeDownButton', function() {
+    document.removeEventListener('volumedown', logEvent, false);
+  });
+  addListenerToClass('interceptResume', function() {
+    document.addEventListener('resume', logEvent, false);
+  });
+  addListenerToClass('stopInterceptOfResume', function() {
+    document.removeEventListener('resume', logEvent, false);
+  });
+  addListenerToClass('interceptPause', function() {
+    document.addEventListener('pause', logEvent, false);
+  });
+  addListenerToClass('stopInterceptOfPause', function() {
+    document.removeEventListener('pause', logEvent, false);
+  });
+  addListenerToClass('interceptOnline', function() {
+    document.addEventListener('online', logEvent, false);
+  });
+  addListenerToClass('stopInterceptOfOnline', function() {
+    document.removeEventListener('online', logEvent, false);
+  });
+  addListenerToClass('interceptOffline', function() {
+    document.addEventListener('offline', logEvent, false);
+  });
+  addListenerToClass('stopInterceptOfOffline', function() {
+    document.removeEventListener('offline', logEvent, false);
   });
 
   addListenerToClass('backBtn', backHome);
