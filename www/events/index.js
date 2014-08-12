@@ -46,16 +46,16 @@ window.onload = function() {
     document.removeEventListener('searchbutton', logEvent, false);
   });
   addListenerToClass('interceptVolumeUpButton', function() {
-    document.addEventListener('volumeup', logEvent, false);
+    document.addEventListener('volumeupbutton', logEvent, false);
   });
   addListenerToClass('stopInterceptOfVolumeUpButton', function() {
-    document.removeEventListener('volumeup', logEvent, false);
+    document.removeEventListener('volumeupbutton', logEvent, false);
   });
   addListenerToClass('interceptVolumeDownButton', function() {
-    document.addEventListener('volumedown', logEvent, false);
+    document.addEventListener('volumedownbutton', logEvent, false);
   });
   addListenerToClass('stopInterceptOfVolumeDownButton', function() {
-    document.removeEventListener('volumedown', logEvent, false);
+    document.removeEventListener('volumedownbutton', logEvent, false);
   });
   addListenerToClass('interceptResume', function() {
     document.addEventListener('resume', logEvent, false);
