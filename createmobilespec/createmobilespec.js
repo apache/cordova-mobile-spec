@@ -44,7 +44,10 @@ var top_dir =             process.cwd() + path.sep,
     cordova_js_git_dir =  path.join(top_dir, "cordova-js"),
     platforms =           [],
     // where to find the /bin/create command and www dir in a non-CLI project
-    platform_layout =     { "android":      { "bin": "cordova-android",
+    platform_layout =     { "amazon-fireos":{ "bin": "cordova-amazon-fireos",
+                                              "www": "assets" + path.sep + "www",
+                                              "config": "res" + path.sep + "xml" },
+                            "android":      { "bin": "cordova-android",
                                               "www": "assets" + path.sep + "www",
                                               "config": "res" + path.sep + "xml" },
                             "blackberry10": { "bin": "cordova-blackberry",
@@ -58,23 +61,26 @@ var top_dir =             process.cwd() + path.sep,
                                               "www": "www" },
                             "wp8":          { "bin": "cordova-wp8" + path.sep + "wp8",
                                               "www": "www" } },
-    platform_dirs =       {"android": "cordova-android",
+    platform_dirs =       {"amazon-fireos": "cordova-amazon-fireos",
+                           "android": "cordova-android",
                            "blackberry10": "cordova-blackberry",
                            "ios": "cordova-ios",
                            "windows8": "cordova-windows" + path.sep + "windows8",
                            "windows": "cordova-windows" + path.sep + "windows",
                            "wp8": "cordova-wp8" + path.sep + "wp8"},
     // where to put the cordova.js file in a non-CLI project
-    platform_www_dirs =   {"android": "assets" + path.sep + "www",
+    platform_www_dirs =   {"amazon-fireos": "assets" + path.sep + "www",
+                           "android": "assets" + path.sep + "www",
                           "blackberry10": "www",
                           "ios": "www",
                           "windows8": "www",
                           "windows": "www",
                           "wp8": "www"},
-    argv = optimist.usage("\nUsage: $0 [--android] [--blackberry10] [--ios] [--windows8] [--wp8] [-h|--help] [--plugman] [--global] [--skipjs] [directoryName]\n" +
+    argv = optimist.usage("\nUsage: $0 [--amazon] [--android] [--blackberry10] [--ios] [--windows8] [--wp8] [-h|--help] [--plugman] [--global] [--skipjs] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.")
                    .boolean("help").describe("help", "Shows usage.")
+                   .boolean("amazon-fireos").describe("amazon-fireos", "Add amazon-fireos platform when creating the mobile-spec project.")
                    .boolean("android").describe("android", "Add Android platform when creating the mobile-spec project.")
                    .boolean("blackberry10").describe("blackberry10", "Add Blackberry 10 platform when creating the mobile-spec project.")
                    .boolean("ios").describe("ios", "Add iOS platform when creating the mobile-spec project.")
@@ -100,6 +106,7 @@ if (!fs.existsSync(cordova_js_git_dir)) {
 }
 
 if (argv.help) { optimist.showHelp(); return; }
+if (argv.amazon) { platforms.push("amazon-fireos"); }
 if (argv.android) { platforms.push("android"); }
 if (argv.ios) { platforms.push("ios"); }
 if (argv.blackberry10) { platforms.push("blackberry10"); }
@@ -205,6 +212,7 @@ if (argv.plugman) {
     // Config.json file ---> linked to local libraries
     shelljs.pushd(cli_project_dir);
     var localPlatforms = {
+        "amazon-fireos" : top_dir + "cordova-amazon-fireos" ,
         "android" : top_dir + "cordova-android" ,
         "ios" : top_dir + "cordova-ios" ,
         "blackberry10" : top_dir + "cordova-blackberry" ,
@@ -218,6 +226,7 @@ if (argv.plugman) {
     platforms.forEach(function (platform) {
         console.log("Adding Platform: " + platform);
         var platformArg = argv.global ? platform : localPlatforms[platform];
+        console.log("platformArg: " + cli + " " + platformArg);
         shelljs.exec(cli + ' platform add "' + platformArg + '" --verbose');
     });
     shelljs.popd();
