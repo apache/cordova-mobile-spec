@@ -20,20 +20,34 @@
 -->
 ## Mobile Spec Suite ##
 
-This project is a set of automated & manual tests that test Cordova core functionality.
+This project is a set of automated & manual tests that test
+Cordova core functionality.
 
-To set up the project, use `cordova-mobile-spec/createmobilespec/createmobilespec.js`. See the README.md in that directory.
+To set up the project, use
+`cordova-mobile-spec/createmobilespec/createmobilespec.js`.
+See the [README.md](createmobilespec/README.md) in that directory.
 
 ### Requirements ###
 
 Repositories required:
-- **cordova-cli** (Install pre-requisites by running `npm install` inside of cordova-cli).
-- **cordova-js** (required [grunt-cli](https://github.com/gruntjs/grunt-cli) installed).
+
+- **cordova-cli**
+  (Install pre-requisites by running `npm install` inside of cordova-cli).
+- **cordova-js** (requires
+  [grunt-cli](https://github.com/gruntjs/grunt-cli) installed).
 - All **plugins**.
-- **Platforms** to test (cordova-android, cordova-ios, cordova-blackberry, cordova-wp8, cordova-windows).
-- **cordova-mobile-spec** (Install pre-requisites by running `npm install` inside of cordova-mobile-spec/createmobilespec).
-- All repositories must be checked out as peers of each other.
+- **Platforms** to test
+  (e.g., cordova-android, cordova-ios, cordova-blackberry,
+  cordova-wp8, or cordova-windows).
+- **cordova-mobile-spec**
+  (Install pre-requisites by running `npm install` inside of
+  [createmobilespec](createmobilespec)).
+- All repositories must be checked out as peers to each other.
 
 ### Performance ###
 
-For reference purposes, the document AndroidBridgePerformance_300.pdf in this directory outlines the Android bridge performance using mobile-spec and the manual bridge test. The tests were performed with Cordova 3.0.0.
+For reference purposes, the document
+[AndroidBridgePerformance_300.pdf](AndroidBridgePerformance_300.pdf)
+in this directory outlines the Android bridge performance using
+`cordova-mobile-spec` and the manual bridge test.
+The tests were performed with **Cordova 3.0.0**.
