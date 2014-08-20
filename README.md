@@ -33,8 +33,7 @@ Repositories required:
 
 - **cordova-cli**
   (Install pre-requisites by running `npm install` inside of cordova-cli).
-- **cordova-js** (requires
-  [grunt-cli](https://github.com/gruntjs/grunt-cli) installed).
+- **cordova-js**
 - All **plugins**.
 - **Platforms** to test
   (e.g., cordova-android, cordova-ios, cordova-blackberry,
