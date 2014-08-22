@@ -102,21 +102,28 @@ var top_dir =             process.cwd() + path.sep,
                            "windows8": ["www"],
                            "windows": ["www"],
                            "wp8": ["www"]},
-    argv = optimist.usage("\nUsage: $0 [--amazon] [--android] [--blackberry10] [--ios] [--windows8] [--wp8] [-h|--help] [--plugman] [--global] [--skipjs] [directoryName]\n" +
+    argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--global] [--skipjs] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
-                          "At least one platform must be specified. See the included README.md.")
+                          "At least one platform must be specified. See the included README.md.\n" +
+                          "\tPLATFORM: [--<amazon|android|blackberry10|ios|windows|windows8|wp8>]\n" +
+                          "")
                    .boolean("help").describe("help", "Shows usage.")
                    .boolean("debug").describe("debug", "Debug logging.")
-                   .boolean("amazon-fireos").describe("amazon-fireos", "Add amazon-fireos platform when creating the mobile-spec project.")
-                   .boolean("android").describe("android", "Add Android platform when creating the mobile-spec project.")
-                   .boolean("blackberry10").describe("blackberry10", "Add Blackberry 10 platform when creating the mobile-spec project.")
-                   .boolean("ios").describe("ios", "Add iOS platform when creating the mobile-spec project.")
-                   .boolean("windows8").describe("windows8", "Add Windows 8 (desktop) platform when creating the mobile-spec project.")
-                   .boolean("windows").describe("windows", "Add Windows (universal) platform when creating the mobile-spec project.")
-                   .boolean("wp8").describe("wp8", "Add Windows Phone 8 when creating the mobile-spec project.")
-                   .boolean("plugman").describe("plugman", "Use /bin/create and plugman directly instead of the CLI.")
-                   .boolean("global").describe("global", "Use the globally-installed cordova and the downloaded platforms/plugins from the registry instead of the local git repo. Will use the local git repo of mobile-spec. Generally used only to test RC or production releases. Cannot be used with --plugman.")
-                   .boolean("skipjs").describe("skipjs", "Do not update the platform's cordova.js from the js git repo, use the one already present in the platform. Rarely used, generally to test RC releases. Cannot be used with --global because it is implied when --global is used.")
+                   .boolean("amazon").describe("amazon", "Add Amazon FireOS platform.")
+                   .boolean("android").describe("android", "Add Android platform.")
+                   .boolean("blackberry10").describe("blackberry10", "Add BlackBerry 10 platform.")
+                   .boolean("ios").describe("ios", "Add iOS platform.")
+                   .boolean("windows").describe("windows", "Add Windows (universal) platform.")
+                   .boolean("windows8").describe("windows8", "Add Windows 8 (desktop) platform.")
+                   .boolean("wp8").describe("wp8", "Add Windows Phone 8 platform.")
+                   .boolean("plugman").describe("plugman", "Use {platform}/bin/create and plugman directly instead of the CLI.")
+                   .boolean("global").describe("global", "Use the globally-installed `cordova` and the downloaded platforms/plugins from the registry instead of the local git repo.\n" +
+                                               "\t\t\tWill use the local git repo of mobile-spec.\n" +
+                                               "\t\t\tGenerally used only to test RC or production releases.\n" +
+                                               "\t\t\tCannot be used with --plugman.")
+                   .boolean("skipjs").describe("skipjs", "Do not update the platform's cordova.js from the js git repo, use the one already present in the platform.\n" +
+                                               "\t\t\tRarely used, generally to test RC releases.\n" +
+                                               "\t\t\tCannot be used with --global because it is implied when --global is used.")
                    .alias("h", "help")
                    .argv;
 
@@ -227,7 +234,7 @@ function myDelete(myDir) {
 }
 
 function getProjName(platform) {
-    return "mobilespec-" + platform;
+    return projectDirName + "-" + platform;
 }
 
 function couldNotFind(it, label) {
@@ -325,12 +332,12 @@ function installPlugins() {
     } else {
         // don't use local git repos for plugins when using --global
         var searchpath = argv.global ? "" : " --searchpath " + top_dir;
-        pushd(cli_project_dir);
         console.log("Adding plugins using CLI...");
         console.log("Searchpath:", searchpath);
         if (!fs.existsSync('cordova-plugin-test-framework')) {
             couldNotFind('cordova-plugin-test-framework');
         }
+        pushd(cli_project_dir);
         shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") +
                      searchpath);
         popd();
