@@ -375,7 +375,8 @@ function updateJS() {
             }
 
             pushd(cordova_js_git_dir);
-            var code = shelljs.exec(path.join(__dirname, "node_modules", "grunt-cli", "bin", "grunt")).code;
+            var nodeCommand = /^win/.test(process.platform) ? process.argv[0] + " " : "";
+            var code = shelljs.exec(nodeCommand + path.join(__dirname, "node_modules", "grunt-cli", "bin", "grunt")).code;
             if (code) {
                 console.log("Failed to build js.");
                 process.exit(1);
