@@ -87,7 +87,8 @@ describe('Whitelist API (cordova.whitelist)', function () {
 
         itShouldMatch('file:///foo', ['file:///foo*']);
         itShouldMatch('file:///foo/bar.html', ['file:///foo*']);
-        itShouldNotMatch('file:///etc/foo', ['file:///foo*']);
+        itShouldMatch('file:///foo.html', [ ]);
+        itShouldNotMatch('http://www.apache.org/etc/foo', ['http://www.apache.org/foo*']);
         itShouldNotMatch('http://www.apache.org/foo', ['file:///foo*']);
 
         itShouldMatch('http://www.apache.org/', ['*://www.apache.org/*']);
