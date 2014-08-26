@@ -20,9 +20,9 @@
 */
 
 describe('Whitelist API (cordova.whitelist)', function () {
-	it("should exist", function() {
+    it("should exist", function() {
         expect(cordova.whitelist).toBeDefined();
-	});
+    });
 
     describe("Match function", function() {
         function expectMatchWithResult(result) {
