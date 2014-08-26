@@ -425,6 +425,7 @@ function summary() {
         popd();
 
         console.log("Done. Project created at " + cli_project_dir);
+        console.log("You may run it via \"cd " + cli_project_dir + " && ./cordova run " + platforms[0] + "\"");
     }
 }
 
