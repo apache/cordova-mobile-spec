@@ -29,6 +29,7 @@
     <access origin="http://*.apache.org" />
     <access origin="https://*.apache.org" />
     <access origin="http://www.google.com" />
+    <access origin="https://www.google.com" />
     <access origin="http://techslides.com" />
     <access origin="httpssss://example.com" />
     <platform name="blackberry10">
