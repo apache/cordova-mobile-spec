@@ -226,7 +226,7 @@ shelljs.config.fatal = true;
 if (argv.global || argv.globalplugins) {
     // clean out cached platforms and plugins and app-hello-world
     var home_dir = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
-    shelljs.rm("-rf", path.join(home_dir, ".cordova"));
+    shelljs.rm("-rf", path.join(home_dir, ".cordova/npm_cache"));
     shelljs.rm("-rf", path.join(home_dir, ".plugman"));
 }
 
@@ -353,11 +353,12 @@ function installPlugins() {
             couldNotFind('cordova-plugin-test-framework');
         }
         pushd(cli_project_dir);
+        // we do need local plugin-test-framework
+        console.log("Installing local test framework plugins...");
+        shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir);
+        shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir);
+        
         if (argv.globalplugins) {
-            // but we do need local plugin-test-framework when using --globalplugins
-            console.log("Installing local test framework plugins...");
-            shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir);
-            shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir);
             shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin"));
         } else {
             shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + searchpath);
