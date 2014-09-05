@@ -43,13 +43,13 @@ function quietshell(fn) {
 function pushd(dir) {
     return quietshell(function() {
         return shelljs.pushd(dir);
-    })
+    });
 }
 
 function popd(dir) {
     return quietshell(function() {
         return shelljs.popd(dir);
-    })
+    });
 }
 
 // Check that we can load dependencies
@@ -102,7 +102,7 @@ var top_dir =             process.cwd() + path.sep,
                            "windows8": ["www"],
                            "windows": ["www"],
                            "wp8": ["www"]},
-    argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--global] [--skipjs] [directoryName]\n" +
+    argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--global] [--globalplugins] [--skipjs] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.\n" +
                           "\tPLATFORM: [--<amazon|android|blackberry10|ios|windows|windows8|wp8>]\n" +
@@ -121,6 +121,9 @@ var top_dir =             process.cwd() + path.sep,
                                                "\t\t\tWill use the local git repo of mobile-spec.\n" +
                                                "\t\t\tGenerally used only to test RC or production releases.\n" +
                                                "\t\t\tCannot be used with --plugman.")
+                   .boolean("globalplugins").describe("globalplugins", "Use the plugins from the remote registry instead of the local git repo.\n" +
+                                                      "\t\t\tRarely used, generally to test platform releases.\n" +
+                                                      "\t\t\tCannot be used with --global because it is implied when --global is used.")
                    .boolean("skipjs").describe("skipjs", "Do not update the platform's cordova.js from the js git repo, use the one already present in the platform.\n" +
                                                "\t\t\tRarely used, generally to test RC releases.\n" +
                                                "\t\t\tCannot be used with --global because it is implied when --global is used.")
@@ -154,6 +157,11 @@ if (argv.skipjs && argv.global) {
     optimist.showHelp();
     quit();
 }
+if (argv.globalplugins && argv.global) {
+    console.log("This --globalplugins option can not be used with the --global option.");
+    optimist.showHelp();
+    quit();
+}
 
 // If no platforms, then stop and show help
 if (platforms.length === 0){
@@ -172,33 +180,40 @@ var cli_project_dir = path.join(top_dir, projectDirName);
 if (!fs.existsSync(path.join("cordova-coho", "coho"))) {
     console.log("You need to clone cordova-coho:");
     console.log("  git clone https://git-wip-us.apache.org/repos/asf/cordova-coho.git");
+    process.exit(3);
 }
 if (argv.global) {
-    console.log("Creating project. Using globally installed cordova and plugman, downloadable platforms and plugins, and local mobile-spec.");
+    console.log("Creating project. Using globally installed tools, downloadable platforms and plugins, and local mobile-spec.");
     console.log("To clone needed repositories:");
     console.log("  ./cordova-coho/coho repo-clone -r mobile-spec");
     console.log("To update all repositories:");
     console.log("  ./cordova-coho/coho repo-update -r mobile-spec");
 } else {
-    var repos = [
-        'plugins'
-    ];
-    console.log("Creating project. If you have any errors, it may be from missing repositories.");
-    console.log("To clone base repositories:");
-    [
-        'cli',
-        'lib',
-    ].forEach(function(d) {
-        if (!fs.existsSync(path.join(path.dirname(path.dirname(__dirname)), 'cordova-'+d))) {
-            repos.push(d);
-        }
+    var repos = [ ];
+    repos.push("mobile-spec", "plugin-test-framework", "cli", "lib", "plugman");
+    platforms.forEach(function(p) {
+        repos.push(p);
     });
+    if (!argv.skipjs) {
+        repos.push("js");
+    }
+    if (argv.globalplugins) {
+        console.log("Creating project from downloadable plugins, local tools and platforms, and local mobile-spec. If you have any errors, it may be from missing repositories.");
+    } else {
+        console.log("Creating project from local git repos. If you have any errors, it may be from missing repositories.");
+        repos.push("plugins");
+    }
+
+    console.log("To clone repositories:");
     console.log(["  ./cordova-coho/coho repo-clone"].concat(repos).join(" -r "));
-    console.log("  mkdir cordova-cli/node_modules");
-    console.log("  (cd cordova-lib/cordova-lib/ && npm install)");
-    console.log("  mkdir cordova-cli/node_modules");
-    console.log("  ln -s ../../cordova-lib/cordova-lib cordova-cli/node_modules");
-    console.log("  (cd cordova-cli && npm install)");
+    if (!argv.globalplugins) {
+        console.log("  mkdir cordova-cli/node_modules");
+        console.log("  (cd cordova-lib/cordova-lib/ && npm install)");
+        console.log("  (cd cordova-plugman/ && npm install)");
+        console.log("  mkdir cordova-cli/node_modules");
+        console.log("  ln -s ../../cordova-lib/cordova-lib cordova-cli/node_modules");
+        console.log("  (cd cordova-cli && npm install)");
+    }
     console.log("To update all repositories:");
     console.log("  ./cordova-coho/coho repo-update");
 }
@@ -208,10 +223,10 @@ shelljs.config.fatal = true;
 
 ////////////////////// preparations before project creation
 
-if (argv.global) {
+if (argv.global || argv.globalplugins) {
     // clean out cached platforms and plugins and app-hello-world
     var home_dir = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
-    shelljs.rm("-rf", path.join(home_dir, ".cordova"));
+    shelljs.rm("-rf", path.join(home_dir, ".cordova/npm_cache"));
     shelljs.rm("-rf", path.join(home_dir, ".plugman"));
 }
 
@@ -330,7 +345,7 @@ function installPlugins() {
             popd();
         });
     } else {
-        // don't use local git repos for plugins when using --global
+        // don't use local git repos for plugins when using --global.
         var searchpath = argv.global ? "" : " --searchpath " + top_dir;
         console.log("Adding plugins using CLI...");
         console.log("Searchpath:", searchpath);
@@ -338,8 +353,16 @@ function installPlugins() {
             couldNotFind('cordova-plugin-test-framework');
         }
         pushd(cli_project_dir);
-        shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") +
-                     searchpath);
+        // we do need local plugin-test-framework
+        console.log("Installing local test framework plugins...");
+        shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir);
+        shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir);
+        
+        if (argv.globalplugins) {
+            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin"));
+        } else {
+            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + searchpath);
+        }
         popd();
     }
 
