@@ -51,13 +51,14 @@ var top_dir        = process.cwd()+path.sep,
     platforms      = [],
     //Setting up optimist features
     tokens         = process.argv.slice(2),
-    argv = optimist.usage('\n\nMain usage: \n\n$0 [--android] [--blackberry10] [--ios] [--windows8] [--wp8] [-h|--help]')
+    argv = optimist.usage('\n\nMain usage: \n\n$0 [--android] [--blackberry10] [--ios] [--windows8] [--wp8] [--globalplugins] [-h|--help]')
                     .describe('help', 'Shows usage')
                     .describe('android', 'Add Android platform to mobilespec project')
                     .describe('blackberry10', 'Add Blackberry 10 platform to mobilespec project')
                     .describe('ios', 'Add iOS platform to mobilespec project')
                     .describe('windows8', 'Add Windows 8 platform to mobilespec project')
                     .describe('wp8', 'Add Windows Phone 8 to mobilespec project')
+                    .describe('globalplugins', 'Use the plugins from the registry instead of from a local git repo')
                     .alias('h', 'help')
                     .argv;
 
@@ -156,7 +157,35 @@ platforms.forEach(function (platform) {
 
 // Installing plugins, using local library and dependencies file.
 console.log("Adding plugins...");
-shelljs.exec(cordova_cli +" plugin add " + path.join(cordova_ms, "dependencies-plugin") + " --searchpath " + top_dir);
+if (argv.globalplugins) {
+  shelljs.exec(cordova_cli +" plugin add " + path.join(cordova_ms, "cordova-plugin-echo") + " --searchpath " + top_dir);
+  shelljs.exec(cordova_cli +" plugin add " + path.join(cordova_ms, "cordova-plugin-whitelist") + " --searchpath " + top_dir);
+  var plugins = [
+    "org.apache.cordova.battery-status",
+    "org.apache.cordova.camera",
+    "org.apache.cordova.console",
+    "org.apache.cordova.contacts",
+    "org.apache.cordova.device",
+    "org.apache.cordova.device-motion",
+    "org.apache.cordova.device-orientation",
+    "org.apache.cordova.dialogs",
+    "org.apache.cordova.file",
+    "org.apache.cordova.file-transfer",
+    "org.apache.cordova.geolocation",
+    "org.apache.cordova.globalization",
+    "org.apache.cordova.inappbrowser",
+    "org.apache.cordova.media",
+    "org.apache.cordova.media-capture",
+    "org.apache.cordova.network-information",
+    "org.apache.cordova.splashscreen",
+    "org.apache.cordova.vibration"
+  ];
+  plugins.forEach(function (plugin) {
+    shelljs.exec(cordova_cli +" plugin add " + plugin);
+  });
+} else {
+  shelljs.exec(cordova_cli +" plugin add " + path.join(cordova_ms, "dependencies-plugin") + " --searchpath " + top_dir);
+}
 
 // Updating Js files for each added platform
 console.log("Updating js for platforms...");
