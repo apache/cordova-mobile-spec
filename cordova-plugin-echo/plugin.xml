@@ -41,6 +41,16 @@
         <source-file src="src/android/Echo.java" target-dir="src/org/apache/cordova/test" />
     </platform>
 
+    <!-- amazon-fireos -->
+    <platform name="amazon-fireos">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="Echo" >
+                <param name="android-package" value="org.apache.cordova.test.Echo"/>
+            </feature>
+        </config-file>
+    
+        <source-file src="src/android/Echo.java" target-dir="src/org/apache/cordova/test" />
+    </platform>
     <!-- ios -->
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
