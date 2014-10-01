@@ -392,7 +392,7 @@ function updateJS() {
         } else {
             console.log("Updating js for platforms...");
             try {
-                require(path.join(cordova_js_git_dir, "node_modules", "grunt"));
+                require(path.join(cordova_js_git_dir, "node_modules", "grunt --platformVersion=MSTEST"));
             } catch (e) {
                 console.error("Grunt isn't installed in cordova-js, you need to:\n\trun `npm install` from: "+ cordova_js_git_dir);
             }
