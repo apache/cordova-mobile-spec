@@ -392,14 +392,14 @@ function updateJS() {
         } else {
             console.log("Updating js for platforms...");
             try {
-                require(path.join(cordova_js_git_dir, "node_modules", "grunt --platformVersion=MSTEST"));
+                require(path.join(cordova_js_git_dir, "node_modules", "grunt"));
             } catch (e) {
                 console.error("Grunt isn't installed in cordova-js, you need to:\n\trun `npm install` from: "+ cordova_js_git_dir);
             }
 
             pushd(cordova_js_git_dir);
             var nodeCommand = /^win/.test(process.platform) ? process.argv[0] + " " : "";
-            var code = shelljs.exec(nodeCommand + path.join(__dirname, "node_modules", "grunt-cli", "bin", "grunt")).code;
+            var code = shelljs.exec(nodeCommand + path.join(__dirname, "node_modules", "grunt-cli", "bin", "grunt") + ' --platformVersion=MSTEST').code;
             if (code) {
                 console.log("Failed to build js.");
                 process.exit(1);
