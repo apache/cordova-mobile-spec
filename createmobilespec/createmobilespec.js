@@ -102,7 +102,7 @@ var top_dir =             process.cwd() + path.sep,
                            "windows8": ["www"],
                            "windows": ["www"],
                            "wp8": ["www"]},
-    argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--global] [--globalplugins] [--skipjs] [directoryName]\n" +
+    argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--global] [--globalplugins] [--skipjs] [--skiplink] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.\n" +
                           "\tPLATFORM: [--<amazon|android|blackberry10|ios|windows|windows8|wp8>]\n" +
@@ -127,6 +127,8 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("skipjs").describe("skipjs", "Do not update the platform's cordova.js from the js git repo, use the one already present in the platform.\n" +
                                                "\t\t\tRarely used, generally to test RC releases.\n" +
                                                "\t\t\tCannot be used with --global because it is implied when --global is used.")
+                   .boolean("skiplink").describe("skiplink", "Do not check 'npm link' of our own dependent modules such as cordova-lib when on master.\n" +
+                                                 "\t\t\tUse only when you know what you are doing, this should be very rare.")
                    .alias("h", "help")
                    .argv;
 
@@ -158,7 +160,12 @@ if (argv.skipjs && argv.global) {
     quit();
 }
 if (argv.globalplugins && argv.global) {
-    console.log("This --globalplugins option can not be used with the --global option.");
+    console.log("The --globalplugins option can not be used with the --global option.");
+    optimist.showHelp();
+    quit();
+}
+if (argv.skiplink && argv.global) {
+    console.log("The --skiplink option can not be used with the --global option.");
     optimist.showHelp();
     quit();
 }
@@ -228,6 +235,70 @@ if (argv.global || argv.globalplugins) {
     var home_dir = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
     shelljs.rm("-rf", path.join(home_dir, ".cordova/npm_cache"));
     shelljs.rm("-rf", path.join(home_dir, ".plugman"));
+}
+
+function getPathFromModuleName(moduleName) {
+    if (moduleName == "cordova-lib") {
+        return(moduleName + path.sep + moduleName);
+    } else {
+        return(moduleName);
+    }
+}
+
+function cdInto(moduleName) {
+    var myPath = getPathFromModuleName(moduleName);
+    pushd(myPath);
+}
+
+function cdOutOf() {
+    popd();
+}
+
+function getBranchName(moduleName) {
+    cdInto(moduleName);
+    // output should look like: refs/head/master
+    var gitOutput = shelljs.exec("git symbolic-ref HEAD").output;
+    var match = /refs\/heads\/(.*)/.exec(gitOutput);
+    if (!match) {
+        throw new Error('Could not parse branch name from: ' + gitOutput);
+    }
+    cdOutOf();
+    return match[1];
+}
+
+function verifyNpmLinkOf(linkedModule, installedModule) {
+    cdInto(installedModule);
+    var linkedPath = shelljs.pwd() + path.sep + "node_modules" + path.sep + linkedModule;
+    if (fs.existsSync(linkedPath)) {
+        var myStat = fs.lstatSync(linkedPath);
+        if (!myStat.isSymbolicLink()) {
+            throw new Error('Module ' + linkedModule + ' installed in ' + installedModule + ' is not npm-linked. I recommend you run "coho npm-link".');
+        }
+    } else {
+        throw new Error('Module ' + linkedModule + ' is not installed at all (direct or npm-linked) in ' + installedModule);
+    }
+    cdOutOf();
+}
+
+if (!argv.skiplink) {
+    console.log("Checking if you are using master branch of tools");
+    // if js, lib, plugman, and cli have master checked out, should npm link.
+    var jsBranch = getBranchName("cordova-js");
+    var libBranch = getBranchName("cordova-lib");
+    var plugmanBranch = getBranchName("cordova-plugman");
+    var cliBranch = getBranchName("cordova-cli");
+    if ((jsBranch == "master") && (libBranch == "master") && (plugmanBranch == "master") && (cliBranch == "master")) {
+        // make sure the dependent modules are 'npm link'ed to each other,
+        // so they actually get tested instead of downloading the last published
+        // one from the npm registry. Fail if they are not.
+        console.log("You are on master branch of tools, checking npm links");
+        verifyNpmLinkOf("cordova-js", "cordova-lib");
+        verifyNpmLinkOf("cordova-lib", "cordova-plugman");
+        verifyNpmLinkOf("cordova-lib", "cordova-cli");
+        console.log("npm links are OK");
+    } else {
+        console.log("Using non-master of one or more tools.");
+    }
 }
 
 ////////////////////// create the project for each platform
