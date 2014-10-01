@@ -50,6 +50,12 @@
         <source-file src="src/android/WhitelistAPI.java" target-dir="src/org/apache/cordova/test" />
     </platform>
 
+    <!-- ubuntu -->
+    <platform name="ubuntu">
+        <header-file src="src/ubuntu/whitelist.h" />
+        <source-file src="src/ubuntu/whitelist.cpp" />
+    </platform>
+
     <!-- ios -->
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
