@@ -413,6 +413,20 @@ function installPlugins() {
                          " install --platform " + platform +
                          " --project . --plugin " + path.join("..", "cordova-mobile-spec", "dependencies-plugin") +
                          " --searchpath " + top_dir);
+
+            // Install new-style test plugins
+            console.log("Adding plugin tests using plugman...");
+            var plugin_path = join_paths(platform_layout[platform].www.concat(["plugins"]));
+            shelljs.ls(plugin_path).forEach(function(plugin) {
+                var id_elts = plugin.split(".");
+                var plugin_name = "cordova-plugin-" + id_elts[id_elts.length - 1];
+                var potential_tests_plugin_xml = path.join(top_dir, plugin_name, 'tests', 'plugin.xml');
+                if (fs.existsSync(potential_tests_plugin_xml)) {
+                    shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
+                                " install --platform " + platform +
+                                " --project . --plugin " + path.dirname(potential_tests_plugin_xml));
+                }
+            });
             popd();
         });
     } else {
@@ -434,14 +448,8 @@ function installPlugins() {
         } else {
             shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + searchpath);
         }
-        popd();
-    }
 
-////////////////////// install new-style test plugins
-    if (argv.plugman) {
-      // TODO
-    } else {
-        pushd(cli_project_dir);
+        // Install new-style test plugins
         console.log("Adding plugin tests using CLI...");
         shelljs.ls('plugins').forEach(function(plugin) {
           var potential_tests_plugin_xml = path.join('plugins', plugin, 'tests', 'plugin.xml');
@@ -449,6 +457,7 @@ function installPlugins() {
             shelljs.exec(cli + " plugin add " + path.dirname(potential_tests_plugin_xml));
           }
         });
+
         popd();
     }
 }
@@ -479,7 +488,7 @@ function updateJS() {
 
             platforms.forEach(function (platform) {
                 var src = path.join(cordova_js_git_dir, "pkg", "cordova." + (platform === "wp8" ? "windowsphone" : platform) + ".js");
-                var dest = argv.plugman ? join_paths([top_dir, getProjName(platform)].concat(platform_layout[platform].www), "cordova.js") :
+                var dest = argv.plugman ? join_paths([top_dir, getProjName(platform)].concat(platform_layout[platform].www).concat(["cordova.js"])) :
                                           path.join(cli_project_dir, "platforms", platform, "platform_www", "cordova.js");
                 shelljs.cp("-f", src, dest);
                 console.log("JavaScript file updated for " + platform);
