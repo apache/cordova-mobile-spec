@@ -488,8 +488,9 @@ function updateJS() {
 
             platforms.forEach(function (platform) {
                 var src = path.join(cordova_js_git_dir, "pkg", "cordova." + (platform === "wp8" ? "windowsphone" : platform) + ".js");
-                var dest = argv.plugman ? join_paths([top_dir, getProjName(platform)].concat(platform_layout[platform].www), "cordova.js") :
+                var dest = argv.plugman ? join_paths([top_dir, getProjName(platform)].concat(platform_layout[platform].www).concat(["cordova.js"])) :
                                           path.join(cli_project_dir, "platforms", platform, "platform_www", "cordova.js");
+										  console.log("DEST: " + dest);
                 shelljs.cp("-f", src, dest);
                 console.log("JavaScript file updated for " + platform);
             });
