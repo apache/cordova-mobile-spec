@@ -400,8 +400,8 @@ function installPlugins() {
         console.log("Adding plugins using plugman...");
         if (!fs.existsSync(path.join(top_dir, "cordova-plugman"))) {
             couldNotFind('plugman');
-            console.log("  mkdir cordova-plugman/node_modules");
-            console.log("  ln -s ../../cordova-lib/cordova-lib cordova-plugman/node_modules");
+            console.log("  cd cordova-plugman");
+            console.log("  npm link cordova-lib && npm install");
             return;
         }
         platforms.forEach(function (platform) {
