@@ -416,7 +416,8 @@ function installPlugins() {
 
             // Install new-style test plugins
             console.log("Adding plugin tests using plugman...");
-            shelljs.ls('Plugins').forEach(function(plugin) {
+            var plugin_path = join_paths(platform_layout[platform].www.concat(["plugins"]));
+            shelljs.ls(plugin_path).forEach(function(plugin) {
                 var id_elts = plugin.split(".");
                 var plugin_name = "cordova-plugin-" + id_elts[id_elts.length - 1];
                 var potential_tests_plugin_xml = path.join(top_dir, plugin_name, 'tests', 'plugin.xml');
