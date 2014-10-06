@@ -414,19 +414,18 @@ function installPlugins() {
                          " --project . --plugin " + path.join("..", "cordova-mobile-spec", "dependencies-plugin") +
                          " --searchpath " + top_dir);
 
-			// Install new-style test plugins
-			console.log("Adding plugin tests using plugman...");
-			shelljs.ls('plugins').forEach(function(plugin) {
-				var id_elts = plugin.split(".");
-				var plugin_name = "cordova-plugin-" + id_elts[id_elts.length - 1];
-				var potential_tests_plugin_xml = path.join(top_dir, plugin_name, 'tests', 'plugin.xml');
-				if (fs.existsSync(potential_tests_plugin_xml)) {
-					shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
-								" install --platform " + platform +
-								" --project . --plugin " + path.dirname(potential_tests_plugin_xml)
-								+ " --searchpath " + top_dir);
-				}
-			});
+            // Install new-style test plugins
+            console.log("Adding plugin tests using plugman...");
+            shelljs.ls('Plugins').forEach(function(plugin) {
+                var id_elts = plugin.split(".");
+                var plugin_name = "cordova-plugin-" + id_elts[id_elts.length - 1];
+                var potential_tests_plugin_xml = path.join(top_dir, plugin_name, 'tests', 'plugin.xml');
+                if (fs.existsSync(potential_tests_plugin_xml)) {
+                    shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
+                                " install --platform " + platform +
+                                " --project . --plugin " + path.dirname(potential_tests_plugin_xml));
+                }
+            });
             popd();
         });
     } else {
