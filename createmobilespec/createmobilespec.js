@@ -81,9 +81,9 @@ var top_dir =             process.cwd() + path.sep,
                             "ios":          { "bin": ["cordova-ios"],
                                               "www": ["www"],
                                               "config": ["CUSTOM"] },
-                            "windows8":     { "bin": ["cordova-windows", "windows8"],
+                            "windows8":     { "bin": ["cordova-windows"],
                                               "www": ["www"] },
-                            "windows":      { "bin": ["cordova-windows", "windows"],
+                            "windows":      { "bin": ["cordova-windows"],
                                               "www": ["www"] },
                             "wp8":          { "bin": ["cordova-wp8", "wp8"],
                                               "www": ["www"] } },
@@ -91,8 +91,8 @@ var top_dir =             process.cwd() + path.sep,
                            "android": ["cordova-android"],
                            "blackberry10": ["cordova-blackberry"],
                            "ios": ["cordova-ios"],
-                           "windows8": ["cordova-windows", "windows8"],
-                           "windows": ["cordova-windows", "windows"],
+                           "windows8": ["cordova-windows"],
+                           "windows": ["cordova-windows"],
                            "wp8": ["cordova-wp8", "wp8"]},
     // where to put the cordova.js file in a non-CLI project
     platform_www_dirs =   {"amazon-fireos": ["assets", "www"],
@@ -370,7 +370,7 @@ if (argv.plugman) {
         "blackberry10" : [top_dir, "cordova-blackberry"],
         "wp8" : [top_dir, "cordova-wp8", "wp8"],
         "windows8" : [top_dir, "cordova-windows"],
-        "windows" : [top_dir, "cordova-windows", "windows"]
+        "windows" : [top_dir, "cordova-windows"]
     };
 
     // Executing platform Add
