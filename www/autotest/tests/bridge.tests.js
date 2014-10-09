@@ -20,18 +20,26 @@
 */
 
 describe('Bridge', function() {
-    if (cordova.platformId == 'android') {
-        it("bridge.spec.1 should reject bridge from iframe with data: URL", function() {
-            var ifr = document.createElement('iframe');
-            var done = false;
-            ifr.src = 'data:text/html,';
-            ifr.onload = function() {
-                var stolenSecret = ifr.contentWindow.prompt('', 'gap_init:');
-                done = true;
-                expect(!!stolenSecret).toBe(false);
-            };
-            document.body.appendChild(ifr);
-            waitsFor(function() { return done; });
-        });
-    }
+
+    // Adding this spec is the way to show some useful information to user
+    // and to avoid failure of test framework (see CB-7491)
+    it("bridge spec will run on android only", function() {
+
+        expect(cordova.platformId).toBe('android');
+
+        if (cordova.platformId == 'android') {
+            it("bridge.spec.1 should reject bridge from iframe with data: URL", function() {
+                var ifr = document.createElement('iframe');
+                var done = false;
+                ifr.src = 'data:text/html,';
+                ifr.onload = function() {
+                    var stolenSecret = ifr.contentWindow.prompt('', 'gap_init:');
+                    done = true;
+                    expect(!!stolenSecret).toBe(false);
+                };
+                document.body.appendChild(ifr);
+                waitsFor(function() { return done; });
+            });
+        }
+    });
 });
