@@ -108,11 +108,11 @@ describe("XMLHttpRequest", function () {
             waitsForAny(win, lose);
         });
 
-        it("XMLHttpRequest.spec.6 adds hash-path and loads file okay", function () {
-            window.location = window.location.href + "#asd/asd/asdasd";
+        it("XMLHttpRequest.spec.6 should be able to load the current page with hash-part added", function () {
             var win = jasmine.createSpy().andCallFake(function (res) { });
             var lose = createDoNotCallSpy('xhrFail');
-            var xhr = createXHR(window.location.href, true, win, lose);
+            var fileName = window.location.href + "#asd/asd/asdasd";
+            var xhr = createXHR(fileName, true, win, lose);
             waitsForAny(win, lose);
         });
 
