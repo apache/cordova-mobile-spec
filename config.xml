@@ -30,6 +30,8 @@
     <access origin="https://*.apache.org" />
     <access origin="http://www.google.com" />
     <access origin="https://www.google.com" />
+    <access origin="http://google.co.uk" />
+    <access origin="https://www.google.co.uk" />
     <access origin="http://techslides.com" />
     <access origin="httpssss://example.com" />
     <platform name="blackberry10">
