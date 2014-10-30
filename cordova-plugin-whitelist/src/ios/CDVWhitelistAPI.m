@@ -34,15 +34,4 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-- (void)URLIsAllowed:(CDVInvokedUrlCommand*)command
-{
-    NSString *url = [command argumentAtIndex:0];
-
-    CDVWhitelist* whitelist = [(CDVViewController *)self.viewController whitelist];
-
-    bool isAllowed = [whitelist URLIsAllowed:[NSURL URLWithString:url]];
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isAllowed];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-}
-
 @end

@@ -48,11 +48,6 @@ public class WhitelistAPI extends CordovaPlugin {
             boolean isAllowed = whitelist.isUrlWhiteListed(url);
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, isAllowed));
             return true;
-        } else if (action.equals("URLIsAllowed")) {
-            String url = args.getString(0);
-            boolean isAllowed = Config.isUrlWhiteListed(url);
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, isAllowed));
-            return true;
         }
         return false;
     }

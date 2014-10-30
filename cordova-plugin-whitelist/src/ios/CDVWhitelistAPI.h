@@ -24,6 +24,5 @@
 {}
 
 - (void)URLMatchesPatterns:(CDVInvokedUrlCommand*)command;
-- (void)URLIsAllowed:(CDVInvokedUrlCommand*)command;
 
 @end

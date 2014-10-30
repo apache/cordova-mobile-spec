@@ -26,9 +26,5 @@ module.exports = {
     match: function(url, patterns, callback) {
         //argscheck.checkArgs('fF', 'Whitelist.match', arguments);
         exec(callback, callback, "WhitelistAPI", "URLMatchesPatterns", [url, patterns]);
-    },
-    test: function(url, callback) {
-        //argscheck.checkArgs('fF', 'Whitelist.test', arguments);
-        exec(callback, callback, "WhitelistAPI", "URLIsAllowed", [url]);
     }
 }

@@ -111,44 +111,4 @@ describe('Whitelist API (cordova.whitelist)', function () {
         itShouldNotMatch('http://www.apache.org:81@www.evil.com/', ['http://www.apache.org:81/*']);
     });
 
-    describe("Test function", function() {
-        function expectTestWithResult(result) {
-            return (function(url, description) {
-                description = description || ((result ? "should accept " : "should reject ") + url);
-                it(description, function() {
-                    var cb = jasmine.createSpy();
-                    runs(function() {
-                        cordova.whitelist.test(url, cb);
-                    });
-                    waitsFor(function() { return cb.wasCalled; }, "success callback never called", Tests.TEST_TIMEOUT);
-                    runs(function() {
-                        expect(cb).toHaveBeenCalledWith(result);
-                    });
-                });
-            });
-        }
-
-        var itShouldAccept = expectTestWithResult(true);
-        var itShouldReject = expectTestWithResult(false);
-
-        it("should exist", function() {
-            expect(cordova.whitelist.test).toBeDefined();
-            expect(typeof cordova.whitelist.test).toBe("function");
-        });
-
-        itShouldAccept('http://apache.org');
-        itShouldAccept('http://apache.org/');
-        itShouldAccept('http://www.apache.org/');
-        itShouldAccept('http://www.apache.org/some/path');
-        itShouldAccept('http://some.domain.under.apache.org/');
-        itShouldAccept('http://user:pass@apache.org/');
-        itShouldAccept('http://user:pass@www.apache.org/');
-        itShouldAccept('https://www.apache.org/');
-        itShouldReject('ftp://www.apache.org/');
-        itShouldReject('http://www.apache.com/');
-        itShouldReject('http://www.apache.org:pass@evil.com/');
-        itShouldReject('http://www.apache.org.evil.com/');
-        itShouldAccept('file:///foo');
-        itShouldAccept('content:///foo');
-    });
 });
