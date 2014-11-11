@@ -255,12 +255,18 @@ function cdOutOf() {
 }
 
 function getBranchName(moduleName) {
+    var isConfigFatal = shelljs.config.fatal;
+    shelljs.config.fatal = false;
     cdInto(moduleName);
     // output should look like: refs/head/master
     var gitOutput = shelljs.exec("git symbolic-ref HEAD").output;
+    shelljs.config.fatal = isConfigFatal;
     var match = /refs\/heads\/(.*)/.exec(gitOutput);
     if (!match) {
-        throw new Error('Could not parse branch name from: ' + gitOutput);
+        if (gitOutput.indexOf("is not a symbolic ref") > -1) {
+            throw new Error(moduleName + ' is not on a named git branch.');
+        }
+        throw new Error('Could not parse branch name from: ' + gitOutput + '(in module ' + moduleName + ')');
     }
     cdOutOf();
     return match[1];
