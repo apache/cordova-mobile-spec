@@ -188,6 +188,10 @@
 
 
     document.addEventListener("deviceready", function() {
+        // Never send logs through exec() bridge.
+        if (console.useLogger) {
+            console.useLogger(false);
+        }
         deviceReady = true;
         appLog("Device="+device.platform+" "+device.version);
         configure();
