@@ -43,4 +43,15 @@
     </platform>
     <preference name="iosPersistentFileLocation" value="Library" />
     <preference name="AndroidPersistentFileLocation" value="Internal" />
+    <platform name="android">
+        <splash src="www/splashscreens/android-port-hdpi.png" density="port-hdpi"/>
+        <splash src="www/splashscreens/android-port-xhdpi.png" density="port-xhdpi"/>
+        <splash src="www/splashscreens/android-land-hdpi.png" density="land-hdpi"/>
+        <splash src="www/splashscreens/android-land-xhdpi.png" density="land-xhdpi"/>
+        <preference name="SplashScreen" value="screen" />
+        <preference name="SplashScreenDelay" value="1000" />
+        <!-- The spinner shows only when SplashScreen is disabled. -->
+        <preference name="LoadingPageDialog" value="Loading,Main Page" />
+        <preference name="LoadingPage" value="Loading,Sub Page" />
+    </platform>
 </widget>
