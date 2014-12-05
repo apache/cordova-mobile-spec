@@ -17,28 +17,23 @@
  * specific language governing permissions and limitations
  * under the License.
  *
-*/
-
-describe('Bridge', function() {
-
-    // Adding this spec is the way to show some useful information to user
-    // and to avoid failure of test framework (see CB-7491)
-    it("bridge spec will run on android only", function() {
-        expect(cordova.platformId).toBe('android');
-    });
-
-    if (cordova.platformId == 'android') {
-        it("bridge.spec.1 should reject bridge from iframe with data: URL", function() {
+ */
+exports.defineAutoTests = function () {
+    describe('Bridge', function (done) {
+        it("bridge.spec.1 should reject bridge from iframe with data: URL", function (done) {
+            if (cordova.platformId != 'android') {
+                pending();
+            }
             var ifr = document.createElement('iframe');
-            var done = false;
+
             ifr.src = 'data:text/html,';
-            ifr.onload = function() {
+            ifr.onload = function () {
                 var stolenSecret = ifr.contentWindow.prompt('', 'gap_init:');
-                done = true;
                 expect(!!stolenSecret).toBe(false);
+                done();
             };
             document.body.appendChild(ifr);
-            waitsFor(function() { return done; });
         });
-    }
-});
+
+    });
+}

@@ -49,4 +49,5 @@
   <dependency id="org.apache.cordova.test-framework"/>
   <dependency id="org.apache.cordova.test.whitelist" url="." subdir="cordova-plugin-whitelist" />
   <dependency id="org.apache.cordova.test.echo" url="." subdir="cordova-plugin-echo" />
+  <dependency id="org.apache.cordova.mobilespec.tests" url="." subdir="cordova-plugin-mobilespec-tests" />
 </plugin>
