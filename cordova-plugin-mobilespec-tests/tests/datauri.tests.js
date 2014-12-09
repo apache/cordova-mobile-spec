@@ -55,19 +55,23 @@
         });
 
         describe('data uris', function () {
+
+            var lose = function (done) {
+                expect(true).toBe(false);
+                done();
+            }
+
+            var win = function (done, message) {
+                expect(true).toBe(true);
+                done();
+            };
+
             it("datauri.spec.2 should work with images Jasmine 2", function (done) {
                 var img = new Image();
+                img.onload = win.bind(null, done);
+                img.onerror = lose.bind(null, done);
 
-                spyOn(img, 'onload').and.callFake(function () {
-                    done();
-                });
-
-                spyOn(img, 'onerror').and.callFake(function () {
-                    expect('').toBe('image load failed: ' + error);
-                    done();
-                });
-
-                img.src = 'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7'
-            });
+                img.src = 'data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7';
+            }); 
         });
     }

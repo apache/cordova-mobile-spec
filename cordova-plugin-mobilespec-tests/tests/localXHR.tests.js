@@ -21,8 +21,7 @@
 
     exports.defineAutoTests = function () {
 
-        var Tests = function () { };
-        Tests.TEST_TIMEOUT = 7500;
+        var TEST_TIMEOUT = 7500;
 
         describe("XMLHttpRequest", function () {
 
@@ -147,7 +146,7 @@
                     createXHR(fileName, true, winA, lose);
                     createXHR(fileName, false, winB, lose);
 
-                }, Tests.TEST_TIMEOUT);
+                }, TEST_TIMEOUT);
 
                 it("XMLHttpRequest.spec.10 overlapping async calls are not muxed", function (done) {
                     expect(lose).not.toHaveBeenCalled();
@@ -155,7 +154,7 @@
                     expect(winB).toHaveBeenCalled();
                     console.log("order = " + order);
                     done();
-                }, "Expecting both callbacks to be called.", Tests.TEST_TIMEOUT);
+                }, "Expecting both callbacks to be called.", TEST_TIMEOUT);
 
             });
         });

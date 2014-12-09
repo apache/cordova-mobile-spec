@@ -44,10 +44,11 @@ exports.defineAutoTests = function () {
 
                     describe("Match function", function () {
 
-                        if (isWindows || isWindowsPhone)
+                        if (isWindows || isWindowsPhone) {
                             pending();
+                        }
                       
-                        beforeEach(function (done) {                           
+                        beforeEach(function (done) {
                             this.cb = jasmine.createSpy('spy');
                             cordova.whitelist.match(url, patterns, this.cb);
                             done();
@@ -55,7 +56,7 @@ exports.defineAutoTests = function () {
                       
                         it(description, function (done) {
                             expect(this.cb).toHaveBeenCalledWith(result);
-                            done(); // call this to finish off the it block                       
+                            done(); // call this to finish off the it block
                         }, Tests.TEST_TIMEOUT);
                       
                     });
@@ -149,8 +150,9 @@ exports.defineAutoTests = function () {
                     
                 describe("Test function", function () {
 
-                    if (isWindows || isWindowsPhone)
+                    if (isWindows || isWindowsPhone) {
                         pending();
+                    }
                      
                     beforeEach(function (done) {
                         this.cb = jasmine.createSpy('spy');
@@ -166,8 +168,7 @@ exports.defineAutoTests = function () {
                 });
                     
             });
-        }                   
-   
+        } 
 
             var itShouldAccept = expectTestWithResult(true);
             var itShouldReject = expectTestWithResult(false);

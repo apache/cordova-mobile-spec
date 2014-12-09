@@ -24,15 +24,14 @@
                 if (cordova.platformId != 'android')
                     pending();
                 var ifr = document.createElement('iframe');
-                var done = false;
+               
                 ifr.src = 'data:text/html,';
                 ifr.onload = function() {
                     var stolenSecret = ifr.contentWindow.prompt('', 'gap_init:');
-                    done = true;
                     expect(!!stolenSecret).toBe(false);
+                    done();
                 };
                 document.body.appendChild(ifr);
-                done();
             });
 
         });
