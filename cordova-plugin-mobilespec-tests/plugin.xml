@@ -26,21 +26,21 @@
     <name>Cordova Non Plugin Auto Tests</name>
     <license>Apache 2.0</license>
 
-    <js-module src="tests/bridge.tests.js" name="bridge">
+    <js-module src="tests/bridge.tests.js" name="bridge.tests">
     </js-module>
     
-    <js-module src="tests/datauri.tests.js" name="datauri">
+    <js-module src="tests/datauri.tests.js" name="datauri.tests">
     </js-module>
     
-    <js-module src="tests/localXHR.tests.js" name="localXHR">
+    <js-module src="tests/localXHR.tests.js" name="localXHR.tests">
     </js-module>
     
-    <js-module src="tests/platform.tests.js" name="platform">
+    <js-module src="tests/platform.tests.js" name="platform.tests">
     </js-module>
     
-    <js-module src="tests/storage.tests.js" name="storage">
+    <js-module src="tests/storage.tests.js" name="storage.tests">
     </js-module>
     
-    <js-module src="tests/whitelist.tests.js" name="whitelist">
+    <js-module src="tests/whitelist.tests.js" name="whitelist.tests">
     </js-module>
 </plugin>
