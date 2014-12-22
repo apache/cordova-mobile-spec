@@ -474,7 +474,7 @@ function updateJS() {
                 }
                 popd();
 
-                var src = path.join(cordova_js_git_dir, "pkg", "cordova." + (platform === "wp8" ? "windowsphone" : platform) + ".js");
+                var src = path.join(cordova_js_git_dir, "pkg", "cordova." + platform + ".js");
                 var dest = argv.plugman ? join_paths([top_dir, getProjName(platform)].concat(platform_layout[platform].www).concat(["cordova.js"])) :
                                           path.join(cli_project_dir, "platforms", platform, "platform_www", "cordova.js");
                 shelljs.cp("-f", src, dest);
