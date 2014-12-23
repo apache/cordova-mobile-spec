@@ -102,6 +102,7 @@ exports.defineAutoTests = function () {
                 expect(typeof window.localStorage.setItem).toBe("function");
                 expect(typeof window.localStorage.removeItem).toBe("function");
                 expect(typeof window.localStorage.clear).toBe("function");
+                window.localStorage.clear();
             });
 
             it("storage.spec.10 check length", function () {
@@ -176,43 +177,51 @@ exports.defineAutoTests = function () {
         describe("HTML 5 Storage", function () {
             it("storage.spec.9 should exist", function () {
                 expect(window.openDatabase);
-
             });
-
 
             it("storage.spec.17 should contain an openDatabase function", function () {
                 //IE doesn't support openDatabase method
-                if (isWindows || isWindowsPhone)
+                if (isWindows || isWindowsPhone) {
                     pending();
+                }
                 expect(window.openDatabase).toBeDefined();
-                if (window.openDatabase)
-                    expect(typeof window.openDatabase == 'function').toBe(true);
+                if (window.openDatabase) {
+                    expect(typeof window.openDatabase).toBe('function');
+                }
             });
 
-
-            it("storage.spec.18 Should be able to create and drop tables", function (done) {
-                if (!window.openDatabase)
-                    pending();
-
-                var fail = function (done) {
-                    expect(true).toBe(false);
-                    done();
+            describe("HTML 5 Storage", function () {
+                var errorHandler = {
+                    onError: function (done) {
+                        if (typeof done === 'function') {
+                            done();
+                        }
+                    }
                 };
 
-                var win = function (done) {
-                    expect(true).toBe(true);
-                    done();
-                }
+                beforeEach(function () {
+                    spyOn(errorHandler, 'onError').and.callThrough();
+                });
 
-                var db = openDatabase("Database", "1.0", "HTML5 Database API example", 5 * 1024 * 1024);
-                db.transaction(function (t) {
-                    t.executeSql('CREATE TABLE IF NOT EXISTS foo(id int, name varchar(255));');
-                    t.executeSql('CREATE TABLE IF NOT EXISTS foo2(id int, name varchar(255));');
-                }, fail, function () {
+                afterEach(function () {
+                    expect(errorHandler.onError).not.toHaveBeenCalled();
+                });
+
+                it("storage.spec.18 Should be able to create and drop tables", function (done) {
+                    if (!window.openDatabase) {
+                        pending();
+                    }
+
+                    var db = openDatabase("Database", "1.0", "HTML5 Database API example", 5 * 1024 * 1024);
                     db.transaction(function (t) {
-                        t.executeSql('DROP TABLE foo;');
-                        t.executeSql('DROP TABLE foo2');
-                    }, fail, win);
+                        t.executeSql('CREATE TABLE IF NOT EXISTS foo(id int, name varchar(255));');
+                        t.executeSql('CREATE TABLE IF NOT EXISTS foo2(id int, name varchar(255));');
+                    }, errorHandler.onError.bind(null, done), function () {
+                        db.transaction(function (t) {
+                            t.executeSql('DROP TABLE foo;');
+                            t.executeSql('DROP TABLE foo2');
+                        }, errorHandler.onError.bind(null, done), done);
+                    });
                 });
             });
         });

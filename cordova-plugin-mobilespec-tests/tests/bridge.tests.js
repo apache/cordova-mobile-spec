@@ -17,22 +17,23 @@
  * specific language governing permissions and limitations
  * under the License.
  *
-*/
-    exports.defineAutoTests = function () {
-        describe('Bridge', function (done) {
-            it("bridge.spec.1 should reject bridge from iframe with data: URL", function (done) {
-                if (cordova.platformId != 'android')
-                    pending();
-                var ifr = document.createElement('iframe');
-               
-                ifr.src = 'data:text/html,';
-                ifr.onload = function() {
-                    var stolenSecret = ifr.contentWindow.prompt('', 'gap_init:');
-                    expect(!!stolenSecret).toBe(false);
-                    done();
-                };
-                document.body.appendChild(ifr);
-            });
+ */
+exports.defineAutoTests = function () {
+    describe('Bridge', function (done) {
+        it("bridge.spec.1 should reject bridge from iframe with data: URL", function (done) {
+            if (cordova.platformId != 'android') {
+                pending();
+            }
+            var ifr = document.createElement('iframe');
 
+            ifr.src = 'data:text/html,';
+            ifr.onload = function () {
+                var stolenSecret = ifr.contentWindow.prompt('', 'gap_init:');
+                expect(!!stolenSecret).toBe(false);
+                done();
+            };
+            document.body.appendChild(ifr);
         });
-    }
+
+    });
+}

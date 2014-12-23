@@ -17,48 +17,52 @@
  * specific language governing permissions and limitations
  * under the License.
  *
-*/
+ */
 
 exports.defineAutoTests = function () {
 
     var isWindowsPhone = cordova.platformId == 'windowsphone';
     var isWindows = (cordova.platformId === "windows") || (cordova.platformId === "windows8")
 
-    // Timeout is 2 seconds to allow physical devices enough
-    // time to query the response. This is important for some
-    // Android devices.
-    var Tests = function () { };
-    Tests.TEST_TIMEOUT = 7500;
-  
     describe('Whitelist API (cordova.whitelist)', function () {
+
         it("should exist", function () {
             expect(cordova.whitelist).toBeDefined();
         });
 
         describe("Match function", function () {
-
             function expectMatchWithResult(result) {
                 return (function (url, patterns, description) {
                     description = description || ((result ? "should accept " : "should reject ") + url + " for " + JSON.stringify(patterns));
                     this.result = result;
 
                     describe("Match function", function () {
+                        // Timeout is 7.5 seconds to allow physical devices enough
+                        // time to query the response. This is important for some
+                        // Android devices.
+                        var originalTimeout,
+                            cb;
 
                         if (isWindows || isWindowsPhone) {
                             pending();
                         }
-                      
+
                         beforeEach(function (done) {
-                            this.cb = jasmine.createSpy('spy');
-                            cordova.whitelist.match(url, patterns, this.cb);
-                            done();
-                        }, Tests.TEST_TIMEOUT);
-                      
-                        it(description, function (done) {
-                            expect(this.cb).toHaveBeenCalledWith(result);
-                            done(); // call this to finish off the it block
-                        }, Tests.TEST_TIMEOUT);
-                      
+                            originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+                            jasmine.DEFAULT_TIMEOUT_INTERVAL = 7500;
+                            cb = jasmine.createSpy('spy').and.callFake(function () {
+                                done();
+                            });
+                            cordova.whitelist.match(url, patterns, cb);
+                        });
+
+                        afterEach(function () {
+                            jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+                        });
+
+                        it(description, function () {
+                            expect(cb).toHaveBeenCalledWith(result);
+                        });
                     });
                 });
             }
@@ -140,35 +144,40 @@ exports.defineAutoTests = function () {
             itShouldNotMatch('http://www.apache.org/bar/foo/', ['*://*.apache.org/foo/*']);
             itShouldNotMatch('http://www.apache.org/Foo/', ['*://*.apache.org/foo/*']);
             itShouldNotMatch('http://www.apache.org/Foo/bar', ['*://*.apache.org/foo/*']);
-
         });
 
-    describe("Test function", function () {
-        function expectTestWithResult(result) {
-            return (function (url, description) {
-                description = description || ((result ? "should accept " : "should reject ") + url);
-                    
-                describe("Test function", function () {
+        describe("Test function", function () {
+            function expectTestWithResult(result) {
+                return (function (url, description) {
+                    description = description || ((result ? "should accept " : "should reject ") + url);
 
-                    if (isWindows || isWindowsPhone) {
-                        pending();
-                    }
-                     
-                    beforeEach(function (done) {
-                        this.cb = jasmine.createSpy('spy');
-                        cordova.whitelist.test(url, this.cb);
-                        done();
-                    }, Tests.TEST_TIMEOUT);
-                     
-                    it(description, function (done) {
-                          
-                        expect(this.cb).toHaveBeenCalledWith(result);
-                        done(); // call this to finish off the it block  
+                    describe("Test function", function () {
+                        if (isWindows || isWindowsPhone) {
+                            pending();
+                        }
+
+                        var cb,
+                            originalTimeout;
+
+                        beforeEach(function (done) {
+                            originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+                            jasmine.DEFAULT_TIMEOUT_INTERVAL = 7500;
+                            cb = jasmine.createSpy('spy').and.callFake(function (){
+                                done();
+                            });
+                            cordova.whitelist.test(url, cb);
+                        });
+
+                        afterEach(function () {
+                            jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+                        });
+
+                        it(description, function () {
+                            expect(cb).toHaveBeenCalledWith(result);
+                        });
                     });
                 });
-                    
-            });
-        } 
+            }
 
             var itShouldAccept = expectTestWithResult(true);
             var itShouldReject = expectTestWithResult(false);
