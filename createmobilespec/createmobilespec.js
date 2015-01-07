@@ -87,21 +87,6 @@ var top_dir =             process.cwd() + path.sep,
                                               "www": ["www"] },
                             "wp8":          { "bin": ["cordova-wp8"],
                                               "www": ["www"] } },
-    platform_dirs =       {"amazon-fireos": ["cordova-amazon-fireos"],
-                           "android": ["cordova-android"],
-                           "blackberry10": ["cordova-blackberry"],
-                           "ios": ["cordova-ios"],
-                           "windows8": ["cordova-windows"],
-                           "windows": ["cordova-windows"],
-                           "wp8": ["cordova-wp8"]},
-    // where to put the cordova.js file in a non-CLI project
-    platform_www_dirs =   {"amazon-fireos": ["assets", "www"],
-                           "android": ["assets", "www"],
-                           "blackberry10": ["www"],
-                           "ios": ["www"],
-                           "windows8": ["www"],
-                           "windows": ["www"],
-                           "wp8": ["www"]},
     argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--global] [--globalplugins] [--skipjs] [--skiplink] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.\n" +
@@ -369,15 +354,6 @@ if (argv.plugman) {
 
     // Config.json file ---> linked to local libraries
     pushd(cli_project_dir);
-    var localPlatforms = {
-        "amazon-fireos" : [top_dir, "cordova-amazon-fireos"],
-        "android" : [top_dir, "cordova-android"],
-        "ios" : [top_dir, "cordova-ios"],
-        "blackberry10" : [top_dir, "cordova-blackberry"],
-        "wp8" : [top_dir, "cordova-wp8"],
-        "windows8" : [top_dir, "cordova-windows"],
-        "windows" : [top_dir, "cordova-windows"]
-    };
 
     // Executing platform Add
     console.log("Adding platforms...");
@@ -387,9 +363,9 @@ if (argv.plugman) {
         if (argv.global) {
             platformArg = platform;
         } else {
-            platformArg = path.join.apply(null, localPlatforms[platform]);
+            platformArg = join_paths([top_dir].concat(platform_layout[platform].bin));
             if (!fs.existsSync(platformArg)) {
-                couldNotFind(localPlatforms[platform][1], platform);
+                couldNotFind(platformArg, platform);
                 platforms = platforms.filter(function (p) { return p != platform; });
                 return;
             }
@@ -485,16 +461,17 @@ function updateJS() {
                 console.error("Grunt isn't installed in cordova-js, you need to:\n\trun `npm install` from: "+ cordova_js_git_dir);
             }
 
-            pushd(cordova_js_git_dir);
-            var nodeCommand = /^win/.test(process.platform) ? process.argv[0] + " " : "";
-            var code = shelljs.exec(nodeCommand + path.join(__dirname, "node_modules", "grunt-cli", "bin", "grunt") + ' --platformVersion=MSTEST').code;
-            if (code) {
-                console.log("Failed to build js.");
-                process.exit(1);
-            }
-            popd();
-
             platforms.forEach(function (platform) {
+                var version = require(join_paths([top_dir].concat(platform_layout[platform].bin)) + '/package').version;
+                pushd(cordova_js_git_dir);
+                var nodeCommand = /^win/.test(process.platform) ? process.argv[0] + " " : "";
+                var code = shelljs.exec(nodeCommand + path.join(__dirname, "node_modules", "grunt-cli", "bin", "grunt") + ' compile:' + platform + ' --platformVersion=' + version).code;
+                if (code) {
+                    console.log("Failed to build js.");
+                    process.exit(1);
+                }
+                popd();
+
                 var src = path.join(cordova_js_git_dir, "pkg", "cordova." + (platform === "wp8" ? "windowsphone" : platform) + ".js");
                 var dest = argv.plugman ? join_paths([top_dir, getProjName(platform)].concat(platform_layout[platform].www).concat(["cordova.js"])) :
                                           path.join(cli_project_dir, "platforms", platform, "platform_www", "cordova.js");
@@ -541,7 +518,7 @@ function summary() {
 }
 
 if (platforms.length) {
-    installPlugins();
     updateJS();
+    installPlugins();
     summary();
 }
