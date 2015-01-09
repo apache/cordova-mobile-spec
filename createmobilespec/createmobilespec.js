@@ -114,6 +114,7 @@ var top_dir =             process.cwd() + path.sep,
                                                "\t\t\tCannot be used with --global because it is implied when --global is used.")
                    .boolean("skiplink").describe("skiplink", "Do not check 'npm link' of our own dependent modules such as cordova-lib when on master.\n" +
                                                  "\t\t\tUse only when you know what you are doing, this should be very rare.")
+                   .boolean("linkplugins").describe("linkplugins", "Use the --link flag when running `cordova plugin add`.\n")
                    .alias("h", "help")
                    .argv;
 
@@ -422,13 +423,14 @@ function installPlugins() {
         pushd(cli_project_dir);
         // we do need local plugin-test-framework
         console.log("Installing local test framework plugins...");
-        shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir);
-        shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir);
+        var linkFlag = argv.linkplugins ? ' --link' : '';
+        shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir + linkFlag);
+        shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir + linkFlag);
         
         if (argv.globalplugins) {
-            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin"));
+            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + linkFlag);
         } else {
-            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + searchpath);
+            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + searchpath + linkFlag);
         }
 
         // Install new-style test plugins
@@ -440,7 +442,7 @@ function installPlugins() {
             pluginTestPaths.push(path.dirname(potential_tests_plugin_xml));
           }
         });
-        shelljs.exec(cli + " plugin add " + pluginTestPaths.join(' '));
+        shelljs.exec(cli + " plugin add " + pluginTestPaths.join(' ') + linkFlag);
 
         popd();
     }
