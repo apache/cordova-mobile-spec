@@ -439,7 +439,7 @@ function installPlugins() {
         shelljs.ls('plugins').forEach(function(plugin) {
           var potential_tests_plugin_xml = path.join('plugins', plugin, 'tests', 'plugin.xml');
           if (fs.existsSync(potential_tests_plugin_xml)) {
-            pluginTestPaths.push(path.dirname(potential_tests_plugin_xml));
+            pluginTestPaths.push(path.resolve(path.dirname(potential_tests_plugin_xml)));
           }
         });
         shelljs.exec(cli + " plugin add " + pluginTestPaths.join(' ') + linkFlag);
