@@ -43,4 +43,7 @@
     
     <js-module src="tests/whitelist.tests.js" name="whitelist.tests">
     </js-module>
+
+    <js-module src="tests/input.tests.js" name="input.tests">
+    </js-module>
 </plugin>
