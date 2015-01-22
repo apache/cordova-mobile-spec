@@ -115,6 +115,7 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("skiplink").describe("skiplink", "Do not check 'npm link' of our own dependent modules such as cordova-lib when on master.\n" +
                                                  "\t\t\tUse only when you know what you are doing, this should be very rare.")
                    .boolean("linkplugins").describe("linkplugins", "Use the --link flag when running `cordova plugin add`.\n")
+                   .boolean("browserify").describe("browserify", "Use the --browserify flag when running `cordova plugin add`.\n")
                    .alias("h", "help")
                    .argv;
 
@@ -168,6 +169,7 @@ var cli = argv.global ? "cordova" : cli_local_bin;
 
 var projectDirName = argv._[0] || "mobilespec";
 var cli_project_dir = path.join(top_dir, projectDirName);
+var browserifyFlag = ' --browserify';
 
 // Print relevant information
 if (!fs.existsSync(path.join("cordova-coho", "coho"))) {
@@ -244,18 +246,21 @@ function getBranchName(moduleName) {
     var isConfigFatal = shelljs.config.fatal;
     shelljs.config.fatal = false;
     cdInto(moduleName);
-    // output should look like: refs/head/master
-    var gitOutput = shelljs.exec("git symbolic-ref HEAD").output;
-    shelljs.config.fatal = isConfigFatal;
-    var match = /refs\/heads\/(.*)/.exec(gitOutput);
-    if (!match) {
-        if (gitOutput.indexOf("is not a symbolic ref") > -1) {
-            throw new Error(moduleName + ' is not on a named git branch.');
+    try {
+        // output should look like: refs/head/master
+        var gitOutput = shelljs.exec("git symbolic-ref HEAD").output;
+        shelljs.config.fatal = isConfigFatal;
+        var match = /refs\/heads\/(.*)/.exec(gitOutput);
+        if (!match) {
+            if (gitOutput.indexOf("is not a symbolic ref") > -1) {
+                return "detached from HEAD";
+            }
+            throw new Error('Could not parse branch name from: ' + gitOutput + '(in module ' + moduleName + ')');
         }
-        throw new Error('Could not parse branch name from: ' + gitOutput + '(in module ' + moduleName + ')');
+        return match[1];
+    } finally {
+        cdOutOf();
     }
-    cdOutOf();
-    return match[1];
 }
 
 function verifyNpmLinkOf(linkedModule, installedModule) {
@@ -395,7 +400,7 @@ function installPlugins() {
             shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
                          " install --platform " + platform +
                          " --project . --plugin " + path.join("..", "cordova-mobile-spec", "dependencies-plugin") +
-                         " --searchpath " + top_dir);
+                         " --searchpath " + top_dir + browserifyFlag);
 
             // Install new-style test plugins
             console.log("Adding plugin tests using plugman...");
@@ -407,7 +412,7 @@ function installPlugins() {
                 if (fs.existsSync(potential_tests_plugin_xml)) {
                     shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
                                 " install --platform " + platform +
-                                " --project . --plugin " + path.dirname(potential_tests_plugin_xml));
+                                " --project . --plugin " + path.dirname(potential_tests_plugin_xml) + browserifyFlag);
                 }
             });
             popd();
@@ -424,13 +429,13 @@ function installPlugins() {
         // we do need local plugin-test-framework
         console.log("Installing local test framework plugins...");
         var linkFlag = argv.linkplugins ? ' --link' : '';
-        shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir + linkFlag);
-        shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir + linkFlag);
+        shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir + linkFlag + browserifyFlag);
+        shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir + linkFlag + browserifyFlag);
         
         if (argv.globalplugins) {
-            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + linkFlag);
+            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + linkFlag + browserifyFlag);
         } else {
-            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + searchpath + linkFlag);
+            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + searchpath + linkFlag + browserifyFlag);
         }
 
         // Install new-style test plugins
@@ -442,7 +447,7 @@ function installPlugins() {
             pluginTestPaths.push(path.resolve(path.dirname(potential_tests_plugin_xml)));
           }
         });
-        shelljs.exec(cli + " plugin add " + pluginTestPaths.join(' ') + linkFlag);
+        shelljs.exec(cli + " plugin add " + pluginTestPaths.join(' ') + linkFlag + browserifyFlag);
 
         popd();
     }
@@ -497,7 +502,7 @@ function summary() {
 
         // Executing cordova prepare
         console.log("Preparing project...");
-        shelljs.exec(cli + " prepare");
+        shelljs.exec(cli + " prepare" + browserifyFlag);
 
         if (!argv.global) {
             console.log("Linking CLI...");
