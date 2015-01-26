@@ -27,6 +27,8 @@ var fs            = require("fs"),
     shelljs,
     optimist;
 
+var startTime = Date.now();
+
 function quietshell(fn) {
     var config = shelljs.config,
         silent = config.silent;
@@ -87,7 +89,7 @@ var top_dir =             process.cwd() + path.sep,
                                               "www": ["www"] },
                             "wp8":          { "bin": ["cordova-wp8"],
                                               "www": ["www"] } },
-    argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--global] [--globalplugins] [--skipjs] [--skiplink] [directoryName]\n" +
+    argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--link] [--global] [--globalplugins] [--skipjs] [--skiplink] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.\n" +
                           "\tPLATFORM: [--<amazon|android|blackberry10|ios|windows|windows8|wp8>]\n" +
@@ -115,6 +117,8 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("skiplink").describe("skiplink", "Do not check 'npm link' of our own dependent modules such as cordova-lib when on master.\n" +
                                                  "\t\t\tUse only when you know what you are doing, this should be very rare.")
                    .boolean("linkplugins").describe("linkplugins", "Use the --link flag when running `cordova plugin add`.\n")
+                   .boolean("linkplatforms").describe("linkplatforms", "Use the --link flag when running `cordova platform add`.\n")
+                   .boolean("link").describe("link", "Alias for --linkplugins --linkplatforms.\n")
                    .boolean("browserify").describe("browserify", "Use the --browserify flag when running `cordova plugin add`.\n")
                    .alias("h", "help")
                    .argv;
@@ -169,7 +173,7 @@ var cli = argv.global ? "cordova" : cli_local_bin;
 
 var projectDirName = argv._[0] || "mobilespec";
 var cli_project_dir = path.join(top_dir, projectDirName);
-var browserifyFlag = ' --browserify';
+var browserifyFlag = argv.browserify ? ' --browserify' : '';
 
 // Print relevant information
 if (!fs.existsSync(path.join("cordova-coho", "coho"))) {
@@ -377,7 +381,8 @@ if (argv.plugman) {
             }
         }
         console.log("platformArg: " + cli + " " + platformArg);
-        shelljs.exec(cli + ' platform add "' + platformArg + '" --verbose');
+        var linkPlatformsFlag = (argv.link || argv.linkplatforms) ? ' --link' : '';
+        shelljs.exec(cli + ' platform add "' + platformArg + '" --verbose' + linkPlatformsFlag);
     });
     popd();
 }
@@ -428,14 +433,14 @@ function installPlugins() {
         pushd(cli_project_dir);
         // we do need local plugin-test-framework
         console.log("Installing local test framework plugins...");
-        var linkFlag = argv.linkplugins ? ' --link' : '';
-        shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir + linkFlag + browserifyFlag);
-        shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir + linkFlag + browserifyFlag);
+        var linkPluginsFlag = (argv.link || argv.linkplugins) ? ' --link' : '';
+        shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir + linkPluginsFlag + browserifyFlag);
+        shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir + linkPluginsFlag + browserifyFlag);
         
         if (argv.globalplugins) {
-            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + linkFlag + browserifyFlag);
+            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + linkPluginsFlag + browserifyFlag);
         } else {
-            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + searchpath + linkFlag + browserifyFlag);
+            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + searchpath + linkPluginsFlag + browserifyFlag);
         }
 
         // Install new-style test plugins
@@ -447,7 +452,7 @@ function installPlugins() {
             pluginTestPaths.push(path.resolve(path.dirname(potential_tests_plugin_xml)));
           }
         });
-        shelljs.exec(cli + " plugin add " + pluginTestPaths.join(' ') + linkFlag + browserifyFlag);
+        shelljs.exec(cli + " plugin add " + pluginTestPaths.join(' ') + linkPluginsFlag + browserifyFlag);
 
         popd();
     }
@@ -492,11 +497,13 @@ function updateJS() {
 ////////////////////// wrap-up
 
 function summary() {
+    var scriptTimeStr = 'Script took ' + Math.round((Date.now() - startTime)/100)/10 + ' seconds';
     if (argv.plugman) {
         platforms.forEach(function (platform) {
             var projName = getProjName(platform);
             console.log("Done. " + platform + " project created at " + path.join(top_dir, projName));
         });
+        console.log(scriptTimeStr);
     } else {
         pushd(cli_project_dir);
 
@@ -520,6 +527,7 @@ function summary() {
         popd();
 
         console.log("Done. Project created at " + cli_project_dir);
+        console.log(scriptTimeStr);
         console.log("You may run it via \"cd " + cli_project_dir + " && ./cordova run " + platforms[0] + "\"");
     }
 }
