@@ -399,7 +399,7 @@ function installPlugins() {
         }
         platforms.forEach(function (platform) {
             var projName = getProjName(platform),
-                nodeCommand = /^win/.test(process.platform) ? process.argv[0] +" " : "";
+                nodeCommand = /^win/.test(process.platform) ? ("\"" + process.argv[0] + "\" ") : "";
             pushd(projName);
             // plugin path must be relative and not absolute (sigh)
             shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
@@ -436,7 +436,7 @@ function installPlugins() {
         var linkPluginsFlag = (argv.link || argv.linkplugins) ? ' --link' : '';
         shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir + linkPluginsFlag + browserifyFlag);
         shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir + linkPluginsFlag + browserifyFlag);
-        
+
         if (argv.globalplugins) {
             shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + linkPluginsFlag + browserifyFlag);
         } else {
@@ -476,7 +476,7 @@ function updateJS() {
             platforms.forEach(function (platform) {
                 var version = require(join_paths([top_dir].concat(platform_layout[platform].bin)) + '/package').version;
                 pushd(cordova_js_git_dir);
-                var nodeCommand = /^win/.test(process.platform) ? process.argv[0] + " " : "";
+                var nodeCommand = /^win/.test(process.platform) ? ("\"" + process.argv[0] + "\" ") : "";
                 var code = shelljs.exec(nodeCommand + path.join(__dirname, "node_modules", "grunt-cli", "bin", "grunt") + ' compile:' + platform + ' --platformVersion=' + version).code;
                 if (code) {
                     console.log("Failed to build js.");
