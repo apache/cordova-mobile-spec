@@ -120,8 +120,55 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("linkplatforms").describe("linkplatforms", "Use the --link flag when running `cordova platform add`.\n")
                    .boolean("link").describe("link", "Alias for --linkplugins --linkplatforms.\n")
                    .boolean("browserify").describe("browserify", "Use the --browserify flag when running `cordova plugin add`.\n")
+                   .boolean("telerikplugins").describe("telerikplugins", "Adds a bunch of known-to-be-popular plugins from Telerik-Verified-Plugins.\n")
+                   .boolean("cprplugins").describe("cprplugins", "Adds a bunch of known-to-be-popular plugins from Cordova Plugin Regsitry.\n")
+                   .boolean("plugregplugins").describe("cprplugins", "Adds a bunch of known-to-be-popular plugins from PlugReg (that are not on the CPR).\n")
+                   .boolean("thirdpartyplugins").describe("thirdpartyplugins", "Alias for --telerikplugins --cprplugins --plugregplugins.\n")
                    .alias("h", "help")
                    .argv;
+
+// List generated based on download counts on registry.
+var CORDOVA_REGISTRY_PLUGINS = [
+    'com.ionic.keyboard',
+    'com.google.playservices',
+    'de.appplant.cordova.plugin.local-notification',
+    'com.phonegap.plugins.barcodescanner',
+    'com.cranberrygame.phonegap.plugin.ad.admob',
+    // 'com.google.cordova.admob', // these two conflict. Use the most popular one.
+    // 'com.google.admob',
+    // Currently need an git version of this to fix a bug in published version.
+    // It's a dep of plugin.google.maps
+    'https://github.com/wf9a5m75/phonegap-http-request.git',
+    'plugin.google.maps',
+    'com.rjfun.cordova.extension',
+    'net.yoik.cordova.plugins.screenorientation',
+    'de.appplant.cordova.plugin.email-composer',
+    'com.msopentech.azure-mobile-services',
+    // 'com.phonegap.plugins.pushplugin', // This one bundles play services, causing duplicate symbols
+    'com.phonegap.plugins.facebookconnect',
+    'com.danielcwilson.plugins.googleanalytics'
+];
+// Commented out plugins are popular, but duplicate those in CPR.
+var TELERIK_VERIFIED_PLUGINS = [
+    'https://github.com/Telerik-Verified-Plugins/Flashlight',
+    'https://github.com/Telerik-Verified-Plugins/SocialSharing',
+    'https://github.com/Telerik-Verified-Plugins/ActionSheet',
+    'https://github.com/Telerik-Verified-Plugins/Calendar',
+    // 'https://github.com/Telerik-Verified-Plugins/EmailComposer',
+    'https://github.com/Telerik-Verified-Plugins/NativePageTransitions',
+    'https://github.com/Telerik-Verified-Plugins/Toast',
+    // 'https://github.com/Telerik-Verified-Plugins/BarcodeScanner',
+    'https://github.com/Telerik-Verified-Plugins/Keychain',
+    // 'https://github.com/Telerik-Verified-Plugins/Keyboard',
+    'https://github.com/Telerik-Verified-Plugins/NFC',
+    'https://github.com/Telerik-Verified-Plugins/AppVersion',
+    'https://github.com/Telerik-Verified-Plugins/PrivacyScreen'
+];
+var PLUGREG_PLUGINS = [
+    'https://github.com/brodysoft/Cordova-SQLitePlugin.git',
+    // 'https://github.com/wildabeast/BarcodeScanner.git',
+    // 'https://github.com/phonegap-build/PushPlugin.git',
+];
 
 if (!fs.existsSync(mobile_spec_git_dir)) {
     console.log("Please run this script from "+path.dirname(path.dirname(__dirname)));
@@ -383,6 +430,11 @@ if (argv.plugman) {
         console.log("platformArg: " + cli + " " + platformArg);
         var linkPlatformsFlag = (argv.link || argv.linkplatforms) ? ' --link' : '';
         shelljs.exec(cli + ' platform add "' + platformArg + '" --verbose' + linkPlatformsFlag);
+        if (platform == 'android') {
+            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.properties'), path.join('platforms', 'android'));
+            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.p12'), path.join('platforms', 'android'));
+            shelljs.cp(path.join(__dirname, 'helper_files', 'build-extras.gradle'), path.join('platforms', 'android'));
+        }
     });
     popd();
 }
@@ -441,6 +493,19 @@ function installPlugins() {
             shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + linkPluginsFlag + browserifyFlag);
         } else {
             shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + searchpath + linkPluginsFlag + browserifyFlag);
+        }
+        
+        if (argv.thirdpartyplugins || argv.cprplugins) {
+            shelljs.exec(cli + " plugin add " + CORDOVA_REGISTRY_PLUGINS.join(' ') + searchpath + browserifyFlag + ' --variable API_KEY_FOR_ANDROID="AIzaSyBICVSs9JqT7WdASuN5HSe7w-pCE0n_X88" --variable API_KEY_FOR_IOS="AIzaSyAikyYG24YYFvq5Vy41P5kppsfO2GgF9jM"');
+            // Delete duplicate <uses-permission> due to maxSdk (CB-8401)
+            shelljs.sed('-i', /{[^{]*(maxSdk|WRITE_EXTERNAL_STORAGE).*?(maxSdk|WRITE_EXTERNAL_STORAGE)[^}]*},/, '', path.join('plugins', 'android.json'));
+            shelljs.sed('-i', /<.*(maxSdk|WRITE_EXTERNAL_STORAGE).*(maxSdk|WRITE_EXTERNAL_STORAGE).*>/, '', path.join('platforms', 'android', 'AndroidManifest.xml'));
+        }
+        if (argv.thirdpartyplugins || argv.telerikplugins) {
+            shelljs.exec(cli + " plugin add " + TELERIK_VERIFIED_PLUGINS.join(' ') + searchpath + browserifyFlag);
+        }
+        if (argv.thirdpartyplugins || argv.plugregplugins) {
+            shelljs.exec(cli + " plugin add " + PLUGREG_PLUGINS.join(' ') + searchpath + browserifyFlag);
         }
 
         // Install new-style test plugins
