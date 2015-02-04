@@ -124,6 +124,7 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("cprplugins").describe("cprplugins", "Adds a bunch of known-to-be-popular plugins from Cordova Plugin Regsitry.\n")
                    .boolean("plugregplugins").describe("cprplugins", "Adds a bunch of known-to-be-popular plugins from PlugReg (that are not on the CPR).\n")
                    .boolean("thirdpartyplugins").describe("thirdpartyplugins", "Alias for --telerikplugins --cprplugins --plugregplugins.\n")
+                   .string("webview").describe("webview", "Use --webview=crosswalk to install the crosswalk plugin")
                    .alias("h", "help")
                    .argv;
 
@@ -489,6 +490,10 @@ function installPlugins() {
         shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir + linkPluginsFlag + browserifyFlag);
         shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir + linkPluginsFlag + browserifyFlag);
 
+        if (argv.webview == 'crosswalk') {
+            var xwalkPluginId = fs.existsSync('cordova-crosswalk-engine') ? 'org.crosswalk.engine' : 'https://github.com/MobileChromeApps/cordova-crosswalk-engine.git';
+            shelljs.exec(cli + " plugin add " + xwalkPluginId + ' --searchpath ' + top_dir + linkPluginsFlag + browserifyFlag);
+        }
         if (argv.globalplugins) {
             shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + linkPluginsFlag + browserifyFlag);
         } else {
