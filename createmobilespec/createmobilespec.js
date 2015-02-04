@@ -488,6 +488,15 @@ function installPlugins() {
         var linkPluginsFlag = (argv.link || argv.linkplugins) ? ' --link' : '';
         shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir + linkPluginsFlag + browserifyFlag);
         shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir + linkPluginsFlag + browserifyFlag);
+
+        if (argv.webview == "crosswalk") {
+            if (!fs.existsSync('cordova-crosswalk-engine')) {
+                console.log('        need pull cordova-crosswalk-engine from github in ' + top_dir);
+                return;
+            } else {
+                shelljs.exec(cli + " plugin add org.crosswalk.engine --searchpath " + top_dir + linkPluginsFlag + browserifyFlag);
+            }
+        }
         
         if (argv.globalplugins) {
             shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + linkPluginsFlag + browserifyFlag);
