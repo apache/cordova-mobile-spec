@@ -501,7 +501,9 @@ function installPlugins() {
         }
         
         if (argv.thirdpartyplugins || argv.cprplugins) {
-            shelljs.exec(cli + " plugin add " + CORDOVA_REGISTRY_PLUGINS.join(' ') + searchpath + browserifyFlag + ' --variable API_KEY_FOR_ANDROID="AIzaSyBICVSs9JqT7WdASuN5HSe7w-pCE0n_X88" --variable API_KEY_FOR_IOS="AIzaSyAikyYG24YYFvq5Vy41P5kppsfO2GgF9jM"');
+            var mapVars = ' --variable API_KEY_FOR_ANDROID="AIzaSyBICVSs9JqT7WdASuN5HSe7w-pCE0n_X88" --variable API_KEY_FOR_IOS="AIzaSyAikyYG24YYFvq5Vy41P5kppsfO2GgF9jM"';
+            var fbVars = ' --variable APP_ID=value --variable APP_NAME=value';
+            shelljs.exec(cli + " plugin add " + CORDOVA_REGISTRY_PLUGINS.join(' ') + searchpath + browserifyFlag + mapVars + fbVars);
             // Delete duplicate <uses-permission> due to maxSdk (CB-8401)
             shelljs.sed('-i', /{[^{]*(maxSdk|WRITE_EXTERNAL_STORAGE).*?(maxSdk|WRITE_EXTERNAL_STORAGE)[^}]*},/, '', path.join('plugins', 'android.json'));
             shelljs.sed('-i', /<.*(maxSdk|WRITE_EXTERNAL_STORAGE).*(maxSdk|WRITE_EXTERNAL_STORAGE).*>/, '', path.join('platforms', 'android', 'AndroidManifest.xml'));
@@ -511,6 +513,9 @@ function installPlugins() {
         }
         if (argv.thirdpartyplugins || argv.plugregplugins) {
             shelljs.exec(cli + " plugin add " + PLUGREG_PLUGINS.join(' ') + searchpath + browserifyFlag);
+        }
+        if (argv.thirdpartyplugins) {
+            shelljs.exec(cli + " plugin add org.apache.cordova.mobilespec.thirdpartytests --searchpath " + mobile_spec_git_dir + linkPluginsFlag + browserifyFlag);
         }
 
         // Install new-style test plugins
