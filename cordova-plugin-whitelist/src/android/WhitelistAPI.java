@@ -27,6 +27,10 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import org.apache.cordova.PluginManager;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 public class WhitelistAPI extends CordovaPlugin {
     /**
      * Executes the request and returns PluginResult.
@@ -50,7 +54,34 @@ public class WhitelistAPI extends CordovaPlugin {
             return true;
         } else if (action.equals("URLIsAllowed")) {
             String url = args.getString(0);
-            boolean isAllowed = Config.isUrlWhiteListed(url);
+            /* This code exists for compatibility between 3.x and 4.x versions of Cordova.
+             * Previously the CordovaWebView class had a method, getWhitelist, which would
+             * return a Whitelist object. Since the fixed whitelist is removed in Cordova 4.x,
+             * the correct call now is to shouldAllowRequest from the plugin manager.
+             */
+            Boolean isAllowed = null;
+            try {
+                Method isUrlWhiteListed = Config.class.getDeclaredMethod("isUrlWhitelisted", String.class);
+                isAllowed = (Boolean)isUrlWhiteListed.invoke(url);
+            } catch (NoSuchMethodException e) {
+            } catch (IllegalAccessException e) {
+            } catch (InvocationTargetException e) {
+            }
+            if (isAllowed == null) {
+                try {
+                    Method gpm = webView.getClass().getMethod("getPluginManager");
+                    PluginManager pm = (PluginManager)gpm.invoke(webView);
+                    Method isAllowedMethod = pm.getClass().getMethod("shouldAllowRequest", String.class);
+                    isAllowed = (Boolean)isAllowedMethod.invoke(pm, url);
+                    if (isAllowed == null) {
+                        isAllowed = false;
+                    }
+                } catch (NoSuchMethodException e) {
+                } catch (IllegalAccessException e) {
+                } catch (InvocationTargetException e) {
+                }
+            }
+
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, isAllowed));
             return true;
         }
