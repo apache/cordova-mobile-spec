@@ -89,10 +89,12 @@ var top_dir =             process.cwd() + path.sep,
                                               "www": ["www"] },
                             "wp8":          { "bin": ["cordova-wp8"],
                                               "www": ["www"] } },
+                            "firefoxos":      { "bin": ["cordova-firefoxos"],
+                                              "www": ["www"] },
     argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--link] [--global] [--globalplugins] [--skipjs] [--skiplink] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.\n" +
-                          "\tPLATFORM: [--<amazon|android|blackberry10|ios|windows|windows8|wp8>]\n" +
+                          "\tPLATFORM: [--<amazon|android|blackberry10|ios|windows|windows8|wp8|firefoxos>]\n" +
                           "")
                    .boolean("help").describe("help", "Shows usage.")
                    .boolean("debug").describe("debug", "Debug logging.")
@@ -103,6 +105,7 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("windows").describe("windows", "Add Windows (universal) platform.")
                    .boolean("windows8").describe("windows8", "Add Windows 8 (desktop) platform.")
                    .boolean("wp8").describe("wp8", "Add Windows Phone 8 platform.")
+                   .boolean("firefoxos").describe("firefoxos", "Add FirefoxOS platform.")
                    .boolean("plugman").describe("plugman", "Use {platform}/bin/create and plugman directly instead of the CLI.")
                    .boolean("global").describe("global", "Use the globally-installed `cordova` and the downloaded platforms/plugins from the registry instead of the local git repo.\n" +
                                                "\t\t\tWill use the local git repo of mobile-spec.\n" +
@@ -188,6 +191,7 @@ if (argv.blackberry10) { platforms.push("blackberry10"); }
 if (argv.wp8) { platforms.push("wp8"); }
 if (argv.windows8) { platforms.push("windows8"); }
 if (argv.windows) { platforms.push("windows"); }
+if (argv.firefoxos) { platforms.push("firefoxos"); }
 if (argv.plugman && argv.global) {
     console.log("The --global option can not be used with the --plugman option.");
     optimist.showHelp();
