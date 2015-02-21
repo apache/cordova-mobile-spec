@@ -88,9 +88,9 @@ var top_dir =             process.cwd() + path.sep,
                             "windows":      { "bin": ["cordova-windows"],
                                               "www": ["www"] },
                             "wp8":          { "bin": ["cordova-wp8"],
-                                              "www": ["www"] } },
-                            "firefoxos":      { "bin": ["cordova-firefoxos"],
                                               "www": ["www"] },
+                            "firefoxos":    { "bin": ["cordova-firefoxos"],
+                                              "www": ["www"] } },
     argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--link] [--global] [--globalplugins] [--skipjs] [--skiplink] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.\n" +
