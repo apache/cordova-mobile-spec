@@ -505,8 +505,10 @@ function installPlugins() {
             var fbVars = ' --variable APP_ID=value --variable APP_NAME=value';
             shelljs.exec(cli + " plugin add " + CORDOVA_REGISTRY_PLUGINS.join(' ') + searchpath + browserifyFlag + mapVars + fbVars);
             // Delete duplicate <uses-permission> due to maxSdk (CB-8401)
-            shelljs.sed('-i', /{[^{]*(maxSdk|WRITE_EXTERNAL_STORAGE).*?(maxSdk|WRITE_EXTERNAL_STORAGE)[^}]*},/, '', path.join('plugins', 'android.json'));
-            shelljs.sed('-i', /<.*(maxSdk|WRITE_EXTERNAL_STORAGE).*(maxSdk|WRITE_EXTERNAL_STORAGE).*>/, '', path.join('platforms', 'android', 'AndroidManifest.xml'));
+            if (argv.android) {
+                shelljs.sed('-i', /{[^{]*(maxSdk|WRITE_EXTERNAL_STORAGE).*?(maxSdk|WRITE_EXTERNAL_STORAGE)[^}]*},/, '', path.join('plugins', 'android.json'));
+                shelljs.sed('-i', /<.*(maxSdk|WRITE_EXTERNAL_STORAGE).*(maxSdk|WRITE_EXTERNAL_STORAGE).*>/, '', path.join('platforms', 'android', 'AndroidManifest.xml'));
+            }
         }
         if (argv.thirdpartyplugins || argv.telerikplugins) {
             shelljs.exec(cli + " plugin add " + TELERIK_VERIFIED_PLUGINS.join(' ') + searchpath + browserifyFlag);
