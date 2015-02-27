@@ -34,6 +34,10 @@
     <access origin="https://www.google.co.uk" />
     <access origin="http://techslides.com" />
     <access origin="httpssss://example.com" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="www.google.com" />
     <platform name="blackberry10">
         <access origin="file:///" />
         <access origin="https://www.apache.org" />

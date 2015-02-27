@@ -493,6 +493,9 @@ function installPlugins() {
         var linkPluginsFlag = (argv.link || argv.linkplugins) ? ' --link' : '';
         shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir + linkPluginsFlag + browserifyFlag);
         shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir + linkPluginsFlag + browserifyFlag);
+        if (argv.android) {
+            shelljs.exec(cli + " plugin add " + path.join(top_dir, 'cordova-plugins', 'url-policy') + linkPluginsFlag + browserifyFlag);
+        }
 
         if (argv.webview == 'crosswalk') {
             var xwalkPluginId = fs.existsSync('cordova-crosswalk-engine') ? 'org.crosswalk.engine' : 'https://github.com/MobileChromeApps/cordova-crosswalk-engine.git';
