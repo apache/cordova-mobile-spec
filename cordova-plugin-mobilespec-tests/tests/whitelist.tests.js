@@ -200,7 +200,7 @@ exports.defineAutoTests = function () {
             itShouldReject('http://www.apache.org:pass@evil.com/');
             itShouldReject('http://www.apache.org.evil.com/');
             itShouldAccept('file:///foo');
-            itShouldAccept('content:///foo');
+            itShouldReject('content:///foo');
         });
     });
 }

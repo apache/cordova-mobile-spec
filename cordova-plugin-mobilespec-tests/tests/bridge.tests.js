@@ -20,20 +20,27 @@
  */
 exports.defineAutoTests = function () {
     describe('Bridge', function (done) {
+        var frame;
+        afterEach(function () {
+            if (frame) {
+                document.body.removeChild(frame);
+            }
+        });
         it("bridge.spec.1 should reject bridge from iframe with data: URL", function (done) {
             if (cordova.platformId != 'android') {
                 pending();
+                return;
             }
-            var ifr = document.createElement('iframe');
+            frame = document.createElement('iframe');
 
-            ifr.src = 'data:text/html,';
-            ifr.onload = function () {
-                var stolenSecret = ifr.contentWindow.prompt('', 'gap_init:');
+            // Gets intercepted in native.
+            frame.src = 'http://stealbridgesecret.test/';
+            frame.onload = function () {
+                var stolenSecret = frame.contentWindow.prompt('', 'gap_init:');
                 expect(!!stolenSecret).toBe(false);
                 done();
             };
-            document.body.appendChild(ifr);
+            document.body.appendChild(frame);
         });
-
     });
 }

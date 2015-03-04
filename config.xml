@@ -38,6 +38,7 @@
     <allow-intent href="mailto:*" />
     <allow-intent href="tel:*" />
     <allow-intent href="www.google.com" />
+    <allow-navigation href="data:*" />
     <platform name="blackberry10">
         <access origin="file:///" />
         <access origin="https://www.apache.org" />

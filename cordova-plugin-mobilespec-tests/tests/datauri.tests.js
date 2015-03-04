@@ -22,31 +22,20 @@ exports.defineAutoTests = function () {
     var isWindows = (cordova.platformId === "windows") || (cordova.platformId === "windows8");
 
     describe('data uris', function () {
-        var gotFoo = false,
-            onMessageBind,
-            originalTimeout;
+        var frame;
+        var onMessageBind;
 
-        function onMessage (done, msg) {
-            gotFoo = gotFoo || msg.data == 'foo';
-            if (gotFoo) {
-                expect(gotFoo).toBe(true);
-                if (typeof(done) === 'function') {
-                    done();
-                }
+        function onMessage(done, msg) {
+            if (msg.data == 'foo') {
+                done();
             }
-        };
-
-        beforeEach(function () {
-            originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-            jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000;
-        });
+        }
 
         afterEach(function () {
-            if (this.frame) {
-                document.body.removeChild(this.frame);
+            if (frame) {
+                document.body.removeChild(frame);
                 window.removeEventListener('message', onMessageBind, false);
             }
-            jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
         });
 
         it("datauri.spec.1 should work with iframes", function (done) {
@@ -58,13 +47,12 @@ exports.defineAutoTests = function () {
                 pending();
             }
 
-            this.frame = document.createElement('iframe');
-
+            frame = document.createElement('iframe');
             onMessageBind = onMessage.bind(null, done);
             window.addEventListener('message', onMessageBind, false);
-            this.frame.src = 'data:text/html;charset=utf-8,%3Chtml%3E%3Cscript%3Eparent.postMessage%28%27foo%27%2C%27%2A%27%29%3C%2Fscript%3E%3C%2Fhtml%3E';
-            document.body.appendChild(this.frame);
-        }, 'iframe did not load.');
+            frame.src = 'data:text/html;charset=utf-8,%3Chtml%3E%3Cscript%3Eparent.postMessage%28%27foo%27%2C%27%2A%27%29%3C%2Fscript%3E%3C%2Fhtml%3E';
+            document.body.appendChild(frame);
+        }, 1000);
     });
 
     describe('data uris', function () {
