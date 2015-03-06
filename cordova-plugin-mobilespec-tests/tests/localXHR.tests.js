@@ -20,6 +20,8 @@
  */
 
 exports.defineAutoTests = function () {
+    var isWp8 = cordova.platformId === "windowsphone";
+
     describe("XMLHttpRequest", function () {
         var errorHandler = {
             onError: function (done) {
@@ -171,7 +173,7 @@ exports.defineAutoTests = function () {
 
     // only add these tests if we are testing on windows phone
 
-    if (/Windows Phone/.exec(navigator.userAgent)) {
+    if (isWp8) {
         describe("XMLHttpRequest Windows Phone", function () {
 
             var errorHandler = { onError: function () { } };
@@ -193,7 +195,6 @@ exports.defineAutoTests = function () {
                 return xhr;
             };
 
-            console.log("running special windows tests");
             it("XMLHttpRequest.spec.7 should be able to load the (WP8 backwards compatability) root page www/index.html", function (done) {
                 expect(function () {
                     createXHR("www/index.html", true, done, errorHandler.onError)
