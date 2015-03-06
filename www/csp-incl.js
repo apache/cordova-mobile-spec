@@ -49,7 +49,7 @@ if (!window._disableCSP) {
     switch (PLAT) {
         case 'android':
         case 'ios':
-            cspMetaContent = 'default-src \'self\'; connect-src \'self\' http://cordova-filetransfer.jitsu.com;frame-src \'self\' data: gap:; img-src \'self\' data:; style-src \'self\' \'unsafe-inline\'';
+            cspMetaContent = 'default-src \'self\' https://ssl.gstatic.com/accessibility/javascript/android/; connect-src \'self\' http://cordova-filetransfer.jitsu.com;frame-src \'self\' data: gap:; img-src \'self\' data:; style-src \'self\' \'unsafe-inline\'';
             break;
     }
 
