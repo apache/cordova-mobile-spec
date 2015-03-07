@@ -411,7 +411,7 @@ if (argv.plugman) {
     // Create the project using "cordova create"
     myDelete(cli_project_dir);
     console.log("Creating project mobilespec...");
-    shelljs.exec(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --link-to cordova-mobile-spec/www");
+    shelljs.exec(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --copy-from cordova-mobile-spec/www");
     shelljs.cp("-f", path.join(mobile_spec_git_dir, 'config.xml'), path.join(projectDirName, 'config.xml'));
 
     // Config.json file ---> linked to local libraries
@@ -506,7 +506,7 @@ function installPlugins() {
         } else {
             shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + searchpath + linkPluginsFlag + browserifyFlag);
         }
-        
+
         if (argv.thirdpartyplugins || argv.cprplugins) {
             var mapVars = ' --variable API_KEY_FOR_ANDROID="AIzaSyBICVSs9JqT7WdASuN5HSe7w-pCE0n_X88" --variable API_KEY_FOR_IOS="AIzaSyAikyYG24YYFvq5Vy41P5kppsfO2GgF9jM"';
             var fbVars = ' --variable APP_ID=value --variable APP_NAME=value';
