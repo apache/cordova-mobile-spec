@@ -29,6 +29,7 @@ var fs            = require("fs"),
 
 var startTime = Date.now();
 
+// helpers
 function quietshell(fn) {
     var config = shelljs.config,
         silent = config.silent;
@@ -52,6 +53,17 @@ function popd(dir) {
     return quietshell(function() {
         return shelljs.popd(dir);
     });
+}
+
+function pluginAdd(pluginName, searchPath, extraFlags) {
+    var command = cli + ' plugin add ' + pluginName;
+    if (searchPath) {
+        command += ' --searchpath ' + searchPath;
+    }
+    if (extraFlags) {
+        command + extraFlags;
+    }
+    shelljs.exec(command);
 }
 
 // Check that we can load dependencies
@@ -480,37 +492,44 @@ function installPlugins() {
             popd();
         });
     } else {
+
         // don't use local git repos for plugins when using --global.
-        var searchpath = argv.global ? "" : " --searchpath " + top_dir;
+        var searchpath = argv.global ? "" : top_dir;
+
         console.log("Adding plugins using CLI...");
         console.log("Searchpath:", searchpath);
         if (!fs.existsSync('cordova-plugin-test-framework')) {
             couldNotFind('cordova-plugin-test-framework');
         }
         pushd(cli_project_dir);
+
         // we do need local plugin-test-framework
         console.log("Installing local test framework plugins...");
         var linkPluginsFlag = (argv.link || argv.linkplugins) ? ' --link' : '';
-        shelljs.exec(cli + " plugin add org.apache.cordova.test.whitelist org.apache.cordova.test.echo --searchpath " + mobile_spec_git_dir + linkPluginsFlag + browserifyFlag);
-        shelljs.exec(cli + " plugin add org.apache.cordova.test-framework --searchpath " + top_dir + linkPluginsFlag + browserifyFlag);
+
+        pluginAdd('org.apache.cordova.test.whitelist', mobile_spec_git_dir, linkPluginsFlag + browserifyFlag);
+        pluginAdd('org.apache.cordova.test.echo', mobile_spec_git_dir, linkPluginsFlag + browserifyFlag);
+        pluginAdd('org.apache.cordova.test-framework', top_dir, linkPluginsFlag + browserifyFlag);
+
         if (argv.android) {
-            shelljs.exec(cli + " plugin add " + path.join(top_dir, 'cordova-plugins', 'whitelist') + linkPluginsFlag + browserifyFlag);
+            pluginAdd(path.join(top_dir, 'cordova-plugin-whitelist'), null, linkPluginsFlag + browserifyFlag);
         }
 
         if (argv.webview == 'crosswalk') {
             var xwalkPluginId = fs.existsSync('cordova-crosswalk-engine') ? 'org.crosswalk.engine' : 'https://github.com/MobileChromeApps/cordova-crosswalk-engine.git';
-            shelljs.exec(cli + " plugin add " + xwalkPluginId + ' --searchpath ' + top_dir + linkPluginsFlag + browserifyFlag);
+            pluginAdd(xwalkPluginId, top_dir, linkPluginsFlag + browserifyFlag);
         }
+
         if (argv.globalplugins) {
-            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + linkPluginsFlag + browserifyFlag);
+            pluginAdd(path.join(mobile_spec_git_dir, "dependencies-plugin"), null, linkPluginsFlag + browserifyFlag);
         } else {
-            shelljs.exec(cli + " plugin add " + path.join(mobile_spec_git_dir, "dependencies-plugin") + searchpath + linkPluginsFlag + browserifyFlag);
+            pluginAdd(path.join(mobile_spec_git_dir, "dependencies-plugin"), searchpath, linkPluginsFlag + browserifyFlag);
         }
-        
+
         if (argv.thirdpartyplugins || argv.cprplugins) {
             var mapVars = ' --variable API_KEY_FOR_ANDROID="AIzaSyBICVSs9JqT7WdASuN5HSe7w-pCE0n_X88" --variable API_KEY_FOR_IOS="AIzaSyAikyYG24YYFvq5Vy41P5kppsfO2GgF9jM"';
             var fbVars = ' --variable APP_ID=value --variable APP_NAME=value';
-            shelljs.exec(cli + " plugin add " + CORDOVA_REGISTRY_PLUGINS.join(' ') + searchpath + browserifyFlag + mapVars + fbVars);
+            pluginAdd(CORDOVA_REGISTRY_PLUGINS.join(' '), searchpath, browserifyFlag + mapVars + fbVars);
             // Delete duplicate <uses-permission> due to maxSdk (CB-8401)
             if (argv.android) {
                 shelljs.sed('-i', /{[^{]*(maxSdk|WRITE_EXTERNAL_STORAGE).*?(maxSdk|WRITE_EXTERNAL_STORAGE)[^}]*},/, '', path.join('plugins', 'android.json'));
@@ -518,13 +537,13 @@ function installPlugins() {
             }
         }
         if (argv.thirdpartyplugins || argv.telerikplugins) {
-            shelljs.exec(cli + " plugin add " + TELERIK_VERIFIED_PLUGINS.join(' ') + searchpath + browserifyFlag);
+            pluginAdd(TELERIK_VERIFIED_PLUGINS.join(' '), searchpath, browserifyFlag);
         }
         if (argv.thirdpartyplugins || argv.plugregplugins) {
-            shelljs.exec(cli + " plugin add " + PLUGREG_PLUGINS.join(' ') + searchpath + browserifyFlag);
+            pluginAdd(PLUGREG_PLUGINS.join(' '), searchpath, browserifyFlag);
         }
         if (argv.thirdpartyplugins) {
-            shelljs.exec(cli + " plugin add org.apache.cordova.mobilespec.thirdpartytests --searchpath " + mobile_spec_git_dir + linkPluginsFlag + browserifyFlag);
+            pluginAdd('org.apache.cordova.mobilespec.thirdpartytests', mobile_spec_git_dir, linkPluginsFlag + browserifyFlag);
         }
 
         // Install new-style test plugins
@@ -536,7 +555,7 @@ function installPlugins() {
             pluginTestPaths.push(path.resolve(path.dirname(potential_tests_plugin_xml)));
           }
         });
-        shelljs.exec(cli + " plugin add " + pluginTestPaths.join(' ') + linkPluginsFlag + browserifyFlag);
+        pluginAdd(pluginTestPaths.join(' '), null, linkPluginsFlag + browserifyFlag);
 
         popd();
     }
