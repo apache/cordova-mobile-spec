@@ -133,6 +133,7 @@ var top_dir =             process.cwd() + path.sep,
                                                  "\t\t\tUse only when you know what you are doing, this should be very rare.")
                    .boolean("linkplugins").describe("linkplugins", "Use the --link flag when running `cordova plugin add`.\n")
                    .boolean("linkplatforms").describe("linkplatforms", "Use the --link flag when running `cordova platform add`.\n")
+                   .boolean("copywww").describe("copywww", "Use --copy-from instead of --link-to when running `cordova create`.\n")
                    .boolean("link").describe("link", "Alias for --linkplugins --linkplatforms.\n")
                    .boolean("browserify").describe("browserify", "Use the --browserify flag when running `cordova plugin add`.\n")
                    .boolean("telerikplugins").describe("telerikplugins", "Adds a bunch of known-to-be-popular plugins from Telerik-Verified-Plugins.\n")
@@ -423,7 +424,8 @@ if (argv.plugman) {
     // Create the project using "cordova create"
     myDelete(cli_project_dir);
     console.log("Creating project mobilespec...");
-    shelljs.exec(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --link-to cordova-mobile-spec/www");
+    var copyOrLinkFlag = argv.copywww ? '--copy-from' : '--link-to';
+    shelljs.exec(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests " + copyOrLinkFlag + " cordova-mobile-spec/www");
     shelljs.cp("-f", path.join(mobile_spec_git_dir, 'config.xml'), path.join(projectDirName, 'config.xml'));
 
     // Config.json file ---> linked to local libraries
