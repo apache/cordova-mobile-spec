@@ -98,7 +98,6 @@ function increaseQuota(index) {
 var databaseOutput = function(s) {
     var el = document.getElementById("database_results");
     el.innerHTML = el.innerHTML + s + "<br>";
-    el.scrollByLines(20000);
 };
 
 /**
