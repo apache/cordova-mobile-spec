@@ -114,8 +114,8 @@ exports.defineAutoTests = function () {
         });
 
         it("XMLHttpRequest.spec.6 adds hash-path and loads file okay", function (done) {
-            window.location = window.location.href + "#asd/asd/asdasd";
-            createXHR(window.location.href, true, done, errorHandler.onError.bind(null, done));
+            var fileName = window.location.href + "#asd/asd/asdasd";
+            createXHR(fileName, true, done, errorHandler.onError.bind(null, done));
         });
 
         describe("XMLHttpRequest", function () {
