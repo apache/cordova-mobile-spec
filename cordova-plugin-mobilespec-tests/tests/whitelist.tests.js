@@ -116,7 +116,8 @@ exports.defineAutoTests = function () {
             itShouldMatch('https://www.apache.org/', ['*://www.apache.org/*']);
             itShouldMatch('ftp://www.apache.org/', ['*://www.apache.org/*']);
             itShouldMatch('file://www.apache.org/', ['*://www.apache.org/*']);
-            itShouldMatch('content://www.apache.org/', ['*://www.apache.org/*']);
+            if (cordova.platformId == 'android')
+                itShouldMatch('content://www.apache.org/', ['*://www.apache.org/*']);
             itShouldMatch('foo://www.apache.org/', ['*://www.apache.org/*']);
             itShouldNotMatch('http://www.apache.com/', ['*://www.apache.org/*']);
 
@@ -200,7 +201,8 @@ exports.defineAutoTests = function () {
             itShouldReject('http://www.apache.org:pass@evil.com/');
             itShouldReject('http://www.apache.org.evil.com/');
             itShouldAccept('file:///foo');
-            itShouldReject('content:///foo');
+            if (cordova.platformId == 'android')
+                itShouldAccept('content:///foo');
         });
     });
 }
