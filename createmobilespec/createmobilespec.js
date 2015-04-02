@@ -129,7 +129,7 @@ var top_dir =             process.cwd() + path.sep,
                                                       "\t\t\tRarely used, generally to test platform releases.\n" +
                                                       "\t\t\tCannot be used with --global because it is implied when --global is used.")
                    .string("plugins").describe("plugins", "Used to explicitly specify the list of plugins to be installed.\n" +
-                                               "Example: --plugins=\"org.apache.cordova.device org.apache.cordova.file-transfer my.custom.plugin\"")
+                                               "Example: --plugins=\"cordova-plugin-device cordova-plugin-file-transfer my-custom-plugin\"")
                    .boolean("skipjs").describe("skipjs", "Do not update the platform's cordova.js from the js git repo, use the one already present in the platform.\n" +
                                                "\t\t\tRarely used, generally to test RC releases.\n" +
                                                "\t\t\tCannot be used with --global because it is implied when --global is used.")
@@ -193,25 +193,25 @@ var PLUGREG_PLUGINS = [
 ];
 
 var DEFAULT_PLUGINS = [
-    'org.apache.cordova.battery-status',
-    'org.apache.cordova.camera',
-    'org.apache.cordova.console',
-    'org.apache.cordova.contacts',
-    'org.apache.cordova.device',
-    'org.apache.cordova.device-motion',
-    'org.apache.cordova.device-orientation',
-    'org.apache.cordova.dialogs',
-    'org.apache.cordova.file',
-    'org.apache.cordova.file-transfer',
-    'org.apache.cordova.geolocation',
-    'org.apache.cordova.globalization',
-    'org.apache.cordova.inappbrowser',
-    'org.apache.cordova.media',
-    'org.apache.cordova.media-capture',
-    'org.apache.cordova.network-information',
-    'org.apache.cordova.splashscreen',
-    'org.apache.cordova.statusbar',
-    'org.apache.cordova.vibration',
+    'cordova-plugin-battery-status',
+    'cordova-plugin-camera',
+    'cordova-plugin-console',
+    'cordova-plugin-contacts',
+    'cordova-plugin-device',
+    'cordova-plugin-device-motion',
+    'cordova-plugin-device-orientation',
+    'cordova-plugin-dialogs',
+    'cordova-plugin-file',
+    'cordova-plugin-file-transfer',
+    'cordova-plugin-geolocation',
+    'cordova-plugin-globalization',
+    'cordova-plugin-inappbrowser',
+    'cordova-plugin-media',
+    'cordova-plugin-media-capture',
+    'cordova-plugin-network-information',
+    'cordova-plugin-splashscreen',
+    'cordova-plugin-statusbar',
+    'cordova-plugin-vibration',
     'org.apache.cordova.mobilespec.tests',
 ];
 
@@ -220,7 +220,7 @@ var SEARCH_PATHS = {
     'org.apache.cordova.mobilespec.tests': mobile_spec_git_dir,
     'org.apache.cordova.test.whitelist': mobile_spec_git_dir,
     'org.apache.cordova.test.echo': mobile_spec_git_dir,
-    'org.apache.cordova.test-framework': top_dir,
+    'cordova-plugin-test-framework': top_dir,
 };
 
 if (!fs.existsSync(mobile_spec_git_dir)) {
@@ -495,9 +495,14 @@ if (argv.plugman) {
 }
 
 function pluginIdToDirName(id) {
-    var lastDotIndex = id.lastIndexOf('.');
+    if (id.indexOf('cordova-plugin-') === 0) {
+        return id;
+    }
 
-    if ((lastDotIndex === -1) || (lastDotIndex === id.length - 1)) return null;
+    var lastDotIndex = id.lastIndexOf('.');
+    if ((lastDotIndex === -1) || (lastDotIndex === id.length - 1)) {
+        return null;
+    }
     return 'cordova-plugin-' + id.substr(lastDotIndex + 1);
 }
 
@@ -561,8 +566,8 @@ function installPlugins() {
 
         pluginAdd('org.apache.cordova.test.whitelist', mobile_spec_git_dir, linkPluginsFlag + browserifyFlag);
         pluginAdd('org.apache.cordova.test.echo', mobile_spec_git_dir, linkPluginsFlag + browserifyFlag);
-        pluginAdd('org.apache.cordova.test-framework', top_dir, linkPluginsFlag + browserifyFlag);
-        pluginAdd('org.apache.cordova.device', top_dir, linkPluginsFlag + browserifyFlag);
+        pluginAdd('cordova-plugin-test-framework', top_dir, linkPluginsFlag + browserifyFlag);
+        pluginAdd('cordova-plugin-device', top_dir, linkPluginsFlag + browserifyFlag);
 
         if (argv.android) {
             pluginAdd(path.join(top_dir, 'cordova-plugin-whitelist'), null, linkPluginsFlag + browserifyFlag);
