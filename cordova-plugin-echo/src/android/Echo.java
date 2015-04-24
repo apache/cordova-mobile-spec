@@ -48,7 +48,7 @@ public class Echo extends CordovaPlugin {
         if (action.equals("echo")) {
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, args.getString(0)));
         } else if(action.equals("echoAsync")) {
-            cordova.getActivity().runOnUiThread(new Runnable() {
+            cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     callbackContext.sendPluginResult( new PluginResult(PluginResult.Status.OK, args.optString(0)));
                 }
