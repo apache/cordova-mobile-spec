@@ -546,10 +546,13 @@ function installPlugins() {
         console.log("Installing local test framework plugins...");
         var linkPluginsFlag = (argv.link || argv.linkplugins) ? ' --link' : '';
 
-        pluginAdd('org.apache.cordova.mobilespec.tests', mobile_spec_git_dir, linkPluginsFlag + browserifyFlag);
+        // Install mobilespec tests only if we install default list of plugins
+        // If custom list of plugins is being installed, mobilespec tests can be listed there, if needed
+        if (!argv.plugins) {
+            pluginAdd('org.apache.cordova.mobilespec.tests', mobile_spec_git_dir, linkPluginsFlag + browserifyFlag);
+        }
         pluginAdd('org.apache.cordova.test.whitelist', mobile_spec_git_dir, linkPluginsFlag + browserifyFlag);
         pluginAdd('org.apache.cordova.test.echo', mobile_spec_git_dir, linkPluginsFlag + browserifyFlag);
-
 
         pluginAdd('cordova-plugin-test-framework', searchPath, linkPluginsFlag + browserifyFlag);
         pluginAdd('cordova-plugin-device', searchPath, linkPluginsFlag + browserifyFlag);
@@ -562,7 +565,10 @@ function installPlugins() {
             pluginAdd('cordova-plugin-crosswalk-webview', searchPath, linkPluginsFlag + browserifyFlag);
         }
 
-        pluginAdd(plugins.join(' '), searchPath, linkPluginsFlag + browserifyFlag);
+        plugins.forEach(function(p) {
+            var sp = SEARCH_PATHS.hasOwnProperty(p) ? SEARCH_PATHS[p] : searchPath;
+            pluginAdd(p, sp, linkPluginsFlag + browserifyFlag);
+        });
 
         if (argv.thirdpartyplugins || argv.cprplugins) {
             var mapVars = ' --variable API_KEY_FOR_ANDROID="AIzaSyBICVSs9JqT7WdASuN5HSe7w-pCE0n_X88" --variable API_KEY_FOR_IOS="AIzaSyAikyYG24YYFvq5Vy41P5kppsfO2GgF9jM"';
