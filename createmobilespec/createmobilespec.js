@@ -56,6 +56,9 @@ function popd(dir) {
 }
 
 function pluginAdd(pluginName, searchPath, extraFlags) {
+    if (!pluginName) {
+        return;
+    }
     var command = cli + ' plugin add ' + pluginName + ' --searchpath ' + searchPath;
     if (extraFlags) {
         command += extraFlags;
