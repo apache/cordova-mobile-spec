@@ -53,7 +53,7 @@ if (!window._disableCSP) {
             cspMetaContent = 'default-src \'self\' https://ssl.gstatic.com/accessibility/javascript/android/;' +
                             ' connect-src \'self\' http://cordova-filetransfer.jitsu.com;' +
                             ' media-src \'self\' http://cordova.apache.org/downloads/;' +
-                            ' frame-src \'self\' data: gap:;' +
+                            ' frame-src \'self\' http://stealbridgesecret.test/ data: gap:;' +
                             ' img-src \'self\' data:;' +
                             ' style-src \'self\' \'unsafe-inline\'';
             break;

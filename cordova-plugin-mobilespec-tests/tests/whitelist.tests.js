@@ -202,7 +202,7 @@ exports.defineAutoTests = function () {
             itShouldReject('http://www.apache.org.evil.com/');
             itShouldAccept('file:///foo');
             if (cordova.platformId == 'android')
-                itShouldAccept('content:///foo');
+                itShouldReject('content:///foo');
         });
     });
 }
