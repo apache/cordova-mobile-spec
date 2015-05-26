@@ -60,7 +60,14 @@ if (!window._disableCSP) {
     }
 
     if (cspMetaContent) {
-        document.write('<meta http-equiv="Content-Security-Policy" content="' + cspMetaContent + '"/>');
+        cspMetaContent = '<meta http-equiv="Content-Security-Policy" content="' + cspMetaContent + '"/>';
+        if (PLAT == 'windows8') {
+            MSApp.execUnsafeLocalFunction(function () {
+                document.write(cspMetaContent);
+            });
+        } else {
+            document.write(cspMetaContent);
+        }
     }
 }
 else {
