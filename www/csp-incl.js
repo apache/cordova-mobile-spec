@@ -31,7 +31,7 @@ var PLAT;
         // than to Windows phone 8 we need to detect it separately.
         windowsphone81: /Windows Phone 8.1/,
         windowsphone: /Windows Phone/,
-        windows8: /MSAppHost/,
+        windows: /MSAppHost/,
         firefoxos: /Firefox/
     };
     for (var key in platforms) {
@@ -49,7 +49,7 @@ if (!window._disableCSP) {
     switch (PLAT) {
         case 'android':
         case 'ios':
-        case 'windows8':
+        case 'windows':
             cspMetaContent = 'default-src \'self\' https://ssl.gstatic.com/accessibility/javascript/android/;' +
                             ' connect-src \'self\' http://cordova-filetransfer.jitsu.com;' +
                             ' media-src \'self\' http://cordova.apache.org/downloads/;' +
@@ -61,7 +61,7 @@ if (!window._disableCSP) {
 
     if (cspMetaContent) {
         cspMetaContent = '<meta http-equiv="Content-Security-Policy" content="' + cspMetaContent + '"/>';
-        if (PLAT == 'windows8') {
+        if (PLAT === 'windows' && MSApp && MSApp.execUnsafeLocalFunction) {
             MSApp.execUnsafeLocalFunction(function () {
                 document.write(cspMetaContent);
             });
