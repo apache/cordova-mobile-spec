@@ -211,6 +211,7 @@ var DEFAULT_PLUGINS = [
     'cordova-plugin-splashscreen',
     'cordova-plugin-statusbar',
     'cordova-plugin-vibration',
+    'cordova-plugin-whitelist',
 ];
 
 // plugin search paths that will override default

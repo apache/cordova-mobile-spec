@@ -23,6 +23,7 @@
     <description>
         Cordova test suite.
     </description>
+    
     <access origin="http://audio.ibeat.org" />
     <access origin="http://cordova-filetransfer.jitsu.com" />
     <access origin="http://whatheaders.com" />
@@ -34,6 +35,19 @@
     <access origin="https://www.google.co.uk" />
     <access origin="http://techslides.com" />
     <access origin="httpssss://example.com" />
+    
+    <allow-navigation href="http://audio.ibeat.org" />
+    <allow-navigation href="http://cordova-filetransfer.jitsu.com" />
+    <allow-navigation href="http://whatheaders.com" />
+    <allow-navigation href="http://*.apache.org" />
+    <allow-navigation href="https://*.apache.org" />
+    <allow-navigation href="http://www.google.com" />
+    <allow-navigation href="https://www.google.com" />
+    <allow-navigation href="http://google.co.uk" />
+    <allow-navigation href="https://www.google.co.uk" />
+    <allow-navigation href="http://techslides.com" />
+    <allow-navigation href="httpssss://example.com" />
+    
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="tel:*" />
