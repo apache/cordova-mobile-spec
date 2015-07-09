@@ -4,12 +4,12 @@
   "homepage": "http://cordova.apache.org",
   "bugs": { "url": "https://issues.apache.org/jira/browse/CB" },
   "license": "Apache-2.0",
-  "main": "./createmobilespec",
-  "bin": {"createmobilespec": "./createmobilespec" },
+  "main": "./createmobilespec.js",
+  "bin": {"createmobilespec": "./createmobilespec.js" },
   "repository": {
-     "type": "git", 
+     "type": "git",
      "url": "https://git-wip-us.apache.org/repos/asf/cordova-mobile-spec.git"},
-  "dependencies": { 
+  "dependencies": {
     "shelljs": "0.2.6",
     "optimist": "0.6.1",
     "grunt-cli": "0.1.*"},
