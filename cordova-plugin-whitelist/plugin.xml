@@ -56,16 +56,4 @@
         <source-file src="src/ubuntu/whitelist.cpp" />
     </platform>
 
-    <!-- ios -->
-    <platform name="ios">
-        <config-file target="config.xml" parent="/*">
-            <feature name="WhitelistAPI">
-                <param name="ios-package" value="CDVWhitelistAPI"/>
-            </feature>
-        </config-file>
-        
-        <header-file src="src/ios/CDVWhitelistAPI.h" />
-        <source-file src="src/ios/CDVWhitelistAPI.m" />
-    </platform>
-
 </plugin>
