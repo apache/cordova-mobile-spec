@@ -54,7 +54,7 @@ if (!window._disableCSP) {
                             ' connect-src \'self\' http://cordova-filetransfer.jitsu.com;' +
                             ' media-src \'self\' http://cordova.apache.org/downloads/;' +
                             ' frame-src \'self\' http://stealbridgesecret.test/ data: gap:;' +
-                            ' img-src \'self\' data:;' +
+                            ' img-src \'self\' data: cdvfile:;' +
                             ' style-src \'self\' \'unsafe-inline\'';
             break;
     }

@@ -47,7 +47,8 @@
     <allow-navigation href="https://www.google.co.uk" />
     <allow-navigation href="http://techslides.com" />
     <allow-navigation href="httpssss://example.com" />
-    
+    <allow-navigation href="cdvfile:*" />
+
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="tel:*" />
