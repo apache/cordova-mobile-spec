@@ -1,4 +1,4 @@
-/*
+cordova.define("org.apache.cordova.mobilespec.tests.whitelist.tests", function(require, exports, module) { /*
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,6 +23,7 @@ exports.defineAutoTests = function () {
 
     var isWindowsPhone = cordova.platformId == 'windowsphone';
     var isWindows = (cordova.platformId === "windows") || (cordova.platformId === "windows8")
+    var isIOS = (cordova.platformId === "ios");
 
     describe('Whitelist API (cordova.whitelist)', function () {
 
@@ -43,7 +44,7 @@ exports.defineAutoTests = function () {
                         var originalTimeout,
                             cb;
 
-                        if (isWindows || isWindowsPhone) {
+                        if (isWindows || isWindowsPhone || isIOS) {
                             pending();
                         }
 
@@ -153,7 +154,7 @@ exports.defineAutoTests = function () {
                     description = description || ((result ? "should accept " : "should reject ") + url);
 
                     describe("Test function", function () {
-                        if (isWindows || isWindowsPhone) {
+                        if (isWindows || isWindowsPhone || isIOS) {
                             pending();
                         }
 
@@ -206,3 +207,5 @@ exports.defineAutoTests = function () {
         });
     });
 }
+
+});
