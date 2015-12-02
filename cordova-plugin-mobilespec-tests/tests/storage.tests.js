@@ -22,6 +22,8 @@ exports.defineAutoTests = function () {
 
     var isWindowsPhone = cordova.platformId == 'windowsphone';
     var isWindows = (cordova.platformId === "windows") || (cordova.platformId === "windows8")
+    var isIOS = (cordova.platformId === "ios");
+    var isIOSWKWebView = isIOS && (window.webkit && window.webkit.messageHandlers);
 
     describe("Session Storage", function () {
         it("storage.spec.1 should exist", function () {
@@ -209,6 +211,10 @@ exports.defineAutoTests = function () {
 
                 it("storage.spec.18 Should be able to create and drop tables", function (done) {
                     if (!window.openDatabase) {
+                        pending();
+                    }
+                   
+                    if (isIOSWKWebView) {
                         pending();
                     }
 

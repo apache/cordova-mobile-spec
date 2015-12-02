@@ -21,7 +21,9 @@
 
 exports.defineAutoTests = function () {
     var isWp8 = cordova.platformId === "windowsphone";
-
+    var isIOS = (cordova.platformId === "ios");
+    var isIOSWKWebView = isIOS && (window.webkit && window.webkit.messageHandlers);
+               
     describe("XMLHttpRequest", function () {
         var errorHandler = {
             onError: function (done) {
@@ -105,6 +107,10 @@ exports.defineAutoTests = function () {
         });
 
         it("XMLHttpRequest.spec.4 should be able to load the parent folder page ../index.html", function (done) {
+            if (isIOSWKWebView) {
+                pending();
+            }
+           
             createXHR("../index.html", true, done, errorHandler.onError.bind(null, done));
         });
 
