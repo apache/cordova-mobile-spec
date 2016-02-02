@@ -95,6 +95,8 @@ var top_dir =             process.cwd() + path.sep,
                             "ios":          { "bin": ["cordova-ios"],
                                               "www": ["www"],
                                               "config": ["CUSTOM"] },
+                            "osx":          { "bin": ["cordova-osx"],
+                                              "www": ["www"] },
                             "windows":      { "bin": ["cordova-windows"],
                                               "www": ["www"] },
                             "wp8":          { "bin": ["cordova-wp8"],
@@ -104,7 +106,7 @@ var top_dir =             process.cwd() + path.sep,
     argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--link] [--global] [--globalplugins] [--plugins=\".\\myPluginDir\"] [--skipjs] [--skiplink] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.\n" +
-                          "\tPLATFORM: [--<amazon|android|blackberry10|ios|windows|wp8|firefoxos>]\n" +
+                          "\tPLATFORM: [--<amazon|android|blackberry10|ios|windows|wp8|firefoxos|osx>]\n" +
                           "")
                    .boolean("help").describe("help", "Shows usage.")
                    .boolean("debug").describe("debug", "Debug logging.")
@@ -112,7 +114,8 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("android").describe("android", "Add Android platform.")
                    .boolean("blackberry10").describe("blackberry10", "Add BlackBerry 10 platform.")
                    .boolean("ios").describe("ios", "Add iOS platform.")
-                   .boolean("windows").describe("windows", "Add Windows (universal) platform.")                   
+                   .boolean("osx").describe("osx", "Add osx platform.")
+                   .boolean("windows").describe("windows", "Add Windows (universal) platform.")
                    .boolean("wp8").describe("wp8", "Add Windows Phone 8 platform.")
                    .boolean("firefoxos").describe("firefoxos", "Add FirefoxOS platform.")
                    .boolean("plugman").describe("plugman", "Use {platform}/bin/create and plugman directly instead of the CLI.")
@@ -236,6 +239,7 @@ if (argv.blackberry10) { platforms.push("blackberry10"); }
 if (argv.wp8) { platforms.push("wp8"); }
 if (argv.windows) { platforms.push("windows"); }
 if (argv.firefoxos) { platforms.push("firefoxos"); }
+if (argv.osx) {platforms.push("osx");}
 
 argv.skiplink = argv.skiplink || argv.global;
 argv.skipjs = argv.skipjs || argv.global;
