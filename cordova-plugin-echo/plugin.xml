@@ -61,4 +61,14 @@
         <source-file src="src/ios/CDVEcho.m" />
     </platform>
 
+    <!-- osx -->
+    <platform name="osx">
+        <config-file target="config.xml" parent="/*">
+            <feature name="Echo">
+                <param name="ios-package" value="CDVEcho"/>
+            </feature>
+        </config-file>
+        <source-file src="src/ios/CDVEcho.m" />
+    </platform>
+
 </plugin>
