@@ -59,7 +59,15 @@ function pluginAdd(pluginName, searchPath, extraFlags) {
     if (!pluginName) {
         return;
     }
-    var command = cli + ' plugin add ' + pluginName + ' --searchpath ' + searchPath;
+    if (!searchPath || typeof searchPath !== "string") {
+        searchPath = '';
+    }
+    var command;
+    if (fs.existsSync(path.join(searchPath, pluginName, 'plugin.xml'))) {
+        command = cli + ' plugin add ' + path.join(searchPath, pluginName);
+    } else {
+        command = cli + ' plugin add ' + pluginName + ' --searchpath ' + searchPath;
+    }
     if (extraFlags) {
         command += extraFlags;
     }
@@ -499,8 +507,8 @@ function pluginIdToDirName(id) {
 function installPlugins() {
     var plugins = DEFAULT_PLUGINS;
     if (argv.plugins) {
-        plugins = argv.plugins.split(" ").filter(function (item) { 
-            return item !== ""; 
+        plugins = argv.plugins.split(" ").filter(function (item) {
+            return item !== "";
         });
     }
 
