@@ -222,6 +222,30 @@ var DEFAULT_PLUGINS = [
     'cordova-plugin-whitelist',
 ];
 
+// OSX has little support for the most of the plugins, so it gets its own default list
+var DEFAULT_PLUGINS_OSX = [
+    //'cordova-plugin-battery-status',
+    //'cordova-plugin-camera',
+    //'cordova-plugin-console',
+    //'cordova-plugin-contacts',
+    'cordova-plugin-device',
+    //'cordova-plugin-device-motion',
+    //'cordova-plugin-device-orientation',
+    //'cordova-plugin-dialogs',
+    'cordova-plugin-file',
+    //'cordova-plugin-file-transfer',
+    //'cordova-plugin-geolocation',
+    //'cordova-plugin-globalization',
+    //'cordova-plugin-inappbrowser',
+    //'cordova-plugin-media',
+    //'cordova-plugin-media-capture',
+    //'cordova-plugin-network-information',
+    //'cordova-plugin-splashscreen',
+    //'cordova-plugin-statusbar',
+    //'cordova-plugin-vibration',
+    'cordova-plugin-whitelist',
+];
+
 // plugin search paths that will override default
 var SEARCH_PATHS = {
     'org.apache.cordova.mobilespec.tests': mobile_spec_git_dir,
@@ -506,6 +530,15 @@ function pluginIdToDirName(id) {
 ////////////////////// install plugins for each platform
 function installPlugins() {
     var plugins = DEFAULT_PLUGINS;
+
+    // special override for osx
+    if (argv.osx) {
+        if (platforms.length > 1) {
+            console.warn('Warning: OSX was added as platform to test - adding reduced plugin set due to compatibility problems.');
+        }
+        plugins = DEFAULT_PLUGINS_OSX;
+    }
+
     if (argv.plugins) {
         plugins = argv.plugins.split(" ").filter(function (item) {
             return item !== "";
