@@ -27,6 +27,7 @@ exports.defineAutoTests = function () {
 
         function onMessage(done, msg) {
             if (msg.data == 'foo') {
+                expect('Suppress SPEC HAS NO EXPECTATIONS').toBeDefined();
                 done();
             }
         }
