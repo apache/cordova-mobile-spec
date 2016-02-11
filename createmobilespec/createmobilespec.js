@@ -534,9 +534,11 @@ function installPlugins() {
     // special override for osx
     if (argv.osx) {
         if (platforms.length > 1) {
-            console.warn('Warning: OSX was added as platform to test - adding reduced plugin set due to compatibility problems.');
+            console.warn('Warning: Testing more than one platform at once might cause problems with unsupported plugins for OSX');
+        } else {
+            console.warn('Warning: Using reduced plugin list for OSX-only tests.');
+            plugins = DEFAULT_PLUGINS_OSX;
         }
-        plugins = DEFAULT_PLUGINS_OSX;
     }
 
     if (argv.plugins) {
