@@ -179,6 +179,10 @@ exports.defineAutoTests = function () {
 
         describe("HTML 5 Storage", function () {
             it("storage.spec.9 should exist", function () {
+                //IE doesn't support openDatabase method
+                if (isWindows || isWindowsPhone) {
+                    pending();
+                }
                 expect(window.openDatabase).toBeDefined();
             });
 
@@ -214,7 +218,7 @@ exports.defineAutoTests = function () {
                     if (!window.openDatabase) {
                         pending();
                     }
-                   
+
                     if (isIOSWKWebView) {
                         pending();
                     }
