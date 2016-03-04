@@ -100,6 +100,9 @@ var top_dir =             process.cwd() + path.sep,
                             "blackberry10": { "bin": ["cordova-blackberry"],
                                               "www": ["www"],
                                               "config": ["www"] },
+                            "browser": { "bin": ["cordova-browser"],
+                                              "www": ["www"],
+                                              "config": ["www"] },   
                             "ios":          { "bin": ["cordova-ios"],
                                               "www": ["www"],
                                               "config": ["CUSTOM"] },
@@ -120,6 +123,7 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("debug").describe("debug", "Debug logging.")
                    .boolean("amazon").describe("amazon", "Add Amazon FireOS platform.")
                    .boolean("android").describe("android", "Add Android platform.")
+                   .boolean("browser").describe("browser", "Add Browser platform.")
                    .boolean("blackberry10").describe("blackberry10", "Add BlackBerry 10 platform.")
                    .boolean("ios").describe("ios", "Add iOS platform.")
                    .boolean("osx").describe("osx", "Add osx platform.")
@@ -267,6 +271,7 @@ if (argv.help) { optimist.showHelp(); quit(); }
 if (argv.amazon) { platforms.push("amazon-fireos"); }
 if (argv.android) { platforms.push("android"); }
 if (argv.ios) { platforms.push("ios"); }
+if (argv.browser) { platforms.push("browser"); }
 if (argv.blackberry10) { platforms.push("blackberry10"); }
 if (argv.wp8) { platforms.push("wp8"); }
 if (argv.windows) { platforms.push("windows"); }
