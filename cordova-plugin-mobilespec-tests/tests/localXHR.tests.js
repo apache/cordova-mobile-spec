@@ -19,6 +19,7 @@
  *
  */
 
+// These tests are needed to check browser's functionality and verify that we are not breaking it.
 exports.defineAutoTests = function () {
     var isWp8 = cordova.platformId === "windowsphone";
     var isIOS = (cordova.platformId === "ios");
@@ -99,7 +100,7 @@ exports.defineAutoTests = function () {
         });
 
         it("XMLHttpRequest.spec.9 calls onload from successful http get", function (done) {
-            createXHR("http://cordova-filetransfer.jitsu.com", true, done, errorHandler.onError.bind(null, done));
+            createXHR("http://google.com", true, done, errorHandler.onError.bind(null, done));
         });
 
         it("XMLHttpRequest.spec.3 should be able to load the current page", function (done) {
