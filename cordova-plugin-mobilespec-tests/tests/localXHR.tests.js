@@ -100,7 +100,7 @@ exports.defineAutoTests = function () {
         });
 
         it("XMLHttpRequest.spec.9 calls onload from successful http get", function (done) {
-            createXHR("http://google.com", true, done, errorHandler.onError.bind(null, done));
+            createXHR("http://www.google.com", true, done, errorHandler.onError.bind(null, done));
         });
 
         it("XMLHttpRequest.spec.3 should be able to load the current page", function (done) {

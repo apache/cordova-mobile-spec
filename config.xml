@@ -25,7 +25,6 @@
     </description>
     
     <access origin="http://audio.ibeat.org" />
-    <access origin="http://cordova-filetransfer.jitsu.com" />
     <access origin="http://whatheaders.com" />
     <access origin="http://*.apache.org" />
     <access origin="https://*.apache.org" />
@@ -37,7 +36,6 @@
     <access origin="httpssss://example.com" />
     
     <allow-navigation href="http://audio.ibeat.org" />
-    <allow-navigation href="http://cordova-filetransfer.jitsu.com" />
     <allow-navigation href="http://whatheaders.com" />
     <allow-navigation href="http://*.apache.org" />
     <allow-navigation href="https://*.apache.org" />

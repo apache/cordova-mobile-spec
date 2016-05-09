@@ -51,7 +51,7 @@ if (!window._disableCSP) {
         case 'ios':
         case 'windows':
             cspMetaContent = 'default-src \'self\' https://ssl.gstatic.com/accessibility/javascript/android/;' +
-                            ' connect-src \'self\' http://cordova-filetransfer.jitsu.com;' +
+                            ' connect-src \'self\' http://www.google.com;' +
                             ' media-src \'self\' http://cordova.apache.org/downloads/ https://cordova.apache.org/downloads/;' +
                             ' frame-src \'self\' http://stealbridgesecret.test/ data: gap:;' +
                             ' img-src \'self\' data: cdvfile:;' +
