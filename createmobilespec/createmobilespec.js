@@ -204,6 +204,7 @@ var PLUGREG_PLUGINS = [
 
 var DEFAULT_PLUGINS = [
     'cordova-plugin-battery-status',
+    'cordova-plugin-compat',
     'cordova-plugin-camera',
     'cordova-plugin-console',
     'cordova-plugin-contacts',
