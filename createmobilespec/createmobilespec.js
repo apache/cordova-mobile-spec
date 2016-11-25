@@ -62,10 +62,10 @@ function pluginAdd(pluginName, searchPath, extraFlags) {
     if (!searchPath || typeof searchPath !== "string") {
         searchPath = '';
     }
-    var command;
+    var command = cli + ' plugin add ' + pluginName;
     if (fs.existsSync(path.join(searchPath, pluginName, 'plugin.xml'))) {
         command = cli + ' plugin add ' + path.join(searchPath, pluginName);
-    } else {
+    } else if (searchPath && searchPath.length) {
         command = cli + ' plugin add ' + pluginName + ' --searchpath ' + searchPath;
     }
     if (extraFlags) {
@@ -114,7 +114,7 @@ var top_dir =             process.cwd() + path.sep,
                                               "www": ["www"] },
                             "firefoxos":    { "bin": ["cordova-firefoxos"],
                                               "www": ["www"] } },
-    argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--link] [--global] [--globalplugins] [--plugins=\".\\myPluginDir\"] [--skipjs] [--skiplink] [directoryName]\n" +
+    argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--link] [--global] [--globalplugins] [--plugins=\".\\myPluginDir\"] [--skipjs] [--skiplink] [--variable VAR=\"value\"] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.\n" +
                           "\tPLATFORM: [--<amazon|android|blackberry10|ios|windows|wp8|firefoxos|osx>]\n" +
@@ -141,6 +141,8 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("clearnpmcache").describe("clearnpmcache", "rm -rf ~/.npm/cache; rm -rf ~/.plugman")
                    .string("plugins").describe("plugins", "Used to explicitly specify the list of plugins to be installed.\n" +
                                                "Example: --plugins=\"cordova-plugin-device cordova-plugin-file-transfer my-custom-plugin\"")
+                   .string("variable").describe("variable", "Used to pass preferences / variables down to cordova components (like plugins).\n" +
+                                               "Example: --variable FILETRANSFER_SERVER_ADDRESS=\"http://yourlocal-IPAddressHere:5000\"")
                    .boolean("skipjs").describe("skipjs", "Do not update the platform's cordova.js from the js git repo, use the one already present in the platform.\n" +
                                                "\t\t\tRarely used, generally to test RC releases.\n" +
                                                "\t\t\tCannot be used with --global because it is implied when --global is used.")
@@ -301,6 +303,16 @@ var cli = argv.global ? "cordova" : cli_local_bin;
 var projectDirName = argv._[0] || "mobilespec";
 var cli_project_dir = path.join(top_dir, projectDirName);
 var browserifyFlag = argv.browserify ? ' --browserify' : '';
+var variableFlag = '';
+// some plugins support setting config.xml <preference> elements via a --variable flag.
+if (argv.variable) {
+    if (argv.variable instanceof Array) {
+        // multiple variables passed in, compose them all into one string
+        variableFlag = ' ' + argv.variable.map(function(v) { return '--variable ' + v; }).join(' ');
+    } else {
+        variableFlag = ' --variable ' + argv.variable;
+    }
+}
 
 // Print relevant information
 if (!fs.existsSync(path.join("cordova-coho", "coho"))) {
@@ -596,35 +608,36 @@ function installPlugins() {
         // we do need local plugin-test-framework
         console.log("Installing local test framework plugins...");
         var linkPluginsFlag = (argv.link || argv.linkplugins) ? ' --link' : '';
+        var allPluginFlags = linkPluginsFlag + browserifyFlag + variableFlag;
 
         // Install mobilespec tests only if we install default list of plugins
         // If custom list of plugins is being installed, mobilespec tests can be listed there, if needed
         if (!argv.plugins) {
-            //pluginAdd('org.apache.cordova.mobilespec.tests', mobile_spec_git_dir, linkPluginsFlag + browserifyFlag);
+            //pluginAdd('org.apache.cordova.mobilespec.tests', mobile_spec_git_dir, allPluginFlags);
         }
-        //pluginAdd('org.apache.cordova.test.whitelist', mobile_spec_git_dir, linkPluginsFlag + browserifyFlag);
-        pluginAdd('org.apache.cordova.test.echo', mobile_spec_git_dir, linkPluginsFlag + browserifyFlag);
+        //pluginAdd('org.apache.cordova.test.whitelist', mobile_spec_git_dir, allPluginFlags);
+        pluginAdd('org.apache.cordova.test.echo', mobile_spec_git_dir, allPluginFlags);
 
-        pluginAdd('cordova-plugin-test-framework', searchPath, linkPluginsFlag + browserifyFlag);
-        pluginAdd('cordova-plugin-device', searchPath, linkPluginsFlag + browserifyFlag);
+        pluginAdd('cordova-plugin-test-framework', searchPath, allPluginFlags);
+        pluginAdd('cordova-plugin-device', searchPath, allPluginFlags);
 
         if (argv.android) {
-            pluginAdd('cordova-plugin-whitelist', searchPath, linkPluginsFlag + browserifyFlag);
+            pluginAdd('cordova-plugin-whitelist', searchPath, allPluginFlags);
         }
 
         if (argv.webview == 'crosswalk') {
-            pluginAdd('cordova-plugin-crosswalk-webview', searchPath, linkPluginsFlag + browserifyFlag);
+            pluginAdd('cordova-plugin-crosswalk-webview', searchPath, allPluginFlags);
         }
 
         plugins.forEach(function(p) {
             var sp = SEARCH_PATHS.hasOwnProperty(p) ? SEARCH_PATHS[p] : searchPath;
-            pluginAdd(p, sp, linkPluginsFlag + browserifyFlag);
+            pluginAdd(p, sp, allPluginFlags);
         });
 
         if (argv.thirdpartyplugins || argv.cprplugins) {
             var mapVars = ' --variable API_KEY_FOR_ANDROID="AIzaSyBICVSs9JqT7WdASuN5HSe7w-pCE0n_X88" --variable API_KEY_FOR_IOS="AIzaSyAikyYG24YYFvq5Vy41P5kppsfO2GgF9jM"';
             var fbVars = ' --variable APP_ID=value --variable APP_NAME=value';
-            pluginAdd(CORDOVA_REGISTRY_PLUGINS.join(' '), searchPath, browserifyFlag + mapVars + fbVars);
+            pluginAdd(CORDOVA_REGISTRY_PLUGINS.join(' '), searchPath, browserifyFlag + mapVars + fbVars + variableFlag);
             // Delete duplicate <uses-permission> due to maxSdk (CB-8401)
             if (argv.android) {
                 shelljs.sed('-i', /{[^{]*(maxSdk|WRITE_EXTERNAL_STORAGE).*?(maxSdk|WRITE_EXTERNAL_STORAGE)[^}]*},/, '', path.join('plugins', 'android.json'));
@@ -632,13 +645,13 @@ function installPlugins() {
             }
         }
         if (argv.thirdpartyplugins || argv.telerikplugins) {
-            pluginAdd(TELERIK_VERIFIED_PLUGINS.join(' '), searchPath, browserifyFlag);
+            pluginAdd(TELERIK_VERIFIED_PLUGINS.join(' '), searchPath, browserifyFlag + variableFlag);
         }
         if (argv.thirdpartyplugins || argv.plugregplugins) {
-            pluginAdd(PLUGREG_PLUGINS.join(' '), searchPath, browserifyFlag);
+            pluginAdd(PLUGREG_PLUGINS.join(' '), searchPath, browserifyFlag + variableFlag);
         }
         if (argv.thirdpartyplugins) {
-            pluginAdd('org.apache.cordova.mobilespec.thirdpartytests', mobile_spec_git_dir, linkPluginsFlag + browserifyFlag);
+            pluginAdd('org.apache.cordova.mobilespec.thirdpartytests', mobile_spec_git_dir, allPluginFlags);
         }
 
         // Install new-style test plugins
@@ -650,7 +663,7 @@ function installPlugins() {
             pluginTestPaths.push(path.resolve(path.dirname(potential_tests_plugin_xml)));
           }
         });
-        pluginAdd(pluginTestPaths.join(' '), null, linkPluginsFlag + browserifyFlag);
+        pluginAdd(pluginTestPaths.join(' '), null, allPluginFlags);
 
         popd();
     }
