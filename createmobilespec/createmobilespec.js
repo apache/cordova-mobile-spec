@@ -141,6 +141,7 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("clearnpmcache").describe("clearnpmcache", "rm -rf ~/.npm/cache; rm -rf ~/.plugman")
                    .string("plugins").describe("plugins", "Used to explicitly specify the list of plugins to be installed.\n" +
                                                "Example: --plugins=\"cordova-plugin-device cordova-plugin-file-transfer my-custom-plugin\"")
+                   .boolean("forceplugins").describe("forceplugins", "Add the --force flag when adding plugins\n")
                    .string("variable").describe("variable", "Used to pass preferences / variables down to cordova components (like plugins).\n" +
                                                "Example: --variable FILETRANSFER_SERVER_ADDRESS=\"http://yourlocal-IPAddressHere:5000\"")
                    .boolean("skipjs").describe("skipjs", "Do not update the platform's cordova.js from the js git repo, use the one already present in the platform.\n" +
@@ -608,7 +609,8 @@ function installPlugins() {
         // we do need local plugin-test-framework
         console.log("Installing local test framework plugins...");
         var linkPluginsFlag = (argv.link || argv.linkplugins) ? ' --link' : '';
-        var allPluginFlags = linkPluginsFlag + browserifyFlag + variableFlag;
+        var forcePluginsFlag = (argv.forceplugins)? ' --force' : '';
+        var allPluginFlags = linkPluginsFlag + browserifyFlag + variableFlag + forcePluginsFlag;
 
         // Install mobilespec tests only if we install default list of plugins
         // If custom list of plugins is being installed, mobilespec tests can be listed there, if needed
