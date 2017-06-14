@@ -324,9 +324,9 @@ if (!fs.existsSync(path.join("cordova-coho", "coho"))) {
 if (argv.global) {
     console.log("Creating project. Using globally installed tools, downloadable platforms and plugins, and local mobile-spec.");
     console.log("To clone needed repositories:");
-    console.log("  ./cordova-coho/coho repo-clone -r mobile-spec");
+    console.log("  ." + path.sep + "cordova-coho" + path.sep + "coho repo-clone -r mobile-spec");
     console.log("To update all repositories:");
-    console.log("  ./cordova-coho/coho repo-update -r mobile-spec");
+    console.log("  ." + path.sep + "cordova-coho" + path.sep + "coho repo-update -r mobile-spec");
 } else {
     var repos = [ ];
     repos.push("mobile-spec", "plugin-test-framework", "cli", "lib", "plugman");
@@ -344,17 +344,17 @@ if (argv.global) {
     }
 
     console.log("To clone repositories:");
-    console.log(["  ./cordova-coho/coho repo-clone"].concat(repos).join(" -r "));
+    console.log(["  ." + path.sep + "cordova-coho" + path.sep + "coho repo-clone"].concat(repos).join(" -r "));
     if (!argv.globalplugins) {
-        console.log("  mkdir cordova-cli/node_modules");
-        console.log("  (cd cordova-lib/cordova-lib/ && npm install)");
-        console.log("  (cd cordova-plugman/ && npm install)");
-        console.log("  mkdir cordova-cli/node_modules");
-        console.log("  ln -s ../../cordova-lib/cordova-lib cordova-cli/node_modules");
+        console.log("  mkdir cordova-cli" + path.sep + "node_modules");
+        console.log("  (cd cordova-lib" + path.sep + "cordova-lib" + path.sep + " && npm install)");
+        console.log("  (cd cordova-plugman" + path.sep + " && npm install)");
+        console.log("  mkdir cordova-cli" + path.sep + "node_modules");
+        console.log("  ln -s .." + path.sep + ".." + path.sep + "cordova-lib" + path.sep + "cordova-lib cordova-cli" + path.sep + "node_modules");
         console.log("  (cd cordova-cli && npm install)");
     }
     console.log("To update all repositories:");
-    console.log("  ./cordova-coho/coho repo-update");
+    console.log("  ." + path.sep + "cordova-coho" + path.sep + "coho repo-update");
 }
 
 // Setting up config.fatal as true, if something goes wrong the program will terminate
@@ -365,7 +365,7 @@ shelljs.config.fatal = true;
 if (argv.clearnpmcache) {
     // clean out cached platforms and plugins and app-hello-world
     var home_dir = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
-    shelljs.rm("-rf", path.join(home_dir, ".cordova/npm_cache"));
+    shelljs.rm("-rf", path.join(home_dir, ".cordova", "npm_cache"));
     shelljs.rm("-rf", path.join(home_dir, ".plugman"));
 }
 
@@ -499,7 +499,7 @@ if (argv.plugman) {
     // Create the project using "cordova create"
     myDelete(cli_project_dir);
     console.log("Creating project mobilespec...");
-    shelljs.exec(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --template cordova-mobile-spec/www");
+    shelljs.exec(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --template cordova-mobile-spec" + path.sep + "www");
     shelljs.cp("-f", path.join(mobile_spec_git_dir, 'config.xml'), path.join(projectDirName, 'config.xml'));
 
     // Config.json file ---> linked to local libraries
