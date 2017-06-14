@@ -347,10 +347,10 @@ if (argv.global) {
     console.log(["  ." + path.sep + "cordova-coho" + path.sep + "coho repo-clone"].concat(repos).join(" -r "));
     if (!argv.globalplugins) {
         console.log("  mkdir cordova-cli" + path.sep + "node_modules");
-        console.log("  (cd cordova-lib" + path.sep + "cordova-lib" + path.sep + " && npm install)");
+        console.log("  (cd cordova-lib && npm install)");
         console.log("  (cd cordova-plugman" + path.sep + " && npm install)");
         console.log("  mkdir cordova-cli" + path.sep + "node_modules");
-        console.log("  ln -s .." + path.sep + ".." + path.sep + "cordova-lib" + path.sep + "cordova-lib cordova-cli" + path.sep + "node_modules");
+        console.log("  ln -s .." + path.sep + ".." + path.sep + "cordova-lib cordova-cli" + path.sep + "node_modules");
         console.log("  (cd cordova-cli && npm install)");
     }
     console.log("To update all repositories:");
@@ -369,17 +369,8 @@ if (argv.clearnpmcache) {
     shelljs.rm("-rf", path.join(home_dir, ".plugman"));
 }
 
-function getPathFromModuleName(moduleName) {
-    if (moduleName == "cordova-lib") {
-        return(moduleName + path.sep + moduleName);
-    } else {
-        return(moduleName);
-    }
-}
-
 function cdInto(moduleName) {
-    var myPath = getPathFromModuleName(moduleName);
-    pushd(myPath);
+    pushd(moduleName);
 }
 
 function cdOutOf() {
