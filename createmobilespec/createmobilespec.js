@@ -329,7 +329,7 @@ if (argv.global) {
     console.log("  ." + path.sep + "cordova-coho" + path.sep + "coho repo-update -r mobile-spec");
 } else {
     var repos = [ ];
-    repos.push("mobile-spec", "plugin-test-framework", "cli", "lib", "plugman");
+    repos.push("mobile-spec", "plugin-test-framework", "cli", "lib", "plugman", "tools");
     platforms.forEach(function(p) {
         repos.push(p);
     });
@@ -345,16 +345,13 @@ if (argv.global) {
 
     console.log("To clone repositories:");
     console.log(["  ." + path.sep + "cordova-coho" + path.sep + "coho repo-clone"].concat(repos).join(" -r "));
-    if (!argv.globalplugins) {
-        console.log("  mkdir cordova-cli" + path.sep + "node_modules");
-        console.log("  (cd cordova-lib && npm install)");
-        console.log("  (cd cordova-plugman" + path.sep + " && npm install)");
-        console.log("  mkdir cordova-cli" + path.sep + "node_modules");
-        console.log("  ln -s .." + path.sep + ".." + path.sep + "cordova-lib cordova-cli" + path.sep + "node_modules");
-        console.log("  (cd cordova-cli && npm install)");
-    }
+    console.log("  ." + path.sep + "cordova-coho" + path.sep + "coho -r cli -r common -r create -r fetch -r js -r serve -r lib -r plugman \"npm install\"");
+    console.log("  ." + path.sep + "cordova-coho" + path.sep + "coho npm-link");
+    platforms.forEach(function (platform) {
+        console.log("  (cd cordova-" + platform + " && npm install && npm link cordova-common)");
+    });
     console.log("To update all repositories:");
-    console.log("  ." + path.sep + "cordova-coho" + path.sep + "coho repo-update");
+    console.log(["  ." + path.sep + "cordova-coho" + path.sep + "coho repo-update"].concat(repos).join(" -r "));
 }
 
 // Setting up config.fatal as true, if something goes wrong the program will terminate
