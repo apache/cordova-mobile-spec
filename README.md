@@ -50,3 +50,31 @@ For reference purposes, the document
 in this directory outlines the Android bridge performance using
 `cordova-mobile-spec` and the manual bridge test.
 The tests were performed with **Cordova 3.0.0**.
+
+## Running a Local File-Transfer Server
+
+The `cordova-vm` file-transfer server could be offline for the `cordova-plugin-file-transfer` tests.
+
+The server to run is at:
+https://github.com/apache/cordova-labs/tree/cordova-filetransfer
+
+And you would override this variable for this test plugin:
+https://github.com/apache/cordova-plugin-file-transfer/blob/9b322dec6790f6d273b8f707bc07976d778c4cf6/tests/plugin.xml#L33
+```
+## in your mobilespec test project, run...
+cordova plugin rm cordova-plugin-file-transfer-tests
+cordova plugin add path/to/cordova-plugin-file-transfer/tests --variable FILETRANSFER_SERVER_ADDRESS="http://yourlocal-IPAddressHere:5000"
+```
+
+Run the server:
+```
+git clone https://github.com/apache/cordova-labs.git
+cd cordova-labs
+git checkout cordova-filetransfer
+node server.js
+```
+
+Get your local ip by running:
+```
+ifconfig
+```
