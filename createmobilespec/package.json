@@ -1,5 +1,5 @@
 { "name": "createmobilespec",
-  "version": "1.2.0",
+  "version": "1.2.1-dev",
   "description": "Create the mobilespec project and populate it.",
   "homepage": "http://cordova.apache.org",
   "bugs": { "url": "https://issues.apache.org/jira/browse/CB" },
