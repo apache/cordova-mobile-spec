@@ -16,9 +16,9 @@
     "url": "https://git-wip-us.apache.org/repos/asf/cordova-mobile-spec.git"
   },
   "dependencies": {
-    "shelljs": "0.2.6",
+    "grunt-cli": "^1.2.0",
     "optimist": "0.6.1",
-    "grunt-cli": "0.1.*"
+    "shelljs": "0.2.6"
   },
   "private": true
 }
