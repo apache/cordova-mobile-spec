@@ -19,7 +19,7 @@
 #
 -->
 
-## Creating the mobile-spec app
+# Creating the mobile-spec app
 
 `createmobilespec.js` is a script for creating a test app that has:
 
@@ -38,23 +38,40 @@ and a way to use the platform-centered workflow instead of the CLI.
 
 ## Requirements and Preparation
 
-Repositories required:
+1. Your Cordova projects have to be checked out and set up in a very specific way: All checkouts have to be siblings (= same parent folder) and the common Cordova libraries have to be npm-linked.  
 
-- All repositories must be checked out as peers to each other.
-- `cordova-cli` 
-  (Install pre-requisites by running `npm install` inside of cordova-cli).
-- `cordova-js`  
-- All plugins.
-- Platforms to test  
-  (e.g., `cordova-android`, `cordova-ios` or `cordova-windows`).
-- `cordova-mobile-spec`
-  (Install pre-requisites by running `npm install` inside of
-  [createmobilespec](createmobilespec)).
+    The easiest and quickest way to achieve this is by using `cordova-coho`:
 
-Before running `createmobilespec.js` for the first time, run `npm install`
-from within the [createmobilespec](.) directory to install the requisite
-third-party **Node** modules. This should be a one-time activity,
-unless there is a change in the pre-reqs.
+    ```
+    # Create a new folder, e.g. `cordova` and `cd cordova` into it.
+    git clone https://github.com/apache/cordova-coho.git
+    cd cordova-coho & npm install & cd ..
+    node cordova-coho/coho repo-clone  -r mobile-spec -r js -r lib -r plugman -r cli
+                                                                                      // -r android -r plugins
+    node cordova-coho/coho npm-link
+    ```
+2. 
+    ```
+    cd cordova-mobile-spec\createmobilespec & npm install & cd ..
+    ```
+The following projects need to be checked out as peers (= in the same directory):
+
+    * `cordova-mobile-spec` (this project)
+    * `cordova-js`  
+    * `cordova-lib`
+    * `cordova-plugman`
+    * `cordova-cli`
+    * All Cordova core plugins
+    * All platforms to test (e.g., `cordova-android`, `cordova-ios` or `cordova-windows`)
+
+    
+
+2. Run `npm install` in the following locations:
+
+    * `cordova-mobile-spec/createmobilespec` (also contains this `README`)
+    * `cordova-lib`
+    * `cordova-cli`
+
 
 Each git repo should be checked out to the state or edited with the content
 that you want to test.
@@ -71,11 +88,27 @@ So if you were to do an `ls` in that directory, you should see all the git repos
 
     cordova-mobile-spec/createmobilespec/createmobilespec.js
 
+On Windows, prefix all commands with `node`:
+
+    node cordova-mobile-spec/createmobilespec/createmobilespec.js
+
 To see the options available in the script, run it with the `-h` option to print the online help.
 
-    cordova-mobile-spec/createmobilespec/createmobilespec.js -h
+    (node) cordova-mobile-spec/createmobilespec/createmobilespec.js -h
 
-After you have run the script to create the app, you can run the app on a device or simulator, using the standard method for that platform(s). For example on **Android**:
+If anything is going wrong and the existing output does not help, add the `--debug` parameter:
+
+    (node) cordova-mobile-spec/createmobilespec/createmobilespec.js --debug
+
+### Create the App
+
+To for example create the app for the Android platform, run:
+
+    (node) cordova-mobile-spec/createmobilespec/createmobilespec.js --android
+
+### Run the App
+
+After the script successfully finished and created the app, you can run the app on a device or simulator, using the standard method for that platform(s). For example on **Android**:
 
     cd mobilespec
     ./cordova run android
