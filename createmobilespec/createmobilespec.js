@@ -512,7 +512,7 @@ if (argv.plugman) {
         } else {
             platformArg = join_paths([top_dir].concat(platform_layout[platform].bin));
             if (!fs.existsSync(platformArg)) {
-                couldNotFind(platformArg, platform);
+                couldNotFind(platform, platform);
                 platforms = platforms.filter(function (p) { return p != platform; });
                 return;
             }
