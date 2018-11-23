@@ -71,7 +71,12 @@ function pluginAdd(pluginName, searchPath, extraFlags) {
     if (extraFlags) {
         command += extraFlags;
     }
-    shelljs.exec(command);
+    executeShellCommand(command);
+}
+
+function executeShellCommand(command) {
+    console.log('$ ' + command);
+    return shelljs.exec(command);
 }
 
 // Check that we can load dependencies
@@ -384,7 +389,7 @@ function getBranchName(moduleName) {
     cdInto(moduleName);
     try {
         // output should look like: refs/head/master
-        var gitOutput = shelljs.exec("git symbolic-ref HEAD").output;
+        var gitOutput = executeShellCommand("git symbolic-ref HEAD").output;
         shelljs.config.fatal = isConfigFatal;
         var match = /refs\/heads\/(.*)/.exec(gitOutput);
         if (!match) {
@@ -445,7 +450,7 @@ function myDelete(myDir) {
         // Kill the process & restart folder deletion
         if (/^win/.test(process.platform)) {
             console.log("Not all files were deleted, killing ADB.EXE process to unlock folder...");
-            shelljs.exec("TASKKILL /F /IM ADB.exe /T");
+            executeShellCommand("TASKKILL /F /IM ADB.exe /T");
             shelljs.rm("-rf", myDir);
         } else
             throw new Error("Error during folder deletion, try to remove " + myDir + " manually.");
@@ -475,8 +480,8 @@ if (argv.plugman) {
         }
         var projName = getProjName(platform);
         myDelete(projName);
-        shelljs.exec(join_paths(platform_layout[platform].bin.concat("bin", "create ")) + projName + " org.apache.cordova.mobilespecplugman " + projName);
         console.log("### Creating project " + projName + "...");
+        executeShellCommand(join_paths(platform_layout[platform].bin.concat("bin", "create ")) + projName + " org.apache.cordova.mobilespecplugman " + projName);
         shelljs.rm("-r", join_paths([top_dir, projName].concat(platform_layout[platform].www)));
         shelljs.cp("-r", path.join(mobile_spec_git_dir, "www", "*"), join_paths([top_dir, projName].concat(platform_layout[platform].www)));
         var configPath = platform == 'ios' ? getProjName(platform) : 'config' in platform_layout[platform] ? join_paths(platform_layout[platform].config) : null;
@@ -490,8 +495,8 @@ if (argv.plugman) {
 } else {
     // Create the project using "cordova create"
     myDelete(cli_project_dir);
-    shelljs.exec(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --template cordova-mobile-spec" + path.sep + "www");
     console.log("### Creating project mobilespec...");
+    executeShellCommand(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --template cordova-mobile-spec" + path.sep + "www");
     shelljs.cp("-f", path.join(mobile_spec_git_dir, 'config.xml'), path.join(projectDirName, 'config.xml'));
 
     // Config.json file ---> linked to local libraries
@@ -514,7 +519,7 @@ if (argv.plugman) {
         }
         console.log("platformArg: " + cli + " " + platformArg);
         var linkPlatformsFlag = (argv.link || argv.linkplatforms) ? ' --link' : '';
-        shelljs.exec(cli + ' platform add "' + platformArg + '" --verbose' + linkPlatformsFlag);
+        executeShellCommand(cli + ' platform add "' + platformArg + '" --verbose' + linkPlatformsFlag);
         if (platform == 'android') {
             shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.properties'), path.join('platforms', 'android'));
             shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.p12'), path.join('platforms', 'android'));
@@ -570,7 +575,7 @@ function installPlugins() {
             pushd(projName);
             plugins.forEach(function(plugin) {
                 // plugin path must be relative and not absolute (sigh)
-                shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
+                executeShellCommand(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
                              " install --platform " + platform +
                              " --project . --plugin " + plugin +
                              " --searchpath " + top_dir + browserifyFlag);
@@ -582,7 +587,7 @@ function installPlugins() {
                 var pluginDirName = pluginIdToDirName(plugin);
                 var potential_tests_plugin_xml = path.join(top_dir, pluginDirName, 'tests', 'plugin.xml');
                 if (fs.existsSync(potential_tests_plugin_xml)) {
-                    shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
+                    executeShellCommand(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
                                 " install --platform " + platform +
                                 " --project . --plugin " + path.dirname(potential_tests_plugin_xml) + browserifyFlag);
                 }
@@ -682,7 +687,7 @@ function updateJS() {
                 var version = require(join_paths([top_dir].concat(platform_layout[platform].bin)) + '/package').version;
                 pushd(cordova_js_git_dir);
                 var nodeCommand = /^win/.test(process.platform) ? ("\"" + process.argv[0] + "\" ") : "";
-                var code = shelljs.exec(nodeCommand + path.join(__dirname, "node_modules", "grunt-cli", "bin", "grunt") + ' compile:' + platform + ' --platformVersion=' + version).code;
+                var code = executeShellCommand(nodeCommand + path.join(__dirname, "node_modules", "grunt-cli", "bin", "grunt") + ' compile:' + platform + ' --platformVersion=' + version).code;
                 if (code) {
                     console.log("Failed to build js.");
                     process.exit(1);
