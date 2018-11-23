@@ -20,27 +20,13 @@
 -->
 # Mobile Spec Suite
 
-This repository contains a special Cordova project that provides a set of automated & manual tests that test Cordova core functionality.
+This repository contains a special Cordova app that provides a set of automated & manual tests that test Cordova core functionality. See the [`README.md` in `/cordova-mobile-spec`](createmobilespec/README.md) for details on how to set it up.
 
-To set up the project, use `cordova-mobile-spec/createmobilespec/createmobilespec.js`. See the [README.md](createmobilespec/README.md) in that directory.
+## Usage
 
-## Requirements
+After setting this project up, you can ...
 
-Repositories required:
-
-- **cordova-cli**  
-  (Install pre-requisites by running `npm install` inside of cordova-cli).
-- **cordova-js**
-- All **plugins**.
-- **Platforms** to test  
-  (e.g., cordova-android, cordova-ios, cordova-blackberry,
-  cordova-wp8, or cordova-windows).
-- **cordova-mobile-spec**  
-  (Install pre-requisites by running `npm install` inside of
-  [createmobilespec](createmobilespec)).
-- All repositories must be checked out as peers to each other.
-
-## Running a Local File-Transfer Server
+### Running a Local File-Transfer Server
 
 If the `cordova-vm` file-transfer server at http://cordova-vm.apache.org:5000 (which is used for the `cordova-plugin-file-transfer` tests) is offline, you can also run the server locally:
 
