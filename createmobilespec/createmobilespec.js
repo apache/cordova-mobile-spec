@@ -71,12 +71,7 @@ function pluginAdd(pluginName, searchPath, extraFlags) {
     if (extraFlags) {
         command += extraFlags;
     }
-    executeShellCommand(command);
-}
-
-function executeShellCommand(command) {
-    console.log('$ ' + command);
-    return shelljs.exec(command);
+    shelljs.exec(command);
 }
 
 // Check that we can load dependencies
@@ -96,9 +91,15 @@ var top_dir =             process.cwd() + path.sep,
     cordova_js_git_dir =  path.join(top_dir, "cordova-js"),
     platforms =           [],
     // where to find the /bin/create command and www dir in a non-CLI project
-    platform_layout =     { "android":      { "bin": ["cordova-android"],
+    platform_layout =     { "amazon-fireos":{ "bin": ["cordova-amazon-fireos"],
                                               "www": ["assets", "www"],
                                               "config": ["res", "xml"] },
+                            "android":      { "bin": ["cordova-android"],
+                                              "www": ["assets", "www"],
+                                              "config": ["res", "xml"] },
+                            "blackberry10": { "bin": ["cordova-blackberry"],
+                                              "www": ["www"],
+                                              "config": ["www"] },
                             "browser": { "bin": ["cordova-browser"],
                                               "www": ["www"],
                                               "config": ["www"] },   
@@ -108,21 +109,28 @@ var top_dir =             process.cwd() + path.sep,
                             "osx":          { "bin": ["cordova-osx"],
                                               "www": ["www"] },
                             "windows":      { "bin": ["cordova-windows"],
-                                              "www": ["www"] }
-                            },
+                                              "www": ["www"] },
+                            "wp8":          { "bin": ["cordova-wp8"],
+                                              "www": ["www"] },
+                            "firefoxos":    { "bin": ["cordova-firefoxos"],
+                                              "www": ["www"] } },
     argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--link] [--global] [--globalplugins] [--plugins=\".\\myPluginDir\"] [--skipjs] [--skiplink] [--variable VAR=\"value\"] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.\n" +
-                          "\tPLATFORM: [--<android|ios|windows|osx>]\n" +
+                          "\tPLATFORM: [--<amazon|android|blackberry10|ios|windows|wp8|firefoxos|osx>]\n" +
                           "")
                    .boolean("help").describe("help", "Shows usage.")
                    .boolean("debug").describe("debug", "Debug logging.")
+                   .boolean("amazon").describe("amazon", "Add Amazon FireOS platform.")
                    .boolean("android").describe("android", "Add Android platform.")
                    .boolean("browser").describe("browser", "Add Browser platform.")
+                   .boolean("blackberry10").describe("blackberry10", "Add BlackBerry 10 platform.")
                    .boolean("ios").describe("ios", "Add iOS platform.")
-                   .boolean("osx").describe("osx", "Add osx platform (macOS).")
+                   .boolean("osx").describe("osx", "Add osx platform.")
                    .boolean("windows").describe("windows", "Add Windows (universal) platform.")
-                   .boolean("plugman").describe("plugman", "Use {platform}/bin/create and plugman directly instead of the CLI.")
+                   .boolean("wp8").describe("wp8", "Add Windows Phone 8 platform.")
+                   .boolean("firefoxos").describe("firefoxos", "Add FirefoxOS platform.")
+                   .boolean("plugman").describe("plugman", "Use {platform}/bin/create and plugman directly instead of the CLI.") // TODO Why would one want to do that?
                    .boolean("global").describe("global", "Use the globally-installed `cordova` and the downloaded platforms/plugins from the registry instead of the local git repo.\n" +
                                                "\t\t\tWill use the local git repo of mobile-spec.\n" +
                                                "\t\t\tGenerally used only to test RC or production releases.\n" +
@@ -144,12 +152,62 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("linkplugins").describe("linkplugins", "Use the --link flag when running `cordova plugin add`.\n")
                    .boolean("linkplatforms").describe("linkplatforms", "Use the --link flag when running `cordova platform add`.\n")
                    .boolean("link").describe("link", "Alias for --linkplugins --linkplatforms.\n")
+                   .boolean("browserify").describe("browserify", "Use the --browserify flag when running `cordova plugin add`.\n")
+                   .boolean("telerikplugins").describe("telerikplugins", "Adds a bunch of known-to-be-popular plugins from Telerik-Verified-Plugins.\n") // TODO
+                   .boolean("cprplugins").describe("cprplugins", "Adds a bunch of known-to-be-popular plugins from Cordova Plugin Regsitry.\n") // TODO
+                   .boolean("plugregplugins").describe("cprplugins", "Adds a bunch of known-to-be-popular plugins from PlugReg (that are not on the CPR).\n") // TODO
+                   .boolean("thirdpartyplugins").describe("thirdpartyplugins", "Alias for --telerikplugins --cprplugins --plugregplugins.\n") // TODO
                    .string("webview").describe("webview", "Use --webview=crosswalk to install the crosswalk plugin") // TODO
                    .alias("h", "help")
                    .argv;
 
+// List generated based on download counts on registry.
+var CORDOVA_REGISTRY_PLUGINS = [
+    'com.ionic.keyboard',
+    'com.google.playservices',
+    'de.appplant.cordova.plugin.local-notification',
+    'com.phonegap.plugins.barcodescanner',
+    'com.cranberrygame.phonegap.plugin.ad.admob',
+    // 'com.google.cordova.admob', // these two conflict. Use the most popular one.
+    // 'com.google.admob',
+    // Currently need an git version of this to fix a bug in published version.
+    // It's a dep of plugin.google.maps
+    'https://github.com/wf9a5m75/phonegap-http-request.git',
+    'plugin.google.maps',
+    'com.rjfun.cordova.extension',
+    'net.yoik.cordova.plugins.screenorientation',
+    'de.appplant.cordova.plugin.email-composer',
+    'com.msopentech.azure-mobile-services',
+    // 'com.phonegap.plugins.pushplugin', // This one bundles play services, causing duplicate symbols
+    'com.phonegap.plugins.facebookconnect',
+    'com.danielcwilson.plugins.googleanalytics'
+];
+// Commented out plugins are popular, but duplicate those in CPR.
+var TELERIK_VERIFIED_PLUGINS = [
+    'https://github.com/Telerik-Verified-Plugins/Flashlight',
+    'https://github.com/Telerik-Verified-Plugins/SocialSharing',
+    'https://github.com/Telerik-Verified-Plugins/ActionSheet',
+    'https://github.com/Telerik-Verified-Plugins/Calendar',
+    // 'https://github.com/Telerik-Verified-Plugins/EmailComposer',
+    'https://github.com/Telerik-Verified-Plugins/NativePageTransitions',
+    'https://github.com/Telerik-Verified-Plugins/Toast',
+    // 'https://github.com/Telerik-Verified-Plugins/BarcodeScanner',
+    'https://github.com/Telerik-Verified-Plugins/Keychain',
+    // 'https://github.com/Telerik-Verified-Plugins/Keyboard',
+    'https://github.com/Telerik-Verified-Plugins/NFC',
+    'https://github.com/Telerik-Verified-Plugins/AppVersion',
+    'https://github.com/Telerik-Verified-Plugins/PrivacyScreen'
+];
+
+var PLUGREG_PLUGINS = [
+    'https://github.com/brodysoft/Cordova-SQLitePlugin.git',
+    // 'https://github.com/wildabeast/BarcodeScanner.git',
+    // 'https://github.com/phonegap-build/PushPlugin.git',
+];
+
 var DEFAULT_PLUGINS = [
     'cordova-plugin-battery-status',
+    'cordova-plugin-compat',
     'cordova-plugin-camera',
     'cordova-plugin-console',
     'cordova-plugin-contacts',
@@ -172,15 +230,27 @@ var DEFAULT_PLUGINS = [
     // TODO check if all are listed
 ];
 
-// osx platform (macOS) has little support for the most of the plugins,
-// so it gets its own default list
+// OSX has little support for the most of the plugins, so it gets its own default list
 var DEFAULT_PLUGINS_OSX = [
-    'cordova-plugin-camera',
+    //'cordova-plugin-battery-status',
+    //'cordova-plugin-camera',
+    //'cordova-plugin-console',
+    //'cordova-plugin-contacts',
     'cordova-plugin-device',
+    //'cordova-plugin-device-motion',
+    //'cordova-plugin-device-orientation',
+    //'cordova-plugin-dialogs',
     'cordova-plugin-file',
-    'cordova-plugin-inappbrowser',
-    // non-functional on osx platform (macOS), iOS,
-    // or any other non-Android platforms:
+    //'cordova-plugin-file-transfer',
+    //'cordova-plugin-geolocation',
+    //'cordova-plugin-globalization',
+    //'cordova-plugin-inappbrowser',
+    //'cordova-plugin-media',
+    //'cordova-plugin-media-capture',
+    //'cordova-plugin-network-information',
+    //'cordova-plugin-splashscreen',
+    //'cordova-plugin-statusbar',
+    //'cordova-plugin-vibration',
     'cordova-plugin-whitelist',
 ];
 
@@ -202,10 +272,14 @@ function quit() {
 }
 
 if (argv.help) { optimist.showHelp(); quit(); }
+if (argv.amazon) { platforms.push("amazon-fireos"); }
 if (argv.android) { platforms.push("android"); }
 if (argv.ios) { platforms.push("ios"); }
 if (argv.browser) { platforms.push("browser"); }
+if (argv.blackberry10) { platforms.push("blackberry10"); }
+if (argv.wp8) { platforms.push("wp8"); }
 if (argv.windows) { platforms.push("windows"); }
+if (argv.firefoxos) { platforms.push("firefoxos"); }
 if (argv.osx) {platforms.push("osx");}
 
 argv.skiplink = argv.skiplink || argv.global;
@@ -230,6 +304,7 @@ var cli = argv.global ? "cordova" : cli_local_bin;
 
 var projectDirName = argv._[0] || "mobilespec";
 var cli_project_dir = path.join(top_dir, projectDirName);
+var browserifyFlag = argv.browserify ? ' --browserify' : ''; // TODO
 var variableFlag = '';
 // some plugins support setting config.xml <preference> elements via a --variable flag.
 if (argv.variable) {
@@ -248,7 +323,7 @@ if (!fs.existsSync(path.join("cordova-coho", "coho"))) {
     process.exit(3);
 }
 if (argv.global) {
-    console.log("### Creating project. Using globally installed tools, downloadable platforms and plugins, and local mobile-spec.");
+    console.log("Creating project. Using globally installed tools, downloadable platforms and plugins, and local mobile-spec.");
     console.log("To clone needed repositories:");
     console.log("  ." + path.sep + "cordova-coho" + path.sep + "coho repo-clone -r mobile-spec");
     console.log("To update all repositories:");
@@ -263,9 +338,9 @@ if (argv.global) {
         repos.push("js");
     }
     if (argv.globalplugins) {
-        console.log("### Creating project from downloadable plugins, local tools and platforms, and local mobile-spec. If you have any errors, it may be from missing repositories.");
+        console.log("Creating project from downloadable plugins, local tools and platforms, and local mobile-spec. If you have any errors, it may be from missing repositories.");
     } else {
-        console.log("### Creating project from local git repos. If you have any errors, it may be from missing repositories.");
+        console.log("Creating project from local git repos. If you have any errors, it may be from missing repositories.");
         repos.push("plugins");
     }
 
@@ -309,7 +384,7 @@ function getBranchName(moduleName) {
     cdInto(moduleName);
     try {
         // output should look like: refs/head/master
-        var gitOutput = executeShellCommand("git symbolic-ref HEAD").output;
+        var gitOutput = shelljs.exec("git symbolic-ref HEAD").output;
         shelljs.config.fatal = isConfigFatal;
         var match = /refs\/heads\/(.*)/.exec(gitOutput);
         if (!match) {
@@ -330,7 +405,7 @@ function verifyNpmLinkOf(linkedModule, installedModule) {
     if (fs.existsSync(linkedPath)) {
         var myStat = fs.lstatSync(linkedPath);
         if (!myStat.isSymbolicLink()) {
-            throw new Error('Module ' + linkedModule + ' installed in ' + installedModule + ' is not npm-linked. I recommend you run "coho npm-link".');
+            throw new Error('Module ' + linkedModule + ' installed in ' + installedModule + ' is not npm-linked. I recommend you run "coho npm-link".'); // TODO angleichen an andere commands
         }
     } else {
         throw new Error('Module ' + linkedModule + ' is not installed at all (direct or npm-linked) in ' + installedModule);
@@ -339,7 +414,7 @@ function verifyNpmLinkOf(linkedModule, installedModule) {
 }
 
 if (!argv.skiplink) {
-    console.log("Checking if you are using master branch of tools (js, lib, plugman, cli)");
+    console.log("Checking if you are using master branch of tools");
     // if js, lib, plugman, and cli have master checked out, should npm link.
     var jsBranch = getBranchName("cordova-js");
     var libBranch = getBranchName("cordova-lib");
@@ -350,7 +425,7 @@ if (!argv.skiplink) {
         // so they actually get tested instead of downloading the last published
         // one from the npm registry. Fail if they are not.
         console.log("You are on master branch of tools, checking npm links");
-        //verifyNpmLinkOf("cordova-js", "cordova-lib"); TODO Clean up other cordova-js stuff above
+        //verifyNpmLinkOf("cordova-js", "cordova-lib"); TODO cordova-js is not a dependency of cordova-lib (any more?)
         verifyNpmLinkOf("cordova-lib", "cordova-plugman");
         verifyNpmLinkOf("cordova-lib", "cordova-cli");
         console.log("npm links are OK");
@@ -370,7 +445,7 @@ function myDelete(myDir) {
         // Kill the process & restart folder deletion
         if (/^win/.test(process.platform)) {
             console.log("Not all files were deleted, killing ADB.EXE process to unlock folder...");
-            executeShellCommand("TASKKILL /F /IM ADB.exe /T");
+            shelljs.exec("TASKKILL /F /IM ADB.exe /T");
             shelljs.rm("-rf", myDir);
         } else
             throw new Error("Error during folder deletion, try to remove " + myDir + " manually.");
@@ -400,8 +475,8 @@ if (argv.plugman) {
         }
         var projName = getProjName(platform);
         myDelete(projName);
+        shelljs.exec(join_paths(platform_layout[platform].bin.concat("bin", "create ")) + projName + " org.apache.cordova.mobilespecplugman " + projName);
         console.log("### Creating project " + projName + "...");
-        executeShellCommand(join_paths(platform_layout[platform].bin.concat("bin", "create ")) + projName + " org.apache.cordova.mobilespecplugman " + projName);
         shelljs.rm("-r", join_paths([top_dir, projName].concat(platform_layout[platform].www)));
         shelljs.cp("-r", path.join(mobile_spec_git_dir, "www", "*"), join_paths([top_dir, projName].concat(platform_layout[platform].www)));
         var configPath = platform == 'ios' ? getProjName(platform) : 'config' in platform_layout[platform] ? join_paths(platform_layout[platform].config) : null;
@@ -415,8 +490,8 @@ if (argv.plugman) {
 } else {
     // Create the project using "cordova create"
     myDelete(cli_project_dir);
+    shelljs.exec(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --template cordova-mobile-spec" + path.sep + "www");
     console.log("### Creating project mobilespec...");
-    executeShellCommand(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --template cordova-mobile-spec" + path.sep + "www");
     shelljs.cp("-f", path.join(mobile_spec_git_dir, 'config.xml'), path.join(projectDirName, 'config.xml'));
 
     // Config.json file ---> linked to local libraries
@@ -432,18 +507,18 @@ if (argv.plugman) {
         } else {
             platformArg = join_paths([top_dir].concat(platform_layout[platform].bin));
             if (!fs.existsSync(platformArg)) {
-                couldNotFind(platform);
+                couldNotFind(platformArg, platform);
                 platforms = platforms.filter(function (p) { return p != platform; });
                 return;
             }
         }
         console.log("platformArg: " + cli + " " + platformArg);
         var linkPlatformsFlag = (argv.link || argv.linkplatforms) ? ' --link' : '';
-        executeShellCommand(cli + ' platform add "' + platformArg + '" --verbose' + linkPlatformsFlag);
+        shelljs.exec(cli + ' platform add "' + platformArg + '" --verbose' + linkPlatformsFlag);
         if (platform == 'android') {
-            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.properties'), path.join('platforms', 'android', 'app'));
-            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.p12'), path.join('platforms', 'android', 'app'));
-            shelljs.cp(path.join(__dirname, 'helper_files', 'build-extras.gradle'), path.join('platforms', 'android', 'app'));
+            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.properties'), path.join('platforms', 'android'));
+            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.p12'), path.join('platforms', 'android'));
+            shelljs.cp(path.join(__dirname, 'helper_files', 'build-extras.gradle'), path.join('platforms', 'android'));
         }
     });
     popd();
@@ -465,12 +540,12 @@ function pluginIdToDirName(id) {
 function installPlugins() {
     var plugins = DEFAULT_PLUGINS;
 
-    // special override for osx platform (macOS)
+    // special override for osx
     if (argv.osx) {
         if (platforms.length > 1) {
-            console.warn('Warning: Testing more than one platform at once may cause issues with unsupported plugins for osx platform (macOS).');
+            console.warn('Warning: Testing more than one platform at once might cause problems with unsupported plugins for OSX');
         } else {
-            console.warn('Warning: Using reduced plugin list for osx platform (macOS).');
+            console.warn('Warning: Using reduced plugin list for OSX-only tests.');
             plugins = DEFAULT_PLUGINS_OSX;
         }
     }
@@ -495,10 +570,10 @@ function installPlugins() {
             pushd(projName);
             plugins.forEach(function(plugin) {
                 // plugin path must be relative and not absolute (sigh)
-                executeShellCommand(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
+                shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
                              " install --platform " + platform +
                              " --project . --plugin " + plugin +
-                             " --searchpath " + top_dir);
+                             " --searchpath " + top_dir + browserifyFlag);
             });
 
             // Install new-style test plugins
@@ -507,9 +582,9 @@ function installPlugins() {
                 var pluginDirName = pluginIdToDirName(plugin);
                 var potential_tests_plugin_xml = path.join(top_dir, pluginDirName, 'tests', 'plugin.xml');
                 if (fs.existsSync(potential_tests_plugin_xml)) {
-                    executeShellCommand(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
+                    shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
                                 " install --platform " + platform +
-                                " --project . --plugin " + path.dirname(potential_tests_plugin_xml));
+                                " --project . --plugin " + path.dirname(potential_tests_plugin_xml) + browserifyFlag);
                 }
             });
             popd();
@@ -527,7 +602,7 @@ function installPlugins() {
         console.log("Installing local test framework plugins...");
         var linkPluginsFlag = (argv.link || argv.linkplugins) ? ' --link' : '';
         var forcePluginsFlag = (argv.forceplugins)? ' --force' : '';
-        var allPluginFlags = linkPluginsFlag + variableFlag + forcePluginsFlag;
+        var allPluginFlags = linkPluginsFlag + browserifyFlag + variableFlag + forcePluginsFlag;
 
         // Install mobilespec tests only if we install default list of plugins
         // If custom list of plugins is being installed, mobilespec tests can be listed there, if needed
@@ -552,6 +627,26 @@ function installPlugins() {
             var sp = SEARCH_PATHS.hasOwnProperty(p) ? SEARCH_PATHS[p] : searchPath;
             pluginAdd(p, sp, allPluginFlags);
         });
+
+        if (argv.thirdpartyplugins || argv.cprplugins) {
+            var mapVars = ' --variable API_KEY_FOR_ANDROID="AIzaSyBICVSs9JqT7WdASuN5HSe7w-pCE0n_X88" --variable API_KEY_FOR_IOS="AIzaSyAikyYG24YYFvq5Vy41P5kppsfO2GgF9jM"';
+            var fbVars = ' --variable APP_ID=value --variable APP_NAME=value';
+            pluginAdd(CORDOVA_REGISTRY_PLUGINS.join(' '), searchPath, browserifyFlag + mapVars + fbVars + variableFlag);
+            // Delete duplicate <uses-permission> due to maxSdk (CB-8401)
+            if (argv.android) {
+                shelljs.sed('-i', /{[^{]*(maxSdk|WRITE_EXTERNAL_STORAGE).*?(maxSdk|WRITE_EXTERNAL_STORAGE)[^}]*},/, '', path.join('plugins', 'android.json'));
+                shelljs.sed('-i', /<.*(maxSdk|WRITE_EXTERNAL_STORAGE).*(maxSdk|WRITE_EXTERNAL_STORAGE).*>/, '', path.join('platforms', 'android', 'AndroidManifest.xml'));
+            }
+        }
+        if (argv.thirdpartyplugins || argv.telerikplugins) {
+            pluginAdd(TELERIK_VERIFIED_PLUGINS.join(' '), searchPath, browserifyFlag + variableFlag);
+        }
+        if (argv.thirdpartyplugins || argv.plugregplugins) {
+            pluginAdd(PLUGREG_PLUGINS.join(' '), searchPath, browserifyFlag + variableFlag);
+        }
+        if (argv.thirdpartyplugins) {
+            pluginAdd('org.apache.cordova.mobilespec.thirdpartytests', mobile_spec_git_dir, allPluginFlags);
+        }
 
         // Install new-style test plugins
         console.log("Adding plugin tests using CLI...");
@@ -587,7 +682,7 @@ function updateJS() {
                 var version = require(join_paths([top_dir].concat(platform_layout[platform].bin)) + '/package').version;
                 pushd(cordova_js_git_dir);
                 var nodeCommand = /^win/.test(process.platform) ? ("\"" + process.argv[0] + "\" ") : "";
-                var code = executeShellCommand(nodeCommand + path.join(__dirname, "node_modules", "grunt-cli", "bin", "grunt") + ' compile:' + platform + ' --platformVersion=' + version).code;
+                var code = shelljs.exec(nodeCommand + path.join(__dirname, "node_modules", "grunt-cli", "bin", "grunt") + ' compile:' + platform + ' --platformVersion=' + version).code;
                 if (code) {
                     console.log("Failed to build js.");
                     process.exit(1);
@@ -619,7 +714,7 @@ function summary() {
 
         // Executing cordova prepare
         console.log("### Preparing project...");
-        executeShellCommand(cli + " prepare");
+        executeShellCommand(cli + " prepare" + browserifyFlag);
 
         if (!argv.global) {
             console.log("Linking CLI...");
