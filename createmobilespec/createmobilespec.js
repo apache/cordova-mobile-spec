@@ -440,6 +440,7 @@ if (argv.plugman) {
         console.log("platformArg: " + cli + " " + platformArg);
         var linkPlatformsFlag = (argv.link || argv.linkplatforms) ? ' --link' : '';
         executeShellCommand(cli + ' platform add "' + platformArg + '" --verbose' + linkPlatformsFlag);
+        // TODO
         if (platform == 'android') {
             shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.properties'), path.join('platforms', 'android', 'app'));
             shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.p12'), path.join('platforms', 'android', 'app'));
