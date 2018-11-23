@@ -239,7 +239,7 @@ if (argv.variable) {
 // Print relevant information
 if (!fs.existsSync(path.join("cordova-coho", "coho"))) {
     console.log("You need to clone cordova-coho:");
-    console.log("  git clone https://git-wip-us.apache.org/repos/asf/cordova-coho.git"); // TODO
+    console.log("  git clone https://github.com/apache/cordova-coho.git");
     process.exit(3);
 }
 if (argv.global) {
