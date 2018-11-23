@@ -43,14 +43,6 @@ Repositories required:
   [createmobilespec](createmobilespec)).
 - All repositories must be checked out as peers to each other.
 
-### Performance ###
-
-For reference purposes, the document
-[AndroidBridgePerformance_300.pdf](AndroidBridgePerformance_300.pdf)
-in this directory outlines the Android bridge performance using
-`cordova-mobile-spec` and the manual bridge test.
-The tests were performed with **Cordova 3.0.0**.
-
 ## Running a Local File-Transfer Server
 
 The `cordova-vm` file-transfer server could be offline for the `cordova-plugin-file-transfer` tests.
