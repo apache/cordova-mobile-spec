@@ -31,14 +31,14 @@ See the [README.md](createmobilespec/README.md) in that directory.
 
 Repositories required:
 
-- **cordova-cli**
+- **cordova-cli**  
   (Install pre-requisites by running `npm install` inside of cordova-cli).
 - **cordova-js**
 - All **plugins**.
-- **Platforms** to test
+- **Platforms** to test  
   (e.g., cordova-android, cordova-ios, cordova-blackberry,
   cordova-wp8, or cordova-windows).
-- **cordova-mobile-spec**
+- **cordova-mobile-spec**  
   (Install pre-requisites by running `npm install` inside of
   [createmobilespec](createmobilespec)).
 - All repositories must be checked out as peers to each other.
