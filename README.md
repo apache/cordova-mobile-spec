@@ -42,28 +42,23 @@ Repositories required:
 
 ## Running a Local File-Transfer Server
 
-The `cordova-vm` file-transfer server could be offline for the `cordova-plugin-file-transfer` tests.
+If the `cordova-vm` file-transfer server at http://cordova-vm.apache.org:5000 (which is used for the `cordova-plugin-file-transfer` tests) is offline, you can also run the server locally:
 
-The server to run is at:
-https://github.com/apache/cordova-labs/tree/cordova-filetransfer
-
-And you would override this variable for this test plugin:
-https://github.com/apache/cordova-plugin-file-transfer/blob/9b322dec6790f6d273b8f707bc07976d778c4cf6/tests/plugin.xml#L33
-```
-## in your mobilespec test project, run...
-cordova plugin rm cordova-plugin-file-transfer-tests
-cordova plugin add path/to/cordova-plugin-file-transfer/tests --variable FILETRANSFER_SERVER_ADDRESS="http://yourlocal-IPAddressHere:5000"
-```
-
-Run the server:
-```
-git clone https://github.com/apache/cordova-labs.git
-cd cordova-labs
-git checkout cordova-filetransfer
-node server.js
-```
-
-Get your local ip by running:
-```
-ifconfig
-```
+- https://github.com/apache/cordova-labs/tree/cordova-filetransfer
+- Checkout and run the server:
+    ```shell
+    git clone https://github.com/apache/cordova-labs.git
+    cd cordova-labs
+    git checkout cordova-filetransfer
+    node server.js
+    ```
+- Overwrite [this variable](https://github.com/apache/cordova-plugin-file-transfer/blob/9b322dec6790f6d273b8f707bc07976d778c4cf6/tests/plugin.xml#L33) for the test plugin. Run this in your mobilespec test project:
+    ```shell
+    cordova plugin rm cordova-plugin-file-transfer-tests
+    cordova plugin add path/to/cordova-plugin-file-transfer/tests --variable FILETRANSFER_SERVER_ADDRESS="http://yourlocal-IPAddressHere:5000"
+    ```
+    - Get your local ip by running:
+    ```shell
+    ifconfig # Linux, macOS
+    ipconfig # Windows
+    ```
