@@ -80,3 +80,8 @@ For example on **Android**:
         cd mobilespec
         ./cordova run android
 
+Some known quirks and issues:
+
+* `npm install` inside `cordova-js` is needed to resolve a local grunt issue
+* A Gradle file in `platforms/android` subdirectory tries to read non-existing debug keys. Workaround is to comment the lines out of the Gradle file.
+* It may be required to uninstall the `cordova-plugin-compat` plugin due to multiple "BuildHelper" classes defined in dex files (<https://stackoverflow.com/questions/46562289/multiple-dex-files-define-lorg-apache-cordova-buildhelper/46562523#46562523>)
