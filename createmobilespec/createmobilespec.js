@@ -91,15 +91,9 @@ var top_dir =             process.cwd() + path.sep,
     cordova_js_git_dir =  path.join(top_dir, "cordova-js"),
     platforms =           [],
     // where to find the /bin/create command and www dir in a non-CLI project
-    platform_layout =     { "amazon-fireos":{ "bin": ["cordova-amazon-fireos"],
+    platform_layout =     { "android":      { "bin": ["cordova-android"],
                                               "www": ["assets", "www"],
                                               "config": ["res", "xml"] },
-                            "android":      { "bin": ["cordova-android"],
-                                              "www": ["assets", "www"],
-                                              "config": ["res", "xml"] },
-                            "blackberry10": { "bin": ["cordova-blackberry"],
-                                              "www": ["www"],
-                                              "config": ["www"] },
                             "browser": { "bin": ["cordova-browser"],
                                               "www": ["www"],
                                               "config": ["www"] },   
@@ -109,27 +103,20 @@ var top_dir =             process.cwd() + path.sep,
                             "osx":          { "bin": ["cordova-osx"],
                                               "www": ["www"] },
                             "windows":      { "bin": ["cordova-windows"],
-                                              "www": ["www"] },
-                            "wp8":          { "bin": ["cordova-wp8"],
-                                              "www": ["www"] },
-                            "firefoxos":    { "bin": ["cordova-firefoxos"],
-                                              "www": ["www"] } },
+                                              "www": ["www"] }
+                            },
     argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--link] [--global] [--globalplugins] [--plugins=\".\\myPluginDir\"] [--skipjs] [--skiplink] [--variable VAR=\"value\"] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.\n" +
-                          "\tPLATFORM: [--<amazon|android|blackberry10|ios|windows|wp8|firefoxos|osx>]\n" +
+                          "\tPLATFORM: [--<android|ios|windows|osx>]\n" +
                           "")
                    .boolean("help").describe("help", "Shows usage.")
                    .boolean("debug").describe("debug", "Debug logging.")
-                   .boolean("amazon").describe("amazon", "Add Amazon FireOS platform.")
                    .boolean("android").describe("android", "Add Android platform.")
                    .boolean("browser").describe("browser", "Add Browser platform.")
-                   .boolean("blackberry10").describe("blackberry10", "Add BlackBerry 10 platform.")
                    .boolean("ios").describe("ios", "Add iOS platform.")
                    .boolean("osx").describe("osx", "Add osx platform.")
                    .boolean("windows").describe("windows", "Add Windows (universal) platform.")
-                   .boolean("wp8").describe("wp8", "Add Windows Phone 8 platform.")
-                   .boolean("firefoxos").describe("firefoxos", "Add FirefoxOS platform.")
                    .boolean("plugman").describe("plugman", "Use {platform}/bin/create and plugman directly instead of the CLI.")
                    .boolean("global").describe("global", "Use the globally-installed `cordova` and the downloaded platforms/plugins from the registry instead of the local git repo.\n" +
                                                "\t\t\tWill use the local git repo of mobile-spec.\n" +
@@ -271,14 +258,10 @@ function quit() {
 }
 
 if (argv.help) { optimist.showHelp(); quit(); }
-if (argv.amazon) { platforms.push("amazon-fireos"); }
 if (argv.android) { platforms.push("android"); }
 if (argv.ios) { platforms.push("ios"); }
 if (argv.browser) { platforms.push("browser"); }
-if (argv.blackberry10) { platforms.push("blackberry10"); }
-if (argv.wp8) { platforms.push("wp8"); }
 if (argv.windows) { platforms.push("windows"); }
-if (argv.firefoxos) { platforms.push("firefoxos"); }
 if (argv.osx) {platforms.push("osx");}
 
 argv.skiplink = argv.skiplink || argv.global;
