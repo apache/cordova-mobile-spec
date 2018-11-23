@@ -395,8 +395,8 @@ if (argv.plugman) {
         }
         var projName = getProjName(platform);
         myDelete(projName);
-        console.log("Creating project " + projName + "...");
         shelljs.exec(join_paths(platform_layout[platform].bin.concat("bin", "create ")) + projName + " org.apache.cordova.mobilespecplugman " + projName);
+        console.log("### Creating project " + projName + "...");
         shelljs.rm("-r", join_paths([top_dir, projName].concat(platform_layout[platform].www)));
         shelljs.cp("-r", path.join(mobile_spec_git_dir, "www", "*"), join_paths([top_dir, projName].concat(platform_layout[platform].www)));
         var configPath = platform == 'ios' ? getProjName(platform) : 'config' in platform_layout[platform] ? join_paths(platform_layout[platform].config) : null;
@@ -410,17 +410,17 @@ if (argv.plugman) {
 } else {
     // Create the project using "cordova create"
     myDelete(cli_project_dir);
-    console.log("Creating project mobilespec...");
     shelljs.exec(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --template cordova-mobile-spec" + path.sep + "www");
+    console.log("### Creating project mobilespec...");
     shelljs.cp("-f", path.join(mobile_spec_git_dir, 'config.xml'), path.join(projectDirName, 'config.xml'));
 
     // Config.json file ---> linked to local libraries
     pushd(cli_project_dir);
 
     // Executing platform Add
-    console.log("Adding platforms...");
+    console.log("### Adding platforms...");
     [].concat(platforms).forEach(function (platform) {
-        console.log("Adding Platform: " + platform);
+        console.log("### Adding Platform: " + platform);
         var platformArg;
         if (argv.global) {
             platformArg = platform;
@@ -477,7 +477,7 @@ function installPlugins() {
     }
 
     if (argv.plugman) {
-        console.log("Adding plugins using plugman...");
+        console.log("### Adding plugins using plugman...");
         if (!fs.existsSync(path.join(top_dir, "cordova-plugman"))) {
             couldNotFind('plugman');
             console.log("  cd cordova-plugman");
@@ -514,7 +514,7 @@ function installPlugins() {
         // don't use local git repos for plugins when using --global.
         var searchPath = argv.globalplugins ? '' : top_dir;
 
-        console.log("Adding plugins using CLI...");
+        console.log("### Adding plugins using CLI...");
         console.log("Searchpath:", searchPath);
         pushd(cli_project_dir);
 
@@ -566,12 +566,12 @@ function installPlugins() {
 ////////////////////// update js files for each platform from cordova-js
 function updateJS() {
     if (argv.skipjs) {
-        console.log("Skipping the js update.");
+        console.log("### Skipping the js update.");
     } else if (!argv.global) {
         if (!fs.existsSync(cordova_js_git_dir)) {
             couldNotFind("js", "cordova-js");
         } else {
-            console.log("Updating js for platforms...");
+            console.log("### Updating js for platforms...");
             try {
                 require(path.join(cordova_js_git_dir, "node_modules", "grunt"));
             } catch (e) {
@@ -602,19 +602,19 @@ function updateJS() {
 ////////////////////// wrap-up
 
 function summary() {
-    var scriptTimeStr = 'Script took ' + Math.round((Date.now() - startTime)/100)/10 + ' seconds';
+    var scriptTimeStr = '### Script took ' + Math.round((Date.now() - startTime)/100)/10 + ' seconds';
     if (argv.plugman) {
         platforms.forEach(function (platform) {
             var projName = getProjName(platform);
-            console.log("Done. " + platform + " project created at " + path.join(top_dir, projName));
+            console.log("### Done. " + platform + " project created at " + path.join(top_dir, projName));
         });
         console.log(scriptTimeStr);
     } else {
         pushd(cli_project_dir);
 
         // Executing cordova prepare
-        console.log("Preparing project...");
-        shelljs.exec(cli + " prepare");
+        console.log("### Preparing project...");
+        executeShellCommand(cli + " prepare");
 
         if (!argv.global) {
             console.log("Linking CLI...");
