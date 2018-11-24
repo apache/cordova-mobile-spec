@@ -26,25 +26,6 @@ This repository contains a special Cordova app that provides a set of automated 
 
 After setting this project up, you can ...
 
-### Running a Local File-Transfer Server
+### Cordova Plugin File-Transfer Tests
 
-If the `cordova-vm` file-transfer server at http://cordova-vm.apache.org:5000 (which is used for the `cordova-plugin-file-transfer` tests) is offline, you can also run the server locally:
-
-- https://github.com/apache/cordova-labs/tree/cordova-filetransfer
-- Checkout and run the server:
-    ```shell
-    git clone https://github.com/apache/cordova-labs.git
-    cd cordova-labs
-    git checkout cordova-filetransfer
-    node server.js
-    ```
-- Overwrite [this variable](https://github.com/apache/cordova-plugin-file-transfer/blob/9b322dec6790f6d273b8f707bc07976d778c4cf6/tests/plugin.xml#L33) for the test plugin. Run this in your mobilespec test project:
-    ```shell
-    cordova plugin rm cordova-plugin-file-transfer-tests
-    cordova plugin add path/to/cordova-plugin-file-transfer/tests --variable FILETRANSFER_SERVER_ADDRESS="http://yourlocal-IPAddressHere:5000"
-    ```
-    - Get your local ip by running:
-    ```shell
-    ifconfig # Linux, macOS
-    ipconfig # Windows
-    ```
+Tests of Cordova Plugin File-Transfer require a test server. [Follow these instructions to install and run the server and configure the plugin.](https://github.com/apache/cordova-labs/tree/cordova-filetransfer)
