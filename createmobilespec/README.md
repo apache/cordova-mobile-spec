@@ -42,49 +42,25 @@ and a way to use the platform-centered workflow instead of the CLI.
 
     The easiest and quickest way to achieve this is by using `cordova-coho`:
 
-    ```
+    ```shell
     # Create a new folder, e.g. `cordova` and `cd cordova` into it.
     git clone https://github.com/apache/cordova-coho.git
     cd cordova-coho & npm install & cd ..
-    node cordova-coho/coho repo-clone  -r mobile-spec -r js -r lib -r plugman -r cli
-                                                                                      // -r android -r plugins
+    node cordova-coho/coho repo-clone -r mobile-spec -r tools -r plugins -r active-platforms
     node cordova-coho/coho npm-link
     ```
-2. 
+
+    After this you should have 40+ folders in your `cordova` folder.
+
+2. As `cordova-mobile-spec` has a special structure, you have to install dependencies in `createmobilespec` manually:
+    ```shell
+    cd cordova-mobile-spec/createmobilespec & npm install & cd ../..
     ```
-    cd cordova-mobile-spec\createmobilespec & npm install & cd ..
-    ```
-The following projects need to be checked out as peers (= in the same directory):
-
-    * `cordova-mobile-spec` (this project)
-    * `cordova-js`  
-    * `cordova-lib`
-    * `cordova-plugman`
-    * `cordova-cli`
-    * All Cordova core plugins
-    * All platforms to test (e.g., `cordova-android`, `cordova-ios` or `cordova-windows`)
-
-    
-
-2. Run `npm install` in the following locations:
-
-    * `cordova-mobile-spec/createmobilespec` (also contains this `README`)
-    * `cordova-lib`
-    * `cordova-cli`
-
-
-Each git repo should be checked out to the state or edited with the content
-that you want to test.
-
-(Be **aware** that it **will not download** missing 
-plugin content from the [plugin registry](http://plugins.cordova.io) nor does 
-it fetch platforms from the npm repository. (Except, I think it does...))
+3. You are now ready to use `createmobilespec.js` with the commands below.
 
 ## Usage
 
-The `createmobilespec.js` script needs to be invoked from a specific current working directory: the one where you have all the git repos cloned.
-
-So if you were to do an `ls` in that directory, you should see all the git repos including `cordova-mobile-spec`. Thus an invocation should look like:
+The `createmobilespec.js` script also needs to be invoked from the "main" folder you created before (`cordova`):
 
     cordova-mobile-spec/createmobilespec/createmobilespec.js
 
