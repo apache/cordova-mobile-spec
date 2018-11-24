@@ -18,13 +18,29 @@
 # under the License.
 #
 -->
-# Mobile Spec Suite
+# Cordova Mobile Spec Suite
 
-This repository contains a special Cordova app that provides a set of automated & manual tests that test Cordova core functionality. See the [`README.md` in `/cordova-mobile-spec`](createmobilespec/README.md) for details on how to set it up.
+This `cordova-mobile-spec` repository can be used to create a Cordova app that provides a set of automated & manual tests that test Cordova core functionality.
+
+## Overview
+
+This repository has 3 parts:
+
+1. This main folder is a Cordova app "template" (`config.xml` and `www`) that includes implementations of various functionalities that Cordova supports (battery, events, keyboard, lazyloadjs, splashscreens, sql, storage, misc) that can manually be tested, some benchmarks, and a link to the automated and manual tests installed plugins offer (`cdvtests/index.html`).
+
+2. There are 4 plugins as well: `cordova-plugin-echo`, `cordova-plugin-mobilespec-tests`, `cordova-plugin-thirdparty-tests` and `cordova-plugin-whitelist`.
+
+3. The `createmobilespec` folder includes a script/CLI to create a Cordova app
+
+    1. using the locally installed Cordova CLI, the currently up to date (published on npm) platforms and plugins (including their tests!), and the 4 local plugins from 2) (mode `--global`) or
+    2. using local checkouts (via `cordova-coho`) of all these (CLI, tools, platforms, plugins...) or  
+    3. with several other modes (to e.g. use plugman and /bin/create instead of the CLI)
+
+The end result is a folder `../mobilespec` with a Cordova app that can be installed on devices. It can be used for some manual testing with the functionality offered by 1) or run the tests additionally provided by the plugins.
 
 ## Usage
 
-After setting this project up, you can ...
+See the [`README.md` in `/createmobilespec`](createmobilespec/README.md) for usage instruction on how to create the project.
 
 ### Cordova Plugin File-Transfer Tests
 
