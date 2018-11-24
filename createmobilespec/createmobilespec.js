@@ -515,9 +515,9 @@ if (argv.plugman) {
         var linkPlatformsFlag = (argv.link || argv.linkplatforms) ? ' --link' : '';
         shelljs.exec(cli + ' platform add "' + platformArg + '" --verbose' + linkPlatformsFlag);
         if (platform == 'android') {
-            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.properties'), path.join('platforms', 'android'));
-            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.p12'), path.join('platforms', 'android'));
-            shelljs.cp(path.join(__dirname, 'helper_files', 'build-extras.gradle'), path.join('platforms', 'android'));
+            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.properties'), path.join('platforms', 'android', 'app'));
+            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.p12'), path.join('platforms', 'android', 'app'));
+            shelljs.cp(path.join(__dirname, 'helper_files', 'build-extras.gradle'), path.join('platforms', 'android', 'app'));
         }
     });
     popd();
