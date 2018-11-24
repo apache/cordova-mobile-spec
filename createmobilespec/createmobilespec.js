@@ -248,7 +248,7 @@ if (!fs.existsSync(path.join("cordova-coho", "coho"))) {
     process.exit(3);
 }
 if (argv.global) {
-    console.log("Creating project. Using globally installed tools, downloadable platforms and plugins, and local mobile-spec.");
+    console.log("### Creating project. Using globally installed tools, downloadable platforms and plugins, and local mobile-spec.");
     console.log("To clone needed repositories:");
     console.log("  ." + path.sep + "cordova-coho" + path.sep + "coho repo-clone -r mobile-spec");
     console.log("To update all repositories:");
@@ -263,9 +263,9 @@ if (argv.global) {
         repos.push("js");
     }
     if (argv.globalplugins) {
-        console.log("Creating project from downloadable plugins, local tools and platforms, and local mobile-spec. If you have any errors, it may be from missing repositories.");
+        console.log("### Creating project from downloadable plugins, local tools and platforms, and local mobile-spec. If you have any errors, it may be from missing repositories.");
     } else {
-        console.log("Creating project from local git repos. If you have any errors, it may be from missing repositories.");
+        console.log("### Creating project from local git repos. If you have any errors, it may be from missing repositories.");
         repos.push("plugins");
     }
 
@@ -339,7 +339,7 @@ function verifyNpmLinkOf(linkedModule, installedModule) {
 }
 
 if (!argv.skiplink) {
-    console.log("Checking if you are using master branch of tools");
+    console.log("Checking if you are using master branch of tools (js, lib, plugman, cli)");
     // if js, lib, plugman, and cli have master checked out, should npm link.
     var jsBranch = getBranchName("cordova-js");
     var libBranch = getBranchName("cordova-lib");
