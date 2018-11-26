@@ -50,7 +50,7 @@ and a way to use the platform-centered workflow instead of the CLI.
     node cordova-coho/coho npm-link
     ```
 
-    After this you should have 40+ folders in your `cordova` folder.
+    After this you should have 30+ folders in your `cordova` folder.
 
 2. As `cordova-mobile-spec` has a special structure, you have to install dependencies in `createmobilespec` manually:
     ```shell
@@ -89,10 +89,9 @@ After the script successfully finished and created the app, you can run the app 
     cd mobilespec
     ./cordova run android
 
-### Quirks and Issues
+## Potential Quirks and Issues
 
 Some known quirks and issues:
 
-* `npm install` inside `cordova-js` is needed to resolve a local grunt issue
-* A Gradle file in `platforms/android` subdirectory tries to read non-existing debug keys. Workaround is to comment the lines out of the Gradle file.
-* It may be required to uninstall the `cordova-plugin-compat` plugin due to multiple "BuildHelper" classes defined in dex files (<https://stackoverflow.com/questions/46562289/multiple-dex-files-define-lorg-apache-cordova-buildhelper/46562523#46562523>)
+* [`npm install` inside `cordova-js` is needed to resolve a local grunt issue](https://github.com/apache/cordova-mobile-spec/issues/150)
+* [It may be required to uninstall the `cordova-plugin-compat` plugin due to multiple "BuildHelper" classes defined in dex files](https://github.com/apache/cordova-mobile-spec/issues/151)(<https://stackoverflow.com/questions/46562289/multiple-dex-files-define-lorg-apache-cordova-buildhelper/46562523#46562523>)
