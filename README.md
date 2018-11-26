@@ -24,6 +24,8 @@ This `cordova-mobile-spec` repository can be used to create a Cordova app that p
 
 It also provides access to [manual and automated tests of the installed plugins (via `cordova-plugin-test-framework`)](https://github.com/apache/cordova-plugin-test-framework).
 
+(History: A very long time ago this repository also _included_ all the manual and automated plugin tests before those were extracted and moved into the plugins themselves.)
+
 ## Overview
 
 This repository has 3 parts:
