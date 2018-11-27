@@ -350,7 +350,7 @@ if (!argv.skiplink) {
         // so they actually get tested instead of downloading the last published
         // one from the npm registry. Fail if they are not.
         console.log("You are on master branch of tools, checking npm links");
-        //verifyNpmLinkOf("cordova-js", "cordova-lib"); TODO cordova-js is not a dependency of cordova-lib (any more?)
+        //verifyNpmLinkOf("cordova-js", "cordova-lib"); TODO Clean up other cordova-js stuff above
         verifyNpmLinkOf("cordova-lib", "cordova-plugman");
         verifyNpmLinkOf("cordova-lib", "cordova-cli");
         console.log("npm links are OK");
