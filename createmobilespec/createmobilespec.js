@@ -396,7 +396,7 @@ function verifyNpmLinkOf(linkedModule, installedModule) {
 }
 
 if (!argv.skiplink) {
-    console.log("Checking if you are using master branch of tools");
+    console.log("Checking if you are using master branch of tools (lib, plugman, cli)");
     // if lib, plugman, and cli have master checked out, should npm link.
     var libBranch = getBranchName("cordova-lib");
     var plugmanBranch = getBranchName("cordova-plugman");
