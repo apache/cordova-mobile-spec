@@ -139,57 +139,9 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("linkplugins").describe("linkplugins", "Use the --link flag when running `cordova plugin add`.\n")
                    .boolean("linkplatforms").describe("linkplatforms", "Use the --link flag when running `cordova platform add`.\n")
                    .boolean("link").describe("link", "Alias for --linkplugins --linkplatforms.\n")
-                   .boolean("telerikplugins").describe("telerikplugins", "Adds a bunch of known-to-be-popular plugins from Telerik-Verified-Plugins.\n")
-                   .boolean("cprplugins").describe("cprplugins", "Adds a bunch of known-to-be-popular plugins from Cordova Plugin Regsitry.\n")
-                   .boolean("plugregplugins").describe("cprplugins", "Adds a bunch of known-to-be-popular plugins from PlugReg (that are not on the CPR).\n")
-                   .boolean("thirdpartyplugins").describe("thirdpartyplugins", "Alias for --telerikplugins --cprplugins --plugregplugins.\n")
                    .string("webview").describe("webview", "Use --webview=crosswalk to install the crosswalk plugin")
                    .alias("h", "help")
                    .argv;
-
-// List generated based on download counts on registry.
-var CORDOVA_REGISTRY_PLUGINS = [
-    'com.ionic.keyboard',
-    'com.google.playservices',
-    'de.appplant.cordova.plugin.local-notification',
-    'com.phonegap.plugins.barcodescanner',
-    'com.cranberrygame.phonegap.plugin.ad.admob',
-    // 'com.google.cordova.admob', // these two conflict. Use the most popular one.
-    // 'com.google.admob',
-    // Currently need an git version of this to fix a bug in published version.
-    // It's a dep of plugin.google.maps
-    'https://github.com/wf9a5m75/phonegap-http-request.git',
-    'plugin.google.maps',
-    'com.rjfun.cordova.extension',
-    'net.yoik.cordova.plugins.screenorientation',
-    'de.appplant.cordova.plugin.email-composer',
-    'com.msopentech.azure-mobile-services',
-    // 'com.phonegap.plugins.pushplugin', // This one bundles play services, causing duplicate symbols
-    'com.phonegap.plugins.facebookconnect',
-    'com.danielcwilson.plugins.googleanalytics'
-];
-// Commented out plugins are popular, but duplicate those in CPR.
-var TELERIK_VERIFIED_PLUGINS = [
-    'https://github.com/Telerik-Verified-Plugins/Flashlight',
-    'https://github.com/Telerik-Verified-Plugins/SocialSharing',
-    'https://github.com/Telerik-Verified-Plugins/ActionSheet',
-    'https://github.com/Telerik-Verified-Plugins/Calendar',
-    // 'https://github.com/Telerik-Verified-Plugins/EmailComposer',
-    'https://github.com/Telerik-Verified-Plugins/NativePageTransitions',
-    'https://github.com/Telerik-Verified-Plugins/Toast',
-    // 'https://github.com/Telerik-Verified-Plugins/BarcodeScanner',
-    'https://github.com/Telerik-Verified-Plugins/Keychain',
-    // 'https://github.com/Telerik-Verified-Plugins/Keyboard',
-    'https://github.com/Telerik-Verified-Plugins/NFC',
-    'https://github.com/Telerik-Verified-Plugins/AppVersion',
-    'https://github.com/Telerik-Verified-Plugins/PrivacyScreen'
-];
-
-var PLUGREG_PLUGINS = [
-    'https://github.com/brodysoft/Cordova-SQLitePlugin.git',
-    // 'https://github.com/wildabeast/BarcodeScanner.git',
-    // 'https://github.com/phonegap-build/PushPlugin.git',
-];
 
 var DEFAULT_PLUGINS = [
     'cordova-plugin-battery-status',
@@ -595,26 +547,6 @@ function installPlugins() {
             var sp = SEARCH_PATHS.hasOwnProperty(p) ? SEARCH_PATHS[p] : searchPath;
             pluginAdd(p, sp, allPluginFlags);
         });
-
-        if (argv.thirdpartyplugins || argv.cprplugins) {
-            var mapVars = ' --variable API_KEY_FOR_ANDROID="AIzaSyBICVSs9JqT7WdASuN5HSe7w-pCE0n_X88" --variable API_KEY_FOR_IOS="AIzaSyAikyYG24YYFvq5Vy41P5kppsfO2GgF9jM"';
-            var fbVars = ' --variable APP_ID=value --variable APP_NAME=value';
-            pluginAdd(CORDOVA_REGISTRY_PLUGINS.join(' '), searchPath, mapVars + fbVars + variableFlag);
-            // Delete duplicate <uses-permission> due to maxSdk (CB-8401)
-            if (argv.android) {
-                shelljs.sed('-i', /{[^{]*(maxSdk|WRITE_EXTERNAL_STORAGE).*?(maxSdk|WRITE_EXTERNAL_STORAGE)[^}]*},/, '', path.join('plugins', 'android.json'));
-                shelljs.sed('-i', /<.*(maxSdk|WRITE_EXTERNAL_STORAGE).*(maxSdk|WRITE_EXTERNAL_STORAGE).*>/, '', path.join('platforms', 'android', 'AndroidManifest.xml'));
-            }
-        }
-        if (argv.thirdpartyplugins || argv.telerikplugins) {
-            pluginAdd(TELERIK_VERIFIED_PLUGINS.join(' '), searchPath, variableFlag);
-        }
-        if (argv.thirdpartyplugins || argv.plugregplugins) {
-            pluginAdd(PLUGREG_PLUGINS.join(' '), searchPath, variableFlag);
-        }
-        if (argv.thirdpartyplugins) {
-            pluginAdd('org.apache.cordova.mobilespec.thirdpartytests', mobile_spec_git_dir, allPluginFlags);
-        }
 
         // Install new-style test plugins
         console.log("Adding plugin tests using CLI...");
