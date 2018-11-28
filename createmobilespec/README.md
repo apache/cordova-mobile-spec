@@ -78,6 +78,9 @@ If anything is going wrong and the existing output does not help, add the `--deb
 
 ### Create the App
 
+Caution: If the generated `mobilespec` project already exists, it is recommended
+to delete the project before proceeding.
+
 To for example create the app for the Android platform, run:
 
     (node) cordova-mobile-spec/createmobilespec/createmobilespec.js --android
