@@ -139,7 +139,6 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("linkplugins").describe("linkplugins", "Use the --link flag when running `cordova plugin add`.\n")
                    .boolean("linkplatforms").describe("linkplatforms", "Use the --link flag when running `cordova platform add`.\n")
                    .boolean("link").describe("link", "Alias for --linkplugins --linkplatforms.\n")
-                   .boolean("browserify").describe("browserify", "Use the --browserify flag when running `cordova plugin add`.\n")
                    .boolean("telerikplugins").describe("telerikplugins", "Adds a bunch of known-to-be-popular plugins from Telerik-Verified-Plugins.\n")
                    .boolean("cprplugins").describe("cprplugins", "Adds a bunch of known-to-be-popular plugins from Cordova Plugin Regsitry.\n")
                    .boolean("plugregplugins").describe("cprplugins", "Adds a bunch of known-to-be-popular plugins from PlugReg (that are not on the CPR).\n")
@@ -274,7 +273,6 @@ var cli = argv.global ? "cordova" : cli_local_bin;
 
 var projectDirName = argv._[0] || "mobilespec";
 var cli_project_dir = path.join(top_dir, projectDirName);
-var browserifyFlag = argv.browserify ? ' --browserify' : '';
 var variableFlag = '';
 // some plugins support setting config.xml <preference> elements via a --variable flag.
 if (argv.variable) {
@@ -543,7 +541,7 @@ function installPlugins() {
                 shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
                              " install --platform " + platform +
                              " --project . --plugin " + plugin +
-                             " --searchpath " + top_dir + browserifyFlag);
+                             " --searchpath " + top_dir);
             });
 
             // Install new-style test plugins
@@ -554,7 +552,7 @@ function installPlugins() {
                 if (fs.existsSync(potential_tests_plugin_xml)) {
                     shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
                                 " install --platform " + platform +
-                                " --project . --plugin " + path.dirname(potential_tests_plugin_xml) + browserifyFlag);
+                                " --project . --plugin " + path.dirname(potential_tests_plugin_xml));
                 }
             });
             popd();
@@ -572,7 +570,7 @@ function installPlugins() {
         console.log("Installing local test framework plugins...");
         var linkPluginsFlag = (argv.link || argv.linkplugins) ? ' --link' : '';
         var forcePluginsFlag = (argv.forceplugins)? ' --force' : '';
-        var allPluginFlags = linkPluginsFlag + browserifyFlag + variableFlag + forcePluginsFlag;
+        var allPluginFlags = linkPluginsFlag + variableFlag + forcePluginsFlag;
 
         // Install mobilespec tests only if we install default list of plugins
         // If custom list of plugins is being installed, mobilespec tests can be listed there, if needed
@@ -601,7 +599,7 @@ function installPlugins() {
         if (argv.thirdpartyplugins || argv.cprplugins) {
             var mapVars = ' --variable API_KEY_FOR_ANDROID="AIzaSyBICVSs9JqT7WdASuN5HSe7w-pCE0n_X88" --variable API_KEY_FOR_IOS="AIzaSyAikyYG24YYFvq5Vy41P5kppsfO2GgF9jM"';
             var fbVars = ' --variable APP_ID=value --variable APP_NAME=value';
-            pluginAdd(CORDOVA_REGISTRY_PLUGINS.join(' '), searchPath, browserifyFlag + mapVars + fbVars + variableFlag);
+            pluginAdd(CORDOVA_REGISTRY_PLUGINS.join(' '), searchPath, mapVars + fbVars + variableFlag);
             // Delete duplicate <uses-permission> due to maxSdk (CB-8401)
             if (argv.android) {
                 shelljs.sed('-i', /{[^{]*(maxSdk|WRITE_EXTERNAL_STORAGE).*?(maxSdk|WRITE_EXTERNAL_STORAGE)[^}]*},/, '', path.join('plugins', 'android.json'));
@@ -609,10 +607,10 @@ function installPlugins() {
             }
         }
         if (argv.thirdpartyplugins || argv.telerikplugins) {
-            pluginAdd(TELERIK_VERIFIED_PLUGINS.join(' '), searchPath, browserifyFlag + variableFlag);
+            pluginAdd(TELERIK_VERIFIED_PLUGINS.join(' '), searchPath, variableFlag);
         }
         if (argv.thirdpartyplugins || argv.plugregplugins) {
-            pluginAdd(PLUGREG_PLUGINS.join(' '), searchPath, browserifyFlag + variableFlag);
+            pluginAdd(PLUGREG_PLUGINS.join(' '), searchPath, variableFlag);
         }
         if (argv.thirdpartyplugins) {
             pluginAdd('org.apache.cordova.mobilespec.thirdpartytests', mobile_spec_git_dir, allPluginFlags);
@@ -684,7 +682,7 @@ function summary() {
 
         // Executing cordova prepare
         console.log("Preparing project...");
-        shelljs.exec(cli + " prepare" + browserifyFlag);
+        shelljs.exec(cli + " prepare");
 
         if (!argv.global) {
             console.log("Linking CLI...");
