@@ -115,7 +115,7 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("android").describe("android", "Add Android platform.")
                    .boolean("browser").describe("browser", "Add Browser platform.")
                    .boolean("ios").describe("ios", "Add iOS platform.")
-                   .boolean("osx").describe("osx", "Add osx platform.")
+                   .boolean("osx").describe("osx", "Add osx platform (macOS).")
                    .boolean("windows").describe("windows", "Add Windows (universal) platform.")
                    .boolean("plugman").describe("plugman", "Use {platform}/bin/create and plugman directly instead of the CLI.")
                    .boolean("global").describe("global", "Use the globally-installed `cordova` and the downloaded platforms/plugins from the registry instead of the local git repo.\n" +
@@ -139,7 +139,6 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("linkplugins").describe("linkplugins", "Use the --link flag when running `cordova plugin add`.\n")
                    .boolean("linkplatforms").describe("linkplatforms", "Use the --link flag when running `cordova platform add`.\n")
                    .boolean("link").describe("link", "Alias for --linkplugins --linkplatforms.\n")
-                   .boolean("browserify").describe("browserify", "Use the --browserify flag when running `cordova plugin add`.\n")
                    .string("webview").describe("webview", "Use --webview=crosswalk to install the crosswalk plugin")
                    .alias("h", "help")
                    .argv;
@@ -168,27 +167,15 @@ var DEFAULT_PLUGINS = [
     'cordova-plugin-whitelist',
 ];
 
-// OSX has little support for the most of the plugins, so it gets its own default list
+// osx platform (macOS) has little support for the most of the plugins,
+// so it gets its own default list
 var DEFAULT_PLUGINS_OSX = [
-    //'cordova-plugin-battery-status',
-    //'cordova-plugin-camera',
-    //'cordova-plugin-console',
-    //'cordova-plugin-contacts',
+    'cordova-plugin-camera',
     'cordova-plugin-device',
-    //'cordova-plugin-device-motion',
-    //'cordova-plugin-device-orientation',
-    //'cordova-plugin-dialogs',
     'cordova-plugin-file',
-    //'cordova-plugin-file-transfer',
-    //'cordova-plugin-geolocation',
-    //'cordova-plugin-globalization',
-    //'cordova-plugin-inappbrowser',
-    //'cordova-plugin-media',
-    //'cordova-plugin-media-capture',
-    //'cordova-plugin-network-information',
-    //'cordova-plugin-splashscreen',
-    //'cordova-plugin-statusbar',
-    //'cordova-plugin-vibration',
+    'cordova-plugin-inappbrowser',
+    // non-functional on osx platform (macOS), iOS,
+    // or any other non-Android platforms:
     'cordova-plugin-whitelist',
 ];
 
@@ -238,7 +225,6 @@ var cli = argv.global ? "cordova" : cli_local_bin;
 
 var projectDirName = argv._[0] || "mobilespec";
 var cli_project_dir = path.join(top_dir, projectDirName);
-var browserifyFlag = argv.browserify ? ' --browserify' : '';
 var variableFlag = '';
 // some plugins support setting config.xml <preference> elements via a --variable flag.
 if (argv.variable) {
@@ -450,9 +436,9 @@ if (argv.plugman) {
         var linkPlatformsFlag = (argv.link || argv.linkplatforms) ? ' --link' : '';
         shelljs.exec(cli + ' platform add "' + platformArg + '" --verbose' + linkPlatformsFlag);
         if (platform == 'android') {
-            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.properties'), path.join('platforms', 'android'));
-            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.p12'), path.join('platforms', 'android'));
-            shelljs.cp(path.join(__dirname, 'helper_files', 'build-extras.gradle'), path.join('platforms', 'android'));
+            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.properties'), path.join('platforms', 'android', 'app'));
+            shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.p12'), path.join('platforms', 'android', 'app'));
+            shelljs.cp(path.join(__dirname, 'helper_files', 'build-extras.gradle'), path.join('platforms', 'android', 'app'));
         }
     });
     popd();
@@ -474,12 +460,12 @@ function pluginIdToDirName(id) {
 function installPlugins() {
     var plugins = DEFAULT_PLUGINS;
 
-    // special override for osx
+    // special override for osx platform (macOS)
     if (argv.osx) {
         if (platforms.length > 1) {
-            console.warn('Warning: Testing more than one platform at once might cause problems with unsupported plugins for OSX');
+            console.warn('Warning: Testing more than one platform at once may cause issues with unsupported plugins for osx platform (macOS).');
         } else {
-            console.warn('Warning: Using reduced plugin list for OSX-only tests.');
+            console.warn('Warning: Using reduced plugin list for osx platform (macOS).');
             plugins = DEFAULT_PLUGINS_OSX;
         }
     }
@@ -507,7 +493,7 @@ function installPlugins() {
                 shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
                              " install --platform " + platform +
                              " --project . --plugin " + plugin +
-                             " --searchpath " + top_dir + browserifyFlag);
+                             " --searchpath " + top_dir);
             });
 
             // Install new-style test plugins
@@ -518,7 +504,7 @@ function installPlugins() {
                 if (fs.existsSync(potential_tests_plugin_xml)) {
                     shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
                                 " install --platform " + platform +
-                                " --project . --plugin " + path.dirname(potential_tests_plugin_xml) + browserifyFlag);
+                                " --project . --plugin " + path.dirname(potential_tests_plugin_xml));
                 }
             });
             popd();
@@ -536,7 +522,7 @@ function installPlugins() {
         console.log("Installing local test framework plugins...");
         var linkPluginsFlag = (argv.link || argv.linkplugins) ? ' --link' : '';
         var forcePluginsFlag = (argv.forceplugins)? ' --force' : '';
-        var allPluginFlags = linkPluginsFlag + browserifyFlag + variableFlag + forcePluginsFlag;
+        var allPluginFlags = linkPluginsFlag + variableFlag + forcePluginsFlag;
 
         // Install mobilespec tests only if we install default list of plugins
         // If custom list of plugins is being installed, mobilespec tests can be listed there, if needed
@@ -628,7 +614,7 @@ function summary() {
 
         // Executing cordova prepare
         console.log("Preparing project...");
-        shelljs.exec(cli + " prepare" + browserifyFlag);
+        shelljs.exec(cli + " prepare");
 
         if (!argv.global) {
             console.log("Linking CLI...");
