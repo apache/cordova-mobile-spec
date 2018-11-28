@@ -145,8 +145,8 @@ var top_dir =             process.cwd() + path.sep,
 
 var DEFAULT_PLUGINS = [
     'cordova-plugin-battery-status',
-    'cordova-plugin-compat',
     'cordova-plugin-camera',
+    'cordova-plugin-compat',
     'cordova-plugin-console',
     'cordova-plugin-contacts',
     'cordova-plugin-device',
