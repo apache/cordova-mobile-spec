@@ -115,7 +115,7 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("android").describe("android", "Add Android platform.")
                    .boolean("browser").describe("browser", "Add Browser platform.")
                    .boolean("ios").describe("ios", "Add iOS platform.")
-                   .boolean("osx").describe("osx", "Add osx platform.")
+                   .boolean("osx").describe("osx", "Add osx platform (macOS).")
                    .boolean("windows").describe("windows", "Add Windows (universal) platform.")
                    .boolean("plugman").describe("plugman", "Use {platform}/bin/create and plugman directly instead of the CLI.")
                    .boolean("global").describe("global", "Use the globally-installed `cordova` and the downloaded platforms/plugins from the registry instead of the local git repo.\n" +
@@ -216,27 +216,15 @@ var DEFAULT_PLUGINS = [
     'cordova-plugin-whitelist',
 ];
 
-// OSX has little support for the most of the plugins, so it gets its own default list
+// osx platform (macOS) has little support for the most of the plugins,
+// so it gets its own default list
 var DEFAULT_PLUGINS_OSX = [
-    //'cordova-plugin-battery-status',
-    //'cordova-plugin-camera',
-    //'cordova-plugin-console',
-    //'cordova-plugin-contacts',
+    'cordova-plugin-camera',
     'cordova-plugin-device',
-    //'cordova-plugin-device-motion',
-    //'cordova-plugin-device-orientation',
-    //'cordova-plugin-dialogs',
     'cordova-plugin-file',
-    //'cordova-plugin-file-transfer',
-    //'cordova-plugin-geolocation',
-    //'cordova-plugin-globalization',
-    //'cordova-plugin-inappbrowser',
-    //'cordova-plugin-media',
-    //'cordova-plugin-media-capture',
-    //'cordova-plugin-network-information',
-    //'cordova-plugin-splashscreen',
-    //'cordova-plugin-statusbar',
-    //'cordova-plugin-vibration',
+    'cordova-plugin-inappbrowser',
+    // non-functional on osx platform (macOS), iOS,
+    // or any other non-Android platforms:
     'cordova-plugin-whitelist',
 ];
 
@@ -522,12 +510,12 @@ function pluginIdToDirName(id) {
 function installPlugins() {
     var plugins = DEFAULT_PLUGINS;
 
-    // special override for osx
+    // special override for osx platform (macOS)
     if (argv.osx) {
         if (platforms.length > 1) {
-            console.warn('Warning: Testing more than one platform at once might cause problems with unsupported plugins for OSX');
+            console.warn('Warning: Testing more than one platform at once may cause issues with unsupported plugins for osx platform (macOS).');
         } else {
-            console.warn('Warning: Using reduced plugin list for OSX-only tests.');
+            console.warn('Warning: Using reduced plugin list for osx platform (macOS).');
             plugins = DEFAULT_PLUGINS_OSX;
         }
     }
