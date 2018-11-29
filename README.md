@@ -20,7 +20,7 @@
 -->
 # Cordova Mobile Spec Suite
 
-This `cordova-mobile-spec` repository can be used to create a Cordova app that provides a set of manual tests to verify Cordova core functionality.  
+This `cordova-mobile-spec` repository can be used to create a Cordova app that provides a set of manual tests to verify Cordova core functionality. It is currently used in the [release processes of platforms, plugins and tools](https://github.com/apache/cordova-coho/tree/master/docs#release-processes).
 
 It also provides access to [manual and automated tests of the installed plugins (via `cordova-plugin-test-framework`)](https://github.com/apache/cordova-plugin-test-framework).
 
