@@ -19,20 +19,15 @@
 #
 -->
 
-## Creating the mobile-spec app
+# Creating the mobile-spec app
 
 `createmobilespec.js` is a script for creating a test app that has:
 
-  * the **mobile-spec** code from the local `cordova-mobile-spec` git repo
-  * a `cordova.js` file that is freshly built from the local `cordova-js`
-    git repo
-  * the platform (e.g., **Android**) from the local platform git repo (e.g.,
-    `cordova-android`)
-  * all the plugins from the local plugin repos (e.g., cordova-plugin-device)
-  * it was built using the local `cordova-cli` and `cordova-plugman` git repos
-
-	Many places in this document that say *git repo*
-	may also mean *npm repository*.
+* local `cordova-mobile-spec`
+* a `cordova.js` file that is freshly built from the local `cordova-js` folder
+* the platform (e.g. Android) from the local platform folder (e.g. `cordova-android`)
+* all the plugins from the local plugin folders (e.g. `cordova-plugin-device`)
+* it was built using the local `cordova-cli` and `cordova-plugman` folders
 
 In other words, it is a great way to test your local development efforts.
 
@@ -41,47 +36,65 @@ globally-installed npm module, a way to use the platform's `cordova.js` file
 instead of building it from the local `cordova-js` git repo,
 and a way to use the platform-centered workflow instead of the CLI.
 
-### Requirements
+## Requirements and Preparation
 
-See the [README.md](../README.md) in the parent directory
-[cordova-mobile-spec](..).
+1. Your Cordova projects have to be checked out and set up in a very specific way: All checkouts have to be siblings (= same parent folder) and the common Cordova libraries have to be npm-linked.  
 
-Each git repo should be checked out to the state or edited with the content
-that you want to test. Be **aware** that it **will** **download** missing plugin content from the
-[plugin registry](http://plugins.cordova.io)
-nor does it fetch platforms from the npm repository.
+    The easiest and quickest way to achieve this is by using `cordova-coho`:
 
-	Except, I think it does...
+    ```shell
+    # Create a new folder, e.g. `cordova` and `cd cordova` into it.
+    git clone https://github.com/apache/cordova-coho.git
+    cd cordova-coho & npm install & cd ..
+    node cordova-coho/coho repo-clone -r mobile-spec -r tools -r plugins -r active-platforms
+    node cordova-coho/coho npm-link
+    ```
 
-Before running `createmobilespec.js` for the first time, run `npm install`
-from within the [createmobilespec](.) directory to install the requisite
-third-party **Node** modules. This should be a one-time activity,
-unless there is a change in the pre-reqs.
+    After this you should have 30+ folders in your `cordova` folder.
 
-### Running
+2. As `cordova-mobile-spec` has a special structure, you have to install dependencies in `createmobilespec` manually:
+    ```shell
+    cd cordova-mobile-spec/createmobilespec & npm install & cd ../..
+    ```
+3. You are now ready to use `createmobilespec.js` with the commands below.
 
-The `createmobilespec.js` script needs to be invoked from a specific
-current working directory:
-the one where you have all the git repos cloned.
-So if you were to do an `ls` in that directory,
-you should see all the git repos including `cordova-mobile-spec`.
-Thus an invocation should look like:
+## Usage
 
-        cordova-mobile-spec/createmobilespec/createmobilespec.js
+The `createmobilespec.js` script also needs to be invoked from the "main" folder you created before (`cordova`):
 
-To see the options available in the script,
-run it with the `-h` option to print the online help.
+    cordova-mobile-spec/createmobilespec/createmobilespec.js
 
-After you have run the script to create the app,
-then you can run the app on a device or simulator,
-using the standard method for that platform(s).
-For example on **Android**:
+On Windows, prefix all commands with `node`:
 
-        cd mobilespec
-        ./cordova run android
+    node cordova-mobile-spec/createmobilespec/createmobilespec.js
+
+To see the options available in the script, run it with the `-h` option to print the online help.
+
+    (node) cordova-mobile-spec/createmobilespec/createmobilespec.js -h
+
+If anything is going wrong and the existing output does not help, add the `--debug` parameter:
+
+    (node) cordova-mobile-spec/createmobilespec/createmobilespec.js --debug
+
+### Create the App
+
+Caution: If the generated `mobilespec` project already exists, it is recommended
+to delete the project before proceeding.
+
+To for example create the app for the Android platform, run:
+
+    (node) cordova-mobile-spec/createmobilespec/createmobilespec.js --android
+
+### Run the App
+
+After the script successfully finished and created the app, you can run the app on a device or simulator, using the standard method for that platform(s). For example on **Android**:
+
+    cd mobilespec
+    ./cordova run android
+
+## Potential Quirks and Issues
 
 Some known quirks and issues:
 
-* `npm install` inside `cordova-js` is needed to resolve a local grunt issue
-* A Gradle file in `platforms/android` subdirectory tries to read non-existing debug keys. Workaround is to comment the lines out of the Gradle file.
-* It may be required to uninstall the `cordova-plugin-compat` plugin due to multiple "BuildHelper" classes defined in dex files (<https://stackoverflow.com/questions/46562289/multiple-dex-files-define-lorg-apache-cordova-buildhelper/46562523#46562523>)
+* [`npm install` inside `cordova-js` is needed to resolve a local grunt issue](https://github.com/apache/cordova-mobile-spec/issues/150)
+* [It may be required to uninstall the `cordova-plugin-compat` plugin due to multiple "BuildHelper" classes defined in dex files](https://github.com/apache/cordova-mobile-spec/issues/151)(<https://stackoverflow.com/questions/46562289/multiple-dex-files-define-lorg-apache-cordova-buildhelper/46562523#46562523>)

@@ -18,63 +18,34 @@
 # under the License.
 #
 -->
-## Mobile Spec Suite ##
+# Cordova Mobile Spec Suite
 
-This project is a set of automated & manual tests that test
-Cordova core functionality.
+This `cordova-mobile-spec` repository can be used to create a Cordova app that provides a set of manual tests to verify Cordova core functionality. It is currently used in the [release processes of platforms, plugins and tools](https://github.com/apache/cordova-coho/tree/master/docs#release-processes).
 
-To set up the project, use
-`cordova-mobile-spec/createmobilespec/createmobilespec.js`.
-See the [README.md](createmobilespec/README.md) in that directory.
+It also provides access to [manual and automated tests of the installed plugins (via `cordova-plugin-test-framework`)](https://github.com/apache/cordova-plugin-test-framework).
 
-### Requirements ###
+(History: A very long time ago this repository also _included_ all the manual and automated plugin tests before those were extracted and moved into the plugins themselves.)
 
-Repositories required:
+## Overview
 
-- **cordova-cli**
-  (Install pre-requisites by running `npm install` inside of cordova-cli).
-- **cordova-js**
-- All **plugins**.
-- **Platforms** to test
-  (e.g., cordova-android, cordova-ios, cordova-blackberry,
-  cordova-wp8, or cordova-windows).
-- **cordova-mobile-spec**
-  (Install pre-requisites by running `npm install` inside of
-  [createmobilespec](createmobilespec)).
-- All repositories must be checked out as peers to each other.
+This repository has 3 parts:
 
-### Performance ###
+1. This main folder is a Cordova app "template" (`config.xml` and `www`) that includes implementations of various functionalities that Cordova supports (battery, events, keyboard, lazyloadjs, splashscreens, sql, storage, misc) that can manually be tested, some benchmarks, and a link to the automated and manual tests installed plugins offer (`cdvtests/index.html`).
 
-For reference purposes, the document
-[AndroidBridgePerformance_300.pdf](AndroidBridgePerformance_300.pdf)
-in this directory outlines the Android bridge performance using
-`cordova-mobile-spec` and the manual bridge test.
-The tests were performed with **Cordova 3.0.0**.
+2. There are 4 plugins as well: [`cordova-plugin-echo`](cordova-plugin-echo) ("plugin implementation of the Echo function to test the bridge"), [`cordova-plugin-mobilespec-tests`](cordova-plugin-mobilespec-tests) ("Cordova Non Plugin Auto Tests"), [`cordova-plugin-thirdparty-tests`](cordova-plugin-thirdparty-tests) ("Tests for popular third-party plugins") and [`cordova-plugin-whitelist`](cordova-plugin-whitelist) (TODO).
 
-## Running a Local File-Transfer Server
+3. The `createmobilespec` folder contains a script/CLI to create a Cordova app
 
-The `cordova-vm` file-transfer server could be offline for the `cordova-plugin-file-transfer` tests.
+    1. using the locally installed Cordova CLI, the currently up to date (published on npm) platforms and plugins (including their tests!), and the 4 local plugins from 2) (mode `--global`) or
+    2. using local checkouts (via `cordova-coho`) of all these (CLI, tools, platforms, plugins...) or  
+    3. with several other modes (to e.g. use plugman and /bin/create instead of the CLI)
 
-The server to run is at:
-https://github.com/apache/cordova-labs/tree/cordova-filetransfer
+The end result is a folder `../mobilespec` with a Cordova app that can be installed on devices. It can be used for some manual testing with the functionality offered by 1) or run the [tests additionally provided by the plugins via `cordova-plugin-test-framework`](https://github.com/apache/cordova-plugin-test-framework).
 
-And you would override this variable for this test plugin:
-https://github.com/apache/cordova-plugin-file-transfer/blob/9b322dec6790f6d273b8f707bc07976d778c4cf6/tests/plugin.xml#L33
-```
-## in your mobilespec test project, run...
-cordova plugin rm cordova-plugin-file-transfer-tests
-cordova plugin add path/to/cordova-plugin-file-transfer/tests --variable FILETRANSFER_SERVER_ADDRESS="http://yourlocal-IPAddressHere:5000"
-```
+## Usage
 
-Run the server:
-```
-git clone https://github.com/apache/cordova-labs.git
-cd cordova-labs
-git checkout cordova-filetransfer
-node server.js
-```
+See the [`README.md` in `/createmobilespec`](createmobilespec/README.md) for usage instruction on how to create the "mobilespec" app.
 
-Get your local ip by running:
-```
-ifconfig
-```
+### Cordova Plugin File-Transfer Tests
+
+Tests of Cordova Plugin File-Transfer require a test server. [Follow these instructions to install and run the server and configure the plugin.](https://github.com/apache/cordova-labs/tree/cordova-filetransfer)
