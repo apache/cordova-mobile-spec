@@ -71,7 +71,12 @@ function pluginAdd(pluginName, searchPath, extraFlags) {
     if (extraFlags) {
         command += extraFlags;
     }
-    shelljs.exec(command);
+    executeShellCommand(command);
+}
+
+function executeShellCommand(command) {
+    console.log('$ ' + command);
+    return shelljs.exec(command);
 }
 
 // Check that we can load dependencies
@@ -127,10 +132,10 @@ var top_dir =             process.cwd() + path.sep,
                                                       "\t\t\tCannot be used with --global because it is implied when --global is used.")
                    .boolean("clearnpmcache").describe("clearnpmcache", "rm -rf ~/.npm/cache; rm -rf ~/.plugman")
                    .string("plugins").describe("plugins", "Used to explicitly specify the list of plugins to be installed.\n" +
-                                               "Example: --plugins=\"cordova-plugin-device cordova-plugin-file-transfer my-custom-plugin\"")
+                                               "\t\t\tExample: --plugins=\"cordova-plugin-device cordova-plugin-file-transfer my-custom-plugin\"")
                    .boolean("forceplugins").describe("forceplugins", "Add the --force flag when adding plugins\n")
                    .string("variable").describe("variable", "Used to pass preferences / variables down to cordova components (like plugins).\n" +
-                                               "Example: --variable FILETRANSFER_SERVER_ADDRESS=\"http://yourlocal-IPAddressHere:5000\"")
+                                               "\t\t\tExample: --variable FILETRANSFER_SERVER_ADDRESS=\"http://yourlocal-IPAddressHere:5000\"")
                    .boolean("skipjs").describe("skipjs", "Do not update the platform's cordova.js from the js git repo, use the one already present in the platform.\n" +
                                                "\t\t\tRarely used, generally to test RC releases.\n" +
                                                "\t\t\tCannot be used with --global because it is implied when --global is used.")
@@ -139,7 +144,7 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("linkplugins").describe("linkplugins", "Use the --link flag when running `cordova plugin add`.\n")
                    .boolean("linkplatforms").describe("linkplatforms", "Use the --link flag when running `cordova platform add`.\n")
                    .boolean("link").describe("link", "Alias for --linkplugins --linkplatforms.\n")
-                   .string("webview").describe("webview", "Use --webview=crosswalk to install the crosswalk plugin")
+                   .string("webview").describe("webview", "Use --webview=crosswalk to install the crosswalk plugin") // TODO
                    .alias("h", "help")
                    .argv;
 
@@ -164,6 +169,7 @@ var DEFAULT_PLUGINS = [
     'cordova-plugin-statusbar',
     'cordova-plugin-vibration',
     'cordova-plugin-whitelist',
+    // TODO check if all are listed
 ];
 
 // osx platform (macOS) has little support for the most of the plugins,
@@ -238,11 +244,11 @@ if (argv.variable) {
 // Print relevant information
 if (!fs.existsSync(path.join("cordova-coho", "coho"))) {
     console.log("You need to clone cordova-coho:");
-    console.log("  git clone https://git-wip-us.apache.org/repos/asf/cordova-coho.git");
+    console.log("  git clone https://github.com/apache/cordova-coho.git");
     process.exit(3);
 }
 if (argv.global) {
-    console.log("Creating project. Using globally installed tools, downloadable platforms and plugins, and local mobile-spec.");
+    console.log("### Creating project. Using globally installed tools, downloadable platforms and plugins, and local mobile-spec.");
     console.log("To clone needed repositories:");
     console.log("  ." + path.sep + "cordova-coho" + path.sep + "coho repo-clone -r mobile-spec");
     console.log("To update all repositories:");
@@ -257,9 +263,9 @@ if (argv.global) {
         repos.push("js");
     }
     if (argv.globalplugins) {
-        console.log("Creating project from downloadable plugins, local tools and platforms, and local mobile-spec. If you have any errors, it may be from missing repositories.");
+        console.log("### Creating project from downloadable plugins, local tools and platforms, and local mobile-spec. If you have any errors, it may be from missing repositories.");
     } else {
-        console.log("Creating project from local git repos. If you have any errors, it may be from missing repositories.");
+        console.log("### Creating project from local git repos. If you have any errors, it may be from missing repositories.");
         repos.push("plugins");
     }
 
@@ -303,7 +309,7 @@ function getBranchName(moduleName) {
     cdInto(moduleName);
     try {
         // output should look like: refs/head/master
-        var gitOutput = shelljs.exec("git symbolic-ref HEAD").output;
+        var gitOutput = executeShellCommand("git symbolic-ref HEAD").output;
         shelljs.config.fatal = isConfigFatal;
         var match = /refs\/heads\/(.*)/.exec(gitOutput);
         if (!match) {
@@ -333,7 +339,7 @@ function verifyNpmLinkOf(linkedModule, installedModule) {
 }
 
 if (!argv.skiplink) {
-    console.log("Checking if you are using master branch of tools");
+    console.log("Checking if you are using master branch of tools (js, lib, plugman, cli)");
     // if js, lib, plugman, and cli have master checked out, should npm link.
     var jsBranch = getBranchName("cordova-js");
     var libBranch = getBranchName("cordova-lib");
@@ -344,7 +350,7 @@ if (!argv.skiplink) {
         // so they actually get tested instead of downloading the last published
         // one from the npm registry. Fail if they are not.
         console.log("You are on master branch of tools, checking npm links");
-        verifyNpmLinkOf("cordova-js", "cordova-lib");
+        //verifyNpmLinkOf("cordova-js", "cordova-lib"); TODO Clean up other cordova-js stuff above
         verifyNpmLinkOf("cordova-lib", "cordova-plugman");
         verifyNpmLinkOf("cordova-lib", "cordova-cli");
         console.log("npm links are OK");
@@ -364,7 +370,7 @@ function myDelete(myDir) {
         // Kill the process & restart folder deletion
         if (/^win/.test(process.platform)) {
             console.log("Not all files were deleted, killing ADB.EXE process to unlock folder...");
-            shelljs.exec("TASKKILL /F /IM ADB.exe /T");
+            executeShellCommand("TASKKILL /F /IM ADB.exe /T");
             shelljs.rm("-rf", myDir);
         } else
             throw new Error("Error during folder deletion, try to remove " + myDir + " manually.");
@@ -394,8 +400,8 @@ if (argv.plugman) {
         }
         var projName = getProjName(platform);
         myDelete(projName);
-        console.log("Creating project " + projName + "...");
-        shelljs.exec(join_paths(platform_layout[platform].bin.concat("bin", "create ")) + projName + " org.apache.cordova.mobilespecplugman " + projName);
+        console.log("### Creating project " + projName + "...");
+        executeShellCommand(join_paths(platform_layout[platform].bin.concat("bin", "create ")) + projName + " org.apache.cordova.mobilespecplugman " + projName);
         shelljs.rm("-r", join_paths([top_dir, projName].concat(platform_layout[platform].www)));
         shelljs.cp("-r", path.join(mobile_spec_git_dir, "www", "*"), join_paths([top_dir, projName].concat(platform_layout[platform].www)));
         var configPath = platform == 'ios' ? getProjName(platform) : 'config' in platform_layout[platform] ? join_paths(platform_layout[platform].config) : null;
@@ -409,31 +415,31 @@ if (argv.plugman) {
 } else {
     // Create the project using "cordova create"
     myDelete(cli_project_dir);
-    console.log("Creating project mobilespec...");
-    shelljs.exec(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --template cordova-mobile-spec" + path.sep + "www");
+    console.log("### Creating project mobilespec...");
+    executeShellCommand(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --template cordova-mobile-spec" + path.sep + "www");
     shelljs.cp("-f", path.join(mobile_spec_git_dir, 'config.xml'), path.join(projectDirName, 'config.xml'));
 
     // Config.json file ---> linked to local libraries
     pushd(cli_project_dir);
 
     // Executing platform Add
-    console.log("Adding platforms...");
+    console.log("### Adding platforms...");
     [].concat(platforms).forEach(function (platform) {
-        console.log("Adding Platform: " + platform);
+        console.log("### Adding Platform: " + platform);
         var platformArg;
         if (argv.global) {
             platformArg = platform;
         } else {
             platformArg = join_paths([top_dir].concat(platform_layout[platform].bin));
             if (!fs.existsSync(platformArg)) {
-                couldNotFind(platformArg, platform);
+                couldNotFind(platform);
                 platforms = platforms.filter(function (p) { return p != platform; });
                 return;
             }
         }
         console.log("platformArg: " + cli + " " + platformArg);
         var linkPlatformsFlag = (argv.link || argv.linkplatforms) ? ' --link' : '';
-        shelljs.exec(cli + ' platform add "' + platformArg + '" --verbose' + linkPlatformsFlag);
+        executeShellCommand(cli + ' platform add "' + platformArg + '" --verbose' + linkPlatformsFlag);
         if (platform == 'android') {
             shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.properties'), path.join('platforms', 'android', 'app'));
             shelljs.cp(path.join(__dirname, 'helper_files', 'android-debug-key.p12'), path.join('platforms', 'android', 'app'));
@@ -476,7 +482,7 @@ function installPlugins() {
     }
 
     if (argv.plugman) {
-        console.log("Adding plugins using plugman...");
+        console.log("### Adding plugins using plugman...");
         if (!fs.existsSync(path.join(top_dir, "cordova-plugman"))) {
             couldNotFind('plugman');
             console.log("  cd cordova-plugman");
@@ -489,7 +495,7 @@ function installPlugins() {
             pushd(projName);
             plugins.forEach(function(plugin) {
                 // plugin path must be relative and not absolute (sigh)
-                shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
+                executeShellCommand(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
                              " install --platform " + platform +
                              " --project . --plugin " + plugin +
                              " --searchpath " + top_dir);
@@ -501,7 +507,7 @@ function installPlugins() {
                 var pluginDirName = pluginIdToDirName(plugin);
                 var potential_tests_plugin_xml = path.join(top_dir, pluginDirName, 'tests', 'plugin.xml');
                 if (fs.existsSync(potential_tests_plugin_xml)) {
-                    shelljs.exec(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
+                    executeShellCommand(nodeCommand + path.join(top_dir, "cordova-plugman", "main.js") +
                                 " install --platform " + platform +
                                 " --project . --plugin " + path.dirname(potential_tests_plugin_xml));
                 }
@@ -513,7 +519,7 @@ function installPlugins() {
         // don't use local git repos for plugins when using --global.
         var searchPath = argv.globalplugins ? '' : top_dir;
 
-        console.log("Adding plugins using CLI...");
+        console.log("### Adding plugins using CLI...");
         console.log("Searchpath:", searchPath);
         pushd(cli_project_dir);
 
@@ -565,12 +571,12 @@ function installPlugins() {
 ////////////////////// update js files for each platform from cordova-js
 function updateJS() {
     if (argv.skipjs) {
-        console.log("Skipping the js update.");
+        console.log("### Skipping the js update.");
     } else if (!argv.global) {
         if (!fs.existsSync(cordova_js_git_dir)) {
             couldNotFind("js", "cordova-js");
         } else {
-            console.log("Updating js for platforms...");
+            console.log("### Updating js for platforms...");
             try {
                 require(path.join(cordova_js_git_dir, "node_modules", "grunt"));
             } catch (e) {
@@ -581,7 +587,7 @@ function updateJS() {
                 var version = require(join_paths([top_dir].concat(platform_layout[platform].bin)) + '/package').version;
                 pushd(cordova_js_git_dir);
                 var nodeCommand = /^win/.test(process.platform) ? ("\"" + process.argv[0] + "\" ") : "";
-                var code = shelljs.exec(nodeCommand + path.join(__dirname, "node_modules", "grunt-cli", "bin", "grunt") + ' compile:' + platform + ' --platformVersion=' + version).code;
+                var code = executeShellCommand(nodeCommand + path.join(__dirname, "node_modules", "grunt-cli", "bin", "grunt") + ' compile:' + platform + ' --platformVersion=' + version).code;
                 if (code) {
                     console.log("Failed to build js.");
                     process.exit(1);
@@ -601,19 +607,19 @@ function updateJS() {
 ////////////////////// wrap-up
 
 function summary() {
-    var scriptTimeStr = 'Script took ' + Math.round((Date.now() - startTime)/100)/10 + ' seconds';
+    var scriptTimeStr = '### Script took ' + Math.round((Date.now() - startTime)/100)/10 + ' seconds';
     if (argv.plugman) {
         platforms.forEach(function (platform) {
             var projName = getProjName(platform);
-            console.log("Done. " + platform + " project created at " + path.join(top_dir, projName));
+            console.log("### Done. " + platform + " project created at " + path.join(top_dir, projName));
         });
         console.log(scriptTimeStr);
     } else {
         pushd(cli_project_dir);
 
         // Executing cordova prepare
-        console.log("Preparing project...");
-        shelljs.exec(cli + " prepare");
+        console.log("### Preparing project...");
+        executeShellCommand(cli + " prepare");
 
         if (!argv.global) {
             console.log("Linking CLI...");
