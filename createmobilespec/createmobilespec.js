@@ -132,7 +132,7 @@ var top_dir =             process.cwd() + path.sep,
                                                       "\t\t\tCannot be used with --global because it is implied when --global is used.")
                    .boolean("clearnpmcache").describe("clearnpmcache", "rm -rf ~/.npm/cache; rm -rf ~/.plugman")
                    .string("plugins").describe("plugins", "Used to explicitly specify the list of plugins to be installed.\n" +
-                                               "\t\t\tExample: --plugins=\"cordova-plugin-device cordova-plugin-file-transfer my-custom-plugin\"")
+                                               "\t\t\tExample: --plugins=\"cordova-plugin-device my-custom-plugin\"")
                    .boolean("forceplugins").describe("forceplugins", "Add the --force flag when adding plugins\n")
                    .string("variable").describe("variable", "Used to pass preferences / variables down to cordova components (like plugins).\n" +
                                                "\t\t\tExample: --variable FILETRANSFER_SERVER_ADDRESS=\"http://yourlocal-IPAddressHere:5000\"")
@@ -151,16 +151,10 @@ var top_dir =             process.cwd() + path.sep,
 var DEFAULT_PLUGINS = [
     'cordova-plugin-battery-status',
     'cordova-plugin-camera',
-    'cordova-plugin-console',
-    'cordova-plugin-contacts',
     'cordova-plugin-device',
-    'cordova-plugin-device-motion',
-    'cordova-plugin-device-orientation',
     'cordova-plugin-dialogs',
     'cordova-plugin-file',
-    'cordova-plugin-file-transfer',
     'cordova-plugin-geolocation',
-    'cordova-plugin-globalization',
     'cordova-plugin-inappbrowser',
     'cordova-plugin-media',
     'cordova-plugin-media-capture',
