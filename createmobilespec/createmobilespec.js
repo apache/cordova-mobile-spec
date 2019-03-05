@@ -101,7 +101,10 @@ var top_dir =             process.cwd() + path.sep,
                                               "config": ["res", "xml"] },
                             "browser": { "bin": ["cordova-browser"],
                                               "www": ["www"],
-                                              "config": ["www"] },   
+                                              "config": ["www"] },
+                            "electron": { "bin": ["cordova-electron"],
+                                              "www": ["www"],
+                                              "config": ["www"] },
                             "ios":          { "bin": ["cordova-ios"],
                                               "www": ["www"],
                                               "config": ["CUSTOM"] },
@@ -113,12 +116,13 @@ var top_dir =             process.cwd() + path.sep,
     argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--link] [--global] [--globalplugins] [--plugins=\".\\myPluginDir\"] [--skipjs] [--skiplink] [--variable VAR=\"value\"] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.\n" +
-                          "\tPLATFORM: [--<android|ios|windows|osx>]\n" +
+                          "\tPLATFORM: [--<android|browser|electron|ios|osx|windows>]\n" +
                           "")
                    .boolean("help").describe("help", "Shows usage.")
                    .boolean("debug").describe("debug", "Debug logging.")
                    .boolean("android").describe("android", "Add Android platform.")
                    .boolean("browser").describe("browser", "Add Browser platform.")
+                   .boolean("electron").describe("electron", "Add Electron platform.")
                    .boolean("ios").describe("ios", "Add iOS platform.")
                    .boolean("osx").describe("osx", "Add osx platform (macOS).")
                    .boolean("windows").describe("windows", "Add Windows (universal) platform.")
@@ -205,6 +209,7 @@ if (argv.help) { optimist.showHelp(); quit(); }
 if (argv.android) { platforms.push("android"); }
 if (argv.ios) { platforms.push("ios"); }
 if (argv.browser) { platforms.push("browser"); }
+if (argv.electron) { platforms.push("electron"); }
 if (argv.windows) { platforms.push("windows"); }
 if (argv.osx) {platforms.push("osx");}
 
