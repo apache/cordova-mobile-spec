@@ -62,9 +62,9 @@ function pluginAdd(pluginName, searchPath, extraFlags) {
     if (!searchPath || typeof searchPath !== "string") {
         searchPath = '';
     }
-    var command = cli + ' plugin add ' + pluginName;
+    var command = cli + ' plugin add ' + pluginName + '';
     if (fs.existsSync(path.join(searchPath, pluginName, 'plugin.xml'))) {
-        command = cli + ' plugin add ' + path.join(searchPath, pluginName);
+        command = cli + ' plugin add "' + path.join(searchPath, pluginName) + '"';
     } else if (searchPath && searchPath.length) {
         command = cli + ' plugin add ' + pluginName + ' --searchpath ' + searchPath;
     }
@@ -564,7 +564,7 @@ function installPlugins() {
         plugins.forEach(function(plugin) {
           var potential_tests_plugin_xml = path.join('plugins', plugin, 'tests', 'plugin.xml');
           if (fs.existsSync(potential_tests_plugin_xml)) {
-            pluginTestPaths.push(path.resolve(path.dirname(potential_tests_plugin_xml)));
+            pluginTestPaths.push('"' + path.resolve(path.dirname(potential_tests_plugin_xml)) + '"');
           }
         });
         pluginAdd(pluginTestPaths.join(' '), null, allPluginFlags);
