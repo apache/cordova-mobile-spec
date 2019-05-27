@@ -19,7 +19,7 @@
  *
  */
 exports.defineAutoTests = function () {
-    describe('Bridge', function (done) {
+    describe('Bridge', function () {
         var frame;
         afterEach(function () {
             if (frame) {
