@@ -20,10 +20,13 @@
 -->
 
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
-           id="org.apache.cordova.test.whitelist"
+           id="cordova-plugin-whitelist-tests"
       version="0.1.0">
     <name>Whitelist</name>
 
+    <js-module src="tests/whitelist.tests.js" name="whitelist.tests">
+    </js-module>
+    
     <js-module src="www/whitelist.js" name="whitelist">
         <clobbers target="cordova.whitelist" />
     </js-module>
@@ -34,6 +37,37 @@
             <feature name="WhitelistAPI" >
                 <param name="android-package" value="org.apache.cordova.test.WhitelistAPI"/>
             </feature>
+        </config-file>
+
+        <config-file target="res/xml/config.xml" parent="/*">
+            <access origin="http://audio.ibeat.org" />
+            <access origin="http://whatheaders.com" />
+            <access origin="http://*.apache.org" />
+            <access origin="https://*.apache.org" />
+            <access origin="http://www.google.com" />
+            <access origin="https://www.google.com" />
+            <access origin="http://google.co.uk" />
+            <access origin="https://www.google.co.uk" />
+            <access origin="http://techslides.com" />
+            <access origin="httpssss://example.com" />
+            
+            <allow-navigation href="http://audio.ibeat.org" />
+            <allow-navigation href="http://whatheaders.com" />
+            <allow-navigation href="http://*.apache.org" />
+            <allow-navigation href="https://*.apache.org" />
+            <allow-navigation href="http://www.google.com" />
+            <allow-navigation href="https://www.google.com" />
+            <allow-navigation href="http://google.co.uk" />
+            <allow-navigation href="https://www.google.co.uk" />
+            <allow-navigation href="http://techslides.com" />
+            <allow-navigation href="httpssss://example.com" />
+            <allow-navigation href="cdvfile:*" />
+
+            <allow-intent href="sms:*" />
+            <allow-intent href="mailto:*" />
+            <allow-intent href="tel:*" />
+            <allow-intent href="www.google.com" />
+            <allow-navigation href="data:*" />
         </config-file>
 
         <source-file src="src/android/WhitelistAPI.java" target-dir="src/org/apache/cordova/test" />

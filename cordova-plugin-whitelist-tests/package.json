@@ -1,9 +1,9 @@
 {
-  "name": "org.apache.cordova.test.whitelist",
+  "name": "cordova-plugin-whitelist-tests",
   "version": "0.1.0",
   "description": "",
   "cordova": {
-    "id": "org.apache.cordova.test.whitelist",
+    "id": "cordova-plugin-whitelist-tests",
     "platforms": []
   },
   "keywords": [
