@@ -537,10 +537,10 @@ function installPlugins() {
         // Install mobilespec tests only if we install default list of plugins
         // If custom list of plugins is being installed, mobilespec tests can be listed there, if needed
         if (!argv.plugins) {
-            //pluginAdd('org.apache.cordova.mobilespec.tests', mobile_spec_git_dir, allPluginFlags);
+            pluginAdd('cordova-plugin-mobilespec-tests', mobile_spec_git_dir, allPluginFlags);
         }
-        //pluginAdd('org.apache.cordova.test.whitelist', mobile_spec_git_dir, allPluginFlags);
-        pluginAdd('org.apache.cordova.test.echo', mobile_spec_git_dir, allPluginFlags);
+        pluginAdd('org.apache.cordova.test.whitelist', mobile_spec_git_dir, allPluginFlags);
+        pluginAdd('cordova-plugin-echo', mobile_spec_git_dir, allPluginFlags);
 
         pluginAdd('cordova-plugin-test-framework', searchPath, allPluginFlags);
         pluginAdd('cordova-plugin-device', searchPath, allPluginFlags);
