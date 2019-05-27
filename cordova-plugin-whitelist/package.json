@@ -1,0 +1,15 @@
+{
+  "name": "org.apache.cordova.test.whitelist",
+  "version": "0.1.0",
+  "description": "",
+  "cordova": {
+    "id": "org.apache.cordova.test.whitelist",
+    "platforms": []
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "",
+  "license": "Apache 2.0"
+}
+
