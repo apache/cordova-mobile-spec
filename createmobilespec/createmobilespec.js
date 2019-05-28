@@ -188,10 +188,9 @@ var DEFAULT_PLUGINS_OSX = [
 ];
 
 // plugin search paths that will override default
-// removed 'org.apache.cordova.test.whitelist': mobile_spec_git_dir,
 var SEARCH_PATHS = {
-    'org.apache.cordova.mobilespec.tests': mobile_spec_git_dir,   
-    'org.apache.cordova.test.echo': mobile_spec_git_dir,
+    'cordova-plugin-mobilespec-tests': mobile_spec_git_dir,   
+    'cordova-plugin-echo-echo': mobile_spec_git_dir,
     'cordova-plugin-test-framework': top_dir
 };
 
@@ -542,10 +541,6 @@ function installPlugins() {
 
         pluginAdd('cordova-plugin-test-framework', searchPath, allPluginFlags);
         pluginAdd('cordova-plugin-device', searchPath, allPluginFlags);
-
-        if (argv.android) {
-            pluginAdd('cordova-plugin-whitelist-tests', searchPath, allPluginFlags);
-        }
 
         plugins.forEach(function(p) {
             var sp = SEARCH_PATHS.hasOwnProperty(p) ? SEARCH_PATHS[p] : searchPath;
