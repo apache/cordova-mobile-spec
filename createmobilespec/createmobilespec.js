@@ -539,14 +539,14 @@ function installPlugins() {
         if (!argv.plugins) {
             pluginAdd('cordova-plugin-mobilespec-tests', mobile_spec_git_dir, allPluginFlags);
         }
-        pluginAdd('org.apache.cordova.test.whitelist', mobile_spec_git_dir, allPluginFlags);
+        //pluginAdd('cordova-plugin-whitelist-tests', mobile_spec_git_dir, allPluginFlags);
         pluginAdd('cordova-plugin-echo', mobile_spec_git_dir, allPluginFlags);
 
         pluginAdd('cordova-plugin-test-framework', searchPath, allPluginFlags);
         pluginAdd('cordova-plugin-device', searchPath, allPluginFlags);
 
         if (argv.android) {
-            pluginAdd('cordova-plugin-whitelist', searchPath, allPluginFlags);
+            pluginAdd('cordova-plugin-whitelist-tests', searchPath, allPluginFlags);
         }
 
         if (argv.webview == 'crosswalk') {
