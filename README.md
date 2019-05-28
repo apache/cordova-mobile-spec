@@ -32,7 +32,7 @@ This repository has 3 parts:
 
 1. This main folder is a Cordova app "template" (`config.xml` and `www`) that includes implementations of various functionalities that Cordova supports (battery, events, keyboard, lazyloadjs, splashscreens, sql, storage, misc) that can manually be tested, some benchmarks, and a link to the automated and manual tests installed plugins offer (`cdvtests/index.html`).
 
-2. There are 4 plugins as well: [`cordova-plugin-echo`](cordova-plugin-echo) ("plugin implementation of the Echo function to test the bridge"), [`cordova-plugin-mobilespec-tests`](cordova-plugin-mobilespec-tests) ("Cordova Non Plugin Auto Tests"), [`cordova-plugin-thirdparty-tests`](cordova-plugin-thirdparty-tests) ("Tests for popular third-party plugins") and [`cordova-plugin-whitelist`](cordova-plugin-whitelist) (TODO).
+2. There are 2 plugins as well: [`cordova-plugin-echo`](cordova-plugin-echo) ("plugin implementation of the Echo function to test the bridge"), [`cordova-plugin-mobilespec-tests`](cordova-plugin-mobilespec-tests) ("Cordova Non Plugin Auto Tests").
 
 3. The `createmobilespec` folder contains a script/CLI to create a Cordova app
 
