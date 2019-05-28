@@ -20,8 +20,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:rim="http://www.blackberry.com/ns/widgets"
-    id="org.apache.cordova.mobilespec.tests"
+    id="cordova-plugin-mobilespec-tests"
     version="1.0.0">
     <name>Cordova Non Plugin Auto Tests</name>
     <license>Apache 2.0</license>
