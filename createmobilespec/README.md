@@ -45,7 +45,7 @@ and a way to use the platform-centered workflow instead of the CLI.
     ```shell
     # Create a new folder, e.g. `cordova` and `cd cordova` into it.
     git clone https://github.com/apache/cordova-coho.git
-    cd cordova-coho & npm install & cd ..
+    cd cordova-coho && npm install && cd ..
     node cordova-coho/coho repo-clone -r mobile-spec -r tools -r plugins -r active-platforms
     node cordova-coho/coho npm-link
     ```
@@ -54,7 +54,7 @@ and a way to use the platform-centered workflow instead of the CLI.
 
 2. As `cordova-mobile-spec` has a special structure, you have to install dependencies in `createmobilespec` manually:
     ```shell
-    cd cordova-mobile-spec/createmobilespec & npm install & cd ../..
+    cd cordova-mobile-spec/createmobilespec && npm install && cd ../..
     ```
 3. You are now ready to use `createmobilespec.js` with the commands below.
 
