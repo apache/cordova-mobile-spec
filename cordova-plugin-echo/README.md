@@ -19,7 +19,35 @@
 #
 -->
 
-cordova-plugin-echo
-------------------------
+# cordova-plugin-echo
 
 This is a plugin implementation of the Echo function to test the bridge. It is currently used by Mobile Spec to test and benchmark the bridge.
+
+## Echo
+
+> The `echo` object provides an interface for testing the bridge. It
+> sends any data received back across the bridge unmodifed. This 
+> allows the bridge modes to be tested and benchmarked.
+
+### Methods
+
+- cordova.echo.echo
+- cordova.echo.echoAsync
+- cordova.echo.echoArrayBuffer
+- cordova.echo.echoMultiPart
+
+#### cordova.echo.echo
+
+Echos string data in the same thread.
+
+#### cordova.echo.echoAsync
+
+Echos string data in a new UI thread.
+
+#### cordova.echo.echoArrayBuffer
+
+Echos base64 encoded data in the same thread.
+
+#### cordova.echo.echoMultiPart
+
+Echos a multipart message in the same thread.
