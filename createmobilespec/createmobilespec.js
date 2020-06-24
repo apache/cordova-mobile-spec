@@ -420,7 +420,7 @@ if (argv.plugman) {
     // Create the project using "cordova create"
     myDelete(cli_project_dir);
     console.log("### Creating project mobilespec...");
-    executeShellCommand(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --template cordova-mobile-spec" + path.sep + "www");
+    executeShellCommand(cli + " create " + projectDirName + " org.apache.cordova.mobilespec MobileSpec_Tests --template ./cordova-mobile-spec" + path.sep + "www");
     shelljs.cp("-f", path.join(mobile_spec_git_dir, 'config.xml'), path.join(projectDirName, 'config.xml'));
 
     // Config.json file ---> linked to local libraries
