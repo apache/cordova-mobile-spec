@@ -44,7 +44,7 @@ and a way to use the platform-centered workflow instead of the CLI.
 
     ```shell
     # Create a new folder, e.g. `cordova` and `cd cordova` into it.
-    git clone https://github.com/apache/cordova-coho.git
+    git clone https://github.com/apache/cordova-coho
     cd cordova-coho && npm install && cd ..
     node ./cordova-coho/coho repo-clone -r mobile-spec -r tools -r plugins -r active-platforms
     node ./cordova-coho/coho npm-link
