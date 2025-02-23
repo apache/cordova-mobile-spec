@@ -52,13 +52,6 @@
     <allow-intent href="tel:*" />
     <allow-intent href="www.google.com" />
     <allow-navigation href="data:*" />
-    <platform name="blackberry10">
-        <access origin="file:///" />
-        <access origin="https://www.apache.org" />
-        <access origin="http://cordova.apache.org" />
-        <access origin="http://foobar.apache.org" />
-        <access origin="http://www.apache.org" />
-    </platform>
     <preference name="iosPersistentFileLocation" value="Library" />
     <preference name="AndroidPersistentFileLocation" value="Internal" />
     <platform name="android">

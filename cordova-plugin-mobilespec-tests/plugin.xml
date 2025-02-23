@@ -42,7 +42,7 @@
     
     <js-module src="tests/input.tests.js" name="input.tests">
     </js-module>
-     
+
     <platform name="android">
         <source-file src="AndroidMobileSpecTestPlugin.java" target-dir="src/org/apache/cordova/mobilespec" />
         <config-file target="res/xml/config.xml" parent="/*">

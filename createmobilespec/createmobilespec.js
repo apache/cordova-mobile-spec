@@ -107,16 +107,12 @@ var top_dir =             process.cwd() + path.sep,
                                               "config": ["www"] },
                             "ios":          { "bin": ["cordova-ios"],
                                               "www": ["www"],
-                                              "config": ["CUSTOM"] },
-                            "osx":          { "bin": ["cordova-osx"],
-                                              "www": ["www"] },
-                            "windows":      { "bin": ["cordova-windows"],
-                                              "www": ["www"] }
+                                              "config": ["CUSTOM"] }
                             },
     argv = optimist.usage("\nUsage: $0 PLATFORM... [--help] [--plugman] [--link] [--global] [--globalplugins] [--plugins=\".\\myPluginDir\"] [--skipjs] [--skiplink] [--variable VAR=\"value\"] [directoryName]\n" +
                           "A project will be created with the mobile-spec app and all the core plugins.\n" +
                           "At least one platform must be specified. See the included README.md.\n" +
-                          "\tPLATFORM: [--<android|browser|electron|ios|osx|windows>]\n" +
+                          "\tPLATFORM: [--<android|browser|electron|ios>]\n" +
                           "")
                    .boolean("help").describe("help", "Shows usage.")
                    .boolean("debug").describe("debug", "Debug logging.")
@@ -124,8 +120,6 @@ var top_dir =             process.cwd() + path.sep,
                    .boolean("browser").describe("browser", "Add Browser platform.")
                    .boolean("electron").describe("electron", "Add Electron platform.")
                    .boolean("ios").describe("ios", "Add iOS platform.")
-                   .boolean("osx").describe("osx", "Add osx platform (macOS).")
-                   .boolean("windows").describe("windows", "Add Windows (universal) platform.")
                    .boolean("plugman").describe("plugman", "Use {platform}/bin/create and plugman directly instead of the CLI.")
                    .boolean("global").describe("global", "Use the globally-installed `cordova` and the downloaded platforms/plugins from the registry instead of the local git repo.\n" +
                                                "\t\t\tWill use the local git repo of mobile-spec.\n" +
@@ -154,8 +148,6 @@ var top_dir =             process.cwd() + path.sep,
 var DEFAULT_PLUGINS = [
     'cordova-plugin-battery-status',
     'cordova-plugin-camera',
-    'cordova-plugin-console',
-    'cordova-plugin-contacts',
     'cordova-plugin-device',
     'cordova-plugin-device-motion',
     'cordova-plugin-device-orientation',
@@ -163,28 +155,15 @@ var DEFAULT_PLUGINS = [
     'cordova-plugin-file',
     'cordova-plugin-file-transfer',
     'cordova-plugin-geolocation',
-    'cordova-plugin-globalization',
     'cordova-plugin-inappbrowser',
     'cordova-plugin-media',
     'cordova-plugin-media-capture',
     'cordova-plugin-network-information',
+    'cordova-plugin-screen-orientation',
     'cordova-plugin-splashscreen',
     'cordova-plugin-statusbar',
     'cordova-plugin-vibration',
-    'cordova-plugin-whitelist',
     // TODO check if all are listed
-];
-
-// osx platform (macOS) has little support for the most of the plugins,
-// so it gets its own default list
-var DEFAULT_PLUGINS_OSX = [
-    'cordova-plugin-camera',
-    'cordova-plugin-device',
-    'cordova-plugin-file',
-    'cordova-plugin-inappbrowser',
-    // non-functional on osx platform (macOS), iOS,
-    // or any other non-Android platforms:
-    'cordova-plugin-whitelist',
 ];
 
 // plugin search paths that will override default
@@ -208,8 +187,6 @@ if (argv.android) { platforms.push("android"); }
 if (argv.ios) { platforms.push("ios"); }
 if (argv.browser) { platforms.push("browser"); }
 if (argv.electron) { platforms.push("electron"); }
-if (argv.windows) { platforms.push("windows"); }
-if (argv.osx) {platforms.push("osx");}
 
 argv.skiplink = argv.skiplink || argv.global;
 argv.skipjs = argv.skipjs || argv.global;
@@ -467,16 +444,6 @@ function pluginIdToDirName(id) {
 ////////////////////// install plugins for each platform
 function installPlugins() {
     var plugins = DEFAULT_PLUGINS;
-
-    // special override for osx platform (macOS)
-    if (argv.osx) {
-        if (platforms.length > 1) {
-            console.warn('Warning: Testing more than one platform at once may cause issues with unsupported plugins for osx platform (macOS).');
-        } else {
-            console.warn('Warning: Using reduced plugin list for osx platform (macOS).');
-            plugins = DEFAULT_PLUGINS_OSX;
-        }
-    }
 
     if (argv.plugins) {
         plugins = argv.plugins.split(" ").filter(function (item) {

@@ -21,10 +21,9 @@
 
 // These tests are needed to check browser's functionality and verify that we are not breaking it.
 exports.defineAutoTests = function () {
-    var isWp8 = cordova.platformId === "windowsphone";
     var isIOS = (cordova.platformId === "ios");
     var isIOSWKWebView = isIOS && (window.webkit && window.webkit.messageHandlers);
-               
+
     describe("XMLHttpRequest", function () {
         var errorHandler = {
             onError: function (done) {
@@ -79,10 +78,8 @@ exports.defineAutoTests = function () {
 
             // overrideMimeType
             //  IE10 does not support overrideMimeType
-            if (cordova.platformId != 'windows8' && cordova.platformId != 'windowsphone') {
-                expect(xhr.overrideMimeType).toBeDefined();
-                expect(typeof xhr.overrideMimeType == 'function').toBe(true);
-            }
+            expect(xhr.overrideMimeType).toBeDefined();
+            expect(typeof xhr.overrideMimeType == 'function').toBe(true);
 
             // open
             expect(xhr.open).toBeDefined();
@@ -176,48 +173,4 @@ exports.defineAutoTests = function () {
             }, "Expecting both callbacks to be called.");
         });
     });
-
-
-    // only add these tests if we are testing on windows phone
-
-    if (isWp8) {
-        describe("XMLHttpRequest Windows Phone", function () {
-
-            var errorHandler = { onError: function () { } };
-
-            beforeEach(function () {
-                spyOn(errorHandler, 'onError');
-            });
-
-            afterEach(function () {
-                expect(errorHandler.onError).not.toHaveBeenCalled();
-            });
-
-            var createXHR = function (url, bAsync, win, lose) {
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", url, bAsync);
-                xhr.onload = win;
-                xhr.onerror = lose;
-                xhr.send();
-                return xhr;
-            };
-
-            it("XMLHttpRequest.spec.7 should be able to load the (WP8 backwards compatability) root page www/index.html", function (done) {
-                expect(function () {
-                    createXHR("www/index.html", true, done, errorHandler.onError)
-                }).not.toThrow();
-            });
-
-            it("XMLHttpRequest.spec.8 should be able to load the (WP7 backwards compatability) root page app/www/index.html", function (done) {
-                expect(function () {
-                    createXHR("app/www/index.html", true, done, errorHandler.onError)
-                }).not.toThrow();
-            });
-
-            it("XMLHttpRequest.spec.11 should be able to load the current page using window.location with extra / [CB-6299]", function (done) {
-                var path = window.location.protocol + "/" + window.location.toString().substr(window.location.protocol.length);
-                createXHR(path, true, done, errorHandler.onError);
-            });
-        });
-    }
 }
