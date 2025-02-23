@@ -189,7 +189,7 @@ var DEFAULT_PLUGINS_OSX = [
 
 // plugin search paths that will override default
 var SEARCH_PATHS = {
-    'cordova-plugin-mobilespec-tests': mobile_spec_git_dir,   
+    'cordova-plugin-mobilespec-tests': mobile_spec_git_dir,
     'cordova-plugin-echo-echo': mobile_spec_git_dir,
     'cordova-plugin-test-framework': top_dir
 };
