@@ -22,17 +22,8 @@
 var PLAT;
 (function getPlatform() {
     var platforms = {
-        amazon_fireos: /cordova-amazon-fireos/,
         android: /Android/,
-        ios: /(iPad)|(iPhone)|(iPod)/,
-        blackberry10: /(BB10)/,
-        blackberry: /(PlayBook)|(BlackBerry)/,
-        // Since Windows Phone 8.1 uses completely different API more similar to Windows 8
-        // than to Windows phone 8 we need to detect it separately.
-        windowsphone81: /Windows Phone 8.1/,
-        windowsphone: /Windows Phone/,
-        windows8: /MSAppHost/,
-        firefoxos: /Firefox/
+        ios: /(iPad)|(iPhone)|(iPod)/
     };
     for (var key in platforms) {
         if (platforms[key].exec(navigator.userAgent)) {
@@ -43,20 +34,11 @@ var PLAT;
 })();
 
 var scripts = document.getElementsByTagName('script');
-var currentPath = scripts[scripts.length - 1].src;
-if (PLAT !== "blackberry10" && PLAT !== "firefoxos" && PLAT !== 'windowsphone' && PLAT !== 'windowsphone81') {
-    currentPath += '?paramShouldBeIgnored';
-}
+var currentPath = scripts[scripts.length - 1].src + '?paramShouldBeIgnored';
 var cordovaPath = currentPath.replace("cordova-incl.js", "cordova.js");
 
 if (!window._doNotWriteCordovaScript) {
-    if (PLAT != "windows8" && PLAT != "windowsphone81") {
-        document.write('<script type="text/javascript" charset="utf-8" src="' + cordovaPath + '"></script>');
-    } else {
-        var s = document.createElement('script');
-        s.src = cordovaPath;
-        document.head.appendChild(s);
-    }
+  document.write('<script type="text/javascript" charset="utf-8" src="' + cordovaPath + '"></script>');
 }
 
 function addListenerToClass(className, listener, argsArray, action, doNotWrap) {
@@ -82,7 +64,7 @@ function addListenerToClass(className, listener, argsArray, action, doNotWrap) {
 }
 
 function backHome() {
-    if (window.device && device.platform && (device.platform.toLowerCase() == 'android' || device.platform.toLowerCase() == 'amazon-fireos')) {
+    if (window.device && device.platform && (device.platform.toLowerCase() == 'android')) {
         navigator.app.backHistory();
     }
     else {

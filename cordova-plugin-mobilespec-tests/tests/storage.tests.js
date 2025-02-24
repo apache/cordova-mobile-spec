@@ -19,11 +19,7 @@
 *
 */
 exports.defineAutoTests = function () {
-
-    var isWindowsPhone = cordova.platformId == 'windowsphone';
-    var isWindows = (cordova.platformId === "windows") || (cordova.platformId === "windows8");
     var isIOS = (cordova.platformId === "ios");
-    var isOSX = (cordova.platformId === "osx");
     var isIOSWKWebView = isIOS && (window.webkit && window.webkit.messageHandlers);
 
     describe("Session Storage", function () {
@@ -179,18 +175,10 @@ exports.defineAutoTests = function () {
 
         describe("HTML 5 Storage", function () {
             it("storage.spec.9 should exist", function () {
-                //IE doesn't support openDatabase method
-                if (isWindows || isWindowsPhone) {
-                    pending();
-                }
                 expect(window.openDatabase).toBeDefined();
             });
 
             it("storage.spec.17 should contain an openDatabase function", function () {
-                //IE doesn't support openDatabase method
-                if (isWindows || isWindowsPhone) {
-                    pending();
-                }
                 expect(window.openDatabase).toBeDefined();
                 if (window.openDatabase) {
                     expect(typeof window.openDatabase).toBe('function');
@@ -220,10 +208,6 @@ exports.defineAutoTests = function () {
                     }
 
                     if (isIOSWKWebView) {
-                        pending();
-                    }
-                    if (isOSX) {
-                        // see CB-10579
                         pending();
                     }
 

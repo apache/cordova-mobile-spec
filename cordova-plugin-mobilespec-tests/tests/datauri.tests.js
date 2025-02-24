@@ -18,9 +18,6 @@
  */
 
 exports.defineAutoTests = function () {
-    var isWindowsPhone = cordova.platformId == 'windowsphone';
-    var isWindows = (cordova.platformId === "windows") || (cordova.platformId === "windows8");
-
     describe('data uris', function () {
         var frame;
         var onMessageBind;
@@ -40,14 +37,6 @@ exports.defineAutoTests = function () {
         });
 
         it("datauri.spec.1 should work with iframes", function (done) {
-            // IE on WP7/8 considers 'data:' in frame.src string as protocol type
-            // so asks user to look for appropriating application in the market;
-            // temporary skipped since requires user interaction
-            // data:text/html is not supported by IE so pended for windows platform for now
-            if (isWindowsPhone || isWindows) {
-                pending();
-            }
-
             frame = document.createElement('iframe');
             onMessageBind = onMessage.bind(null, done);
             window.addEventListener('message', onMessageBind, false);

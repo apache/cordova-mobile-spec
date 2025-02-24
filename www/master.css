@@ -169,15 +169,8 @@
   display: none;
 }
 
-body.amazon-fireos-platform .platform.amazon-fireos,
 body.android-platform .platform.android,
-body.blackberry10-platform .platform.blackberry10,
 body.browser-platform .platform.browser,
-body.firefoxos-platform .platform.firefoxos,
-body.ios-platform .platform.ios,
-body.osx-platform .platform.ios,
-body.ubuntu-platform .platform.ubuntu,
-body.windows8-platform .platform.windows8,
-body.windowsphone-platform .platform.windowsphone {
+body.ios-platform .platform.ios {
   display: block;
 }

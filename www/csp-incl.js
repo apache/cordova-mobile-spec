@@ -22,17 +22,8 @@
 var PLAT;
 (function getPlatform() {
     var platforms = {
-        amazon_fireos: /cordova-amazon-fireos/,
         android: /Android/,
-        ios: /(iPad)|(iPhone)|(iPod)/,
-        blackberry10: /(BB10)/,
-        blackberry: /(PlayBook)|(BlackBerry)/,
-        // Since Windows Phone 8.1 uses completely different API more similar to Windows 8
-        // than to Windows phone 8 we need to detect it separately.
-        windowsphone81: /Windows Phone 8.1/,
-        windowsphone: /Windows Phone/,
-        windows: /MSAppHost/,
-        firefoxos: /Firefox/
+        ios: /(iPad)|(iPhone)|(iPod)/
     };
     for (var key in platforms) {
         if (platforms[key].exec(navigator.userAgent)) {
@@ -49,7 +40,6 @@ if (!window._disableCSP) {
     switch (PLAT) {
         case 'android':
         case 'ios':
-        case 'windows':
             cspMetaContent = 'default-src \'self\' https://ssl.gstatic.com/accessibility/javascript/android/;' +
                             ' connect-src \'self\' http://www.google.com;' +
                             ' media-src \'self\' http://cordova.apache.org/downloads/ https://cordova.apache.org/downloads/;' +
@@ -61,16 +51,10 @@ if (!window._disableCSP) {
 
     if (cspMetaContent) {
         cspMetaContent = '<meta http-equiv="Content-Security-Policy" content="' + cspMetaContent + '"/>';
-        if (PLAT === 'windows' && MSApp && MSApp.execUnsafeLocalFunction) {
-            MSApp.execUnsafeLocalFunction(function () {
-                document.write(cspMetaContent);
-            });
-        } else {
-            document.write(cspMetaContent);
-        }
+        document.write(cspMetaContent);
     }
 }
 else {
-  console.log('CSP injection is disabled.');
+    console.log('CSP injection is disabled.');
 }
 
