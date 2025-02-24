@@ -64,7 +64,7 @@ function pluginAdd(pluginName, searchPath, extraFlags) {
     }
     var command = cli + ' plugin add ' + pluginName;
     if (fs.existsSync(path.join(searchPath, pluginName, 'plugin.xml'))) {
-        command = cli + ' plugin add ' + path.join(searchPath, pluginName);
+        command = cli + ' plugin add "' + path.join(searchPath, pluginName) + '"';
     } else if (searchPath && searchPath.length) {
         command = cli + ' plugin add ' + pluginName + ' --searchpath ' + searchPath;
     }
@@ -188,10 +188,9 @@ var DEFAULT_PLUGINS_OSX = [
 ];
 
 // plugin search paths that will override default
-// removed 'org.apache.cordova.test.whitelist': mobile_spec_git_dir,
 var SEARCH_PATHS = {
-    'org.apache.cordova.mobilespec.tests': mobile_spec_git_dir,   
-    'org.apache.cordova.test.echo': mobile_spec_git_dir,
+    'cordova-plugin-mobilespec-tests': mobile_spec_git_dir,
+    'cordova-plugin-echo': mobile_spec_git_dir,
     'cordova-plugin-test-framework': top_dir
 };
 
@@ -536,17 +535,12 @@ function installPlugins() {
         // Install mobilespec tests only if we install default list of plugins
         // If custom list of plugins is being installed, mobilespec tests can be listed there, if needed
         if (!argv.plugins) {
-            //pluginAdd('org.apache.cordova.mobilespec.tests', mobile_spec_git_dir, allPluginFlags);
+            pluginAdd('cordova-plugin-mobilespec-tests', mobile_spec_git_dir, allPluginFlags);
         }
-        //pluginAdd('org.apache.cordova.test.whitelist', mobile_spec_git_dir, allPluginFlags);
-        pluginAdd('org.apache.cordova.test.echo', mobile_spec_git_dir, allPluginFlags);
+        pluginAdd('cordoa-plugin-echo', mobile_spec_git_dir, allPluginFlags);
 
         pluginAdd('cordova-plugin-test-framework', searchPath, allPluginFlags);
         pluginAdd('cordova-plugin-device', searchPath, allPluginFlags);
-
-        if (argv.android) {
-            pluginAdd('cordova-plugin-whitelist', searchPath, allPluginFlags);
-        }
 
         plugins.forEach(function(p) {
             var sp = SEARCH_PATHS.hasOwnProperty(p) ? SEARCH_PATHS[p] : searchPath;
@@ -559,7 +553,7 @@ function installPlugins() {
         plugins.forEach(function(plugin) {
           var potential_tests_plugin_xml = path.join('plugins', plugin, 'tests', 'plugin.xml');
           if (fs.existsSync(potential_tests_plugin_xml)) {
-            pluginTestPaths.push(path.resolve(path.dirname(potential_tests_plugin_xml)));
+            pluginTestPaths.push('"' + path.resolve(path.dirname(potential_tests_plugin_xml)) + '"');
           }
         });
         pluginAdd(pluginTestPaths.join(' '), null, allPluginFlags);
