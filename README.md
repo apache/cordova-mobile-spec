@@ -7,9 +7,9 @@
 # to you under the Apache License, Version 2.0 (the
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing,
 # software distributed under the License is distributed on an
 # "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -18,34 +18,115 @@
 # under the License.
 #
 -->
-# Cordova Mobile Spec Suite
 
-This `cordova-mobile-spec` repository can be used to create a Cordova app that provides a set of manual tests to verify Cordova core functionality. It is currently used in the [release processes of platforms, plugins and tools](https://github.com/apache/cordova-coho/tree/master/docs#release-processes).
+# Cordova Mobile Spec
 
-It also provides access to [manual and automated tests of the installed plugins (via `cordova-plugin-test-framework`)](https://github.com/apache/cordova-plugin-test-framework).
+This repository is used to create a Cordova testing application that verifies the core functionality and plugins of **Apache Cordova**.
 
-(History: A very long time ago this repository also _included_ all the manual and automated plugin tests before those were extracted and moved into the plugins themselves.)
+Its purpose is to be executed as part of the [release process for platforms, plugins, and tools](https://github.com/apache/cordova-coho/tree/master/docs#release-processes).
+
+It uses the [`cordova-plugin-test-framework`](https://github.com/apache/cordova-plugin-test-framework), which provides the ability for **manual and automated testing**.
+
+_(History: A long time ago, this repository included all manual and automated plugin tests before they were extracted and moved into the respective plugins.)_
+
+---
+
+- [Cordova Mobile Spec](#cordova-mobile-spec)
+  - [Overview](#overview)
+  - [Prerequisites](#prerequisites)
+    - [Setting Up a Cordova Workspace](#setting-up-a-cordova-workspace)
+    - [Installing Interactive CLI Dependencies](#installing-interactive-cli-dependencies)
+    - [Global Command Support (Optional)](#global-command-support-optional)
+  - [Usage](#usage)
+
+---
 
 ## Overview
 
-This repository has 3 parts:
+This repository contains the following:
 
-1. This main folder is a Cordova app "template" (`config.xml` and `www`) that includes implementations of various functionalities that Cordova supports (battery, events, keyboard, lazyloadjs, splashscreens, sql, storage, misc) that can manually be tested, some benchmarks, and a link to the automated and manual tests installed plugins offer (`cdvtests/index.html`).
+1. **Template for the Cordova testing app**
 
-2. There are 2 plugins as well: [`cordova-plugin-echo`](cordova-plugin-echo) ("plugin implementation of the Echo function to test the bridge"), [`cordova-plugin-mobilespec-tests`](cordova-plugin-mobilespec-tests) ("Cordova Non Plugin Auto Tests").
+    - **`config.xml`**
 
-3. The `createmobilespec` folder contains a script/CLI to create a Cordova app
+      The configuration file for the testing application.
 
-    1. using the locally installed Cordova CLI, the currently up to date (published on npm) platforms and plugins (including their tests!), and the 4 local plugins from 2) (mode `--global`) or
-    2. using local checkouts (via `cordova-coho`) of all these (CLI, tools, platforms, plugins...) or  
-    3. with several other modes (to e.g. use plugman and /bin/create instead of the CLI)
+    - **`www`**
 
-The end result is a folder `../mobilespec` with a Cordova app that can be installed on devices. It can be used for some manual testing with the functionality offered by 1) or run the [tests additionally provided by the plugins via `cordova-plugin-test-framework`](https://github.com/apache/cordova-plugin-test-framework).
+      This folder contains:
+
+      - A web-based UI template for the testing application.
+      - Pages for manually testing various Cordova functionalities.
+      - Benchmarks and links for triggering manual and automated tests.
+
+      The preconfigured Cordova functionalities include:
+
+      - Battery
+      - Events
+      - Keyboard
+      - LazyloadJS
+      - SQL
+      - Storage
+      - Miscellaneous features
+
+2. **`cordova-plugin-echo` (Internal Plugin)**
+
+   A simple echo function implemented for testing the Cordova bridge.
+
+3. **`cordova-plugin-mobilespec-tests` (Internal Plugin)**
+
+   Contains non-plugin automated tests for Cordova.
+
+4. **Interactive CLI Setup Tool**
+
+   The main tool used to automatically create and configure the Mobile Spec application.
+
+## Prerequisites
+
+### Setting Up a Cordova Workspace
+
+You should already have a workspace that contains all Cordova repositories. It is **RECOMMENDED** to use `cordova-coho` to set up your workspace, as it will automatically clone all necessary repositories.
+
+You can also manually set up a workspace, but for this tool to work, the following criteria **MUST** be met:
+
+1. The Cordova workspace directory **MUST** contain at least **one or more active Apache Cordova core plugins**.
+2. The Cordova workspace directory **MUST** contain at least **one or more active Apache Cordova core platforms**.
+3. The Cordova workspace directory **MUST** contain `cordova-plugin-test-framework`.
+4. It is **RECOMMENDED** that the Cordova workspace directory contains the `cordova-mobile-spec` repository.
+
+    - If `cordova-mobile-spec` is inside the Cordova workspace, the interactive CLI tool will automatically detect the other repositories in the parent directory.
+    - If `cordova-mobile-spec` is located elsewhere, you **MUST** specify the workspace path using the `CORDOVA_WORKSPACE` environment variable when running the interactive CLI.
+
+### Installing Interactive CLI Dependencies
+
+Run the following command in the root directory of `cordova-mobile-spec`:
+
+```bash
+npm install
+```
+
+### Global Command Support (Optional)
+
+To enable the `mobilespec` command to run from any directory, run the following command in the root directory of `cordova-mobile-spec`:
+
+```bash
+npm link
+```
+
+> **Note:** The app created when running the `mobilespec` command will be generated in the Cordova workspace.
 
 ## Usage
 
-See the [`README.md` in `/createmobilespec`](createmobilespec/README.md) for usage instruction on how to create the "mobilespec" app.
+Once the prerequisites are met, you can launch the interactive CLI tool from the Cordova workspace directory.
 
-### Cordova Plugin File-Transfer Tests
+If **Global Command Support** was configured:
 
-Tests of Cordova Plugin File-Transfer require a test server. [Follow these instructions to install and run the server and configure the plugin.](https://github.com/apache/cordova-labs/tree/cordova-filetransfer)
+```bash
+mobilespec
+```
+
+Or, without global installation:
+
+```bash
+npx ./cordova-mobile-spec
+```
