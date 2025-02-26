@@ -113,7 +113,10 @@ const platformDefaultChoices = platformChoices.filter(
  * @returns {Boolean}
  */
 const isPluginDisabled = plugin => {
-    return !existsSync(path.join(parentDir, plugin)) || !existsSync(path.join(parentDir, plugin, 'tests'));
+    return !existsSync(path.join(parentDir, plugin)) ||
+        !existsSync(path.join(parentDir, plugin, 'tests')) ||
+        // Temporarily disabling file-transfer plugin. Need to support running local server.
+        plugin === 'cordova-plugin-file-transfer';
 };
 const pluginChoices = SUPPORTED_PLUGINS.map(
     p => ({ name: p, value: p, disabled: isPluginDisabled(p) })
