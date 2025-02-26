@@ -75,6 +75,10 @@ const parentDir = process.env.CORDOVA_WORKSPACE || path.join(__dirname, '..');
 const projectDir = path.join(parentDir, 'mobilespec');
 const projectWwwDir = path.join(projectDir, 'www');
 
+if (existsSync(projectDir)) {
+    print.error(`A mobilespec test project already exists at: ${projectDir}\n    Remove it before running 'mobilespec'.`);
+}
+
 const testFrameworkPluginDir = path.join(parentDir, 'cordova-plugin-test-framework');
 if (!existsSync(testFrameworkPluginDir)) {
     print.error('Missing required plugin "cordova-plugin-test-framework"');
