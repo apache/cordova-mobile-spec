@@ -75,6 +75,19 @@ const parentDir = process.env.CORDOVA_WORKSPACE || path.join(__dirname, '..');
 const projectDir = path.join(parentDir, 'mobilespec');
 const projectWwwDir = path.join(projectDir, 'www');
 
+const testFrameworkPluginDir = path.join(parentDir, 'cordova-plugin-test-framework');
+if (!existsSync(testFrameworkPluginDir)) {
+    print.error('Missing required plugin "cordova-plugin-test-framework"');
+}
+
+const INTERNAL_PLUGINS = [
+    testFrameworkPluginDir,
+    ...[
+        'cordova-plugin-echo',
+        'cordova-plugin-mobilespec-tests'
+    ].map(p => path.join(__dirname, p)).filter(p => existsSync(p))
+];
+
 // MARK: Platform Choices & Defaults
 
 const platformChoices = SUPPORTED_PLATFORMS.map(
@@ -186,17 +199,21 @@ async function runCmdSequentially (commands, options) {
 
 (async function () {
     const { platforms, plugins } = await gatherPackagesToInstall();
-    const packagesToInstall = [
-        ...platforms.map(p => `cordova platform add ${path.join(parentDir, p)}`),
-        ...[
-            // We are going to add the testing framework & mobile spec related plugin tests.
-            // Users will not have control over these options.
-            path.join(parentDir, 'cordova-plugin-test-framework'),
-            path.join(parentDir, 'cordova-mobile-spec', 'cordova-plugin-echo'),
-            path.join(parentDir, 'cordova-mobile-spec', 'cordova-plugin-mobilespec-tests')
-        ].filter(p => existsSync(p)).map(p => `cordova plugin add ${p}`)
-    ];
+    const packagesToInstall = [];
 
+    // The user selected platforms will be added including their tests if existing.
+    for (const p of platforms) {
+        const platformDir = path.join(parentDir, p);
+        const platformTestDir = path.join(platformDir, 'tests', 'mobilespec');
+        packagesToInstall.push(`cordova platform add ${platformDir}`);
+        if (existsSync(platformTestDir)) {
+            packagesToInstall.push(`cordova plugin add ${platformTestDir}`);
+        }
+    }
+    // Adding internal plugins
+    for (const p of INTERNAL_PLUGINS) {
+        packagesToInstall.push(`cordova plugin add ${p}`);
+    }
     // The user selected plugins will be added including their tests.
     for (const p of plugins) {
         packagesToInstall.push(`cordova plugin add ${path.join(parentDir, p)}`);
