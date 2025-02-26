@@ -68,11 +68,13 @@ const print = {
     process: message => { console.log(styleText(['cyan', 'bold'], `\n🔵  ${message}`)); }
 };
 
-// MARK: Directory Path Setup
+// MARK: Directory Path & Variables Setup
+
+const projectName = 'mobilespecTestApp';
 
 // The parent directory is the workspace containing all Cordova repositories. Including cordova-mobile-spec.
 const parentDir = process.env.CORDOVA_WORKSPACE || path.join(__dirname, '..');
-const projectDir = path.join(parentDir, 'mobilespec');
+const projectDir = path.join(parentDir, projectName);
 const projectWwwDir = path.join(projectDir, 'www');
 
 if (existsSync(projectDir)) {
@@ -229,11 +231,11 @@ async function runCmdSequentially (commands, options) {
 
     // Create Cordova App
     try {
-        const createCmd = 'cordova create mobilespec org.apache.cordova.mobilespec mobilespec';
+        const createCmd = `cordova create ${projectName} org.apache.cordova.mobilespec ${projectName}`;
         print.process(createCmd);
         await runCmd(createCmd, { cwd: parentDir });
     } catch (error) {
-        print.error('An error occurred while creating mobilespec project.', error);
+        print.error('An error occurred while creating the mobilespec project.', error);
     }
 
     // Run npm install on each selected platform. "cordova.js" is needed and most platforms auto generate.
