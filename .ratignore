@@ -1,3 +1,4 @@
 jasmine.*
 html
 uubench.js
+*.properties
