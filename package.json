@@ -1,0 +1,25 @@
+{
+  "name": "@cordova/mobile-spec",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Create a Mobile Spec Cordova project for manual testing",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint index.js"
+  },
+  "bin": {
+    "mobilespec": "index.js"
+  },
+  "keywords": [
+    "cordova",
+    "testing"
+  ],
+  "author": "Apache Software Foundation",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@cordova/eslint-config": "^5.1.0"
+  },
+  "dependencies": {
+    "inquirer": "^12.4.2"
+  }
+}
