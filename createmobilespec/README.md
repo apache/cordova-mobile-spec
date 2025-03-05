@@ -60,30 +60,32 @@ and a way to use the platform-centered workflow instead of the CLI.
 
 ## Usage
 
-The `createmobilespec.js` script also needs to be invoked from the "main" folder you created before (`cordova`):
+The `createmobilespec.js` script also needs to be invoked from the "main" folder you created before (`cordova`).
 
-    cordova-mobile-spec/createmobilespec/createmobilespec.js
+To show formal usage (online help):
+
+    node ./cordova-mobile-spec/createmobilespec/createmobilespec.js --help
+
+The `node` prefix on all commands is only needed on Windows, may be removed on other systems. For example:
+
+    ./cordova-mobile-spec/createmobilespec/createmobilespec.js --help
 
 On Windows, prefix all commands with `node`:
 
     node cordova-mobile-spec/createmobilespec/createmobilespec.js
-
-To see the options available in the script, run it with the `-h` option to print the online help.
-
-    (node) cordova-mobile-spec/createmobilespec/createmobilespec.js -h
-
-If anything is going wrong and the existing output does not help, add the `--debug` parameter:
-
-    (node) cordova-mobile-spec/createmobilespec/createmobilespec.js --debug
 
 ### Create the App
 
 Caution: If the generated `mobilespec` project already exists, it is recommended
 to delete the project before proceeding.
 
-To for example create the app for the Android platform, run:
+To create the app for the Android platform, for example, run:
 
-    (node) cordova-mobile-spec/createmobilespec/createmobilespec.js --android
+    node ./cordova-mobile-spec/createmobilespec/createmobilespec.js --android
+
+In case anything is going wrong and the existing output does not help, add the `--debug` parameter:
+
+    node ./cordova-mobile-spec/createmobilespec/createmobilespec.js --android --debug
 
 ### Run the App
 
