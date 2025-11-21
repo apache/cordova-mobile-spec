@@ -15,5 +15,5 @@
 # specific language governing permissions and limitations
 # under the License.
 
-node_modules
-createmobilespec/package-lock.json
+# Empty for the release audit workflow.
+# The `license-config` is required even if there are no custom configs
