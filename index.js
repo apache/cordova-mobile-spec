@@ -261,12 +261,14 @@ async function runCmdSequentially (commands, options) {
     await runCmdSequentially(packagesToInstall, { cwd: projectDir });
 
     // Build Cordova-Android once to ensure gradle wrapper is created
-    try {
-        const buildAndroid = 'cordova build android';
-        print.process(buildAndroid);
-        await runCmd(buildAndroid, { cwd: projectDir });
-    } catch (error) {
-        print.error('An error occurred while building the Android project.', error);
+    if (platforms.includes('cordova-android')) {
+        try {
+            const buildAndroid = 'cordova build android';
+            print.process(buildAndroid);
+            await runCmd(buildAndroid, { cwd: projectDir });
+        } catch (error) {
+            print.error('An error occurred while building the Android project.', error);
+        }
     }
 
     print.success('Successfully created and mobile spec project.');
