@@ -1,6 +1,6 @@
 {
   "name": "@cordova/mobile-spec",
-  "version": "1.0.0",
+  "version": "2.0.0-dev.0",
   "private": true,
   "description": "Create a Mobile Spec Cordova project for manual testing",
   "main": "index.js",
