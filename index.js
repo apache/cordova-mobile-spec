@@ -219,6 +219,11 @@ async function runCmdSequentially (commands, options) {
             packagesToInstall.push(`cordova plugin add ${platformTestDir}`);
         }
     }
+
+    // Make sure to npm install "cordova-plugin-test-framework"
+    print.process(`Installing npm packages for cordova-plugin-test-framework.`);
+    await runCmd('npm install', { cwd: testFrameworkPluginDir });
+
     // Adding internal plugins
     for (const p of INTERNAL_PLUGINS) {
         packagesToInstall.push(`cordova plugin add ${p}`);
