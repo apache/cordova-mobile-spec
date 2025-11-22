@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-node_modules
-.git
+.git/
+node_modules/
+www/benchmarks/uubench.js
 VERSION
-uubench.js
