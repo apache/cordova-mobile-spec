@@ -20,6 +20,6 @@
     "@cordova/eslint-config": "^6.0.1"
   },
   "dependencies": {
-    "inquirer": "^13.0.1"
+    "inquirer": "^14.0.2"
   }
 }
